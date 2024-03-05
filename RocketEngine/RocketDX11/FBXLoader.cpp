@@ -46,6 +46,8 @@ namespace Rocket::Core
 		Assimp::Importer importer;
 
 		const aiScene* _scene = importer.ReadFile(path,
+			//aiProcess_PreTransformVertices |
+
 			aiProcess_Triangulate |
 			aiProcess_ConvertToLeftHanded |
 			aiProcess_CalcTangentSpace);
@@ -110,7 +112,7 @@ namespace Rocket::Core
 
 	void FBXLoader::ProcessNode(Node* node, aiNode* ainode, const aiScene* scene)
 	{
-		node->transformMatrix = AIMatrix4x4ToXMMatrix(ainode->mTransformation);
+		node->transformMatrix = AIMatrix4x4ToXMMatrix(ainode->mTransformation.Transpose());
 
 		for (UINT i = 0; i < ainode->mNumMeshes; ++i)
 		{
@@ -123,6 +125,7 @@ namespace Rocket::Core
 		{
 			Node* newNode = new Node();
 			node->children.emplace_back(newNode);
+			newNode->parent = node;
 
 			ProcessNode(newNode, ainode->mChildren[i], scene);
 		}

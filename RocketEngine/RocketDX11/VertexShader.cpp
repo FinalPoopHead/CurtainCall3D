@@ -2,6 +2,8 @@
 #include <fstream>
 #include <vector>
 #include <DirectXMath.h>
+#include <d3dcompiler.h>
+#pragma comment(lib, "D3DCompiler.lib")
 
 #include "VertexShader.h"
 #include "GraphicsMacro.h"
@@ -21,7 +23,7 @@ namespace Rocket::Core
 		_vertexShader.Reset();
 	}
 
-	void VertexShader::Initialize(ID3D11Device* device, const std::string& path)
+	void VertexShader::Initialize(ID3D11Device* device, const std::wstring& path)
 	{
 		CreateShaderAndInputLayout(device, path);
 		CreateMatrixBuffer(device);
@@ -48,23 +50,37 @@ namespace Rocket::Core
 		return _matrixBuffer.GetAddressOf();
 	}
 
-	void VertexShader::CreateShaderAndInputLayout(ID3D11Device* device, const std::string& path)
+	void VertexShader::CreateShaderAndInputLayout(ID3D11Device* device, const std::wstring& path)
 	{
-		std::ifstream vsFile(path, std::ios::binary);
-		std::vector<char> vsData = { std::istreambuf_iterator<char>(vsFile), std::istreambuf_iterator<char>() };
+// 		std::ifstream vsFile(path, std::ios::binary);
+// 		std::vector<char> vsData = { std::istreambuf_iterator<char>(vsFile), std::istreambuf_iterator<char>() };
 
-		device->CreateVertexShader(vsData.data(), vsData.size(), nullptr, &_vertexShader);
+// 		device->CreateVertexShader(vsData.data(), vsData.size(), nullptr, &_vertexShader);
+// 
+// 		assert(_vertexDesc != nullptr);
+// 
+// 		HR(device->CreateInputLayout(_vertexDesc, _numElements, vsData.data(), vsData.size(), &_inputLayout));
 
-// 		// Create the vertex input layout.
-// 		D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
-// 		{
-// 			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-// 			{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
-// 		};
+		UINT flags1 = 0;
+#if defined(_DEBUG) || defined(_DEBUG)
+		flags1 |= D3DCOMPILE_DEBUG;
+		flags1 |= D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
 
-		assert(_vertexDesc != nullptr);
+		ID3D10Blob* vertexShaderBlob = nullptr;
+		HRESULT hResult = D3DCompileFromFile(path.c_str(), nullptr, nullptr, "main", "vs_5_0", flags1, 0, &vertexShaderBlob, nullptr);
+		if (hResult != S_OK)
+		{
+			assert(false);
+		}
 
-		HR(device->CreateInputLayout(_vertexDesc, _numElements, vsData.data(), vsData.size(), &_inputLayout));
+		hResult = device->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), nullptr, &_vertexShader);
+		if (hResult != S_OK)
+		{
+			assert(false);
+		}
+
+		HR(device->CreateInputLayout(_vertexDesc, _numElements, vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &_inputLayout));
 	}
 
 	void VertexShader::CreateMatrixBuffer(ID3D11Device* device)

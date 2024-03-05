@@ -44,9 +44,9 @@ PixelInputType main(VertexInputType input)
     
     matrix nodeTransformMatrix = nodeTransform[input.nodeIndex];
     
-    //output.position = mul(input.position, mul(nodeTransformMatrix, worldMatrix));
+    output.position = mul(input.position, mul(nodeTransformMatrix, worldMatrix));
     //output.position = mul(input.position, worldMatrix);
-    output.position = mul(input.position, nodeTransformMatrix);
+    //output.position = mul(input.position, nodeTransformMatrix);
     output.position = mul(output.position, viewMatrix);
     output.position = mul(output.position, projectionMatrix);
     

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <wrl.h>
 #include "IShader.h"
 #include "GraphicsStruct.h"
@@ -12,7 +12,7 @@ namespace Rocket::Core
 		~VertexShader();
 
 	public:
-		virtual void Initialize(ID3D11Device* device, const std::string& path) override;
+		virtual void Initialize(ID3D11Device* device, const std::wstring& path) override;
 
 	public:
 		ID3D11VertexShader* GetVertexShader() const;
@@ -27,7 +27,7 @@ namespace Rocket::Core
 		VertexType GetVertexType() const;
 
 	private:
-		void CreateShaderAndInputLayout(ID3D11Device* device, const std::string& path);
+		void CreateShaderAndInputLayout(ID3D11Device* device, const std::wstring& path);
 		void CreateMatrixBuffer(ID3D11Device* device);
 		void CreateSamplerState(ID3D11Device* device);
 

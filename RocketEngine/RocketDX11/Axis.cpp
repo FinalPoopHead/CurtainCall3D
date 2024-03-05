@@ -72,7 +72,7 @@ namespace Rocket::Core
 		// 렌더스테이트
 		deviceContext->RSSetState(_renderState.Get());
 
-		deviceContext->DrawIndexed(40, 0, 0);
+		deviceContext->DrawIndexed(6, 0, 0);
 	}
 
 	void Axis::BuildGeometryBuffers(ID3D11Device* device)

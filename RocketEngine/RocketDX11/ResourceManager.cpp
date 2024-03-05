@@ -51,12 +51,14 @@ namespace Rocket::Core
 				{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 			};
 			colorVS->SetVertexDesc(colorDesc, ARRAYSIZE(colorDesc));
-			colorVS->Initialize(_device.Get(), "Resources/Shaders/ColorVS.cso");
+			//colorVS->Initialize(_device.Get(), "Resources/Shaders/ColorVS.cso");
+			colorVS->Initialize(_device.Get(), L"RocketDX11/ColorVS.hlsl");
 			colorVS->SetVertexType(VertexType::COLOR_VERTEX);
 			_vertexShaders["ColorVS"] = colorVS;
 
 			PixelShader* colorPS = new PixelShader();
-			colorPS->Initialize(_device.Get(), "Resources/Shaders/ColorPS.cso");
+			//colorPS->Initialize(_device.Get(), L"Resources/Shaders/ColorPS.cso");
+			colorPS->Initialize(_device.Get(), L"RocketDX11/ColorPS.hlsl");
 			_pixelShaders["ColorPS"] = colorPS;
 		}
 
@@ -69,12 +71,14 @@ namespace Rocket::Core
 				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 			};
 			textureVS->SetVertexDesc(textureDesc, ARRAYSIZE(textureDesc));
-			textureVS->Initialize(_device.Get(), "Resources/Shaders/TextureVS.cso");
+			//textureVS->Initialize(_device.Get(), "Resources/Shaders/TextureVS.cso");
+			textureVS->Initialize(_device.Get(), L"RocketDX11/TextureVS.hlsl");
 			textureVS->SetVertexType(VertexType::TEXTURE_VERTEX);
 			_vertexShaders["TextureVS"] = textureVS;
 
 			PixelShader* texturePS = new PixelShader();
-			texturePS->Initialize(_device.Get(), "Resources/Shaders/TexturePS.cso");
+			//texturePS->Initialize(_device.Get(), L"Resources/Shaders/TexturePS.cso");
+			texturePS->Initialize(_device.Get(), L"RocketDX11/TexturePS.hlsl");
 			_pixelShaders["TexturePS"] = texturePS;
 		}
 
@@ -88,12 +92,14 @@ namespace Rocket::Core
 				{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
 			};
 			lightVS->SetVertexDesc(lightDesc, ARRAYSIZE(lightDesc));
-			lightVS->Initialize(_device.Get(), "Resources/Shaders/LightVS.cso");
+			//lightVS->Initialize(_device.Get(), "Resources/Shaders/LightVS.cso");
+			lightVS->Initialize(_device.Get(), L"RocketDX11/LightVS.hlsl");
 			lightVS->SetVertexType(VertexType::LIGHT_VERTEX);
 			_vertexShaders["LightVS"] = lightVS;
 
 			PixelShader* lightPS = new PixelShader();
-			lightPS->Initialize(_device.Get(), "Resources/Shaders/LightPS.cso");
+			//lightPS->Initialize(_device.Get(), L"Resources/Shaders/LightPS.cso");
+			lightPS->Initialize(_device.Get(), L"RocketDX11/LightPS.hlsl");
 			_pixelShaders["LightPS"] = lightPS;
 		}
 
@@ -109,12 +115,14 @@ namespace Rocket::Core
 				{"BLENDINDICES", 0, DXGI_FORMAT_R32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
 			};
 			staticMeshVS->SetVertexDesc(staticMeshDesc, ARRAYSIZE(staticMeshDesc));
-			staticMeshVS->Initialize(_device.Get(), "Resources/Shaders/StaticMeshVS.cso");
+			//staticMeshVS->Initialize(_device.Get(), "Resources/Shaders/StaticMeshVS.cso");
+			staticMeshVS->Initialize(_device.Get(), L"RocketDX11/StaticMeshVS.hlsl");
 			staticMeshVS->SetVertexType(VertexType::VERTEX);
 			_vertexShaders["StaticMeshVS"] = staticMeshVS;
 
 			PixelShader* staticMeshPS = new PixelShader();
-			staticMeshPS->Initialize(_device.Get(), "Resources/Shaders/StaticMeshPS.cso");
+			//staticMeshPS->Initialize(_device.Get(), L"Resources/Shaders/StaticMeshPS.cso");
+			staticMeshPS->Initialize(_device.Get(), L"RocketDX11/StaticMeshPS.hlsl");
 			_pixelShaders["StaticMeshPS"] = staticMeshPS;
 		}
 

@@ -71,7 +71,7 @@ namespace Rocket::Core
 			DirectX::XMMATRIX v = DirectX::XMMatrixTranspose(view);
 			DirectX::XMMATRIX p = DirectX::XMMatrixTranspose(proj);
 
-			matrixBufferDataPtr->world = w;
+			matrixBufferDataPtr->world = _worldTM;
 			matrixBufferDataPtr->view = v;
 			matrixBufferDataPtr->projection = p;
 
@@ -184,7 +184,7 @@ namespace Rocket::Core
 
 	void MeshRenderer::SetNodeBuffer(Node* node, UINT& index, NodeBufferType* nodeBuffer)
 	{
-		nodeBuffer->transformMatrix[node->bone.id] = node->transformMatrix;
+		nodeBuffer->transformMatrix[node->bone.id] = DirectX::XMMatrixTranspose(node->GetWorldMatrix());
 		index++;
 		for (int i = 0; i < node->children.size(); i++)
 		{
