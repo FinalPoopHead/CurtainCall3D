@@ -12,7 +12,6 @@
 #pragma comment(lib, "dxguid.lib")
 #endif
 
-
 #pragma region testIncludes
 #include "TestBuilder.h"
 #pragma endregion

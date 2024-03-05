@@ -8,8 +8,9 @@
 #include <dxgidebug.h>
 #endif
 
-
 //#pragma comment(lib, "D3DCompiler.lib")
+
+
 template<typename T>
 using comptr = Microsoft::WRL::ComPtr<T>;
 
@@ -26,13 +27,14 @@ flt::DX11VertexShader* flt::DX11VertexShaderBuilder::build() const
 		return nullptr;
 	}
 
-	UINT flags1 = 0;
+	UINT compileFlag = 0;
 #if defined(_DEBUG) || defined(_DEBUG)
-	flags1 |= D3DCOMPILE_DEBUG;
+	compileFlag |= D3DCOMPILE_DEBUG;
+	compileFlag |= D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif
 
 	comptr<ID3D10Blob> vertexShaderBlob = nullptr;
-	HRESULT hResult = D3DCompileFromFile(filePath.c_str(), nullptr, nullptr, "main", "vs_5_0", flags1, 0, &vertexShaderBlob, nullptr);
+	HRESULT hResult = D3DCompileFromFile(filePath.c_str(), nullptr, nullptr, "main", "vs_5_0", compileFlag, 0, &vertexShaderBlob, nullptr);
 	if (hResult != S_OK)
 	{
 		ASSERT(false, "버텍스 쉐이더 컴파일 실패");
