@@ -160,9 +160,6 @@
     <ProjectReference Include="..\FloaterUtil\FloaterUtil.vcxproj">
       <Project>{cb145f87-3fe0-445e-bb70-582b466cbe74}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\ZeldaGraphicsAdapter\ZeldaGraphicsAdapter.vcxproj">
-      <Project>{80add0b6-e8be-4e79-b9ee-c628bbe3243d}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

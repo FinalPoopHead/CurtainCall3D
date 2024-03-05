@@ -29,7 +29,7 @@
 #include "../FloaterMath/include/Vector2f.h"
 #include "../FloaterMath/include/Vector3f.h"
 
-#include "../ZeldaGraphicsAdapter/include/IZeldaRendererAdapter.h"
+#include <windows.h>
 
 #pragma warning(push)
 #pragma warning(disable: 4717)
