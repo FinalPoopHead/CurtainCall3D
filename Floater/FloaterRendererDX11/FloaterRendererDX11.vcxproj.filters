@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="RendererResource">
+      <UniqueIdentifier>{804008d5-4768-45b4-86e5-d011f14d2ab8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{30128534-0d42-46fc-a73f-a0efac546311}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL">
+      <UniqueIdentifier>{ee09bdfc-7383-4e4b-a906-3c9092fc1dd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test">
+      <UniqueIdentifier>{6ce95901-f138-43f7-8884-34d64ec46fa5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{29a520e2-db3b-4489-b642-91d1a92a1700}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Font">
+      <UniqueIdentifier>{7febb21a-a802-4040-a664-5001c346adaf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DX11Node.cpp">
+      <Filter>RendererResource</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonMath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11PixelShader.cpp">
+      <Filter>RendererResource</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11VertexShader.cpp">
+      <Filter>RendererResource</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11Mesh.cpp">
+      <Filter>RendererResource</Filter>
+    </ClCompile>
+    <ClCompile Include="TestBuilder.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="RendererDX11.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="CreateRenderer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Font.cpp">
+      <Filter>Font</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DX11Node.h">
+      <Filter>RendererResource</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11Mesh.h">
+      <Filter>RendererResource</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>RendererResource</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>RendererResource</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11PixelShader.h">
+      <Filter>RendererResource</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11VertexShader.h">
+      <Filter>RendererResource</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11VSConstantBuffer.h">
+      <Filter>RendererResource</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CreateRenderer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11PSConstantBuffer.h">
+      <Filter>RendererResource</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestBuilder.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="RendererDX11.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Font.h">
+      <Filter>Font</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11Entity.h">
+      <Filter>RendererResource</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11Animation.h">
+      <Filter>RendererResource</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="CubeVS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="CubePS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="VertexShader.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="PixelShader.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="BackBufferVertexShader.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="BackBufferPixelShader.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="DebugDataVertexShader.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="DebugDataPixelShader.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="GridVS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="GridPS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="FloaterRendererDX11.natvis">
+      <Filter>include</Filter>
+    </Natvis>
+  </ItemGroup>
+</Project>

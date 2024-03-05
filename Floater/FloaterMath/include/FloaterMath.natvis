@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name ="flt::Vector2f">
+		<DisplayString>{x}, {y}</DisplayString>
+		<Expand>
+			<Item Name ="[x]">x</Item>
+			<Item Name ="[y]">y</Item>
+		</Expand>
+	</Type>
+
+	<Type Name ="flt::Vector3f">
+		<DisplayString>{x}, {y}, {z}</DisplayString>
+		<Expand>
+			<Item Name ="[x]">x</Item>
+			<Item Name ="[y]">y</Item>
+			<Item Name ="[z]">z</Item>
+		</Expand>
+	</Type>
+
+	<Type Name ="flt::Vector4f">
+		<DisplayString>{x}, {y}, {z}, {w}</DisplayString>
+		<Expand>
+			<Item Name ="[x]">x</Item>
+			<Item Name ="[y]">y</Item>
+			<Item Name ="[z]">z</Item>
+			<Item Name ="[w]">w</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="flt::Quaternion">
+		<DisplayString>{x}, {y}, {z}, {w}</DisplayString>
+		<Expand>
+			<Item Name ="[x]">x</Item>
+			<Item Name ="[y]">y</Item>
+			<Item Name ="[z]">z</Item>
+			<Item Name ="[w]">w</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="flt::Matrix3f">
+		<Expand>
+			<Item Name="[0]">v[0]</Item>
+			<Item Name="[1]">v[1]</Item>
+			<Item Name="[2]">v[2]</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="flt::Matrix4f">
+		<DisplayString>4x4 matrix</DisplayString>
+		<Expand>
+			<Item Name="[0]">v[0]</Item>
+			<Item Name="[1]">v[1]</Item>
+			<Item Name="[2]">v[2]</Item>
+			<Item Name="[3]">v[3]</Item>
+		</Expand>
+	</Type>
+</AutoVisualizer>

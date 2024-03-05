@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="flt::RendererDX11">
+		<DisplayString>isRun = {_isRunRenderEngine}</DisplayString>
+		<Expand>
+			<Item Name="[useVsync]">_useVsync</Item>
+			<Item Name="[CameraNum]">_cameras.size()</Item>
+			<Item Name="[NodeNum]">_renderableObjects.size()</Item>
+		</Expand>
+	</Type>
+</AutoVisualizer>

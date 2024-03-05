@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="DataStructure">
+      <UniqueIdentifier>{63da3ed2-0eae-46d3-8b6b-408d7ceb5088}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{2a0d728d-5464-425b-a2d1-5bb9f7cacd1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test">
+      <UniqueIdentifier>{2b44496f-4b1c-4535-9e7e-3b2105e15481}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Allocator.h">
+      <Filter>DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RBTree.h">
+      <Filter>DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SparseSet.h">
+      <Filter>DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Vector.h">
+      <Filter>DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ConvString.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Timer.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FloaterMacro.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FloaterType.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="TesterRBTree.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HashTable.h">
+      <Filter>DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UUID.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FixedSizeMemoryPool.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="TesterFixedSizeMemoryPool.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ITester.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Hash.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ConvString.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="TesterRBTree.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="FixedSizeMemoryPool.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="TesterFixedSizeMemoryPool.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

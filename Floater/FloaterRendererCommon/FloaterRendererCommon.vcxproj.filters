@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Loader">
+      <UniqueIdentifier>{87087e9b-2cfb-4026-9526-2499e9fdb68b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Factory">
+      <UniqueIdentifier>{a120e28c-3f92-489b-97b9-9468d33a315d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RawData">
+      <UniqueIdentifier>{d6b8fb00-175e-4740-bb81-0d86d1a5ea02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Loader\VertexData">
+      <UniqueIdentifier>{ab203090-c065-4c5d-93cf-3d27bf80675f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Loader\impl">
+      <UniqueIdentifier>{17584974-1792-4f76-b154-c89e2b6efe51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Loader\impl\Assimp">
+      <UniqueIdentifier>{67daba17-d3cc-499a-85d8-48567954a0e2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Transform.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Camera.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IRenderer.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IBuilder.h">
+      <Filter>Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resource.h">
+      <Filter>Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResourceMgr.h">
+      <Filter>Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RawNode.h">
+      <Filter>RawData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RawMesh.h">
+      <Filter>RawData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RawAnimation.h">
+      <Filter>RawData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RawSkin.h">
+      <Filter>RawData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RawShader.h">
+      <Filter>RawData</Filter>
+    </ClInclude>
+    <ClInclude Include="CoordSystem.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexNormalData.h">
+      <Filter>Loader\VertexData</Filter>
+    </ClInclude>
+    <ClInclude Include="VertedDataLayer.h">
+      <Filter>Loader\VertexData</Filter>
+    </ClInclude>
+    <ClInclude Include="FBXLoader.h">
+      <Filter>Loader\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="GLTFLoader.h">
+      <Filter>Loader\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ModelLoader.h">
+      <Filter>Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RawMaterial.h">
+      <Filter>RawData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RawTexture.h">
+      <Filter>RawData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RawScene.h">
+      <Filter>RawData</Filter>
+    </ClInclude>
+    <ClInclude Include="AssimpLoader.h">
+      <Filter>Loader\impl\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="AssimpRawMeshBuilder.h">
+      <Filter>Loader\impl\Assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rect.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TransformOwner.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RawAnimationClip.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RawSkeleton.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Transform.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceMgr.cpp">
+      <Filter>Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="RawNode.cpp">
+      <Filter>RawData</Filter>
+    </ClCompile>
+    <ClCompile Include="CoordSystem.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexNormalData.cpp">
+      <Filter>Loader\VertexData</Filter>
+    </ClCompile>
+    <ClCompile Include="FBXLoader.cpp">
+      <Filter>Loader\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="GLTFLoader.cpp">
+      <Filter>Loader\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelLoader.cpp">
+      <Filter>Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="RawMaterial.cpp">
+      <Filter>RawData</Filter>
+    </ClCompile>
+    <ClCompile Include="RawTexture.cpp">
+      <Filter>RawData</Filter>
+    </ClCompile>
+    <ClCompile Include="RawScene.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="RawMesh.cpp">
+      <Filter>RawData</Filter>
+    </ClCompile>
+    <ClCompile Include="AssimpLoader.cpp">
+      <Filter>Loader\impl\Assimp</Filter>
+    </ClCompile>
+    <ClCompile Include="AssimpRawMeshBuilder.cpp">
+      <Filter>Loader\impl\Assimp</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
