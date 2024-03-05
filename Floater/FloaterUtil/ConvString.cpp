@@ -1,11 +1,8 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 #include "./include/convString.h"
 #include <atlstr.h>
-
-#include <format>
-#include <locale>	
-#include <codecvt>
-
+//#include <format>
+//#include <locale>
 
 std::wstring flt::ConvertToWstring(const std::string& str)
 {
