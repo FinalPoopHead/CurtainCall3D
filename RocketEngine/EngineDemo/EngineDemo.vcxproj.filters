@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="EntryPoint">
+      <UniqueIdentifier>{3fb451f6-a165-446e-adfb-67a5d9406031}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Client">
+      <UniqueIdentifier>{9735de1c-aa77-47a6-b280-fef5ebee24db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneView">
+      <UniqueIdentifier>{488a04f0-75d4-4fa1-8370-7bdbfb209124}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ClientComponent">
+      <UniqueIdentifier>{c3570028-8cd8-4a12-86bf-94db1f0912ec}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="WinMain.cpp">
+      <Filter>EntryPoint</Filter>
+    </ClCompile>
+    <ClCompile Include="Client.cpp">
+      <Filter>Client</Filter>
+    </ClCompile>
+    <ClCompile Include="TestScene.cpp">
+      <Filter>SceneView</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugCameraMove.cpp">
+      <Filter>ClientComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerController.cpp">
+      <Filter>ClientComponent</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Client.h">
+      <Filter>Client</Filter>
+    </ClInclude>
+    <ClInclude Include="TestScene.h">
+      <Filter>SceneView</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugCameraMove.h">
+      <Filter>ClientComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerController.h">
+      <Filter>ClientComponent</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
