@@ -11,6 +11,6 @@ namespace flt
 	{
 		std::vector<RawNode*> nodes;
 		std::vector<RawMaterial*> materials;
-		std::vector<Resource<RawMesh>> meshes;
+		std::vector<RawMesh*> meshes;
 	};
 }

@@ -5,7 +5,6 @@ flt::RawNode::RawNode(const std::wstring& name) :
 	meshes(),
 	skeleton(nullptr),
 	camera(nullptr),
-	boneIndex(-1),
 	parent(nullptr),
 	children()
 {

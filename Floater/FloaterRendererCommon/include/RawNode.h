@@ -20,15 +20,13 @@ namespace flt
 		~RawNode();
 
 		std::wstring name;
-		std::vector<Resource<RawMesh>> meshes;
+		//std::vector<Resource<RawMesh>> meshes;
+		std::vector<RawMesh*> meshes;
 		RawSkeleton* skeleton;
+		RawAnimationClip* animationClip;
 		Camera* camera;
-
-		int boneIndex;
 
 		RawNode* parent;
 		std::vector<RawNode*> children;
-
-		bool isDraw;
 	};
 }

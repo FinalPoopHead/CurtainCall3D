@@ -119,13 +119,7 @@ int main()
 
 		//std::filesystem::path currPath = std::filesystem::current_path();
 
-		//loader.Load(L"..\\x64\\fbx\\PBR_BasicShader.blend");
-
-
 		loader.Load(filePath, &rawScene);
-		//loader.Load(zUpYForward);
-		//loader.Load(yUpZForward);
-		//loader.Load(xUpYForward);
 
 	}
 #pragma endregion
@@ -148,22 +142,22 @@ int main()
 	cameraNode.transform.SetRotation(0.0f, 0.0f, 0.0f);
 	cameraNode.camera = new flt::Camera(&cameraNode.transform);
 
-	flt::RendererObject cameraObject(cameraNode, isDraw, L"testCamera");
-	auto cameraID = renderer->RegisterObject(cameraObject);
+	//flt::RendererObject cameraObject(cameraNode, isDraw, L"testCamera");
+	//auto cameraID = renderer->RegisterObject(cameraObject);
 
 
-	flt::RawNode cubeNode(L"testNode");
-	cubeNode.transform.SetPosition(0.0f, 0.0f, 0.7f);
-	cubeNode.transform.SetScale(0.3f, 0.3f, 0.3f);
+	//flt::RawNode cubeNode(L"testNode");
+	//cubeNode.transform.SetPosition(0.0f, 0.0f, 0.7f);
+	//cubeNode.transform.SetScale(0.3f, 0.3f, 0.3f);
 
-	flt::RendererObject fbxObject(*rawScene.nodes[1], isDraw, L"test1");
-	auto objectID0 = renderer->RegisterObject(fbxObject);
-	rawScene.nodes[1]->transform.SetScale(1.f, 1.f, 1.f);
-	rawScene.nodes[1]->transform.SetPosition(0.f, 0.f, 30.f);
+	//flt::RendererObject fbxObject(*rawScene.nodes[1], isDraw, L"test1");
+	//auto objectID0 = renderer->RegisterObject(fbxObject);
+	//rawScene.nodes[1]->transform.SetScale(1.f, 1.f, 1.f);
+	//rawScene.nodes[1]->transform.SetPosition(0.f, 0.f, 30.f);
 
-	flt::RendererObject renderable(cubeNode, isDraw, L"cube");
-	auto objectID1 = renderer->RegisterObject(renderable);
-	cubeNode.transform.SetPosition(0.0f, 0.0f, 0.0f);
+	//flt::RendererObject renderable(cubeNode, isDraw, L"cube");
+	//auto objectID1 = renderer->RegisterObject(renderable);
+	//cubeNode.transform.SetPosition(0.0f, 0.0f, 0.0f);
 
 	while (true)
 	{
@@ -172,9 +166,9 @@ int main()
 			break;
 		}
 
-		renderer->Render(1.0f);
-		rawScene.nodes[1]->transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, 0.01f);
-		cubeNode.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, -0.1f);
+		//renderer->Render(1.0f);
+		//rawScene.nodes[1]->transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, 0.01f);
+		//cubeNode.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, -0.1f);
 		{
 			auto keyData = platform.GetKey(flt::KeyCode::mouseLButton);
 			if (keyData)
@@ -183,11 +177,25 @@ int main()
 				//platform.ShowCursor(isShowCurser);
 				std::cout << "LL " << keyData.keyTime << " " << keyData.x << " " << keyData.y << std::endl;
 			}
+			
+			keyData = platform.GetKey(flt::KeyCode::w);
+			if (keyData)
+			{
+				std::cout << keyData.keyTime << " " << "pressed w" << std::endl;
+			}
+			keyData = platform.GetKey(flt::KeyCode::s);
+			if (keyData)
+			{
+				std::cout << keyData.keyTime << " " << "pressed s" << std::endl;
+			}
+			
+			
 			keyData = platform.GetKey(flt::KeyCode::mouseRButton);
 			float cameraSpeed = 0.1f;
 			if (keyData)
 			{
-				keyData = platform.GetKey(flt::KeyCode::w);
+
+				/*keyData = platform.GetKey(flt::KeyCode::w);
 				if (keyData)
 				{
 					std::cout << "pressed w" << std::endl;
@@ -226,14 +234,14 @@ int main()
 					flt::Vector3f euler = cameraNode.transform.GetLocalRotation().GetEuler();
 					euler.x = std::clamp(euler.x + flt::RadToDeg(keyData.y * 0.01f), -89.0f, 89.0f);
 					cameraNode.transform.SetRotation(flt::Quaternion(euler));
-				}
+				}*/
 			}
 		}
 
 		Sleep(10);
 	}
 
-	renderer->DeregisterObject(objectID0);
+	//renderer->DeregisterObject(objectID0);
 
 	//renderer->DeregisterObject(objectID1);
 	//renderer->DeregisterObject(objectID2);

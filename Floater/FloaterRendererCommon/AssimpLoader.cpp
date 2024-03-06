@@ -35,16 +35,20 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 	//	aiProcess_LimitBoneWeights;
 
 	std::string path = ConvertToString(filePath);
-	const aiScene* scene = importer.ReadFile(path, flags);
+	const aiScene* assimpScene = importer.ReadFile(path, flags);
 	size_t pos = path.find_last_of('\\');
 	std::wstring directory = ConvertToWstring(path.substr(0, pos + 1));
+
+	_nodeMap.clear();
+	_nodeBoneMap.clear();
+	_skeletonMap.clear();
 
 	// 데이터 로드 전 벡터 등 크기 조절
 	// 노드와 메쉬 등의 데이터가 떨어져있어서 두번 다시 돌면서 로드하지 않기 위해
 	// 미리 데이터들을 넣을 공간만 잡아놓기.
 	// 머테리얼
 	std::vector<RawMaterial*>& rawMaterials = outRawScene->materials;
-	const unsigned int materialCount = scene->mNumMaterials;
+	const unsigned int materialCount = assimpScene->mNumMaterials;
 	const unsigned int rawMaterialCount = (unsigned int)rawMaterials.size();
 	rawMaterials.resize(rawMaterialCount + materialCount);
 	for (unsigned int i = 0; i < materialCount; ++i)
@@ -52,17 +56,17 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 		rawMaterials[rawMaterialCount + i] = new RawMaterial();
 	}
 	// 메쉬
-	unsigned int meshCount = scene->mNumMeshes;
-	unsigned int rawMeshCount = (unsigned int)outRawScene->meshes.size();
-	std::vector<Resource<RawMesh>>& rawMeshes = outRawScene->meshes;
-	rawMeshes.resize(rawMeshCount + meshCount);
+	unsigned int meshCount = assimpScene->mNumMeshes;
+	//unsigned int rawMeshCount = (unsigned int)outRawScene->meshes.size();
+	std::vector<RawMesh*>& rawMeshes = outRawScene->meshes;
+	rawMeshes.resize(assimpScene->mNumMeshes);
 
 	// 먼저 머티리얼 로드
-	if (scene->HasMaterials())
+	if (assimpScene->HasMaterials())
 	{
 		for (unsigned int i = 0; i < materialCount; ++i)
 		{
-			aiMaterial* material = scene->mMaterials[i];
+			aiMaterial* material = assimpScene->mMaterials[i];
 
 			aiString outStr;
 
@@ -196,7 +200,7 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 		}
 	}
 
-	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+	if (!assimpScene || assimpScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !assimpScene->mRootNode)
 	{
 		auto errorStr = importer.GetErrorString();
 		ASSERT(false, errorStr);
@@ -204,65 +208,146 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 		return;
 	}
 
+
+	for (int i = 0; i < assimpScene->mNumMeshes; ++i)
+	{
+		auto mesh = assimpScene->mMeshes[i];
+		if (mesh->HasBones())
+		{
+			auto armature = mesh->mBones[0]->mArmature;
+			auto iter = _skeletonMap.find(armature);
+			if (iter == _skeletonMap.end())
+			{
+				_skeletonMap.insert({ armature, RawSkeleton{} });
+
+				auto& skeleton = _skeletonMap[armature];
+				SetSkeletonRecursive(armature, skeleton);
+				int test = 0;
+			}
+
+			for (int j = 0; j < mesh->mNumBones; ++j)
+			{
+				auto bone = mesh->mBones[j];
+				std::wstring boneNodeName = ConvertToWstring(bone->mNode->mName.C_Str());
+			}
+		}
+	}
+
+
 	// 노드 트리 구조 구축 및 노드 이름 맵핑
-	const int nodeCount = scene->mRootNode->mNumChildren;
+	const int nodeCount = assimpScene->mRootNode->mNumChildren;
 	outRawScene->nodes.reserve(nodeCount);
 	for (int i = 0; i < nodeCount; ++i)
 	{
 		outRawScene->nodes.push_back(new RawNode());
-		SetHierarchyRawNodeRecursive(scene->mRootNode->mChildren[i], outRawScene->nodes.back(), outRawScene);
+		SetHierarchyRawNodeRecursive(assimpScene->mRootNode->mChildren[i], outRawScene->nodes.back(), outRawScene);
 	}
 
+
 	// 메쉬 로드
-	if (scene->HasMeshes())
+	if (assimpScene->HasMeshes())
 	{
 		for (unsigned int i = 0; i < meshCount; ++i)
 		{
-			aiMesh* mesh = scene->mMeshes[i];
+			aiMesh* mesh = assimpScene->mMeshes[i];
 
-			AssimpRawMeshBuilder meshBuilder(mesh, filePath, i, outRawScene, _nodeMap);
+			//AssimpRawMeshBuilder meshBuilder(mesh, filePath, i, outRawScene, _nodeMap);
+			//rawMeshes[i].Set(meshBuilder);
 
-			rawMeshes[i].Set(meshBuilder);
+			rawMeshes[i] = new(std::nothrow) RawMesh();
+			ASSERT(rawMeshes[i], "메모리 할당 실패");
 
-			// 본 데이터
+			int vertexCount = mesh->mNumVertices;
+			rawMeshes[i]->vertices.resize(vertexCount);
+
+			// 버텍스 별 데이터
+			if (mesh->HasPositions())
+			{
+				for (int j = 0; j < vertexCount; ++j)
+				{
+					rawMeshes[i]->vertices[j].pos.x = mesh->mVertices[j].x;
+					rawMeshes[i]->vertices[j].pos.y = mesh->mVertices[j].y;
+					rawMeshes[i]->vertices[j].pos.z = mesh->mVertices[j].z;
+				}
+			}
+
+			if (mesh->HasNormals())
+			{
+				for (int j = 0; j < vertexCount; ++j)
+				{
+					rawMeshes[i]->vertices[j].normal.x = mesh->mNormals[j].x;
+					rawMeshes[i]->vertices[j].normal.y = mesh->mNormals[j].y;
+					rawMeshes[i]->vertices[j].normal.z = mesh->mNormals[j].z;
+				}
+			}
+
+			if (mesh->HasTangentsAndBitangents())
+			{
+				for (int j = 0; j < vertexCount; ++j)
+				{
+					rawMeshes[i]->vertices[j].tangent.x = mesh->mTangents[j].x;
+					rawMeshes[i]->vertices[j].tangent.y = mesh->mTangents[j].y;
+					rawMeshes[i]->vertices[j].tangent.z = mesh->mTangents[j].z;
+
+					rawMeshes[i]->vertices[j].binormal.x = mesh->mBitangents[j].x;
+					rawMeshes[i]->vertices[j].binormal.y = mesh->mBitangents[j].y;
+					rawMeshes[i]->vertices[j].binormal.z = mesh->mBitangents[j].z;
+				}
+			}
+
+			for (int j = 0; j < vertexCount; ++j)
+			{
+				for (int k = 0; k < AI_MAX_NUMBER_OF_TEXTURECOORDS; ++k)
+				{
+					if (!mesh->HasTextureCoords(k))
+					{
+						continue;
+					}
+
+					int texCoordCount = mesh->mNumUVComponents[k];
+					ASSERT(texCoordCount == 2, "텍스쳐 좌표가 2개가 아닙니다.");
+
+					rawMeshes[i]->vertices[j].uvs[k].x = mesh->mTextureCoords[k][j].x;
+					rawMeshes[i]->vertices[j].uvs[k].y = mesh->mTextureCoords[k][j].y;
+				}
+			}
+
+			// 본 데이터 내가 들고있는 skeleton 구조체의 boneindex와 매핑을 해야함.
 			if (mesh->HasBones())
 			{
+				//RawSkeleton* skeleton = new RawSkeleton();
 
-				RawSkeleton* skeleton = new RawSkeleton();
+				////skeleton->rootBoneIndex = rootBoneNode->boneIndex;
 
-				// 루트 본 찾기
-				std::wstring firstBoneName = ConvertToWstring(mesh->mBones[0]->mName.C_Str());
-				RawNode* rootBoneNode = _nodeMap.find(firstBoneName)->second;
-				while (rootBoneNode->parent)
-				{
-					if (rootBoneNode->parent->boneIndex != -1)
-					{
-						rootBoneNode = rootBoneNode->parent;
-					}
-					else
-					{
-						break;
-					}
-				}
+				//skeleton->bones.resize(mesh->mNumBones);
+				//for (unsigned int j = 0; j < mesh->mNumBones; ++j)
+				//{
+				//	aiBone* bone = mesh->mBones[j];
+				//	std::wstring boneName = ConvertToWstring(bone->mName.C_Str());
+				//	skeleton->bones[j].name = boneName;
 
-				skeleton->rootBoneIndex = rootBoneNode->boneIndex;
+				//	auto boneOffsetMatrix = bone->mOffsetMatrix;
+				//	aiVector3D bonePosition;
+				//	aiQuaternion boneRotation;
+				//	aiVector3D boneScale;
 
-				skeleton->bones.resize(mesh->mNumBones);
+				//	boneOffsetMatrix.Decompose(boneScale, boneRotation, bonePosition);
+				//	skeleton->bones[j].transform.SetPosition(bonePosition.x, bonePosition.y, bonePosition.z);
+				//	skeleton->bones[j].transform.SetRotation(boneRotation.x, boneRotation.y, boneRotation.z, boneRotation.w);
+				//	skeleton->bones[j].transform.SetScale(boneScale.x, boneScale.y, boneScale.z);
+				//}
+
 				for (unsigned int j = 0; j < mesh->mNumBones; ++j)
 				{
 					aiBone* bone = mesh->mBones[j];
 					std::wstring boneName = ConvertToWstring(bone->mName.C_Str());
-					skeleton->bones[j].name = boneName;
-
-					auto boneOffsetMatrix = bone->mOffsetMatrix;
-					aiVector3D bonePosition;
-					aiQuaternion boneRotation;
-					aiVector3D boneScale;
-
-					boneOffsetMatrix.Decompose(boneScale, boneRotation, bonePosition);
-					skeleton->bones[j].transform.SetPosition(bonePosition.x, bonePosition.y, bonePosition.z);
-					skeleton->bones[j].transform.SetRotation(boneRotation.x, boneRotation.y, boneRotation.z, boneRotation.w);
-					skeleton->bones[j].transform.SetScale(boneScale.x, boneScale.y, boneScale.z);
+					int boneIndex = _nodeBoneMap[boneName];
+					for (int k = 0; k < bone->mNumWeights; ++k)
+					{
+						aiVertexWeight weight = bone->mWeights[k];
+						rawMeshes[i]->vertices[weight.mVertexId].boneIndice.push_back(boneIndex);
+						rawMeshes[i]->vertices[weight.mVertexId].boneWeights.push_back(weight.mWeight);
+					}
 				}
 			}
 		}
@@ -270,18 +355,18 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 
 	for (int i = 0; i < nodeCount; ++i)
 	{
-		SetRawMeshToRawNodeRecursive(scene->mRootNode->mChildren[i], outRawScene->nodes[i], outRawScene);
+		SetRawMeshToRawNodeRecursive(assimpScene->mRootNode->mChildren[i], outRawScene->nodes[i], outRawScene);
 	}
 
 	// 애니메이션 로드
-	if (scene->HasAnimations())
+	if (assimpScene->HasAnimations())
 	{
-		const int animationCount = scene->mNumAnimations;
+		const int animationCount = assimpScene->mNumAnimations;
 		for (int i = 0; i < animationCount; ++i)
 		{
-			aiAnimation* animation = scene->mAnimations[i];
+			aiAnimation* animation = assimpScene->mAnimations[i];
 
-			aiString animName = animation->mName;
+			aiString& animName = animation->mName;
 			double duration = animation->mDuration;
 			double ticksPerSecond = animation->mTicksPerSecond;
 
@@ -289,35 +374,52 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 			for (int j = 0; j < channelCount; ++j)
 			{
 				aiNodeAnim* nodeAnim = animation->mChannels[j];
-				aiString nodeName = nodeAnim->mNodeName;
+				std::wstring nodeName = ConvertToWstring(nodeAnim->mNodeName.C_Str());
 
-				std::wstring wNodeName = ConvertToWstring(nodeName.C_Str());
-				auto iter = _nodeMap.find(wNodeName);
-				ASSERT(iter != _nodeMap.end(), "node not found");
+				auto iter = _nodeBoneMap.find(nodeName);
+				ASSERT(iter != _nodeBoneMap.end(), "node not found");
 
-				iter->second->skeleton->clips.push_back(RawAnimationClip{});
-				RawAnimationClip& rawAnim = iter->second->skeleton->clips.back();
-				rawAnim.name = ConvertToWstring(animName.C_Str());
+				RawAnimationClip* clips = nullptr;
+				if (iter->second == -1)
+				{
+					// 본이 아닌 노드에 애니메이션을 넣어야함.
+					int i = 0;
+				}
+				else
+				{
+					clips = &_skeletonMap[assimpScene->mMeshes[0]->mBones[0]->mArmature].clips[_nodeBoneMap[nodeName]];
+				}
+
+				clips->name = ConvertToWstring(animName.C_Str());
 
 				int keyCount = (int)nodeAnim->mNumPositionKeys;
 				for (int k = 0; k < keyCount; ++k)
 				{
 					aiVectorKey key = nodeAnim->mPositionKeys[k];
-					rawAnim.keyPosition.push_back(RawAnimationClip::KeyPosition((float)key.mTime, { key.mValue.x, key.mValue.y, key.mValue.z, 0.0f }));
+					clips->keyPosition.push_back
+					(
+						RawAnimationClip::KeyPosition{ (float)key.mTime, { key.mValue.x, key.mValue.y, key.mValue.z, 0.0f } }
+					);
 				}
 
 				keyCount = (int)nodeAnim->mNumRotationKeys;
 				for (int k = 0; k < keyCount; ++k)
 				{
 					aiQuatKey key = nodeAnim->mRotationKeys[k];
-					rawAnim.keyRotation.push_back(RawAnimationClip::KeyRotation((float)key.mTime, { key.mValue.x, key.mValue.y, key.mValue.z, key.mValue.w }));
+					clips->keyRotation.push_back
+					(
+						RawAnimationClip::KeyRotation{ (float)key.mTime, { key.mValue.x, key.mValue.y, key.mValue.z, key.mValue.w } }
+					);
 				}
 
 				keyCount = (int)nodeAnim->mNumScalingKeys;
 				for (int k = 0; k < keyCount; ++k)
 				{
 					aiVectorKey key = nodeAnim->mScalingKeys[k];
-					rawAnim.keyScale.push_back(RawAnimationClip::KeyScale((float)key.mTime, { key.mValue.x, key.mValue.y, key.mValue.z, 0.0f }));
+					clips->keyScale.push_back
+					(
+						RawAnimationClip::KeyScale{ (float)key.mTime, { key.mValue.x, key.mValue.y, key.mValue.z, 0.0f } }
+					);
 				}
 			}
 		}
@@ -331,6 +433,8 @@ void flt::AssimpLoader::SetHierarchyRawNodeRecursive(aiNode* pNode, RawNode* pRa
 
 	pRawNode->name = ConvertToWstring(pNode->mName.C_Str());
 	_nodeMap.insert({ pRawNode->name , pRawNode });
+	std::wcout << pRawNode->name << std::endl;
+	_nodeBoneMap.insert({ pRawNode->name , -1 });
 
 	aiVector3D position;
 	aiQuaternion rotation;
@@ -445,4 +549,28 @@ void flt::AssimpLoader::PrintNodeNameRecursive(aiNode* pNode, int depth /*= 0*/)
 	//	std::wcout << L" |";
 	//}
 	//std::wcout << L" ) " << std::endl;
+}
+
+void flt::AssimpLoader::SetSkeletonRecursive(aiNode* assimpBone, RawSkeleton& skeleton)
+{
+	skeleton.bones.push_back(RawSkeleton::Bone{});
+
+	auto& bone = skeleton.bones.back();
+	bone.name = ConvertToWstring(assimpBone->mName.C_Str());
+	_nodeBoneMap[bone.name] = skeleton.bones.size() - 1;
+
+	aiVector3D position;
+	aiQuaternion rotation;
+	aiVector3D scale;
+
+	assimpBone->mTransformation.Decompose(scale, rotation, position);
+
+	bone.transform.SetPosition(position.x, position.y, position.z);
+	bone.transform.SetRotation(rotation.x, rotation.y, rotation.z, rotation.w);
+	bone.transform.SetScale(scale.x, scale.y, scale.z);
+
+	for (int i = 0; i < assimpBone->mNumChildren; ++i)
+	{
+		SetSkeletonRecursive(assimpBone->mChildren[i], skeleton);
+	}
 }
