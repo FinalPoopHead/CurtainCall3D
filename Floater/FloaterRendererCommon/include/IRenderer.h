@@ -19,7 +19,8 @@ namespace flt
 		RendererObject(Transform& transform, RawNode& rawNode, const bool& isDraw, const std::wstring& name) : 
 			transform(transform),
 			node(rawNode), 
-			isDraw(isDraw), 
+			isDraw(isDraw),
+			camera(nullptr),
 			name(name) {}
 		// 1. 그릴때 필요한것들.
 		// 2. 게임 엔진상에서 데이터를 바꾸고 싶은것들.

@@ -40,26 +40,34 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 	std::wstring directory = ConvertToWstring(path.substr(0, pos + 1));
 
 	_nodeMap.clear();
-	_nodeBoneMap.clear();
+	_boneNameIndexMap.clear();
 	_skeletonMap.clear();
+	for (auto& material : _materials)
+	{
+		delete material;
+	}
+	_materials.clear();
+	for (auto& mesh : _meshes)
+	{
+		delete mesh;
+	}
+	_meshes.clear();
 
 	// 데이터 로드 전 벡터 등 크기 조절
 	// 노드와 메쉬 등의 데이터가 떨어져있어서 두번 다시 돌면서 로드하지 않기 위해
 	// 미리 데이터들을 넣을 공간만 잡아놓기.
 	// 머테리얼
-	std::vector<RawMaterial*>& rawMaterials = outRawScene->materials;
 	const unsigned int materialCount = assimpScene->mNumMaterials;
-	const unsigned int rawMaterialCount = (unsigned int)rawMaterials.size();
-	rawMaterials.resize(rawMaterialCount + materialCount);
+	const unsigned int rawMaterialCount = (unsigned int)_materials.size();
+	_materials.resize(rawMaterialCount + materialCount);
 	for (unsigned int i = 0; i < materialCount; ++i)
 	{
-		rawMaterials[rawMaterialCount + i] = new RawMaterial();
+		_materials[rawMaterialCount + i] = new RawMaterial();
 	}
 	// 메쉬
 	unsigned int meshCount = assimpScene->mNumMeshes;
 	//unsigned int rawMeshCount = (unsigned int)outRawScene->meshes.size();
-	std::vector<RawMesh*>& rawMeshes = outRawScene->meshes;
-	rawMeshes.resize(assimpScene->mNumMeshes);
+	_meshes.resize(assimpScene->mNumMeshes);
 
 	// 먼저 머티리얼 로드
 	if (assimpScene->HasMaterials())
@@ -73,60 +81,60 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 			auto ret = material->Get(AI_MATKEY_NAME, outStr);
 			if (ret == AI_SUCCESS)
 			{
-				rawMaterials[i]->name = ConvertToWstring(outStr.C_Str());
+				_materials[i]->name = ConvertToWstring(outStr.C_Str());
 			}
 
 			aiColor3D diffuse;
 			ret = material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
 			if (ret == AI_SUCCESS)
 			{
-				rawMaterials[i]->baseColor[0] = diffuse.r;
-				rawMaterials[i]->baseColor[1] = diffuse.g;
-				rawMaterials[i]->baseColor[2] = diffuse.b;
+				_materials[i]->baseColor[0] = diffuse.r;
+				_materials[i]->baseColor[1] = diffuse.g;
+				_materials[i]->baseColor[2] = diffuse.b;
 			}
 
 			aiColor3D ambient;
 			ret = material->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
 			if (ret == AI_SUCCESS)
 			{
-				rawMaterials[i]->ambient[0] = ambient.r;
-				rawMaterials[i]->ambient[1] = ambient.g;
-				rawMaterials[i]->ambient[2] = ambient.b;
+				_materials[i]->ambient[0] = ambient.r;
+				_materials[i]->ambient[1] = ambient.g;
+				_materials[i]->ambient[2] = ambient.b;
 			}
 
 			aiColor3D specular;
 			ret = material->Get(AI_MATKEY_COLOR_SPECULAR, specular);
 			if (ret == AI_SUCCESS)
 			{
-				rawMaterials[i]->specular[0] = specular.r;
-				rawMaterials[i]->specular[1] = specular.g;
-				rawMaterials[i]->specular[2] = specular.b;
+				_materials[i]->specular[0] = specular.r;
+				_materials[i]->specular[1] = specular.g;
+				_materials[i]->specular[2] = specular.b;
 			}
 
 			float shininess;
 			ret = material->Get(AI_MATKEY_SHININESS, shininess);
 			if (ret == AI_SUCCESS)
 			{
-				rawMaterials[i]->roughness = shininess;
+				_materials[i]->roughness = shininess;
 			}
 
 			float opacity;
 			ret = material->Get(AI_MATKEY_OPACITY, opacity);
 			if (ret == AI_SUCCESS)
 			{
-				rawMaterials[i]->opacity = opacity;
+				_materials[i]->opacity = opacity;
 			}
 
 			ret = material->GetTexture(aiTextureType_DIFFUSE, 0, &outStr);
 			if (ret == AI_SUCCESS)
 			{
-				rawMaterials[i]->textures[RawMaterial::ALBEDO_OPACITY]->path = directory + ConvertToWstring(outStr.C_Str());
+				_materials[i]->textures[RawMaterial::ALBEDO_OPACITY]->path = directory + ConvertToWstring(outStr.C_Str());
 			}
 
 			ret = material->GetTexture(aiTextureType_NORMALS, 0, &outStr);
 			if (ret == AI_SUCCESS)
 			{
-				rawMaterials[i]->textures[RawMaterial::NORMAL]->path = directory + ConvertToWstring(outStr.C_Str());
+				_materials[i]->textures[RawMaterial::NORMAL]->path = directory + ConvertToWstring(outStr.C_Str());
 
 			}
 
@@ -136,37 +144,37 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 			ret = material->GetTexture(aiTextureType_EMISSIVE, 0, &outStr);
 			if (ret == AI_SUCCESS)
 			{
-				rawMaterials[i]->textures[RawMaterial::EMISSIVE]->path = directory + ConvertToWstring(outStr.C_Str());
+				_materials[i]->textures[RawMaterial::EMISSIVE]->path = directory + ConvertToWstring(outStr.C_Str());
 			}
 
 			ret = material->GetTexture(aiTextureType_AMBIENT, 0, &outStr);
 			if (ret == AI_SUCCESS)
 			{
-				rawMaterials[i]->textures[RawMaterial::AO]->path = directory + ConvertToWstring(outStr.C_Str());
+				_materials[i]->textures[RawMaterial::AO]->path = directory + ConvertToWstring(outStr.C_Str());
 			}
 
 			ret = material->GetTexture(aiTextureType_HEIGHT, 0, &outStr);
 			if (ret == AI_SUCCESS)
 			{
-				rawMaterials[i]->textures[RawMaterial::HEIGHT]->path = directory + ConvertToWstring(outStr.C_Str());
+				_materials[i]->textures[RawMaterial::HEIGHT]->path = directory + ConvertToWstring(outStr.C_Str());
 			}
 
 			ret = material->GetTexture(aiTextureType_OPACITY, 0, &outStr);
 			if (ret == AI_SUCCESS)
 			{
-				rawMaterials[i]->textures[RawMaterial::OPACITY]->path = directory + ConvertToWstring(outStr.C_Str());
+				_materials[i]->textures[RawMaterial::OPACITY]->path = directory + ConvertToWstring(outStr.C_Str());
 			}
 
 			ret = material->GetTexture(aiTextureType_SHININESS, 0, &outStr);
 			if (ret == AI_SUCCESS)
 			{
-				rawMaterials[i]->textures[RawMaterial::ROUGHNESS]->path = directory + ConvertToWstring(outStr.C_Str());
+				_materials[i]->textures[RawMaterial::ROUGHNESS]->path = directory + ConvertToWstring(outStr.C_Str());
 			}
 
 			ret = material->GetTexture(aiTextureType_UNKNOWN, 0, &outStr);
 			if (ret == AI_SUCCESS)
 			{
-				rawMaterials[i]->textures[RawMaterial::UNKNOWN]->path = directory + ConvertToWstring(outStr.C_Str());
+				_materials[i]->textures[RawMaterial::UNKNOWN]->path = directory + ConvertToWstring(outStr.C_Str());
 			}
 
 			/*ASSERT(!(material->GetTextureCount(aiTextureType_DIFFUSE)), "has Texture");
@@ -209,7 +217,7 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 	}
 
 
-	for (int i = 0; i < assimpScene->mNumMeshes; ++i)
+	for (unsigned int i = 0; i < assimpScene->mNumMeshes; ++i)
 	{
 		auto mesh = assimpScene->mMeshes[i];
 		if (mesh->HasBones())
@@ -221,28 +229,17 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 				_skeletonMap.insert({ armature, RawSkeleton{} });
 
 				auto& skeleton = _skeletonMap[armature];
-				SetSkeletonRecursive(armature, skeleton);
+				SetSkeleton(armature, skeleton);
 				int test = 0;
 			}
-
-			for (int j = 0; j < mesh->mNumBones; ++j)
-			{
-				auto bone = mesh->mBones[j];
-				std::wstring boneNodeName = ConvertToWstring(bone->mNode->mName.C_Str());
-			}
+			//for (unsigned int j = 0; j < mesh->mNumBones; ++j)
+			//{
+			//	auto bone = mesh->mBones[j];
+			//	std::wstring boneNodeName = ConvertToWstring(bone->mNode->mName.C_Str());
+			//	// 본 이름 세팅.
+			//}
 		}
 	}
-
-
-	// 노드 트리 구조 구축 및 노드 이름 맵핑
-	const int nodeCount = assimpScene->mRootNode->mNumChildren;
-	outRawScene->nodes.reserve(nodeCount);
-	for (int i = 0; i < nodeCount; ++i)
-	{
-		outRawScene->nodes.push_back(new RawNode());
-		SetHierarchyRawNodeRecursive(assimpScene->mRootNode->mChildren[i], outRawScene->nodes.back(), outRawScene);
-	}
-
 
 	// 메쉬 로드
 	if (assimpScene->HasMeshes())
@@ -254,20 +251,20 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 			//AssimpRawMeshBuilder meshBuilder(mesh, filePath, i, outRawScene, _nodeMap);
 			//rawMeshes[i].Set(meshBuilder);
 
-			rawMeshes[i] = new(std::nothrow) RawMesh();
-			ASSERT(rawMeshes[i], "메모리 할당 실패");
+			_meshes[i] = new(std::nothrow) RawMesh();
+			ASSERT(_meshes[i], "메모리 할당 실패");
 
 			int vertexCount = mesh->mNumVertices;
-			rawMeshes[i]->vertices.resize(vertexCount);
+			_meshes[i]->vertices.resize(vertexCount);
 
 			// 버텍스 별 데이터
 			if (mesh->HasPositions())
 			{
 				for (int j = 0; j < vertexCount; ++j)
 				{
-					rawMeshes[i]->vertices[j].pos.x = mesh->mVertices[j].x;
-					rawMeshes[i]->vertices[j].pos.y = mesh->mVertices[j].y;
-					rawMeshes[i]->vertices[j].pos.z = mesh->mVertices[j].z;
+					_meshes[i]->vertices[j].pos.x = mesh->mVertices[j].x;
+					_meshes[i]->vertices[j].pos.y = mesh->mVertices[j].y;
+					_meshes[i]->vertices[j].pos.z = mesh->mVertices[j].z;
 				}
 			}
 
@@ -275,9 +272,9 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 			{
 				for (int j = 0; j < vertexCount; ++j)
 				{
-					rawMeshes[i]->vertices[j].normal.x = mesh->mNormals[j].x;
-					rawMeshes[i]->vertices[j].normal.y = mesh->mNormals[j].y;
-					rawMeshes[i]->vertices[j].normal.z = mesh->mNormals[j].z;
+					_meshes[i]->vertices[j].normal.x = mesh->mNormals[j].x;
+					_meshes[i]->vertices[j].normal.y = mesh->mNormals[j].y;
+					_meshes[i]->vertices[j].normal.z = mesh->mNormals[j].z;
 				}
 			}
 
@@ -285,13 +282,13 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 			{
 				for (int j = 0; j < vertexCount; ++j)
 				{
-					rawMeshes[i]->vertices[j].tangent.x = mesh->mTangents[j].x;
-					rawMeshes[i]->vertices[j].tangent.y = mesh->mTangents[j].y;
-					rawMeshes[i]->vertices[j].tangent.z = mesh->mTangents[j].z;
+					_meshes[i]->vertices[j].tangent.x = mesh->mTangents[j].x;
+					_meshes[i]->vertices[j].tangent.y = mesh->mTangents[j].y;
+					_meshes[i]->vertices[j].tangent.z = mesh->mTangents[j].z;
 
-					rawMeshes[i]->vertices[j].binormal.x = mesh->mBitangents[j].x;
-					rawMeshes[i]->vertices[j].binormal.y = mesh->mBitangents[j].y;
-					rawMeshes[i]->vertices[j].binormal.z = mesh->mBitangents[j].z;
+					_meshes[i]->vertices[j].binormal.x = mesh->mBitangents[j].x;
+					_meshes[i]->vertices[j].binormal.y = mesh->mBitangents[j].y;
+					_meshes[i]->vertices[j].binormal.z = mesh->mBitangents[j].z;
 				}
 			}
 
@@ -307,8 +304,8 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 					int texCoordCount = mesh->mNumUVComponents[k];
 					ASSERT(texCoordCount == 2, "텍스쳐 좌표가 2개가 아닙니다.");
 
-					rawMeshes[i]->vertices[j].uvs[k].x = mesh->mTextureCoords[k][j].x;
-					rawMeshes[i]->vertices[j].uvs[k].y = mesh->mTextureCoords[k][j].y;
+					_meshes[i]->vertices[j].uvs[k].x = mesh->mTextureCoords[k][j].x;
+					_meshes[i]->vertices[j].uvs[k].y = mesh->mTextureCoords[k][j].y;
 				}
 			}
 
@@ -341,21 +338,36 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 				{
 					aiBone* bone = mesh->mBones[j];
 					std::wstring boneName = ConvertToWstring(bone->mName.C_Str());
-					int boneIndex = _nodeBoneMap[boneName];
-					for (int k = 0; k < bone->mNumWeights; ++k)
+					int boneIndex = _boneNameIndexMap[boneName];
+					for (unsigned int k = 0; k < bone->mNumWeights; ++k)
 					{
 						aiVertexWeight weight = bone->mWeights[k];
-						rawMeshes[i]->vertices[weight.mVertexId].boneIndice.push_back(boneIndex);
-						rawMeshes[i]->vertices[weight.mVertexId].boneWeights.push_back(weight.mWeight);
+						_meshes[i]->vertices[weight.mVertexId].boneIndice.push_back(boneIndex);
+						_meshes[i]->vertices[weight.mVertexId].boneWeights.push_back(weight.mWeight);
 					}
 				}
 			}
 		}
 	}
 
+	//for (int i = 0; i < nodeCount; ++i)
+	//{
+	//	SetRawMeshToRawNodeRecursive(assimpScene->mRootNode->mChildren[i], outRawScene->nodes[i], outRawScene);
+	//}
+
+	// 노드 트리 구조 구축 및 노드 이름 맵핑
+	const int nodeCount = assimpScene->mRootNode->mNumChildren;
+	//outRawScene->nodes.reserve(nodeCount);
 	for (int i = 0; i < nodeCount; ++i)
 	{
-		SetRawMeshToRawNodeRecursive(assimpScene->mRootNode->mChildren[i], outRawScene->nodes[i], outRawScene);
+		std::wstring nodeName = ConvertToWstring(assimpScene->mRootNode->mChildren[i]->mName.C_Str());
+		if (_boneNameIndexMap.find(nodeName) != _boneNameIndexMap.end())
+		{
+			continue;
+		}
+
+		outRawScene->nodes.push_back(new RawNode());
+		SetHierarchyRawNodeRecursive(assimpScene->mRootNode->mChildren[i], outRawScene->nodes.back(), outRawScene);
 	}
 
 	// 애니메이션 로드
@@ -376,8 +388,8 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 				aiNodeAnim* nodeAnim = animation->mChannels[j];
 				std::wstring nodeName = ConvertToWstring(nodeAnim->mNodeName.C_Str());
 
-				auto iter = _nodeBoneMap.find(nodeName);
-				ASSERT(iter != _nodeBoneMap.end(), "node not found");
+				auto iter = _boneNameIndexMap.find(nodeName);
+				ASSERT(iter != _boneNameIndexMap.end(), "node not found");
 
 				RawAnimationClip* clips = nullptr;
 				if (iter->second == -1)
@@ -387,7 +399,7 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 				}
 				else
 				{
-					clips = &_skeletonMap[assimpScene->mMeshes[0]->mBones[0]->mArmature].clips[_nodeBoneMap[nodeName]];
+					clips = &_skeletonMap[assimpScene->mMeshes[0]->mBones[0]->mArmature].clips[_boneNameIndexMap[nodeName]];
 				}
 
 				clips->name = ConvertToWstring(animName.C_Str());
@@ -434,7 +446,6 @@ void flt::AssimpLoader::SetHierarchyRawNodeRecursive(aiNode* pNode, RawNode* pRa
 	pRawNode->name = ConvertToWstring(pNode->mName.C_Str());
 	_nodeMap.insert({ pRawNode->name , pRawNode });
 	std::wcout << pRawNode->name << std::endl;
-	_nodeBoneMap.insert({ pRawNode->name , -1 });
 
 	aiVector3D position;
 	aiQuaternion rotation;
@@ -446,11 +457,11 @@ void flt::AssimpLoader::SetHierarchyRawNodeRecursive(aiNode* pNode, RawNode* pRa
 	pRawNode->transform.SetRotation(rotation.x, rotation.y, rotation.z, rotation.w);
 	pRawNode->transform.SetScale(scale.x, scale.y, scale.z);
 
-	auto test = pNode->mTransformation;
-	auto test2 = pRawNode->transform.GetLocalMatrix4f();
-
 	{
 		float epsilon = 0.0001f;
+		
+		auto test = pNode->mTransformation;
+		auto test2 = pRawNode->transform.GetLocalMatrix4f();
 		float sub = test.a1 - test2.e[0][0];
 		ASSERT(sub < epsilon && sub > -epsilon, "diff");
 		sub = test.a2 - test2.e[1][0];
@@ -486,10 +497,30 @@ void flt::AssimpLoader::SetHierarchyRawNodeRecursive(aiNode* pNode, RawNode* pRa
 	}
 
 	const int childCount = pNode->mNumChildren;
-	pRawNode->children.reserve(childCount);
+	//pRawNode->children.reserve(childCount);
+
+	int meshCount = pNode->mNumMeshes;
+	//ASSERT(meshCount == 1 || meshCount == 0, "meshCount more then 1");
+
+	pRawNode->meshes.reserve(meshCount);
+	for (int i = 0; i < meshCount; ++i)
+	{
+		pRawNode->meshes.push_back(*_meshes[pNode->mMeshes[i]]);
+	}
 
 	for (int i = 0; i < childCount; ++i)
 	{
+		SetRawMeshToRawNodeRecursive(pNode->mChildren[i], pRawNode->children[i], pRawScene);
+	}
+
+	for (int i = 0; i < childCount; ++i)
+	{
+		std::wstring childName = ConvertToWstring(pNode->mChildren[i]->mName.C_Str());
+		if (_boneNameIndexMap.find(childName) != _boneNameIndexMap.end())
+		{
+			continue;
+		}
+
 		RawNode* childNode = new RawNode();
 		pRawNode->children.push_back(childNode);
 		childNode->parent = pRawNode;
@@ -508,7 +539,7 @@ void flt::AssimpLoader::SetRawMeshToRawNodeRecursive(aiNode* pNode, RawNode* out
 	outRawNode->meshes.reserve(meshCount);
 	for (int i = 0; i < meshCount; ++i)
 	{
-		outRawNode->meshes.push_back(pRawScene->meshes[pNode->mMeshes[i]]);
+		outRawNode->meshes.push_back(*_meshes[pNode->mMeshes[i]]);
 	}
 
 	const int childCount = pNode->mNumChildren;
@@ -551,13 +582,22 @@ void flt::AssimpLoader::PrintNodeNameRecursive(aiNode* pNode, int depth /*= 0*/)
 	//std::wcout << L" ) " << std::endl;
 }
 
-void flt::AssimpLoader::SetSkeletonRecursive(aiNode* assimpBone, RawSkeleton& skeleton)
+void flt::AssimpLoader::SetSkeleton(aiNode* armature, RawSkeleton& skeleton)
 {
-	skeleton.bones.push_back(RawSkeleton::Bone{});
+	int boneCount = CalcNodeCountRecursive(armature);
 
-	auto& bone = skeleton.bones.back();
-	bone.name = ConvertToWstring(assimpBone->mName.C_Str());
-	_nodeBoneMap[bone.name] = skeleton.bones.size() - 1;
+	skeleton.bones.reserve(boneCount);
+	skeleton.bones.push_back(RawSkeleton::Bone{});
+	skeleton.rootBoneIndex = 0;
+
+	SetSkeletonRecursive(armature, skeleton, (int)skeleton.bones.size() - 1);
+}
+
+void flt::AssimpLoader::SetSkeletonRecursive(aiNode* assimpBone, RawSkeleton& skeleton, int index)
+{
+	RawSkeleton::Bone* bone = &skeleton.bones[index];
+	bone->name = ConvertToWstring(assimpBone->mName.C_Str());
+	_boneNameIndexMap[bone->name] = index;
 
 	aiVector3D position;
 	aiQuaternion rotation;
@@ -565,12 +605,27 @@ void flt::AssimpLoader::SetSkeletonRecursive(aiNode* assimpBone, RawSkeleton& sk
 
 	assimpBone->mTransformation.Decompose(scale, rotation, position);
 
-	bone.transform.SetPosition(position.x, position.y, position.z);
-	bone.transform.SetRotation(rotation.x, rotation.y, rotation.z, rotation.w);
-	bone.transform.SetScale(scale.x, scale.y, scale.z);
+	bone->transform.SetPosition(position.x, position.y, position.z);
+	bone->transform.SetRotation(rotation.x, rotation.y, rotation.z, rotation.w);
+	bone->transform.SetScale(scale.x, scale.y, scale.z);
 
-	for (int i = 0; i < assimpBone->mNumChildren; ++i)
+	for (unsigned int i = 0; i < assimpBone->mNumChildren; ++i)
 	{
-		SetSkeletonRecursive(assimpBone->mChildren[i], skeleton);
+		skeleton.bones.push_back(RawSkeleton::Bone{});
+		bone = &skeleton.bones[index];
+		auto& childBone = skeleton.bones.back();
+		childBone.transform.SetParent(&bone->transform);
+		SetSkeletonRecursive(assimpBone->mChildren[i], skeleton, (int)skeleton.bones.size() - 1);
 	}
+}
+
+int flt::AssimpLoader::CalcNodeCountRecursive(aiNode* pNode)
+{
+	int count = 1;
+	for (unsigned int i = 0; i < pNode->mNumChildren; ++i)
+	{
+		count += CalcNodeCountRecursive(pNode->mChildren[i]);
+	}
+
+	return count;
 }

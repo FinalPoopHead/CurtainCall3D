@@ -246,8 +246,8 @@ bool flt::FBXLoader::LoadToRawNode(fbxsdk::FbxNode& node, RawNode* outNode)
 	fbxsdk::FbxMesh* pMesh = node.GetMesh();
 	if (pMesh != nullptr)
 	{
-		outNode->meshes.push_back(nullptr);
-		CreateMesh(*pMesh, outNode->meshes.back());
+		outNode->meshes.emplace_back();
+		CreateMesh(*pMesh, &outNode->meshes.back());
 	}
 
 	// animation 세팅

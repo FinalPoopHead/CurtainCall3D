@@ -12,6 +12,35 @@ flt::Transform::~Transform()
 	//}
 }
 
+flt::Transform::Transform(const Transform& other)
+{
+	_position = other._position;
+	_scale = other._scale;
+	_rotation = other._rotation;
+	_pParent = nullptr;
+	_children.clear();
+	_isDirty = true;
+	_pOwner = nullptr;
+}
+
+flt::Transform& flt::Transform::operator=(const Transform& other)
+{
+	if (this == &other)
+	{
+		return *this;
+	}
+
+	_position = other._position;
+	_scale = other._scale;
+	_rotation = other._rotation;
+	_pParent = nullptr;
+	_children.clear();
+	_isDirty = true;
+	_pOwner = nullptr;
+
+	return *this;
+}
+
 void flt::Transform::SetMatrix(const Matrix4f& worldMatrix)
 {
 	MakeDirtyRecursive();
@@ -325,7 +354,7 @@ bool flt::Transform::SetParent(Transform* pParent)
 		checkRecursive = checkRecursive->_pParent;
 	}
 
-	// 이미 어떤 자식이 ㄹ경우에는 
+	// 이미 어떤 자식일 경우에는 
 	if (_pParent)
 	{
 		auto iter = std::find(_pParent->_children.begin(), _pParent->_children.end(), this);
@@ -345,6 +374,11 @@ bool flt::Transform::SetParent(Transform* pParent)
 	MakeDirtyRecursive();
 
 	return true;
+}
+
+bool flt::Transform::AddChild(Transform* pChild)
+{
+	return pChild->SetParent(this);
 }
 
 void flt::Transform::MakeDirtyRecursive() noexcept

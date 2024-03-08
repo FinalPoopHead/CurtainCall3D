@@ -939,7 +939,7 @@ void flt::RendererDX11::SetDX11Node(DX11Node* dxNode, RawNode& node)
 		meshBuilder.pDevice = _device.Get();
 		meshBuilder.vsBuilder = DX11VertexShaderBuilder(L"flt::CubeVS");
 		meshBuilder.pImmediateContext = _immediateContext.Get();
-		meshBuilder.pRawMesh = node.meshes[i];
+		meshBuilder.pRawMesh = &node.meshes[i];
 
 		dxNode->meshes[i].Set(meshBuilder);
 		ASSERT(dxNode->meshes[i].Get(), "Set Mesh fail");

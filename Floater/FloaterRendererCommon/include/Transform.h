@@ -20,6 +20,14 @@ namespace flt
 		Transform() : _position(), _scale(1.0f, 1.0f, 1.0f, 0.0f), _rotation(), _pParent(nullptr), _children(), _worldMatrix(), _isDirty(true), _pOwner(nullptr) {}
 		~Transform();
 
+		Transform(const Transform& other);
+		Transform& operator=(const Transform& other);
+
+		//Transform(Transform&& other) noexcept;
+		//Transform& operator=(Transform&& other) noexcept;
+
+
+
 		void SetMatrix(const Matrix4f& worldMatrix);
 
 		Vector4f GetLocalPosition() const noexcept { return _position; }
@@ -67,6 +75,7 @@ namespace flt
 
 		Transform* GetChild(size_t index) const noexcept { return _children[index]; }
 		const std::vector<Transform*>& GetChildren() const noexcept { return _children; }
+		bool AddChild(Transform* pChild);
 
 		TransformOwner* GetOwner() const noexcept { return _pOwner; }
 
