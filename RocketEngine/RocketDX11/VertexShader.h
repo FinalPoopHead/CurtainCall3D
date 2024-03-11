@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <wrl.h>
 #include "IShader.h"
-#include "GraphicsStruct.h"
+#include "VertexStruct.h"
 
 namespace Rocket::Core
 {
@@ -23,8 +23,8 @@ namespace Rocket::Core
 
 	public:
 		void SetVertexDesc(D3D11_INPUT_ELEMENT_DESC desc[], unsigned int numElements);
-		void SetVertexType(VertexType type);
-		VertexType GetVertexType() const;
+		void SetVertexType(eVertexType type);
+		eVertexType GetVertexType() const;
 
 	private:
 		void CreateShaderAndInputLayout(ID3D11Device* device, const std::wstring& path);
@@ -37,7 +37,7 @@ namespace Rocket::Core
 		ComPtr<ID3D11Buffer> _matrixBuffer;
 		ComPtr<ID3D11InputLayout> _inputLayout;
 		ComPtr<ID3D11SamplerState> _sampleState;
-		VertexType _vertexType;
+		eVertexType _vertexType;
 		unsigned int _numElements;
 	};
 }

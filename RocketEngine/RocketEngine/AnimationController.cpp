@@ -1,8 +1,8 @@
-#include "AnimationController.h"
+﻿#include "AnimationController.h"
 #include "GraphicsSystem.h"
-#include "MeshRendererBase.h"
-#include "MeshRenderer.h"
-#include "SkinnedMeshRenderer.h"
+#include "ModelRendererBase.h"
+#include "StaticModelRenderer.h"
+#include "DynamicModelRenderer.h"
 #include "GameObject.h"
 #include "Animator.h"
 #include "State.h"
@@ -58,10 +58,10 @@ namespace Rocket
 		}
 	}
 
-	// �ӽ�
+	// 임시
 	void AnimationController::PlayCurrentAnim()
 	{
-		Rocket::Core::MeshRendererBase* renderer = gameObject->GetComponentDynamic<Rocket::Core::MeshRendererBase>();
+		Rocket::Core::ModelRendererBase* renderer = gameObject->GetComponentDynamic<Rocket::Core::ModelRendererBase>();
 		
 		if (!renderer)
 		{

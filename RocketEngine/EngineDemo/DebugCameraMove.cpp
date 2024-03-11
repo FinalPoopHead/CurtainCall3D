@@ -1,7 +1,9 @@
-#include "DebugCameraMove.h"
+﻿#include "DebugCameraMove.h"
 
 DebugCameraMove::DebugCameraMove()
-	: moveSpeed(2.0f)
+	: moveSpeed(2.0f),
+	accelRatio(10.0f),
+	thisFrameSpeed()
 {
 }
 
@@ -14,41 +16,41 @@ void DebugCameraMove::Update()
 {
 	//float deltaTime = rocket.GetDeltaTime();
 	float deltaTime = Rocket::GetDeltaTime();
-	moveSpeed = 5.0f;
+	thisFrameSpeed = moveSpeed;
 
 	if (Rocket::GetKey(VK_SHIFT))
 	{
-		moveSpeed *= 2.0f;
+		thisFrameSpeed *= moveSpeed * accelRatio;
 	}
 
 	if (Rocket::GetKey('W'))
 	{
-		_camera->Walk(moveSpeed * deltaTime);
+		_camera->Walk(thisFrameSpeed * deltaTime);
 	}
 
 	if (Rocket::GetKey('S'))
 	{
-		_camera->Walk(-moveSpeed * deltaTime);
+		_camera->Walk(-thisFrameSpeed * deltaTime);
 	}
 
 	if (Rocket::GetKey('A'))
 	{
-		_camera->Strafe(-moveSpeed * deltaTime);
+		_camera->Strafe(-thisFrameSpeed * deltaTime);
 	}
 
 	if (Rocket::GetKey('D'))
 	{
-		_camera->Strafe(moveSpeed * deltaTime);
+		_camera->Strafe(thisFrameSpeed * deltaTime);
 	}
 
 	if (Rocket::GetKey('Q'))
 	{
-		_camera->WorldUpDown(-moveSpeed * deltaTime);
+		_camera->WorldUpDown(-thisFrameSpeed * deltaTime);
 	}
 
 	if (Rocket::GetKey('E'))
 	{
-		_camera->WorldUpDown(moveSpeed * deltaTime);
+		_camera->WorldUpDown(thisFrameSpeed * deltaTime);
 	}
 
 	OnMouseMove();

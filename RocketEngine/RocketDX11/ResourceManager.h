@@ -25,16 +25,7 @@ namespace Rocket::Core
 	class Texture;
 	class Material;
 	class FBXLoader;
-	struct Node;
-
-	struct ModelData
-	{
-		std::string name;
-		std::vector<Mesh*> meshes;
-		Node* rootNode;
-		ID3D11Buffer* nodeBuffer;
-		// std::unordered_map<std::string, Animation*> animations;
-	};
+	struct Model;
 
 	class ResourceManager : public Singleton<ResourceManager>
 	{
@@ -55,8 +46,8 @@ namespace Rocket::Core
 
 		CubeMesh* GetCubeMesh() const { return _cubeMesh; }
 		Mesh* GetMesh(eMeshType meshType) const;
-		std::vector<Mesh*>& GetMeshes(const std::string& fileName);
-		ModelData* GetModel(const std::string& fileName);
+		// std::vector<Mesh*>& GetMeshes(const std::string& fileName);		지금은 Model 베이스로 그리게끔 해놨음.
+		Model* GetModel(const std::string& fileName);
 		Texture* GetTexture(std::string fileName);
 		Texture* GetDefaultTexture() const { return _defaultTexture; }
 		Material* GetDefaultMaterial() const { return _defaultMaterial; }
@@ -104,6 +95,6 @@ namespace Rocket::Core
 		std::unordered_map<std::string, PixelShader*> _pixelShaders;
 		std::unordered_map<std::string, Texture*> _textures;
 		std::vector<ID3D11RasterizerState*> _renderStates;
-		std::unordered_map<std::string, ModelData*> _models;
+		std::unordered_map<std::string, Model*> _models;
 	};
 }

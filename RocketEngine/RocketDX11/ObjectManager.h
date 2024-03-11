@@ -9,7 +9,8 @@ namespace Rocket::Core
 	class ResourceManager;
 
 	class Camera;
-	class MeshRenderer;
+	class StaticModelRenderer;
+	class DynamicModelRenderer;
 	class TextRenderer;
 	class SpriteRenderer;
 	class LineRenderer;
@@ -21,21 +22,24 @@ namespace Rocket::Core
 		ObjectManager();
 
 	public:
-		std::vector<MeshRenderer*>& GetStaticMeshRenderers();
+		std::vector<StaticModelRenderer*>& GetStaticModelRenderers();
+		std::vector<DynamicModelRenderer*>& GetDynamicModelRenderers();
 		std::vector<TextRenderer*>& GetTextList();
 		std::vector<SpriteRenderer*>& GetImageList();
 		LineRenderer* GetLineRenderer();
 
 	public:
 		Camera* CreateCamera();
-		MeshRenderer* CreateMeshRenderer();
+		StaticModelRenderer* CreateStaticModelRenderer();
+		DynamicModelRenderer* CreateDynamicModelRenderer();
 		TextRenderer* CreateText();
 		SpriteRenderer* CreateImage();
 		LineRenderer* CreateLineRenderer();
 
 	private:
 		std::vector<Camera*> _cameraList;
-		std::vector<MeshRenderer*> _meshRendererList;
+		std::vector<StaticModelRenderer*> _staticModelRendererList;
+		std::vector<DynamicModelRenderer*> dynamicModelRendererList;
 		std::vector<TextRenderer*> _textList;
 		std::vector<SpriteRenderer*> _ImageList;
 		LineRenderer* _lineRenderer;

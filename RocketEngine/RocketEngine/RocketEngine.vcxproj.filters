@@ -25,18 +25,6 @@
     <Filter Include="Component\Renderer">
       <UniqueIdentifier>{644faffe-3692-45b4-9240-c42eff6d848c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Component\Renderer\Mesh">
-      <UniqueIdentifier>{7998041d-194f-4581-8e19-38f64ac9dea5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Component\Renderer\Mesh\BaseClass">
-      <UniqueIdentifier>{023f3669-3073-45ee-91ac-c1e75cd0c8c0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Component\Renderer\Mesh\MeshRenderer">
-      <UniqueIdentifier>{ca4d48c7-1965-4fdf-bf7b-ded7efe3dc5b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Component\Renderer\Mesh\SkinnedMeshRenderer">
-      <UniqueIdentifier>{39f79bdb-8626-4e6b-9ef3-4bfc18c95330}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Component\Camera">
       <UniqueIdentifier>{ef92ac9a-e862-4ff0-bd1b-f145251ffbad}</UniqueIdentifier>
     </Filter>
@@ -184,6 +172,18 @@
     <Filter Include="System\GraphicsSystem">
       <UniqueIdentifier>{1554353f-8156-49ee-8340-7690958d55ed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Component\Renderer\Model">
+      <UniqueIdentifier>{7998041d-194f-4581-8e19-38f64ac9dea5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Renderer\Model\BaseClass">
+      <UniqueIdentifier>{023f3669-3073-45ee-91ac-c1e75cd0c8c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Renderer\Model\MeshRenderer">
+      <UniqueIdentifier>{ca4d48c7-1965-4fdf-bf7b-ded7efe3dc5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Renderer\Model\SkinnedMeshRenderer">
+      <UniqueIdentifier>{39f79bdb-8626-4e6b-9ef3-4bfc18c95330}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineProcess.h">
@@ -219,8 +219,8 @@
     <ClInclude Include="DLLExporter.h">
       <Filter>1_DLLExporter</Filter>
     </ClInclude>
-    <ClInclude Include="MeshRendererBase.h">
-      <Filter>Component\Renderer\Mesh\BaseClass</Filter>
+    <ClInclude Include="ModelRendererBase.h">
+      <Filter>Component\Renderer\Model\BaseClass</Filter>
     </ClInclude>
     <ClInclude Include="SceneSystem.h">
       <Filter>System\SceneSystem</Filter>
@@ -231,8 +231,8 @@
     <ClInclude Include="TimeSystem.h">
       <Filter>System\TimeSystem</Filter>
     </ClInclude>
-    <ClInclude Include="MeshRenderer.h">
-      <Filter>Component\Renderer\Mesh\MeshRenderer</Filter>
+    <ClInclude Include="StaticModelRenderer.h">
+      <Filter>Component\Renderer\Model\MeshRenderer</Filter>
     </ClInclude>
     <ClInclude Include="InputSystem.h">
       <Filter>System\InputSystem</Filter>
@@ -252,8 +252,8 @@
     <ClInclude Include="TweenTimer.h">
       <Filter>Tween\TweenTimer</Filter>
     </ClInclude>
-    <ClInclude Include="SkinnedMeshRenderer.h">
-      <Filter>Component\Renderer\Mesh\SkinnedMeshRenderer</Filter>
+    <ClInclude Include="DynamicModelRenderer.h">
+      <Filter>Component\Renderer\Model\SkinnedMeshRenderer</Filter>
     </ClInclude>
     <ClInclude Include="State.h">
       <Filter>Animation\State</Filter>
@@ -374,8 +374,8 @@
     <ClCompile Include="Component.cpp">
       <Filter>Component\1_BaseClass</Filter>
     </ClCompile>
-    <ClCompile Include="MeshRendererBase.cpp">
-      <Filter>Component\Renderer\Mesh\BaseClass</Filter>
+    <ClCompile Include="ModelRendererBase.cpp">
+      <Filter>Component\Renderer\Model\BaseClass</Filter>
     </ClCompile>
     <ClCompile Include="SceneSystem.cpp">
       <Filter>System\SceneSystem</Filter>
@@ -386,8 +386,8 @@
     <ClCompile Include="TimeSystem.cpp">
       <Filter>System\TimeSystem</Filter>
     </ClCompile>
-    <ClCompile Include="MeshRenderer.cpp">
-      <Filter>Component\Renderer\Mesh\MeshRenderer</Filter>
+    <ClCompile Include="StaticModelRenderer.cpp">
+      <Filter>Component\Renderer\Model\MeshRenderer</Filter>
     </ClCompile>
     <ClCompile Include="InputSystem.cpp">
       <Filter>System\InputSystem</Filter>
@@ -404,8 +404,8 @@
     <ClCompile Include="TweenTimer.cpp">
       <Filter>Tween\TweenTimer</Filter>
     </ClCompile>
-    <ClCompile Include="SkinnedMeshRenderer.cpp">
-      <Filter>Component\Renderer\Mesh\SkinnedMeshRenderer</Filter>
+    <ClCompile Include="DynamicModelRenderer.cpp">
+      <Filter>Component\Renderer\Model\SkinnedMeshRenderer</Filter>
     </ClCompile>
     <ClCompile Include="State.cpp">
       <Filter>Animation\State</Filter>

@@ -7,7 +7,7 @@
 
 #include "PixelShader.h"
 #include "GraphicsMacro.h"
-#include "GraphicsStruct.h"
+#include "VertexStruct.h"
 
 namespace Rocket::Core
 {

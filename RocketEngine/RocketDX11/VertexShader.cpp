@@ -102,12 +102,12 @@ namespace Rocket::Core
 		_numElements = numElements;
 	}
 
-	void VertexShader::SetVertexType(VertexType type)
+	void VertexShader::SetVertexType(eVertexType type)
 	{
 		_vertexType = type;
 	}
 
-	VertexType VertexShader::GetVertexType() const
+	eVertexType VertexShader::GetVertexType() const
 	{
 		return _vertexType;
 	}

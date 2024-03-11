@@ -18,7 +18,7 @@ namespace Rocket::Core
 
 namespace Rocket::Core
 {
-	class MeshRendererBase;
+	class ModelRendererBase;
 	class UIRenderer;
 }
 

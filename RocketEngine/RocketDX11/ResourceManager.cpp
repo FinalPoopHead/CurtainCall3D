@@ -13,9 +13,9 @@
 #include "GraphicsMacro.h"
 #include "texture.h"
 #include "material.h"
-#include "GraphicsStruct.h"
 #include "FBXLoader.h"
-#include "Animation.h"
+#include "VertexStruct.h"
+#include "ModelStruct.h"
 
 const std::string TEXTURE_PATH = "Resources/Textures/";
 const std::string MODEL_PATH = "Resources/Models/";
@@ -53,7 +53,7 @@ namespace Rocket::Core
 			colorVS->SetVertexDesc(colorDesc, ARRAYSIZE(colorDesc));
 			//colorVS->Initialize(_device.Get(), "Resources/Shaders/ColorVS.cso");
 			colorVS->Initialize(_device.Get(), L"RocketDX11/ColorVS.hlsl");
-			colorVS->SetVertexType(VertexType::COLOR_VERTEX);
+			colorVS->SetVertexType(eVertexType::COLOR_VERTEX);
 			_vertexShaders["ColorVS"] = colorVS;
 
 			PixelShader* colorPS = new PixelShader();
@@ -73,7 +73,7 @@ namespace Rocket::Core
 			textureVS->SetVertexDesc(textureDesc, ARRAYSIZE(textureDesc));
 			//textureVS->Initialize(_device.Get(), "Resources/Shaders/TextureVS.cso");
 			textureVS->Initialize(_device.Get(), L"RocketDX11/TextureVS.hlsl");
-			textureVS->SetVertexType(VertexType::TEXTURE_VERTEX);
+			textureVS->SetVertexType(eVertexType::TEXTURE_VERTEX);
 			_vertexShaders["TextureVS"] = textureVS;
 
 			PixelShader* texturePS = new PixelShader();
@@ -94,7 +94,7 @@ namespace Rocket::Core
 			lightVS->SetVertexDesc(lightDesc, ARRAYSIZE(lightDesc));
 			//lightVS->Initialize(_device.Get(), "Resources/Shaders/LightVS.cso");
 			lightVS->Initialize(_device.Get(), L"RocketDX11/LightVS.hlsl");
-			lightVS->SetVertexType(VertexType::LIGHT_VERTEX);
+			lightVS->SetVertexType(eVertexType::LIGHT_VERTEX);
 			_vertexShaders["LightVS"] = lightVS;
 
 			PixelShader* lightPS = new PixelShader();
@@ -117,13 +117,38 @@ namespace Rocket::Core
 			staticMeshVS->SetVertexDesc(staticMeshDesc, ARRAYSIZE(staticMeshDesc));
 			//staticMeshVS->Initialize(_device.Get(), "Resources/Shaders/StaticMeshVS.cso");
 			staticMeshVS->Initialize(_device.Get(), L"RocketDX11/StaticMeshVS.hlsl");
-			staticMeshVS->SetVertexType(VertexType::VERTEX);
+			staticMeshVS->SetVertexType(eVertexType::VERTEX);
 			_vertexShaders["StaticMeshVS"] = staticMeshVS;
 
 			PixelShader* staticMeshPS = new PixelShader();
 			//staticMeshPS->Initialize(_device.Get(), L"Resources/Shaders/StaticMeshPS.cso");
 			staticMeshPS->Initialize(_device.Get(), L"RocketDX11/StaticMeshPS.hlsl");
 			_pixelShaders["StaticMeshPS"] = staticMeshPS;
+		}
+
+		// SkinnedMesh Shader
+		{
+			VertexShader* skinnedMeshVS = new VertexShader();
+			D3D11_INPUT_ELEMENT_DESC skinnedMeshDesc[] =
+			{
+				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{"BLENDINDICES", 0, DXGI_FORMAT_R32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{"BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{"BLENDINDICES", 1, DXGI_FORMAT_R32G32B32A32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
+			};
+			skinnedMeshVS->SetVertexDesc(skinnedMeshDesc, ARRAYSIZE(skinnedMeshDesc));
+			//staticMeshVS->Initialize(_device.Get(), "Resources/Shaders/StaticMeshVS.cso");
+			skinnedMeshVS->Initialize(_device.Get(), L"RocketDX11/SkinnedMeshVS.hlsl");
+			skinnedMeshVS->SetVertexType(eVertexType::SKINNED_VERTEX);
+			_vertexShaders["SkinnedMeshVS"] = skinnedMeshVS;
+
+			PixelShader* skinnedMeshPS = new PixelShader();
+			//staticMeshPS->Initialize(_device.Get(), L"Resources/Shaders/StaticMeshPS.cso");
+			skinnedMeshPS->Initialize(_device.Get(), L"RocketDX11/SkinnedMeshPS.hlsl");
+			_pixelShaders["SkinnedMeshPS"] = skinnedMeshPS;
 		}
 
 		CreateRenderStates();
@@ -139,8 +164,8 @@ namespace Rocket::Core
 		_defaultFont = new DirectX::SpriteFont(_device.Get(), L"Resources/Font/NotoSansKR.spritefont");
 		
 		_defaultMaterial = new Material();
-		_defaultMaterial->SetVertexShader(GetVertexShader("LightVS"));
-		_defaultMaterial->SetPixelShader(GetPixelShader("LightPS"));
+		_defaultMaterial->SetVertexShader(GetVertexShader("StaticMeshVS"));
+		_defaultMaterial->SetPixelShader(GetPixelShader("StaticMeshPS"));
 		_defaultMaterial->SetRenderState(GetRenderState(eRenderState::SOLID));
 		_defaultMaterial->SetTexture(_defaultTexture);
 
@@ -267,17 +292,17 @@ namespace Rocket::Core
 		return texture;
 	}
 
-	std::vector<Mesh*>& ResourceManager::GetMeshes(const std::string& fileName)
-	{
-		if (_models.find(fileName) == _models.end())
-		{
-			_fbxLoader->LoadFBXFile(fileName);
-		}
+// 	std::vector<Mesh*>& ResourceManager::GetMeshes(const std::string& fileName)
+// 	{
+// 		if (_models.find(fileName) == _models.end())
+// 		{
+// 			_fbxLoader->LoadFBXFile(fileName);
+// 		}
+// 
+// 		return _models[fileName]->meshes;
+// 	}
 
-		return _models[fileName]->meshes;
-	}
-
-	Rocket::Core::ModelData* ResourceManager::GetModel(const std::string& fileName)
+	Rocket::Core::Model* ResourceManager::GetModel(const std::string& fileName)
 	{
 		if (_models.find(fileName) == _models.end())
 		{
@@ -286,5 +311,4 @@ namespace Rocket::Core
 
 		return _models[fileName];
 	}
-
 }

@@ -15,7 +15,8 @@
 #include "ResourceManager.h"
 #include "ObjectManager.h"
 
-#include "MeshRenderer.h"
+#include "StaticModelRenderer.h"
+#include "DynamicModelRenderer.h"
 #include "SpriteRenderer.h"
 #include "LineRenderer.h"
 #include "GraphicsMacro.h"
@@ -304,7 +305,7 @@ namespace Rocket::Core
 		return;
 	}
 
-	void RocketDX11::RenderStaticMesh()
+	void RocketDX11::RenderMesh()
 	{
 		Camera* mainCam = Camera::GetMainCamera();
 
@@ -326,9 +327,14 @@ namespace Rocket::Core
 			_deviceContext->VSSetConstantBuffers(bufferNumber, 1, mainCam->GetAddressOfCameraBuffer());
 		}
 
-		for (auto meshRenderer : ObjectManager::Instance().GetStaticMeshRenderers())
+		for (auto meshRenderer : ObjectManager::Instance().GetStaticModelRenderers())
 		{
 			meshRenderer->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
+		}
+
+		for (auto skinnedMeshRenderer : ObjectManager::Instance().GetDynamicModelRenderers())
+		{
+			skinnedMeshRenderer->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
 		}
 	}
 
@@ -380,6 +386,7 @@ namespace Rocket::Core
 
 		Camera::GetMainCamera()->UpdateViewMatrix();
 		Camera::GetMainCamera()->UpdateProjectionMatrix();
+		UpdateAnimation(deltaTime);
 	}
 
 	void RocketDX11::OnResize(int _width, int _height)
@@ -391,7 +398,7 @@ namespace Rocket::Core
 	{
 		BeginRender(0.0f, 0.0f, 0.0f, 1.0f);
 		RenderHelperObject();
-		RenderStaticMesh();
+		RenderMesh();
 
 		RenderText();
 		RenderTexture();
@@ -440,4 +447,13 @@ namespace Rocket::Core
 		
 		ObjectManager::Instance().GetLineRenderer()->Flush();
 	}
+
+	void RocketDX11::UpdateAnimation(float deltaTime)
+	{
+		for (auto& dynamicModel : ObjectManager::Instance().GetDynamicModelRenderers())
+		{
+			dynamicModel->UpdateAnimation(deltaTime);
+		}
+	}
+
 }
