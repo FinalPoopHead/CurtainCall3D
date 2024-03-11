@@ -7,10 +7,9 @@ namespace flt
 {
 	struct RawSkeleton
 	{
-		struct Bone
+		struct Bone : public TransformOwner
 		{
 			std::wstring name;
-			Transform transform;
 		};
 
 		RawSkeleton() : bones(), rootBoneIndex(-1), clips() {}
@@ -23,7 +22,8 @@ namespace flt
 				auto& children = other.bones[i].transform.GetChildren();
 				for (int j = 0; j < children.size(); ++j)
 				{
-					int childIndex = (int)(children[j] - &other.bones[0].transform);
+					auto owner = children[j]->GetOwner();
+					int childIndex = (int)((Bone*)owner - &other.bones[0]);
 					bones[i].transform.AddChild(&bones[childIndex].transform);
 				}
 			}

@@ -43,7 +43,7 @@ flt::DX11Mesh* flt::DX11MeshBuilder::build() const
 	vertexBufferDesc.StructureByteStride = 0;
 
 	D3D11_SUBRESOURCE_DATA vertexData;
-	vertexData.pSysMem = &(vertices[0]);
+	vertexData.pSysMem = vertices.data();
 	vertexData.SysMemPitch = 0;
 	vertexData.SysMemSlicePitch = 0;
 
@@ -64,7 +64,7 @@ flt::DX11Mesh* flt::DX11MeshBuilder::build() const
 	indexBufferDesc.StructureByteStride = 0;
 
 	D3D11_SUBRESOURCE_DATA indexData;
-	indexData.pSysMem = &(pRawMesh->indices[0]);
+	indexData.pSysMem = pRawMesh->indices.data();
 	indexData.SysMemPitch = 0;
 	indexData.SysMemSlicePitch = 0;
 
