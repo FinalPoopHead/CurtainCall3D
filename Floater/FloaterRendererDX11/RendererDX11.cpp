@@ -485,11 +485,6 @@ bool flt::RendererDX11::Render(float deltaTime)
 
 			for (auto& mesh : node->meshes)
 			{
-				//if (mesh->pRootBoneTransform)
-				//{
-
-				//}
-
 				DX11Mesh* pMesh = mesh.Get();
 
 				DX11VertexShader* vertexShader = pMesh->vertexShader.Get();
@@ -512,20 +507,21 @@ bool flt::RendererDX11::Render(float deltaTime)
 				{
 					void* pData[2] = { &worldViewProj, _boneMatrices };
 
-					for (int i = 0; i < node->pSkeleton->clips.size(); ++i)
-					{
-						auto& clip = node->pSkeleton->clips[i];
+					//for (int i = 0; i < node->pSkeleton->clips.size(); ++i)
+					//{
+					//	auto& clip = node->pSkeleton->clips[i];
 
-						if (clip.keyPosition.size() > 0)
-							node->pSkeleton->bones[i].SetPosition(clip.keyPosition[0].position);
-						if (clip.keyRotation.size() > 0)
-							node->pSkeleton->bones[i].SetRotation(clip.keyRotation[0].rotation);
-						if (clip.keyScale.size() > 0)
-							node->pSkeleton->bones[i].SetScale(clip.keyScale[0].scale);
-					}
+					//	if (clip.keyPosition.size() > 0)
+					//		node->pSkeleton->bones[i].SetPosition(clip.keyPosition[0].position);
+					//	if (clip.keyRotation.size() > 0)
+					//		node->pSkeleton->bones[i].SetRotation(clip.keyRotation[0].rotation);
+					//	if (clip.keyScale.size() > 0)
+					//		node->pSkeleton->bones[i].SetScale(clip.keyScale[0].scale);
+					//}
 					for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
 					{
-						_boneMatrices[i] = ConvertXMMatrix(node->pSkeleton->bones[i].GetWorldMatrix4f());
+						_boneMatrices[i] = ConvertXMMatrix(node->pSkeleton->boneOffsetMatrix[i] * node->pSkeleton->bones[i].GetWorldMatrix4f());
+						//_boneMatrices[i] = ConvertXMMatrix(Matrix4f::Identity());
 					}
 
 					vertexShader->SetConstantBuffer(_immediateContext.Get(), pData, 2);
@@ -626,14 +622,15 @@ bool flt::RendererDX11::Render(float deltaTime)
 	_immediateContext->OMSetBlendState(NULL, blend, 0xFFFFFFFF);
 
 	// 수직동기화 여부에 따라서 present
-	if (_useVsync)
-	{
-		_swapChain->Present(1, 0);
-	}
-	else
-	{
-		_swapChain->Present(0, 0);
-	}
+	_swapChain->Present(_useVsync, 0);
+	//if (_useVsync)
+	//{
+	//	_swapChain->Present(1, 0);
+	//}
+	//else
+	//{
+	//	_swapChain->Present(0, 0);
+	//}
 
 	return true;
 }

@@ -156,7 +156,7 @@ int main()
 	flt::RendererObject fbxObject(fbxTransform, *rawScene.nodes[0], isDraw, L"test1");
 	auto objectID0 = renderer->RegisterObject(fbxObject);
 	fbxObject.transform.SetScale(0.1f, 0.1f, 0.1f);
-	fbxObject.transform.SetRotation(90.0f, 0.0f, 0.0f);
+	//fbxObject.transform.SetRotation(90.0f, 0.0f, 0.0f);
 	fbxObject.transform.SetPosition(0.f, 0.f, 30.f);
 
 	flt::Transform cubeTransform;
@@ -172,7 +172,7 @@ int main()
 		}
 
 		renderer->Render(1.0f);
-		fbxObject.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, 0.01f);
+		//fbxObject.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, 0.01f);
 		renderable.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, -0.1f);
 		{
 			auto keyData = platform.GetKey(flt::KeyCode::mouseLButton);

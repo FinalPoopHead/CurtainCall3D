@@ -12,8 +12,8 @@ namespace flt
 			std::wstring name;
 		};
 
-		RawSkeleton() : bones(), rootBoneIndex(-1), clips() {}
-		RawSkeleton(const RawSkeleton& other) : bones(other.bones), rootBoneIndex(other.rootBoneIndex), clips(other.clips)
+		RawSkeleton() : bones(), boneOffsets(), rootBoneIndex(-1), clips() {}
+		RawSkeleton(const RawSkeleton& other) : bones(other.bones), boneOffsets(other.boneOffsets), rootBoneIndex(other.rootBoneIndex), clips(other.clips)
 		{
 			bones.reserve(other.bones.size());
 
@@ -32,6 +32,7 @@ namespace flt
 		RawSkeleton(RawSkeleton&& other) noexcept : bones(std::move(other.bones)), rootBoneIndex(other.rootBoneIndex), clips(std::move(other.clips)) {}
 
 		std::vector<Bone> bones;
+		std::vector<Matrix4f> boneOffsets;
 		int rootBoneIndex;
 
 		std::vector<RawAnimationClip> clips;

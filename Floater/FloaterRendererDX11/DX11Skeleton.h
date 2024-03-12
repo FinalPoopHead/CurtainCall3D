@@ -6,7 +6,8 @@ namespace flt
 {
 	struct DX11Skeleton
 	{
-		DX11Skeleton(const RawSkeleton& rawSkeleton) :
+		DX11Skeleton(RawSkeleton& rawSkeleton) :
+			boneOffsetMatrix(rawSkeleton.boneOffsets),
 			bones(rawSkeleton.bones.size()),
 			clips(rawSkeleton.clips)
 		{
@@ -14,7 +15,8 @@ namespace flt
 			for(int i = 0; i < boneCount; i++)
 			{
 				bones[i] = rawSkeleton.bones[i].transform;
-
+				//boneOffsetMatrix[i] = rawSkeleton.bones[i].transform.GetWorldMatrix4f() * rawSkeleton.bones[rawSkeleton.rootBoneIndex].transform.GetWorldMatrix4f().Inverse();
+				//boneOffsetMatrix[i] = boneOffsetMatrix[i].Inverse();
 				auto& children = rawSkeleton.bones[i].transform.GetChildren();
 				for (int j = 0; j < children.size(); ++j)
 				{
@@ -25,6 +27,7 @@ namespace flt
 			}
 		}
 
+		std::vector<Matrix4f> boneOffsetMatrix;
 		std::vector<Transform> bones;
 		std::vector<RawAnimationClip> clips;
 	};
