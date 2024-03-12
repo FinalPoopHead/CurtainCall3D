@@ -98,33 +98,6 @@ namespace Rocket::Core
 		{
 			mesh->CreateBuffers();	// vertexBuffer와 indexBuffer 생성.
 		}
-
-		/// nodeBuffer 생성 (상수버퍼에 세팅해주기 위함)
-		D3D11_BUFFER_DESC nodeBufferDesc;
-		nodeBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-		nodeBufferDesc.ByteWidth = sizeof(NodeBufferType);
-		nodeBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		nodeBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		nodeBufferDesc.MiscFlags = 0;
-		nodeBufferDesc.StructureByteStride = 0;
-
-		HR(_device->CreateBuffer(&nodeBufferDesc, NULL, _nowModel->nodeBuffer.GetAddressOf()));
-
-		/// dynamicModel의 경우 boneBuffer 생성 (상수버퍼에 세팅해주기 위함)
-		if (scene->HasAnimations())
-		{
-			D3D11_BUFFER_DESC boneBufferDesc;
-			boneBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-			boneBufferDesc.ByteWidth = sizeof(BoneBufferType);
-			boneBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-			boneBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-			boneBufferDesc.MiscFlags = 0;
-			boneBufferDesc.StructureByteStride = 0;
-
-			auto dModel = reinterpret_cast<DynamicModel*>(_nowModel);
-
-			HR(_device->CreateBuffer(&boneBufferDesc, NULL, dModel->boneBuffer.GetAddressOf()));
-		}
 	}
 
 	void FBXLoader::ProcessNode(aiNode* ainode, const aiScene* scene)

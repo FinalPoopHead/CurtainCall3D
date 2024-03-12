@@ -20,12 +20,12 @@ void TestScene::Initialize()
 	scene->GetMainCamera()->GetCamera().SetAsMainCamera();
 
 	/// 스태틱 메쉬 테스트
-// 	auto staticTest = scene->CreateObject("StaticTest");
-// 	staticTest->transform.SetPosition(1.0f, 0.0f, 0.0f);
-// 	auto staticTestRenderer = staticTest->AddComponent<Rocket::StaticModelRenderer>();
-// 	staticTestRenderer->SetMesh("SK_TP_CH_Default.fbx");
-// 	staticTestRenderer->SetTexture("T_TP_CH_Camo_006_003_D.png");
-// 	staticTest->AddComponent<PlayerController>();
+	auto staticTest = scene->CreateObject("StaticTest");
+	staticTest->transform.SetPosition(1.0f, 0.0f, 0.0f);
+	auto staticTestRenderer = staticTest->AddComponent<Rocket::StaticModelRenderer>();
+	staticTestRenderer->SetMesh("SK_TP_CH_Default.fbx");
+	staticTestRenderer->SetTexture("T_TP_CH_Camo_006_003_D.png");
+	staticTest->AddComponent<PlayerController>();
 
 	/// 스태틱 메쉬 노드 하이어라키 테스트
 // 	auto boxTest = scene->CreateObject("boxTest");

@@ -422,9 +422,9 @@ namespace Rocket::Core
 		auto ps = _resourceManager.GetPixelShader("ColorPS");
 
 		_grid->Update(DirectX::XMMatrixIdentity(), Camera::GetMainCamera()->GetViewMatrix(), Camera::GetMainCamera()->GetProjectionMatrix());
-		_grid->Render(_deviceContext.Get(), vs->GetVertexShader(), ps->GetPixelShader(), vs->GetMatrixBuffer(), vs->GetInputLayout());
+		_grid->Render(_deviceContext.Get(), vs->GetVertexShader(), ps->GetPixelShader(), vs->GetConstantBuffer(0), vs->GetInputLayout());
 		_axis->Update(DirectX::XMMatrixIdentity(), Camera::GetMainCamera()->GetViewMatrix(), Camera::GetMainCamera()->GetProjectionMatrix());
-		_axis->Render(_deviceContext.Get(), vs->GetVertexShader(), ps->GetPixelShader(), vs->GetMatrixBuffer(), vs->GetInputLayout());
+		_axis->Render(_deviceContext.Get(), vs->GetVertexShader(), ps->GetPixelShader(), vs->GetConstantBuffer(0), vs->GetInputLayout());
 	}
 
 	void RocketDX11::RenderLine()

@@ -56,8 +56,10 @@ namespace Rocket::Core
 		// 상수 버퍼 세팅
 		{
 			// 버텍스 쉐이더
+			unsigned int bufferNumber = 0;
+
 			D3D11_MAPPED_SUBRESOURCE mappedResource;
-			HR(deviceContext->Map(_material->GetVertexShader()->GetMatrixBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+			HR(deviceContext->Map(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
 
 			MatrixBufferType* matrixBufferDataPtr = (MatrixBufferType*)mappedResource.pData;
 
@@ -78,28 +80,29 @@ namespace Rocket::Core
 			matrixBufferDataPtr->view = v;
 			matrixBufferDataPtr->projection = p;
 
-			deviceContext->Unmap(_material->GetVertexShader()->GetMatrixBuffer(), 0);
+			deviceContext->Unmap(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0);
 
-			unsigned int bufferNumber = 0;
 
-			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfMatrixBuffer());
+			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
 
 			///
-			HR(deviceContext->Map(_model->nodeBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+			bufferNumber = 2;
+
+			HR(deviceContext->Map(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
 
 			NodeBufferType* nodeBufferDataPtr = (NodeBufferType*)mappedResource.pData;
 
 			SetNodeBuffer(_model->rootNode, nodeBufferDataPtr);
 			
-			deviceContext->Unmap(_model->nodeBuffer.Get(), 0);
+			deviceContext->Unmap(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0);
 
-			bufferNumber = 2;
 
-			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _model->nodeBuffer.GetAddressOf());
+			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
 			///
-
 			// 픽셀 쉐이더
-			HR(deviceContext->Map(_material->GetPixelShader()->GetLightBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+			bufferNumber = 0;
+
+			HR(deviceContext->Map(_material->GetPixelShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
 		
 			LightBufferType* lightBufferDataPtr = (LightBufferType*)mappedResource.pData;
 
@@ -110,11 +113,11 @@ namespace Rocket::Core
 			lightBufferDataPtr->specularPower = 2.0f;
 			lightBufferDataPtr->specularColor = { 0.5f,0.5f,0.5f,1.0f };
 
-			deviceContext->Unmap(_material->GetPixelShader()->GetLightBuffer(), 0);
+			deviceContext->Unmap(_material->GetPixelShader()->GetConstantBuffer(bufferNumber), 0);
 
-			bufferNumber = 0;
+			
 
-			deviceContext->PSSetConstantBuffers(bufferNumber, 1, _material->GetPixelShader()->GetAddressOfLightBuffer());
+			deviceContext->PSSetConstantBuffers(bufferNumber, 1, _material->GetPixelShader()->GetAddressOfConstantBuffer(bufferNumber));
 		}
 
 		// 렌더스테이트

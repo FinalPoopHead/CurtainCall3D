@@ -1,17 +1,11 @@
 ﻿#pragma once
-#include <d3d11_2.h>
-#include <dxgi1_3.h>
 #include <DirectXMath.h>
-#include <wrl.h>
 #include <vector>
 #include <string>
 #include <unordered_map>
 
 #include "MathHeader.h"
 #include "IResource.h"
-
-
-using Microsoft::WRL::ComPtr;
 
 namespace Rocket::Core
 {
@@ -34,7 +28,6 @@ namespace Rocket::Core
 
 		std::string name;
 		Node* rootNode;
-		ComPtr<ID3D11Buffer> nodeBuffer;
 		std::unordered_map<std::string, Node*> nodeMap;
 	};
 
@@ -50,7 +43,6 @@ namespace Rocket::Core
 		virtual std::vector<Mesh*> GetMeshes() override;
 
 		std::vector<SkinnedMesh*> meshes;
-		ComPtr<ID3D11Buffer> boneBuffer;
 		std::unordered_map<std::string, Animation*> animations;		// 애니메이션이 여러개일 수 있으므로
 	};
 

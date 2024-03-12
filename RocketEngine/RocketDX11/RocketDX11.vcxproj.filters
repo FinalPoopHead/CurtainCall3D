@@ -140,7 +140,7 @@
     <ClInclude Include="LineRenderer.h">
       <Filter>Object\LineRenderer</Filter>
     </ClInclude>
-    <ClInclude Include="IShader.h">
+    <ClInclude Include="ShaderBase.h">
       <Filter>Resource\Shader\Interface</Filter>
     </ClInclude>
     <ClInclude Include="ObjectFactory.h">

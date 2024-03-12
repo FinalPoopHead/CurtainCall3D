@@ -200,7 +200,7 @@
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="RocketDX11.h" />
     <ClInclude Include="GraphicsMacro.h" />
-    <ClInclude Include="IShader.h" />
+    <ClInclude Include="ShaderBase.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="StaticModelRenderer.h" />
     <ClInclude Include="SphereMesh.h" />
