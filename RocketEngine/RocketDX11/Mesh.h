@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "IResource.h"
-#include "GraphicsStruct.h"
+#include "VertexStruct.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -14,14 +14,15 @@ namespace Rocket::Core
 {
 	struct Node;
 
+	// TODO : 이거를 템플릿으로 빼서 staticMesh와 skinnedMesh를 구분하면 좋지 않을까?
 	class Mesh : public IResource
 	{
 	public:
 		Mesh();
-		Mesh(std::vector<Vertex> vertices, std::vector<UINT> indices);
+		// Mesh(std::vector<Vertex> vertices, std::vector<UINT> indices);
 		virtual void Initialize(ID3D11Device* device) {}
 		
-		void CreateBuffers();
+		virtual void CreateBuffers() = 0;
 
 		int GetVertexCount() const;
 		int GetIndexCount() const;
@@ -31,20 +32,20 @@ namespace Rocket::Core
 		ID3D11Buffer** GetAddressOfVertexBuffer();
 		ID3D11Buffer** GetAddressOfIndexBuffer();
 
-		void SetVertexType(VertexType type);
-		VertexType GetVertexType() const;
+		void SetVertexType(eVertexType type);
+		eVertexType GetVertexType() const;
 
 		Node* GetNode() const { return _node; }
 		void SetNode(Node* val) { _node = val; }
 
 	protected:
-		std::vector<Vertex> _vertices;
+		// std::vector<Vertex> _vertices;		// VertexType은 자식클래스인 Static,Skinned에서 정의
 		std::vector<UINT> _indices;
 		ComPtr<ID3D11Buffer> _vertexBuffer;
 		ComPtr<ID3D11Buffer> _indexBuffer;
 		int _vertexCount;
 		int _indexCount;
-		VertexType _vertexType;
+		eVertexType _vertexType;
 		Node* _node;
 	};
 }

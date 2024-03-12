@@ -8,7 +8,7 @@
 namespace Rocket::Core
 {
 	class ObjectSystem;
-	class MeshRendererBase;
+	class ModelRendererBase;
 	class PhysicsSystem;
 }
 

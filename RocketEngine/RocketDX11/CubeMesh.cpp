@@ -1,7 +1,7 @@
 ﻿#include <DirectXColors.h>	// 이미 많은 부분 DX11과 겹친다.
 #include "CubeMesh.h"
 #include "GraphicsMacro.h"
-#include "GraphicsStruct.h"
+#include "VertexStruct.h"
 
 namespace Rocket::Core
 {
@@ -23,7 +23,7 @@ namespace Rocket::Core
 
 	void CubeMesh::BuildGeometryBuffers(ID3D11Device* device)
 	{
-		_vertexType = VertexType::LIGHT_VERTEX;
+		_vertexType = eVertexType::LIGHT_VERTEX;
 		
 		LightVertex vertices[] =
 		{

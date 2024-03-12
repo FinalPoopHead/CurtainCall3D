@@ -3,7 +3,8 @@
 
 #include "Transform.h"
 #include "Camera.h"
-#include "MeshRenderer.h"
+#include "StaticModelRenderer.h"
+#include "DynamicModelRenderer.h"
 #include "CubeMesh.h"
 #include "TextRenderer.h"
 #include "SpriteRenderer.h"
@@ -40,9 +41,9 @@ namespace Rocket::Core
 		return _objectManager.CreateCamera();
 	}
 
-	IMeshRenderer* ObjectFactory::CreateMeshRenderer()
+	IStaticModelRenderer* ObjectFactory::CreateStaticModelRenderer()
 	{
-		return _objectManager.CreateMeshRenderer();
+		return _objectManager.CreateStaticModelRenderer();
 	}
 
 	ITextRenderer* ObjectFactory::CreateTextRenderer()
@@ -60,9 +61,9 @@ namespace Rocket::Core
 		return _objectManager.CreateLineRenderer();
 	}
 
-	ISkinnedMesh* ObjectFactory::CreateSkinnedMeshObject()
+	IDynamicModelRenderer* ObjectFactory::CreateDynamicModelRenderer()
 	{
-		return nullptr;
+		return _objectManager.CreateDynamicModelRenderer();
 	}
 
 	CubePrimitive* ObjectFactory::CreateCubePrimitive()

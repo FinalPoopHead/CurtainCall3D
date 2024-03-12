@@ -21,6 +21,8 @@ public:
 
 public:
 	float moveSpeed;
+	float accelRatio;
+	float thisFrameSpeed;
 
 private:
 	Rocket::Camera* _camera;

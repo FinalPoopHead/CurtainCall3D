@@ -37,7 +37,7 @@
     <ClInclude Include="IGraphicsSystem.h">
       <Filter>GraphicsSystem</Filter>
     </ClInclude>
-    <ClInclude Include="IMeshRenderer.h">
+    <ClInclude Include="IStaticModelRenderer.h">
       <Filter>Component</Filter>
     </ClInclude>
     <ClInclude Include="ITextRenderer.h">
@@ -55,7 +55,7 @@
     <ClInclude Include="ILineRenderer.h">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="ISkinnedMesh.h">
+    <ClInclude Include="IDynamicModelRenderer.h">
       <Filter>Component</Filter>
     </ClInclude>
     <ClInclude Include="ITransform.h">
