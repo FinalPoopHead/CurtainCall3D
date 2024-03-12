@@ -386,7 +386,7 @@ namespace Rocket::Core
 
 		Camera::GetMainCamera()->UpdateViewMatrix();
 		Camera::GetMainCamera()->UpdateProjectionMatrix();
-		UpdateAnimation(deltaTime);
+		//UpdateAnimation(deltaTime);
 	}
 
 	void RocketDX11::OnResize(int _width, int _height)

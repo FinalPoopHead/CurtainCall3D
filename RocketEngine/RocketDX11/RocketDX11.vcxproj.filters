@@ -111,6 +111,9 @@
     <ClCompile Include="ModelStruct.cpp">
       <Filter>Struct</Filter>
     </ClCompile>
+    <ClCompile Include="CubeMap.cpp">
+      <Filter>Object\CubeMap</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Axis.h">
@@ -214,6 +217,9 @@
     </ClInclude>
     <ClInclude Include="ModelStruct.h">
       <Filter>Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeMap.h">
+      <Filter>Object\CubeMap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -342,6 +348,9 @@
     </Filter>
     <Filter Include="Object\ModelRenderer\DynamicModelRenderer">
       <UniqueIdentifier>{51bf0425-9c14-4153-a750-4f08ac11fce2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\CubeMap">
+      <UniqueIdentifier>{b69fe248-0bba-4c99-9e53-0a598b73b05c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

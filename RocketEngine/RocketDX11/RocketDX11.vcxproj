@@ -149,6 +149,7 @@
   <ItemGroup>
     <ClCompile Include="Axis.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="CubeMesh.cpp" />
     <ClCompile Include="DeviceBuilderDX11.cpp" />
     <ClCompile Include="ModelStruct.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="AssimpMathConverter.h" />
     <ClInclude Include="Axis.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CubeMap.h" />
     <ClInclude Include="CubeMesh.h" />
     <ClInclude Include="DeviceBuilderDX11.h" />
     <ClInclude Include="MathHeader.h" />
