@@ -1,31 +1,31 @@
-/// Å¬¶óÀÌ¾ğÆ®¿¡°Ô ¿£ÁøÀÇ ±â´ÉÀ» Á¦°øÇÏ±â À§ÇØ ÇÑ¹ø ·¦ÇÎÇÏ¿© export ÇÏ´Â ÄÚµå.
-/// Å¬¶óÀÌ¾ğÆ®¿¡°Ô OpenÇÏ°í ½ÍÀº ºÎºĞ¸¸ Á¦°øÇÒ ¼ö ÀÖµµ·Ï Çß´Ù.
+ï»¿/// í´ë¼ì´ì–¸íŠ¸ì—ê²Œ ì—”ì§„ì˜ ê¸°ëŠ¥ì„ ì œê³µí•˜ê¸° ìœ„í•´ í•œë²ˆ ë©í•‘í•˜ì—¬ export í•˜ëŠ” ì½”ë“œ.
+/// í´ë¼ì´ì–¸íŠ¸ì—ê²Œ Opení•˜ê³  ì‹¶ì€ ë¶€ë¶„ë§Œ ì œê³µí•  ìˆ˜ ìˆë„ë¡ í–ˆë‹¤.
 ///
-/// 23.07.07 °­¼®¿ø ÀÎÀç¿ø.
+/// 23.07.07 ê°•ì„ì› ì¸ì¬ì›.
 
 #pragma once
 #include <string>
 #include "DLLExporter.h"
 #include "MathHeader.h"
 
-// ¿©±â¿¡ Å¬¶óÀÌ¾ğÆ®¿¡¼­ ¾µ Å¬·¡½ºµé ÂüÁ¶ÇØÁÖ°í (»ó¼ÓÀ»À§ÇÑ?)
-/// ¿£Áø »ı¼º ÆÑÅä¸®
+// ì—¬ê¸°ì— í´ë¼ì´ì–¸íŠ¸ì—ì„œ ì“¸ í´ë˜ìŠ¤ë“¤ ì°¸ì¡°í•´ì£¼ê³  (ìƒì†ì„ìœ„í•œ?)
+/// ì—”ì§„ ìƒì„± íŒ©í† ë¦¬
 #include "EngineProcess.h"
 
-/// °´Ã¼ »ı¼º ÆÑÅä¸®.
+/// ê°ì²´ ìƒì„± íŒ©í† ë¦¬.
 #include "GameObject.h"
 #include "Scene.h"
 
-/// ±â´É Á¦°ø.
-// ±â´ÉÁ¦°øÀº cpp¿¡¼­ ·¡ÇÎ.
+/// ê¸°ëŠ¥ ì œê³µ.
+// ê¸°ëŠ¥ì œê³µì€ cppì—ì„œ ë˜í•‘.
 #include "eSoundGroup.h"
 
-/// Å¬·¡½º export.
-// ´ëÃ¼·Î ÄÄÆ÷³ÍÆ®.
+/// í´ë˜ìŠ¤ export.
+// ëŒ€ì²´ë¡œ ì»´í¬ë„ŒíŠ¸.
 #include "Component.h"
 #include "Camera.h"
-#include "MeshRenderer.h"
-#include "SkinnedMeshRenderer.h"
+#include "StaticModelRenderer.h"
+#include "DynamicModelRenderer.h"
 #include "Transform.h"
 #include "AnimationController.h"
 #include "Animator.h"
@@ -47,14 +47,14 @@
 
 namespace Rocket
 {
-	/// ¿£Áø »ı¼º ÆÑÅä¸®.
+	/// ì—”ì§„ ìƒì„± íŒ©í† ë¦¬.
 	ROCKET_API EngineProcess* CreateLauncher();
 	ROCKET_API void ReleaseLauncher(IEngineProcess* instance);
 
-	/// ¿¡µğÅÍ Á¤º¸ ·Îµå.
+	/// ì—ë””í„° ì •ë³´ ë¡œë“œ.
 	ROCKET_API void LoadSceneFromJSON(std::string sceneDataPath);
 
-	/// °´Ã¼ »ı¼º ÆÑÅä¸®.
+	/// ê°ì²´ ìƒì„± íŒ©í† ë¦¬.
 	ROCKET_API GameObject* CreateObject(const std::string& objName);
 	ROCKET_API GameObject* CreateStaticObject(const std::string& objName);
 	ROCKET_API Scene* CreateScene(const std::string& sceneName, bool withNoCam = false);
@@ -63,14 +63,14 @@ namespace Rocket
 	ROCKET_API GameObject* CreateImageBox(const std::string& objName);
 	ROCKET_API GameObject* CreateTextBox(const std::string& objName);
 
-	/// °´Ã¼ ¹İÈ¯. (°´Ã¼ÀÇ ÁÖ¼Ò ¹İÈ¯)
+	/// ê°ì²´ ë°˜í™˜. (ê°ì²´ì˜ ì£¼ì†Œ ë°˜í™˜)
 	ROCKET_API Camera* GetMainCamera();
 
-	/// ¸ŞÀÎ Ä«¸Ş¶ó º¯°æ.
+	/// ë©”ì¸ ì¹´ë©”ë¼ ë³€ê²½.
 	ROCKET_API void SetMainCamera(Camera* camera);
 
-	/// ±â´É Á¦°ø.
-	ROCKET_API void RocketDestroyWindow();						// À©µµ¿ì Á¾·á.
+	/// ê¸°ëŠ¥ ì œê³µ.
+	ROCKET_API void RocketDestroyWindow();						// ìœˆë„ìš° ì¢…ë£Œ.
 	ROCKET_API bool LoadScene(const std::string& sceneName);
 	ROCKET_API float GetDeltaTime();
 	ROCKET_API bool GetKeyDown(int keyCode);
@@ -84,10 +84,10 @@ namespace Rocket
 	ROCKET_API void SetMouseSensitivity(float sensitivity);
 	ROCKET_API GameObject* FindObjectByName(std::string name);
 
-	/// ¹°¸® ±â´É Á¦°ø.
+	/// ë¬¼ë¦¬ ê¸°ëŠ¥ ì œê³µ.
 	ROCKET_API Collider* ShootRay(Vector3 origin, Vector3 direction, float length = 100.0f, int* type = nullptr);
 
-	/// »ç¿îµå °ü·Ã.
+	/// ì‚¬ìš´ë“œ ê´€ë ¨.
 	ROCKET_API float GetGroupVolume(eSoundGroup group);
 	ROCKET_API void SetGroupVolume(eSoundGroup group, float volume);
 	ROCKET_API void AddAudio(const std::string& audioPath, eSoundGroup group);
@@ -97,7 +97,7 @@ namespace Rocket
 	ROCKET_API void PlayEnd(std::string soundPath);
 	ROCKET_API void PlayAllEnd();
 
-	/// µğ¹ö±× °ü·Ã.
+	/// ë””ë²„ê·¸ ê´€ë ¨.
 	//ROCKET_API void ToggleDebugMode();
 	ROCKET_API void DrawDebugText(Vector2 centerPos, std::string content, float size);
 	ROCKET_API void DrawDebugBox(Matrix worldTM, Vector3 widthHeightDepth = { 1.0f,1.0f,1.0f }, bool isWire = true, Vector4 color = { 1.0f,0.0f,0.0f,1.0f });

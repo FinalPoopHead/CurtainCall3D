@@ -1,7 +1,7 @@
 ﻿#include <cmath>
 #include "Camera.h"
 #include "ResourceManager.h"
-#include "GraphicsStruct.h"
+#include "VertexStruct.h"
 #include "GraphicsMacro.h"
 
 using namespace DirectX;

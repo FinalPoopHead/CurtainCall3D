@@ -1,7 +1,7 @@
 ﻿#include <vector>
 #include "SphereMesh.h"
 #include "GraphicsMacro.h"
-#include "GraphicsStruct.h"
+#include "VertexStruct.h"
 
 namespace Rocket::Core
 {
@@ -24,7 +24,7 @@ namespace Rocket::Core
 
 	void SphereMesh::BuildGeometryBuffers(ID3D11Device* device, float radius, UINT sliceCount, UINT stackCount)
 	{
-		_vertexType = VertexType::LIGHT_VERTEX;
+		_vertexType = eVertexType::LIGHT_VERTEX;
 
 		std::vector<LightVertex> vertices;
 		std::vector<UINT> indices;

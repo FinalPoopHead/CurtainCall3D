@@ -1,11 +1,14 @@
 ﻿#pragma once
 #include <wrl.h>
-#include "IShader.h"
-#include "GraphicsStruct.h"
+#include <vector>
+#include "ShaderBase.h"
+#include "VertexStruct.h"
+
+using Microsoft::WRL::ComPtr;
 
 namespace Rocket::Core
 {
-	class VertexShader : public IShader
+	class VertexShader : public ShaderBase
 	{
 	public:
 		VertexShader();
@@ -16,28 +19,26 @@ namespace Rocket::Core
 
 	public:
 		ID3D11VertexShader* GetVertexShader() const;
-		ID3D11Buffer* GetMatrixBuffer() const;
-		ID3D11Buffer** GetAddressOfMatrixBuffer();
+		ID3D11Buffer* GetConstantBuffer(int registerSlot) const;
+		ID3D11Buffer** GetAddressOfConstantBuffer(int registerSlot);
 		ID3D11InputLayout* GetInputLayout() const;
 		ID3D11SamplerState** GetAddressOfSampleState();
 
 	public:
-		void SetVertexDesc(D3D11_INPUT_ELEMENT_DESC desc[], unsigned int numElements);
-		void SetVertexType(VertexType type);
-		VertexType GetVertexType() const;
+		void SetVertexType(eVertexType type);
+		eVertexType GetVertexType() const;
 
 	private:
-		void CreateShaderAndInputLayout(ID3D11Device* device, const std::wstring& path);
-		void CreateMatrixBuffer(ID3D11Device* device);
+		void CreateAndReflectShader(ID3D11Device* device, const std::wstring& path);
+		void ReflectShader(ID3D11Device* device, const std::wstring& path);		// 안쓰는 함수.
 		void CreateSamplerState(ID3D11Device* device);
 
 	private:
-		D3D11_INPUT_ELEMENT_DESC* _vertexDesc;
 		ComPtr<ID3D11VertexShader> _vertexShader;
-		ComPtr<ID3D11Buffer> _matrixBuffer;
+		std::vector<ComPtr<ID3D11Buffer>> _constantBuffers;
 		ComPtr<ID3D11InputLayout> _inputLayout;
 		ComPtr<ID3D11SamplerState> _sampleState;
-		VertexType _vertexType;
+		eVertexType _vertexType;
 		unsigned int _numElements;
 	};
 }
