@@ -3,12 +3,12 @@ cbuffer ConstantBuffer : register(b0)
     float4x4 WorldViewProj;
 };
 
-cbuffer ConstantBuffer : register(b0)
-{
-    float4x4 World;
-    float4x4 WorldInvTransp;
-    float4x4 ViewProj;
-};
+//cbuffer ConstantBuffer2 : register(b1)
+//{
+//    float4x4 World;
+//    float4x4 WorldInvTransp;
+//    float4x4 ViewProj;
+//};
 
 cbuffer BoneConstantBuffer : register(b1)
 {
@@ -18,16 +18,16 @@ cbuffer BoneConstantBuffer : register(b1)
 struct VS_INPUT
 {
     float3 Position : POSITION;
-    float2 UV0 : TEXCOORD;
-    float2 UV1 : TEXCOORD;
-    float2 UV2 : TEXCOORD;
-    float2 UV3 : TEXCOORD;
-    float2 UV4 : TEXCOORD;
-    float2 UV5 : TEXCOORD;
-    float2 UV6 : TEXCOORD;
-    float2 UV7 : TEXCOORD;
-    float2 UV8 : TEXCOORD;
-    float2 UV9 : TEXCOORD;
+    float2 UV0 : TEXCOORD0;
+    float2 UV1 : TEXCOORD1;
+    float2 UV2 : TEXCOORD2;
+    float2 UV3 : TEXCOORD3;
+    float2 UV4 : TEXCOORD4;
+    float2 UV5 : TEXCOORD5;
+    float2 UV6 : TEXCOORD6;
+    float2 UV7 : TEXCOORD7;
+    float2 UV8 : TEXCOORD8;
+    float2 UV9 : TEXCOORD9;
     float3 Normal : NORMAL;
     float3 binormal : BINORMAL;
     float3 tangent : TANGENT;
@@ -74,7 +74,7 @@ VS_OUTPUT main(VS_INPUT Input)
     //    );
     
     float4 PosL = mul(bone, float4(Input.Position.xyz, 1.0f));
-    Output.Position = mul(WorldViewProj, float4(Input.Position.xyz, 1.0f));
+    Output.Position = mul(WorldViewProj, PosL);
     
     //Output.PositionW = mul(World, PosL);
     //// 아래 임시코드

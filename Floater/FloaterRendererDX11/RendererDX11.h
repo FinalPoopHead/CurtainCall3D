@@ -110,6 +110,9 @@ namespace flt
 		std::vector<DX11Node*> _renderableObjects;
 		std::vector<Camera*> _cameras;
 
+		// 애니메이션 그릴때 돌려 쓸 버퍼
+		DirectX::XMMATRIX _boneMatrices[512];
+
 		// 디버그용 변수
 		//HWND _debugHWnd;
 		//bool _isDebugMode;

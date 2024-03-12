@@ -26,8 +26,6 @@ namespace flt
 		//Transform(Transform&& other) noexcept;
 		//Transform& operator=(Transform&& other) noexcept;
 
-
-
 		void SetMatrix(const Matrix4f& worldMatrix);
 
 		Vector4f GetLocalPosition() const noexcept { return _position; }

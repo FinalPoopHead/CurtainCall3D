@@ -503,27 +503,33 @@ bool flt::RendererDX11::Render(float deltaTime)
 
 				_immediateContext->PSSetShaderResources(0, pMesh->srvCount, pMesh->srv);
 
-				void* pData = &worldViewProj;
-				vertexShader->SetConstantBuffer(_immediateContext.Get(), &pData, 1);
+				if (!node->pSkeleton)
+				{
+					void* pData[1] = { &worldViewProj };
+					vertexShader->SetConstantBuffer(_immediateContext.Get(), pData, 1);
+				}
+				else
+				{
+					void* pData[2] = { &worldViewProj, _boneMatrices };
 
-				//if (node->pSkeleton)
-				//{
-				//	DirectX::XMMATRIX* pBoneTransform = new(std::nothrow) DirectX::XMMATRIX[512];
+					for (int i = 0; i < node->pSkeleton->clips.size(); ++i)
+					{
+						auto& clip = node->pSkeleton->clips[i];
 
-				//	for (int i = 0; i < node->pSkeleton->clips.size(); ++i)
-				//	{
-				//		auto& clip = node->pSkeleton->clips[i];
+						if (clip.keyPosition.size() > 0)
+							node->pSkeleton->bones[i].SetPosition(clip.keyPosition[0].position);
+						if (clip.keyRotation.size() > 0)
+							node->pSkeleton->bones[i].SetRotation(clip.keyRotation[0].rotation);
+						if (clip.keyScale.size() > 0)
+							node->pSkeleton->bones[i].SetScale(clip.keyScale[0].scale);
+					}
+					for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
+					{
+						_boneMatrices[i] = ConvertXMMatrix(node->pSkeleton->bones[i].GetWorldMatrix4f());
+					}
 
-				//		Transform transform;
-				//		transform.SetPosition(clip.keyPosition[i].position);
-				//		transform.SetRotation(clip.keyRotation[i].rotation);
-				//		transform.SetScale(clip.keyScale[i].scale);
-
-				//		pBoneTransform[i] = ConvertXMMatrix(transform.GetLocalMatrix4f());
-				//	}
-
-				//	delete[] pBoneTransform;
-				//}
+					vertexShader->SetConstantBuffer(_immediateContext.Get(), pData, 2);
+				}
 
 				_immediateContext->PSSetSamplers(0, 1, &pMesh->sampler);
 
@@ -950,6 +956,8 @@ bool flt::RendererDX11::SetVsConstantBuffer(ID3D11Buffer* vsConstantBuffer, void
 
 void flt::RendererDX11::SetDX11Node(DX11Node* dxNode, RawNode& node)
 {
+	dxNode->name = node.name;
+
 	int rawMeshCount = (int)node.meshes.size();
 	dxNode->meshes.resize(rawMeshCount);
 	for (int i = 0; i < rawMeshCount; ++i)
@@ -963,6 +971,13 @@ void flt::RendererDX11::SetDX11Node(DX11Node* dxNode, RawNode& node)
 		dxNode->meshes[i].Set(meshBuilder);
 		ASSERT(dxNode->meshes[i].Get(), "Set Mesh fail");
 	}
+
+	if (node.skeleton)
+	{
+		dxNode->pSkeleton = new DX11Skeleton{ *node.skeleton };
+	}
+
+
 }
 
 flt::Resource<flt::DX11Mesh>* flt::RendererDX11::CreateBox()

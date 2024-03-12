@@ -96,7 +96,8 @@ int main()
 
 		ModelLoader loader;
 		//std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Ganondorf (TotK).fbx";
-		std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Dying.fbx";
+		//std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Dying.fbx";
+		std::wstring filePath = L"..\\x64\\fbx\\Models\\A_TP_CH_Breathing.fbx";
 		std::wstring zUpYForward = L"..\\x64\\fbx\\Test\\ZY.fbx";
 		std::wstring yUpZForward = L"..\\x64\\fbx\\Test\\YZ.fbx";
 		std::wstring xUpYForward = L"..\\x64\\fbx\\Test\\XY.fbx";
@@ -154,7 +155,8 @@ int main()
 	flt::Transform fbxTransform;
 	flt::RendererObject fbxObject(fbxTransform, *rawScene.nodes[0], isDraw, L"test1");
 	auto objectID0 = renderer->RegisterObject(fbxObject);
-	fbxObject.transform.SetScale(1.f, 1.f, 1.f);
+	fbxObject.transform.SetScale(0.1f, 0.1f, 0.1f);
+	fbxObject.transform.SetRotation(90.0f, 0.0f, 0.0f);
 	fbxObject.transform.SetPosition(0.f, 0.f, 30.f);
 
 	flt::Transform cubeTransform;
@@ -180,19 +182,6 @@ int main()
 				//platform.ShowCursor(isShowCurser);
 				std::cout << "LL " << keyData.keyTime << " " << keyData.x << " " << keyData.y << std::endl;
 			}
-			
-			keyData = platform.GetKey(flt::KeyCode::w);
-			if (keyData)
-			{
-				std::cout << keyData.keyTime << " " << "pressed w" << std::endl;
-			}
-			keyData = platform.GetKey(flt::KeyCode::s);
-			if (keyData)
-			{
-				std::cout << keyData.keyTime << " " << "pressed s" << std::endl;
-			}
-			
-			
 			keyData = platform.GetKey(flt::KeyCode::mouseRButton);
 			float cameraSpeed = 0.1f;
 			if (keyData)
