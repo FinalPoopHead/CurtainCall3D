@@ -506,6 +506,25 @@ bool flt::RendererDX11::Render(float deltaTime)
 				void* pData = &worldViewProj;
 				vertexShader->SetConstantBuffer(_immediateContext.Get(), &pData, 1);
 
+				//if (node->pSkeleton)
+				//{
+				//	DirectX::XMMATRIX* pBoneTransform = new(std::nothrow) DirectX::XMMATRIX[512];
+
+				//	for (int i = 0; i < node->pSkeleton->clips.size(); ++i)
+				//	{
+				//		auto& clip = node->pSkeleton->clips[i];
+
+				//		Transform transform;
+				//		transform.SetPosition(clip.keyPosition[i].position);
+				//		transform.SetRotation(clip.keyRotation[i].rotation);
+				//		transform.SetScale(clip.keyScale[i].scale);
+
+				//		pBoneTransform[i] = ConvertXMMatrix(transform.GetLocalMatrix4f());
+				//	}
+
+				//	delete[] pBoneTransform;
+				//}
+
 				_immediateContext->PSSetSamplers(0, 1, &pMesh->sampler);
 
 				UINT offset = 0;

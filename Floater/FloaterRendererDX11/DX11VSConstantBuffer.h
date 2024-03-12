@@ -13,7 +13,7 @@ namespace flt
 
 	struct VSBoneConstantBuffer
 	{
-		DirectX::XMMATRIX boneTransform[96];
+		DirectX::XMMATRIX boneTransform[512];
 	};
 
 

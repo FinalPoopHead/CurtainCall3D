@@ -60,6 +60,9 @@
     <ClCompile Include="Font.cpp">
       <Filter>Font</Filter>
     </ClCompile>
+    <ClCompile Include="DX11Skeleton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX11Node.h">
@@ -109,6 +112,9 @@
     </ClInclude>
     <ClInclude Include="DX11Animation.h">
       <Filter>RendererResource</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11Skeleton.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

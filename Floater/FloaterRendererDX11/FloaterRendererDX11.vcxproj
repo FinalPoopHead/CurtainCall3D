@@ -22,6 +22,7 @@
     <ClCompile Include="CommonMath.cpp" />
     <ClCompile Include="CreateRenderer.cpp" />
     <ClCompile Include="DX11PixelShader.cpp" />
+    <ClCompile Include="DX11Skeleton.cpp" />
     <ClCompile Include="DX11VertexShader.cpp" />
     <ClCompile Include="DX11Mesh.cpp" />
     <ClCompile Include="DX11Node.cpp" />
@@ -34,6 +35,7 @@
     <ClInclude Include="DX11Entity.h" />
     <ClInclude Include="DX11PixelShader.h" />
     <ClInclude Include="DX11PSConstantBuffer.h" />
+    <ClInclude Include="DX11Skeleton.h" />
     <ClInclude Include="DX11VertexShader.h" />
     <ClInclude Include="DX11VSConstantBuffer.h" />
     <ClInclude Include="Font.h" />

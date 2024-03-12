@@ -1,5 +1,6 @@
 ﻿#include "DX11VertexShader.h"
 #include "DX11VSConstantBuffer.h"
+#include "../FloaterUtil/include/FloaterType.h"
 #include "../FloaterUtil/include/FloaterMacro.h"
 #include <d3dcompiler.h>
 #include <wrl/client.h>
@@ -21,11 +22,7 @@ flt::DX11VertexShaderBuilder::~DX11VertexShaderBuilder()
 
 flt::DX11VertexShader* flt::DX11VertexShaderBuilder::build() const
 {
-	if (pDevice == nullptr)
-	{
-		ASSERT(false, "디바이스 세팅 안됨.");
-		return nullptr;
-	}
+	ASSERT(pDevice != nullptr, "디바이스 세팅 안됨.");
 
 	UINT compileFlag = 0;
 #if defined(_DEBUG) || defined(_DEBUG)
@@ -35,49 +32,69 @@ flt::DX11VertexShader* flt::DX11VertexShaderBuilder::build() const
 
 	comptr<ID3D10Blob> vertexShaderBlob = nullptr;
 	HRESULT hResult = D3DCompileFromFile(filePath.c_str(), nullptr, nullptr, "main", "vs_5_0", compileFlag, 0, &vertexShaderBlob, nullptr);
-	if (hResult != S_OK)
-	{
-		ASSERT(false, "버텍스 쉐이더 컴파일 실패");
-		return nullptr;
-	}
+	ASSERT(hResult == S_OK, "버텍스 쉐이더 컴파일 실패");
 
 	ID3D11VertexShader* vertexShader = nullptr;
 	hResult = pDevice->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), nullptr, &vertexShader);
-	if (hResult != S_OK)
-	{
-		ASSERT(false, "버텍스 쉐이더 생성 실패");
-		return nullptr;
-	}
-
-	ID3D11InputLayout* inputLayout = nullptr;
-	hResult = pDevice->CreateInputLayout(&(inputLayoutDesc[0]), (UINT)inputLayoutDesc.size(),
-		vertexShaderBlob->GetBufferPointer(), (UINT)(vertexShaderBlob->GetBufferSize()),
-		&inputLayout);
-	if (hResult != S_OK)
-	{
-		ASSERT(false, "인풋 레이아웃 생성 실패");
-		vertexShader->Release();
-		return nullptr;
-	}
+	ASSERT(hResult == S_OK, "버텍스 쉐이더 생성 실패");
 
 	ID3D11ShaderReflection* pVertexShaderReflection = nullptr;
 	hResult = D3DReflect(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), IID_ID3D11ShaderReflection, (void**)&pVertexShaderReflection);
 
 	D3D11_SHADER_DESC shaderDesc = {};
 	hResult = pVertexShaderReflection->GetDesc(&shaderDesc);
-	if (hResult != S_OK)
+	ASSERT(hResult == S_OK, "버텍스 쉐이더 디스크립션 실패");
+
+	DX11VertexShader* dx11VertexShader = new(std::nothrow) DX11VertexShader();
+	ASSERT(dx11VertexShader != nullptr, "메모리 할당 실패");
+
+	uint32 inputParameterCount = shaderDesc.InputParameters;
+	std::vector<D3D11_INPUT_ELEMENT_DESC> testinputLayoutDesc{ inputParameterCount };
+	for (uint32 i = 0; i < inputParameterCount; ++i)
 	{
-		ASSERT(false, "버텍스 쉐이더 디스크립션 실패");
-		vertexShader->Release();
-		inputLayout->Release();
-		return nullptr;
+		D3D11_SIGNATURE_PARAMETER_DESC inputParameterDesc;
+		hResult = pVertexShaderReflection->GetInputParameterDesc(i, &inputParameterDesc);
+		testinputLayoutDesc[i].SemanticName = inputParameterDesc.SemanticName;
+		testinputLayoutDesc[i].SemanticIndex = inputParameterDesc.SemanticIndex;
+		testinputLayoutDesc[i].InputSlot = 0;
+		testinputLayoutDesc[i].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+		testinputLayoutDesc[i].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		testinputLayoutDesc[i].InstanceDataStepRate = 0;
+		if (inputParameterDesc.Mask == 1)
+		{
+			if (inputParameterDesc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) testinputLayoutDesc[i].Format = DXGI_FORMAT_R32_UINT;
+			else if (inputParameterDesc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) testinputLayoutDesc[i].Format = DXGI_FORMAT_R32_SINT;
+			else if (inputParameterDesc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) testinputLayoutDesc[i].Format = DXGI_FORMAT_R32_FLOAT;
+		}
+		else if (inputParameterDesc.Mask <= 3)
+		{
+			if (inputParameterDesc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) testinputLayoutDesc[i].Format = DXGI_FORMAT_R32G32_UINT;
+			else if (inputParameterDesc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) testinputLayoutDesc[i].Format = DXGI_FORMAT_R32G32_SINT;
+			else if (inputParameterDesc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) testinputLayoutDesc[i].Format = DXGI_FORMAT_R32G32_FLOAT;
+		}
+		else if (inputParameterDesc.Mask <= 7)
+		{
+			if (inputParameterDesc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) testinputLayoutDesc[i].Format = DXGI_FORMAT_R32G32B32_UINT;
+			else if (inputParameterDesc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) testinputLayoutDesc[i].Format = DXGI_FORMAT_R32G32B32_SINT;
+			else if (inputParameterDesc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) testinputLayoutDesc[i].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		}
+		else if (inputParameterDesc.Mask <= 15)
+		{
+			if (inputParameterDesc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) testinputLayoutDesc[i].Format = DXGI_FORMAT_R32G32B32A32_UINT;
+			else if (inputParameterDesc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) testinputLayoutDesc[i].Format = DXGI_FORMAT_R32G32B32A32_SINT;
+			else if (inputParameterDesc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) testinputLayoutDesc[i].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		}
 	}
 
-	DX11VertexShader* dx11VertexShader = new DX11VertexShader();
+	ID3D11InputLayout* inputLayout = nullptr;
+	hResult = pDevice->CreateInputLayout(&(testinputLayoutDesc[0]), (UINT)testinputLayoutDesc.size(),
+		vertexShaderBlob->GetBufferPointer(), (UINT)(vertexShaderBlob->GetBufferSize()),
+		&inputLayout);
+	ASSERT(hResult == S_OK, "인풋 레이아웃 생성 실패");
 
-	int constantBufferCount = shaderDesc.ConstantBuffers;
+	uint32 constantBufferCount = shaderDesc.ConstantBuffers;
 	dx11VertexShader->pConstantBuffers.resize(constantBufferCount);
-	for (int i = 0; i < constantBufferCount; ++i)
+	for (uint32 i = 0; i < constantBufferCount; ++i)
 	{
 		ID3D11ShaderReflectionConstantBuffer* pConstantBufferReflection = pVertexShaderReflection->GetConstantBufferByIndex(i);
 		D3D11_SHADER_BUFFER_DESC ConstantBufferReflectionDesc = {};

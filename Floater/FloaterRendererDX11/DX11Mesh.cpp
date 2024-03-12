@@ -123,11 +123,6 @@ flt::DX11Mesh* flt::DX11MeshBuilder::build() const
 
 	DX11VertexShaderBuilder vsBuilder(L"../FloaterRendererDX11/VertexShader.hlsl");
 	vsBuilder.pDevice = pDevice;
-	int layoutElementCount = Vertex::numElements;
-	for (int i = 0; i < layoutElementCount; ++i)
-	{
-		vsBuilder.inputLayoutDesc.push_back(Vertex::layout[i]);
-	}
 
 	DX11PixelShaderBuilder psBuilder(L"../FloaterRendererDX11/PixelShader.hlsl");
 	psBuilder.pDevice = pDevice;
@@ -336,11 +331,6 @@ flt::DX11Mesh* flt::DX11CubeMeshBuilder::build() const
 
 	DX11VertexShaderBuilder vsBuilder(L"../FloaterRendererDX11/CubeVS.hlsl");
 	vsBuilder.pDevice = pDevice;
-	int layoutElementCount = sizeof(VertexElementDesc) / sizeof(D3D11_INPUT_ELEMENT_DESC);
-	for (int i = 0; i < layoutElementCount; ++i)
-	{
-		vsBuilder.inputLayoutDesc.push_back(VertexElementDesc[i]);
-	}
 
 	DX11PixelShaderBuilder psBuilder(L"../FloaterRendererDX11/CubePS.hlsl");
 	psBuilder.pDevice = pDevice;
@@ -467,12 +457,6 @@ flt::DX11Mesh* flt::DX11ScreedQuadBuilder::build() const
 	DX11VertexShaderBuilder vsBuilder(L"../FloaterRendererDX11/BackBufferVertexShader.hlsl");
 	vsBuilder.pDevice = pDevice;
 
-	int layoutElementCount = sizeof(inputLayoutDesc) / sizeof(D3D11_INPUT_ELEMENT_DESC);
-	for (int i = 0; i < layoutElementCount; ++i)
-	{
-		vsBuilder.inputLayoutDesc.push_back(inputLayoutDesc[i]);
-	}
-
 	DX11PixelShaderBuilder psBuilder(L"../FloaterRendererDX11/BackBufferPixelShader.hlsl");
 	psBuilder.pDevice = pDevice;
 
@@ -592,14 +576,6 @@ flt::DX11Mesh* flt::DX11GridMeshBuilder::build() const
 	cbDesc.MiscFlags = 0;
 	cbDesc.StructureByteStride = 0;
 
-	//ID3D11Buffer* constantBuffer;
-	//hResult = pDevice->CreateBuffer(&cbDesc, nullptr, &constantBuffer);
-	//if (hResult != S_OK)
-	//{
-	//	return nullptr;
-	//}
-	//constantBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"CubeConstantBuffer")-1, L"CubeConstantBuffer");
-
 	ID3D11Resource* texture;
 	ID3D11ShaderResourceView** textureView = new(std::nothrow) ID3D11ShaderResourceView * [1];
 	ASSERT(textureView, "텍스처 뷰 생성 실패");
@@ -624,29 +600,9 @@ flt::DX11Mesh* flt::DX11GridMeshBuilder::build() const
 
 	DX11VertexShaderBuilder vsBuilder(L"../FloaterRendererDX11/GridVS.hlsl");
 	vsBuilder.pDevice = pDevice;
-	int layoutElementCount = sizeof(vertexElementDesc) / sizeof(D3D11_INPUT_ELEMENT_DESC);
-	for (int i = 0; i < layoutElementCount; ++i)
-	{
-		vsBuilder.inputLayoutDesc.push_back(vertexElementDesc[i]);
-	}
 
 	DX11PixelShaderBuilder psBuilder(L"../FloaterRendererDX11/GridPS.hlsl");
 	psBuilder.pDevice = pDevice;
-
-	//D3D11_RASTERIZER_DESC rasterizerDesc = {};
-	//rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
-	//rasterizerDesc.CullMode = D3D11_CULL_NONE;
-	//rasterizerDesc.FrontCounterClockwise = false;
-	//rasterizerDesc.DepthBias = 0;
-	//rasterizerDesc.DepthBiasClamp = 0.0f;
-	//rasterizerDesc.SlopeScaledDepthBias = 0.0f;
-	//rasterizerDesc.DepthClipEnable = true;
-	//rasterizerDesc.ScissorEnable = false;
-	//rasterizerDesc.MultisampleEnable = false;
-	//rasterizerDesc.AntialiasedLineEnable = false;
-
-	//ID3D11RasterizerState* rasterizerState;
-	//pDevice->CreateRasterizerState(&rasterizerDesc, &rasterizerState);
 
 	DX11Mesh* pMesh = new DX11Mesh(vsBuilder, psBuilder);
 	pMesh->vertexBuffer = vertexBuffer;
