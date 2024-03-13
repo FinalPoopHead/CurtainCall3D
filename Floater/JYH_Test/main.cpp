@@ -131,9 +131,17 @@ int main()
 			{
 				node->meshes[i].material.textures[0]->path = L"..\\x64\\fbx\\Models\\Textures\\T_TP_CH_Basic_001_001_D.png";
 			}
-			
 		}
 
+		//node->meshes[0].material.textures[0]->path = L"..\\x64\\fbx\\Ganondorf - 3d - model - dl\\textures\\Npc_Ganondorf_Human_Face_1_Alb.png";
+		//node->meshes[1].material.textures[0]->path = L"..\\x64\\fbx\\Ganondorf - 3d - model - dl\\textures\\Npc_Ganondorf_Human_Metal_Alb.png";
+		//node->meshes[2].material.textures[0]->path = L"..\\x64\\fbx\\Ganondorf - 3d - model - dl\\textures\\Npc_Ganondorf_Human_Body_Dm_Alb.png";
+		//node->meshes[3].material.textures[0]->path = L"..\\x64\\fbx\\Ganondorf - 3d - model - dl\\textures\\Npc_Ganondorf_Human_Eyeball_Alb.png";
+		//node->meshes[4].material.textures[0]->path = L"..\\x64\\fbx\\Ganondorf - 3d - model - dl\\textures\\Npc_Ganondorf_Human_Face_2_Alb.png";
+		//node->meshes[5].material.textures[0]->path = L"..\\x64\\fbx\\Ganondorf - 3d - model - dl\\textures\\CmnTex_SecretStone_Dm_Ind.png";
+		//node->meshes[6].material.textures[0]->path = L"..\\x64\\fbx\\Ganondorf - 3d - model - dl\\textures\\Npc_Ganondorf_Human_Forehead_Alb.png";
+		//node->meshes[7].material.textures[0]->path = L"..\\x64\\fbx\\Ganondorf - 3d - model - dl\\textures\\Npc_Ganondorf_Human_Skin_Dm_Alb.png";
+		//node->meshes[8].material.textures[0]->path = L"..\\x64\\fbx\\Ganondorf - 3d - model - dl\\textures\\Npc_Ganondorf_Human_Hair_Alb.png";
 	}
 #pragma endregion
 
@@ -169,9 +177,9 @@ int main()
 	//flt::RendererObject fbxObject(fbxTransform, *rawScene.nodes[0]->children[0]->children[0], isDraw, L"test1");
 	auto objectID0 = renderer->RegisterObject(fbxObject);
 	fbxObject.transform.SetScale(1.0f, 1.0f, 1.0f);
-	fbxObject.transform.SetScale(0.1f, 0.1f, 0.1f);
+	fbxObject.transform.SetScale(0.05f, 0.05f, 0.05f);
 	//fbxObject.transform.SetRotation(90.0f, 0.0f, 0.0f);
-	fbxObject.transform.SetPosition(0.f, 0.f, 30.f);
+	fbxObject.transform.SetPosition(0.f, 0.f, 1.f);
 
 	flt::Transform cubeTransform;
 	flt::RendererObject renderable(cubeTransform, cubeNode, isDraw, L"cube");
@@ -188,6 +196,9 @@ int main()
 		renderer->Render(1.0f);
 		//fbxObject.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, 0.01f);
 		renderable.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, -0.1f);
+
+		fbxObject.transform.AddLocalPosition(0.0f, 0.0f, 0.01f);
+		renderable.transform.AddLocalPosition(0.0f, 0.0f, 0.01f);
 		{
 			auto keyData = platform.GetKey(flt::KeyCode::mouseLButton);
 			if (keyData)

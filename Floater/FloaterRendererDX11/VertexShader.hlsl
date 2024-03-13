@@ -39,7 +39,7 @@ struct VS_OUTPUT
 {
     float4 Position : SV_Position;
     //float3 PositionW : POSITION;
-    //float2 UV : TEXCOORD;
+    float2 UV : TEXCOORD;
     //float3 Normal : NORMAL;
 };
 
@@ -47,10 +47,11 @@ VS_OUTPUT main(VS_INPUT Input)
 {
     VS_OUTPUT Output;
 
-    float4x4 bone = mul(Input.BoneWeights[0], BoneMatrices[Input.BoneIndices[0]]);
-    bone += mul(Input.BoneWeights[1], BoneMatrices[Input.BoneIndices[1]]);
-    bone += mul(Input.BoneWeights[2], BoneMatrices[Input.BoneIndices[2]]);
-    bone += mul(Input.BoneWeights[3], BoneMatrices[Input.BoneIndices[3]]);
+    float4x4 bone 
+    = mul(BoneMatrices[Input.BoneIndices[0]], Input.BoneWeights[0]);
+    + mul(BoneMatrices[Input.BoneIndices[1]], Input.BoneWeights[1]);
+    + mul(BoneMatrices[Input.BoneIndices[2]], Input.BoneWeights[2]);
+    +mul(BoneMatrices[Input.BoneIndices[3]], Input.BoneWeights[3]);
     
     if (Input.BoneWeights[0] + Input.BoneWeights[1] + Input.BoneWeights[2] + Input.BoneWeights[3] == 0)
     {
@@ -80,7 +81,7 @@ VS_OUTPUT main(VS_INPUT Input)
     //// 아래 임시코드
     //Output.PositionW = PosL;
     
-    //Output.UV = Input.UV0;
+    Output.UV = Input.UV0;
     
     //float3 normalL = mul((float3x3) bone, Input.Normal);
     ////Output.Normal = mul((float3x3) WorldInvTransp, normalL);

@@ -204,8 +204,8 @@ namespace Rocket::Core
 
 			NodeBufferType* nodeBufferDataPtr = (NodeBufferType*)mappedResource.pData;
 
-			//SetNodeBuffer(_model->rootNode, nodeBufferDataPtr);
-			SetNodeBuffer(_animatedRootNode, nodeBufferDataPtr);
+			SetNodeBuffer(_model->rootNode, nodeBufferDataPtr);
+			//SetNodeBuffer(_animatedRootNode, nodeBufferDataPtr);
 
 			deviceContext->Unmap(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0);
 

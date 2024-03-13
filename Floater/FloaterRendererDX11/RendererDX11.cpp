@@ -507,20 +507,22 @@ bool flt::RendererDX11::Render(float deltaTime)
 				{
 					void* pData[2] = { &worldViewProj, _boneMatrices };
 
-					for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
-					{
-						auto& clip = node->pSkeleton->bones[i].clip;
+					//for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
+					//{
+					//	auto& clip = node->pSkeleton->bones[i].clip;
 
-						if (clip.keyPosition.size() > 0)
-							node->pSkeleton->bones[i].tr.SetPosition(clip.keyPosition[0].position);
-						if (clip.keyRotation.size() > 0)
-							node->pSkeleton->bones[i].tr.SetRotation(clip.keyRotation[0].rotation);
-						if (clip.keyScale.size() > 0)
-							node->pSkeleton->bones[i].tr.SetScale(clip.keyScale[0].scale);
-					}
+					//	if (clip.keyPosition.size() > 0)
+					//		node->pSkeleton->bones[i].tr.SetPosition(clip.keyPosition[0].position);
+					//	if (clip.keyRotation.size() > 0)
+					//		node->pSkeleton->bones[i].tr.SetRotation(clip.keyRotation[0].rotation);
+					//	if (clip.keyScale.size() > 0)
+					//		node->pSkeleton->bones[i].tr.SetScale(clip.keyScale[0].scale);
+					//}
 					for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
 					{
-						_boneMatrices[i] = ConvertXMMatrix(node->pSkeleton->bones[i].boneOffset * node->pSkeleton->bones[i].transform.GetWorldMatrix4f());
+						Matrix4f boneMatrix = node->pSkeleton->bones[i].transform.GetWorldMatrix4f();
+						/boneMatrix *= worldMatrix;
+						_boneMatrices[i] = ConvertXMMatrix(node->pSkeleton->bones[i].boneOffset * boneMatrix);
 						//_boneMatrices[i] = ConvertXMMatrix(Matrix4f::Identity());
 					}
 
@@ -557,7 +559,7 @@ bool flt::RendererDX11::Render(float deltaTime)
 
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc = {};
 	depthStencilDesc.DepthEnable = true;
-	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthState;

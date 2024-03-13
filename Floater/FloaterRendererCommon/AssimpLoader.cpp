@@ -30,6 +30,7 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 		aiProcess_CalcTangentSpace | aiProcess_PopulateArmatureData |
 		aiProcess_FlipWindingOrder | aiProcess_GenSmoothNormals | aiProcess_SplitLargeMeshes |
 		aiProcess_SortByPType | aiProcess_LimitBoneWeights;
+	//const unsigned int flags = aiProcess_Triangulate | aiProcess_ConvertToLeftHanded | aiProcess_PopulateArmatureData | aiProcess_CalcTangentSpace;
 
 	//importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, 0);
 
@@ -487,6 +488,7 @@ void flt::AssimpLoader::SetHierarchyRawNodeRecursive(aiNode* pNode, RawNode* pRa
 	pRawNode->transform.SetRotation(rotation.x, rotation.y, rotation.z, rotation.w);
 	pRawNode->transform.SetScale(scale.x, scale.y, scale.z);
 
+	// 내가 만든 matrix와 assimp의 matrix가 같은지 확인.
 	{
 		float epsilon = 0.0001f;
 
@@ -526,12 +528,7 @@ void flt::AssimpLoader::SetHierarchyRawNodeRecursive(aiNode* pNode, RawNode* pRa
 		ASSERT(sub < epsilon && sub > -epsilon, "diff");
 	}
 
-	const int childCount = pNode->mNumChildren;
-	//pRawNode->children.reserve(childCount);
-
 	int meshCount = pNode->mNumMeshes;
-	//ASSERT(meshCount == 1 || meshCount == 0, "meshCount more then 1");
-
 	pRawNode->meshes.reserve(meshCount);
 	for (int i = 0; i < meshCount; ++i)
 	{
@@ -540,11 +537,7 @@ void flt::AssimpLoader::SetHierarchyRawNodeRecursive(aiNode* pNode, RawNode* pRa
 		pRawNode->skeleton = new RawSkeleton{ _skeletonMap[armature] };
 	}
 
-	//for (int i = 0; i < childCount; ++i)
-	//{
-	//	SetRawMeshToRawNodeRecursive(pNode->mChildren[i], pRawNode->children[i], pRawScene);
-	//}
-
+	const int childCount = pNode->mNumChildren;
 	for (int i = 0; i < childCount; ++i)
 	{
 		std::wstring childName = ConvertToWstring(pNode->mChildren[i]->mName.C_Str());

@@ -33,8 +33,8 @@ flt::Transform& flt::Transform::operator=(const Transform& other)
 	_position = other._position;
 	_scale = other._scale;
 	_rotation = other._rotation;
-	_pParent = nullptr;
-	_children.clear();
+	//_pParent = nullptr;
+	//_children.clear();
 	_isDirty = true;
 
 	return *this;
