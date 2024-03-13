@@ -65,15 +65,6 @@ VS_OUTPUT main(VS_INPUT Input)
     //    );
     //}
     
-    //float4x4 bone =
-    //    float4x4
-    //    (
-    //    1.0f, 0, 0, 0,
-    //    0, 1.0f, 0, 0,
-    //    0, 0, 1.0f, 0,
-    //    0, 0, 0, 1.0f
-    //    );
-    
     float4 PosL = mul(bone, float4(Input.Position.xyz, 1.0f));
     Output.Position = mul(WorldViewProj, PosL);
     
