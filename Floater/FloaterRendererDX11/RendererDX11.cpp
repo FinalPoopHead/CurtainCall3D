@@ -521,7 +521,7 @@ bool flt::RendererDX11::Render(float deltaTime)
 					for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
 					{
 						Matrix4f boneMatrix = node->pSkeleton->bones[i].transform.GetWorldMatrix4f();
-						/boneMatrix *= worldMatrix;
+						//boneMatrix *= worldMatrix;
 						_boneMatrices[i] = ConvertXMMatrix(node->pSkeleton->bones[i].boneOffset * boneMatrix);
 						//_boneMatrices[i] = ConvertXMMatrix(Matrix4f::Identity());
 					}

@@ -53,17 +53,17 @@ VS_OUTPUT main(VS_INPUT Input)
     + mul(BoneMatrices[Input.BoneIndices[2]], Input.BoneWeights[2]);
     +mul(BoneMatrices[Input.BoneIndices[3]], Input.BoneWeights[3]);
     
-    if (Input.BoneWeights[0] + Input.BoneWeights[1] + Input.BoneWeights[2] + Input.BoneWeights[3] == 0)
-    {
-        bone =
-        float4x4
-        (
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1
-        );
-    }
+    //if (Input.BoneWeights[0] + Input.BoneWeights[1] + Input.BoneWeights[2] + Input.BoneWeights[3] == 0)
+    //{
+    //    bone =
+    //    float4x4
+    //    (
+    //    1, 0, 0, 0,
+    //    0, 1, 0, 0,
+    //    0, 0, 1, 0,
+    //    0, 0, 0, 1
+    //    );
+    //}
     
     //float4x4 bone =
     //    float4x4
