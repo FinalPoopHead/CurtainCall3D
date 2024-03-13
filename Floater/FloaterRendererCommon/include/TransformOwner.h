@@ -6,8 +6,8 @@ namespace flt
 	struct TransformOwner
 	{
 	public:
-		TransformOwner() : transform() { transform._pOwner = this; }
-		TransformOwner(const TransformOwner& other) : transform()
+		TransformOwner() : transform(), tr(this->transform) { transform._pOwner = this; }
+		TransformOwner(const TransformOwner& other) : transform(), tr(this->transform)
 		{
 			transform._position = other.transform._position;
 			transform._rotation = other.transform._rotation;
@@ -39,5 +39,6 @@ namespace flt
 		virtual ~TransformOwner() = default;
 
 		Transform transform;
+		Transform& tr;
 	};
 }

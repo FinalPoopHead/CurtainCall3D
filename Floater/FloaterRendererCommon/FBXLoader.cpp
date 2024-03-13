@@ -314,8 +314,6 @@ bool flt::FBXLoader::CreateMesh(fbxsdk::FbxMesh& mesh, RawMesh* outMesh)
 	auto materialMappingMode = materialElement->GetMappingMode();
 	auto materialReferenceMode = materialElement->GetReferenceMode();
 
-	//outMesh->Set(builder);
-
 	return true;
 }
 

@@ -61,7 +61,7 @@
       <Filter>Font</Filter>
     </ClCompile>
     <ClCompile Include="DX11Skeleton.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>RendererResource</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -114,7 +114,7 @@
       <Filter>RendererResource</Filter>
     </ClInclude>
     <ClInclude Include="DX11Skeleton.h">
-      <Filter>Header Files</Filter>
+      <Filter>RendererResource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

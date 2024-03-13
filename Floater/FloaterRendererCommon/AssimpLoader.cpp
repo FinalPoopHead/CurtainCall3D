@@ -4,6 +4,7 @@
 #include "assimp/scene.h"
 #include "../FloaterUtil/include/ConvString.h"
 #include "../FloaterUtil/include/FloaterMacro.h"
+#include "../FloaterUtil/include/FloaterType.h"
 
 #include "./include/RawScene.h"
 #include "./include/RawMesh.h"
@@ -29,6 +30,8 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 		aiProcess_CalcTangentSpace | aiProcess_PopulateArmatureData |
 		aiProcess_FlipWindingOrder | aiProcess_GenSmoothNormals | aiProcess_SplitLargeMeshes |
 		aiProcess_SortByPType | aiProcess_LimitBoneWeights;
+
+	//importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, 0);
 
 	//const unsigned int flags = aiProcess_Triangulate |
 	//	aiProcess_ConvertToLeftHanded |	aiProcess_CalcTangentSpace | aiProcess_PopulateArmatureData |
@@ -219,24 +222,38 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 
 				auto& skeleton = _skeletonMap[armature];
 				SetSkeleton(armature, skeleton);
+				PrintBoneNameRecursive(skeleton.bones[skeleton.rootBoneIndex]);
 
-				int boneCount = mesh->mNumBones;
-				for (int i = 0; i < boneCount; ++i)
+				int meshCount = assimpScene->mNumMeshes;
+				for (int j = 0; j < meshCount; ++j)
 				{
-					auto& bone = mesh->mBones[i];
-					std::wstring boneName = ConvertToWstring(bone->mName.C_Str());
+					int boneCount = assimpScene->mMeshes[j]->mNumBones;
+					for (int k = 0; k < boneCount; ++k)
+					{
+						auto& bone = assimpScene->mMeshes[j]->mBones[k];
+						std::wstring boneName = ConvertToWstring(bone->mName.C_Str());
 
-					auto& m = bone->mOffsetMatrix;
-					Matrix4f offset{
-						m.a1, m.a2, m.a3, m.a4, 
-						m.b1, m.b2, m.b3, m.b4, 
-						m.c1, m.c2, m.c3, m.c4, 
-						m.d1, m.d2, m.d3, m.d4 
-					};
+						auto& m = bone->mOffsetMatrix;
+						//Matrix4f offset{
+						//	m.a1, m.a2, m.a3, m.a4, 
+						//	m.b1, m.b2, m.b3, m.b4, 
+						//	m.c1, m.c2, m.c3, m.c4, 
+						//	m.d1, m.d2, m.d3, m.d4 
+						//};
 
-					auto boneIndex = _boneIndexMap[boneName].second;
-					skeleton.boneOffsets[boneIndex] = offset;
+						Matrix4f offset{
+							m.a1, m.b1, m.c1, m.d1,
+							m.a2, m.b2, m.c2, m.d2,
+							m.a3, m.b3, m.c3, m.d3,
+							m.a4, m.b4, m.c4, m.d4
+						};
+
+						auto boneIndex = _boneIndexMap[boneName].second;
+						ASSERT((skeleton.boneOffsets[boneIndex] == Matrix4f::Zero() || skeleton.boneOffsets[boneIndex] == offset) , "assert");
+						skeleton.boneOffsets[boneIndex] = offset;
+					}
 				}
+
 			}
 			//for (unsigned int j = 0; j < mesh->mNumBones; ++j)
 			//{
@@ -253,9 +270,6 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 		for (unsigned int i = 0; i < meshCount; ++i)
 		{
 			aiMesh* mesh = assimpScene->mMeshes[i];
-
-			//AssimpRawMeshBuilder meshBuilder(mesh, filePath, i, outRawScene, _nodeMap);
-			//rawMeshes[i].Set(meshBuilder);
 
 			auto& rawMesh = _meshes[i].first;
 			rawMesh = new(std::nothrow) RawMesh();
@@ -348,41 +362,12 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 					}
 				}
 			}
+
+			// 머티리얼
+			uint32 materialIndex = mesh->mMaterialIndex;
+			rawMesh->material = *_materials[materialIndex];
 		}
 	}
-
-	auto testBoneIndex = (*_boneIndexMap.find(L"clavicle_r")).second.second;
-	auto& testBone = _skeletonMap[assimpScene->mMeshes[0]->mBones[0]->mArmature].bones[testBoneIndex].transform;
-
-	aiMatrix4x4 modelTransform = assimpScene->mRootNode->mChildren[0]->mTransformation;
-	//modelTransform = modelTransform.Inverse();
-
-	int rawBoneCount = assimpScene->mMeshes[0]->mNumBones;
-	for (int i = 0; i < rawBoneCount; ++i)
-	{
-		auto fbxBone = assimpScene->mMeshes[0]->mBones[i];
-		int ret = strcmp(fbxBone->mName.C_Str(), "clavicle_r");
-		if (ret == 0)
-		{
-			auto offset = fbxBone->mOffsetMatrix;
-			auto cmp = testBone.GetWorldMatrix4f().Inverse();
-
-			aiNode* node = fbxBone->mNode;
-			aiMatrix4x4 nodeMatrix = node->mTransformation;
-			node = node->mParent;
-			while (node != nullptr)
-			{
-				nodeMatrix = nodeMatrix * node->mTransformation;
-				auto testtest = nodeMatrix;
-				testtest.Inverse();
-				testtest = modelTransform * testtest;
-				node = node->mParent;
-			}
-
-			int i = 0;
-		}
-	}
-
 
 	// 애니메이션 로드
 	if (assimpScene->HasAnimations())
@@ -489,7 +474,7 @@ void flt::AssimpLoader::SetHierarchyRawNodeRecursive(aiNode* pNode, RawNode* pRa
 	ASSERT(pRawNode, "pRawNode is nullptr");
 
 	pRawNode->name = ConvertToWstring(pNode->mName.C_Str());
-	_RawNodeMap.insert({ pRawNode->name , pRawNode});
+	_RawNodeMap.insert({ pRawNode->name , pRawNode });
 	std::wcout << pRawNode->name << std::endl;
 
 	aiVector3D position;
@@ -595,6 +580,20 @@ void flt::AssimpLoader::PrintNodeNameRecursive(aiNode* pNode, int depth /*= 0*/)
 	for (unsigned int i = 0; i < pNode->mNumChildren; ++i)
 	{
 		PrintNodeNameRecursive(pNode->mChildren[i], depth + 1);
+	}
+}
+
+void flt::AssimpLoader::PrintBoneNameRecursive(RawSkeleton::Bone& bone, int depth /*= 0*/)
+{
+	for (int i = 0; i < depth; ++i)
+	{
+		std::wcout << L"| ";
+	}
+	std::wcout << bone.name << std::endl;
+
+	for (auto& child : bone.transform.GetChildren())
+	{
+		PrintBoneNameRecursive(*(RawSkeleton::Bone*)child->GetOwner(), depth + 1);
 	}
 }
 

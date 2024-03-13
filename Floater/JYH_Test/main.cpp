@@ -98,6 +98,7 @@ int main()
 		//std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Ganondorf (TotK).fbx";
 		//std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Dying.fbx";
 		std::wstring filePath = L"..\\x64\\fbx\\Models\\A_TP_CH_Breathing.fbx";
+		//std::wstring filePath = L"C:\\Users\\KOCCA56\\Desktop\\Bee.glb";
 		std::wstring zUpYForward = L"..\\x64\\fbx\\Test\\ZY.fbx";
 		std::wstring yUpZForward = L"..\\x64\\fbx\\Test\\YZ.fbx";
 		std::wstring xUpYForward = L"..\\x64\\fbx\\Test\\XY.fbx";
@@ -121,6 +122,17 @@ int main()
 		//std::filesystem::path currPath = std::filesystem::current_path();
 
 		loader.Load(filePath, &rawScene);
+
+		auto& node = rawScene.nodes[0];
+
+		for (int i = 0; i < node->meshes.size(); ++i)
+		{
+			if (node->meshes[i].material.textures[0]->path == L"")
+			{
+				node->meshes[i].material.textures[0]->path = L"..\\x64\\fbx\\Models\\Textures\\T_TP_CH_Basic_001_001_D.png";
+			}
+			
+		}
 
 	}
 #pragma endregion
@@ -150,11 +162,13 @@ int main()
 
 	flt::RawNode cubeNode(L"testNode");
 	cubeNode.transform.SetPosition(0.0f, 0.0f, 0.7f);
-	cubeNode.transform.SetScale(0.3f, 0.3f, 0.3f);
+	cubeNode.transform.SetScale(1.0f, 1.0f, 1.0f);
 
 	flt::Transform fbxTransform;
 	flt::RendererObject fbxObject(fbxTransform, *rawScene.nodes[0], isDraw, L"test1");
+	//flt::RendererObject fbxObject(fbxTransform, *rawScene.nodes[0]->children[0]->children[0], isDraw, L"test1");
 	auto objectID0 = renderer->RegisterObject(fbxObject);
+	fbxObject.transform.SetScale(1.0f, 1.0f, 1.0f);
 	fbxObject.transform.SetScale(0.1f, 0.1f, 0.1f);
 	//fbxObject.transform.SetRotation(90.0f, 0.0f, 0.0f);
 	fbxObject.transform.SetPosition(0.f, 0.f, 30.f);

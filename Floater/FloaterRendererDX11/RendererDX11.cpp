@@ -507,20 +507,20 @@ bool flt::RendererDX11::Render(float deltaTime)
 				{
 					void* pData[2] = { &worldViewProj, _boneMatrices };
 
-					//for (int i = 0; i < node->pSkeleton->clips.size(); ++i)
-					//{
-					//	auto& clip = node->pSkeleton->clips[i];
-
-					//	if (clip.keyPosition.size() > 0)
-					//		node->pSkeleton->bones[i].SetPosition(clip.keyPosition[0].position);
-					//	if (clip.keyRotation.size() > 0)
-					//		node->pSkeleton->bones[i].SetRotation(clip.keyRotation[0].rotation);
-					//	if (clip.keyScale.size() > 0)
-					//		node->pSkeleton->bones[i].SetScale(clip.keyScale[0].scale);
-					//}
 					for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
 					{
-						_boneMatrices[i] = ConvertXMMatrix(node->pSkeleton->boneOffsetMatrix[i] * node->pSkeleton->bones[i].GetWorldMatrix4f());
+						auto& clip = node->pSkeleton->bones[i].clip;
+
+						if (clip.keyPosition.size() > 0)
+							node->pSkeleton->bones[i].tr.SetPosition(clip.keyPosition[0].position);
+						if (clip.keyRotation.size() > 0)
+							node->pSkeleton->bones[i].tr.SetRotation(clip.keyRotation[0].rotation);
+						if (clip.keyScale.size() > 0)
+							node->pSkeleton->bones[i].tr.SetScale(clip.keyScale[0].scale);
+					}
+					for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
+					{
+						_boneMatrices[i] = ConvertXMMatrix(node->pSkeleton->bones[i].boneOffset * node->pSkeleton->bones[i].transform.GetWorldMatrix4f());
 						//_boneMatrices[i] = ConvertXMMatrix(Matrix4f::Identity());
 					}
 

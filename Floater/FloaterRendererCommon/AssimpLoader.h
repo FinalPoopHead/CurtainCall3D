@@ -2,6 +2,7 @@
 #include <string>
 #include <unordered_map>
 //#include "../FloaterUtil/include/RBTree.h"
+#include "./include/RawSkeleton.h"
 
 struct aiNode;
 
@@ -21,11 +22,12 @@ namespace flt
 	private:
 		void SetAINodeMapRecursive(aiNode* pNode);
 		void SetHierarchyRawNodeRecursive(aiNode* pNode, RawNode* pRawNode, RawScene* pRawScene);
-		void PrintNodeNameRecursive(aiNode* pNode, int depth = 0);
 		void SetSkeleton(aiNode* armature, RawSkeleton& skeleton);
 		void SetSkeletonRecursive(aiNode* assimpBone, RawSkeleton& skeleton, int index);
 		int CalcAINodeCountRecursive(aiNode* pNode);
 
+		void PrintNodeNameRecursive(aiNode* pNode, int depth = 0);
+		void PrintBoneNameRecursive(RawSkeleton::Bone& bone, int depth = 0);
 		void ClearPrivateData();
 
 	private:

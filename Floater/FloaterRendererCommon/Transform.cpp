@@ -12,15 +12,15 @@ flt::Transform::~Transform()
 	//}
 }
 
-flt::Transform::Transform(const Transform& other)
+flt::Transform::Transform(const Transform& other) : 
+	_position(other._position),
+	_scale(other._scale),
+	_rotation(other._rotation),
+	_pParent(nullptr),
+	_children(),
+	_isDirty(true),
+	_pOwner(nullptr)
 {
-	_position = other._position;
-	_scale = other._scale;
-	_rotation = other._rotation;
-	_pParent = nullptr;
-	_children.clear();
-	_isDirty = true;
-	_pOwner = nullptr;
 }
 
 flt::Transform& flt::Transform::operator=(const Transform& other)
@@ -36,7 +36,6 @@ flt::Transform& flt::Transform::operator=(const Transform& other)
 	_pParent = nullptr;
 	_children.clear();
 	_isDirty = true;
-	_pOwner = nullptr;
 
 	return *this;
 }
