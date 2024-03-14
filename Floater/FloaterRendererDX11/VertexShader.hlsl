@@ -48,10 +48,10 @@ VS_OUTPUT main(VS_INPUT Input)
     VS_OUTPUT Output;
 
     float4x4 bone 
-    = mul(BoneMatrices[Input.BoneIndices[0]], Input.BoneWeights[0]);
-    + mul(BoneMatrices[Input.BoneIndices[1]], Input.BoneWeights[1]);
-    + mul(BoneMatrices[Input.BoneIndices[2]], Input.BoneWeights[2]);
-    +mul(BoneMatrices[Input.BoneIndices[3]], Input.BoneWeights[3]);
+    = mul(BoneMatrices[Input.BoneIndices[0]], Input.BoneWeights[0])
+    + mul(BoneMatrices[Input.BoneIndices[1]], Input.BoneWeights[1])
+    + mul(BoneMatrices[Input.BoneIndices[2]], Input.BoneWeights[2])
+    + mul(BoneMatrices[Input.BoneIndices[3]], Input.BoneWeights[3]);
     
     //if (Input.BoneWeights[0] + Input.BoneWeights[1] + Input.BoneWeights[2] + Input.BoneWeights[3] == 0)
     //{

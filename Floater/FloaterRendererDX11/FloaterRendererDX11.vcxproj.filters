@@ -148,6 +148,9 @@
     <FxCompile Include="GridPS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
+    <FxCompile Include="ForwardPixelShader.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="FloaterRendererDX11.natvis">

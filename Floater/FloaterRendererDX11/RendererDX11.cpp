@@ -466,7 +466,206 @@ bool flt::RendererDX11::ForwardRender(float deltaTime)
 	_immediateContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
 	_immediateContext->RSSetState(_solidCullRasterizerState.Get());
 
-	return false;
+	{
+		//디버그용 그리드 그리기
+
+		auto& camera = _cameras[0];
+		Matrix4f viewMatrix = camera->GetViewMatrix();
+		Matrix4f projMatrix = camera->GetProjectionMatrix();
+
+		const Transform* cameraTransform = camera->GetTransform();
+		Vector4f cameraPosition = cameraTransform->GetLocalPosition();
+
+		// 투명으로 그리기위한 임시 블렌딩 상태 생성
+		D3D11_BLEND_DESC blendDesc = { };
+		blendDesc.RenderTarget[0].BlendEnable = TRUE;
+		blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+		blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+		ID3D11BlendState* blendState;
+		auto ret = _device->CreateBlendState(&blendDesc, &blendState);
+		ASSERT(ret == S_OK, "블렌드 상태 생성 실패");
+		float blend[4] = { 1.0f,1.0f,1.0f, 1.0f };
+		_immediateContext->OMSetBlendState(blendState, blend, 0xffffffff);
+		blendState->Release();
+
+		// 그리드 스케일은 카메라 높이에 따라서 1, 10, 100, 1000, 10000 중 하나.
+		float gridScale = 1.0f;
+
+		if (cameraPosition.y > 10000.0f)
+		{
+			gridScale = 10000.0f;
+		}
+		else if (cameraPosition.y > 1000.0f)
+		{
+			gridScale = 1000.0f;
+		}
+		else if (cameraPosition.y > 100.0f)
+		{
+			gridScale = 100.0f;
+		}
+		else if (cameraPosition.y > 10.0f)
+		{
+			gridScale = 10.0f;
+		}
+		float secondGridScale = (float)((int)gridScale / 10);
+		float heightOpacitys[2] = { 1.0f, 0.0f };
+
+		if (secondGridScale > 0.0f)
+		{
+			// 0~5 일경우는 0, 5~10일경우 0~1 사이로 변경.
+			heightOpacitys[1] = ((cameraPosition.y / gridScale) - 5.0f) * 2.0f;
+			heightOpacitys[1] < 0.0f ? heightOpacitys[1] = 0.0f : heightOpacitys[1];
+			heightOpacitys[1] /= 10.0f;
+			heightOpacitys[1] = 1.0f - heightOpacitys[1];
+			ASSERT(heightOpacitys[1] >= 0.0f && heightOpacitys[1] <= 1.0f, "높이 투명도 오류");
+		}
+
+
+		_grids[0].transform.SetScale(gridScale, gridScale, gridScale);
+		_grids[1].transform.SetScale(secondGridScale, secondGridScale, secondGridScale);
+
+		// 그리드의 위치는 카메라의 위치에서 가장 가까운 정수값위치 * 그리드 스케일
+		_grids[0].transform.SetPosition(
+			(int)(cameraPosition.x / gridScale) * gridScale,
+			0.0f,
+			(int)(cameraPosition.z / gridScale) * gridScale
+		);
+
+		_grids[1].transform.SetPosition(
+			(int)(cameraPosition.x / secondGridScale) * secondGridScale,
+			0.0f,
+			(int)(cameraPosition.z / secondGridScale) * secondGridScale
+		);
+
+		_immediateContext->RSSetState(_wireRasterizerState.Get());
+
+		int gridCounts[2] = { 161, 801 };
+		for (int i = 0; i < 2; ++i)
+		{
+			DX11Mesh* pGridMesh = _grids[i].node->meshes[0].Get();
+			DX11VertexShader* girdVsShader = pGridMesh->vertexShader.Get();
+			DX11PixelShader* pixelShader = pGridMesh->pixelShader.Get();
+			_immediateContext->IASetInputLayout(girdVsShader->pInputLayout);
+			_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+
+			_immediateContext->VSSetShader(girdVsShader->pVertexShader, nullptr, 0);
+			_immediateContext->PSSetShader(pixelShader->pPixelShader, nullptr, 0);
+
+			// 상수 버퍼 임시 세팅
+			struct {
+				unsigned int gridCount;
+			} entityInitData;
+			entityInitData.gridCount = gridCounts[i];
+
+			struct {
+				DirectX::XMFLOAT3 cameraPos;
+			}framePerCamera;
+			framePerCamera.cameraPos = { cameraPosition.x, cameraPosition.y, cameraPosition.z };
+
+			struct {
+				DirectX::XMMATRIX worldTranslate;
+				DirectX::XMMATRIX worldViewProj;
+				float heightOpacity;
+			}framePerEntity;
+
+			framePerEntity.worldTranslate = ConvertXMMatrix(_grids[i].transform.GetTranslateMatrix4f());
+			framePerEntity.worldViewProj = ConvertXMMatrix(_grids[i].transform.GetWorldMatrix4f() * viewMatrix * projMatrix);
+			framePerEntity.heightOpacity = heightOpacitys[i];
+
+			void* pData[3] = { &entityInitData , &framePerCamera , &framePerEntity };
+			girdVsShader->SetConstantBuffer(_immediateContext.Get(), pData, 3);
+
+			_immediateContext->PSSetSamplers(0, 1, &pGridMesh->sampler);
+
+			UINT offset = 0;
+			_immediateContext->IASetVertexBuffers(0, 1, &pGridMesh->vertexBuffer, &pGridMesh->singleVertexSize, &offset);
+			_immediateContext->IASetIndexBuffer(pGridMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+			_immediateContext->DrawIndexed(pGridMesh->indexCount, 0, 0);
+		}
+
+		// 원래 상태로 복구
+		_immediateContext->RSSetState(NULL);
+		_immediateContext->OMSetBlendState(NULL, blend, 0xFFFFFFFF);
+	}
+
+	for (auto& camera : _cameras)
+	{
+		Matrix4f viewMatrix = camera->GetViewMatrix();
+		Matrix4f projMatrix = camera->GetProjectionMatrix();
+
+		for (auto& node : _renderableObjects)
+		{
+			Matrix4f worldMatrix = node->transform.GetWorldMatrix4f();
+			Matrix4f worldViewProjMatrix = worldMatrix * viewMatrix * projMatrix;
+			DirectX::XMMATRIX world = ConvertXMMatrix(worldMatrix);
+			DirectX::XMMATRIX worldViewProj = ConvertXMMatrix(worldViewProjMatrix);
+
+			for (auto& mesh : node->meshes)
+			{
+				DX11Mesh* pMesh = mesh.Get();
+
+				DX11VertexShader* vertexShader = pMesh->vertexShader.Get();
+				DX11PixelShader* pixelShader = pMesh->pixelShader.Get();
+
+				_immediateContext->IASetInputLayout(vertexShader->pInputLayout);
+				_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+				_immediateContext->VSSetShader(vertexShader->pVertexShader, nullptr, 0);
+				_immediateContext->PSSetShader(pixelShader->pPixelShader, nullptr, 0);
+
+				_immediateContext->PSSetShaderResources(0, pMesh->srvCount, pMesh->srv);
+
+				if (!node->pSkeleton)
+				{
+					void* pData[1] = { &worldViewProj };
+					vertexShader->SetConstantBuffer(_immediateContext.Get(), pData, 1);
+				}
+				else
+				{
+					void* pData[2] = { &worldViewProj, _boneMatrices };
+
+					//for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
+					//{
+					//	auto& clip = node->pSkeleton->bones[i].clip;
+
+					//	if (clip.keyPosition.size() > 0)
+					//		node->pSkeleton->bones[i].tr.SetPosition(clip.keyPosition[0].position);
+					//	if (clip.keyRotation.size() > 0)
+					//		node->pSkeleton->bones[i].tr.SetRotation(clip.keyRotation[0].rotation);
+					//	if (clip.keyScale.size() > 0)
+					//		node->pSkeleton->bones[i].tr.SetScale(clip.keyScale[0].scale);
+					//}
+					for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
+					{
+						Matrix4f boneMatrix = node->pSkeleton->bones[i].transform.GetWorldMatrix4f();
+						auto testTranspose = boneMatrix.Transpose();
+						//boneMatrix *= worldMatrix;
+						_boneMatrices[i] = ConvertXMMatrix(node->pSkeleton->bones[i].boneOffset * boneMatrix);
+						//_boneMatrices[i] = ConvertXMMatrix(Matrix4f::Identity());
+					}
+
+					vertexShader->SetConstantBuffer(_immediateContext.Get(), pData, 2);
+				}
+
+				_immediateContext->PSSetSamplers(0, 1, &pMesh->sampler);
+
+				UINT offset = 0;
+				_immediateContext->IASetVertexBuffers(0, 1, &pMesh->vertexBuffer, &pMesh->singleVertexSize, &offset);
+				_immediateContext->IASetIndexBuffer(pMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+				_immediateContext->DrawIndexed(pMesh->indexCount, 0, 0);
+			}
+		}
+	}
+
+	return true;
 }
 
 bool flt::RendererDX11::DeferredRender(float deltaTime)
@@ -692,9 +891,6 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 	}
 
 	float blend[4] = { 1,1,1, 1 };
-
-
-
 	_immediateContext->OMSetBlendState(_blendState.Get(), blend, 0xFFFFFFFF);
 	_immediateContext->OMSetDepthStencilState(_depthState.Get(), 0);
 
@@ -758,6 +954,7 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 
 bool flt::RendererDX11::ForwardPlusRender(float deltaTime)
 {
+	ASSERT(false, "구현되지 않은 렌더링 모드");
 	return false;
 }
 
