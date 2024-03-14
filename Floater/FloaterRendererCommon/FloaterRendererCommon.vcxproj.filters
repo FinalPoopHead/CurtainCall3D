@@ -105,11 +105,11 @@
     <ClInclude Include="include\TransformOwner.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="include\RawAnimationClip.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="include\RawSkeleton.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>RawData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RawAnimationClip.h">
+      <Filter>RawData</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -146,9 +146,6 @@
     <ClCompile Include="RawTexture.cpp">
       <Filter>RawData</Filter>
     </ClCompile>
-    <ClCompile Include="RawScene.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="RawMesh.cpp">
       <Filter>RawData</Filter>
     </ClCompile>
@@ -157,6 +154,9 @@
     </ClCompile>
     <ClCompile Include="AssimpRawMeshBuilder.cpp">
       <Filter>Loader\impl\Assimp</Filter>
+    </ClCompile>
+    <ClCompile Include="RawScene.cpp">
+      <Filter>RawData</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

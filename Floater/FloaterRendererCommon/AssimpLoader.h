@@ -5,6 +5,7 @@
 #include "./include/RawSkeleton.h"
 
 struct aiNode;
+struct aiMesh;
 
 namespace flt
 {
@@ -29,6 +30,8 @@ namespace flt
 		void PrintNodeNameRecursive(aiNode* pNode, int depth = 0);
 		void PrintBoneNameRecursive(RawSkeleton::Bone& bone, int depth = 0);
 		void ClearPrivateData();
+
+		void CheckVertexBoneName(RawMesh* pRawMesh, aiMesh* pAiMesh);
 
 	private:
 		std::unordered_map<std::wstring, aiNode*> _aiNodeMap;

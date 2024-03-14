@@ -127,7 +127,7 @@
     <FxCompile Include="VertexShader.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="PixelShader.hlsl">
+    <FxCompile Include="DeferredPixelShader.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
     <FxCompile Include="BackBufferVertexShader.hlsl">

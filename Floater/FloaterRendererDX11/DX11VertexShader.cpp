@@ -4,6 +4,7 @@
 #include "../FloaterUtil/include/FloaterMacro.h"
 #include <d3dcompiler.h>
 #include <wrl/client.h>
+#include <filesystem>
 
 #if defined(DEBUG) || defined(_DEBUG)
 #include <dxgidebug.h>
@@ -14,6 +15,11 @@
 
 template<typename T>
 using comptr = Microsoft::WRL::ComPtr<T>;
+
+flt::DX11VertexShaderBuilder::DX11VertexShaderBuilder(const std::wstring filePath) : IBuilder<DX11VertexShader>(filePath), filePath(filePath), pDevice(nullptr)
+{
+	ASSERT(std::filesystem::exists(filePath), "파일을 찾을 수 없습니다.");
+}
 
 flt::DX11VertexShaderBuilder::~DX11VertexShaderBuilder()
 {

@@ -17,7 +17,8 @@ flt::DX11Mesh* flt::DX11MeshBuilder::build() const
 	{
 		vertices[i].pos = pRawMesh->vertices[i].pos;
 		//vertices[i].tex = pRawMesh->vertices[i].uvs[0];
-		for (int j = 0; j < 10; ++j)
+		int count = sizeof(vertices[i].tex) / sizeof(vertices[i].tex[0]);
+		for (int j = 0; j < count; ++j)
 		{
 			vertices[i].tex[j] = pRawMesh->vertices[i].uvs[j];
 		}
@@ -124,7 +125,7 @@ flt::DX11Mesh* flt::DX11MeshBuilder::build() const
 	DX11VertexShaderBuilder vsBuilder(L"../FloaterRendererDX11/VertexShader.hlsl");
 	vsBuilder.pDevice = pDevice;
 
-	DX11PixelShaderBuilder psBuilder(L"../FloaterRendererDX11/PixelShader.hlsl");
+	DX11PixelShaderBuilder psBuilder(L"../FloaterRendererDX11/DeferredPixelShader.hlsl");
 	psBuilder.pDevice = pDevice;
 
 	DX11Mesh* pMesh = new DX11Mesh(vsBuilder, psBuilder);

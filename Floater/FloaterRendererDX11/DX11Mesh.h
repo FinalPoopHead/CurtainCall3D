@@ -17,7 +17,7 @@ namespace flt
 		using type = struct _Type
 		{
 			Vector3f pos;
-			Vector2f tex[10];
+			Vector2f tex[1];
 			Vector3f normal;
 			Vector3f binormal;
 			Vector3f tangent;

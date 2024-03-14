@@ -197,8 +197,8 @@ int main()
 		//fbxObject.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, 0.01f);
 		renderable.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, -0.1f);
 
-		fbxObject.transform.AddLocalPosition(0.0f, 0.0f, 0.01f);
-		renderable.transform.AddLocalPosition(0.0f, 0.0f, 0.01f);
+		//fbxObject.transform.AddLocalPosition(0.0f, 0.0f, 0.01f);
+		//renderable.transform.AddLocalPosition(0.0f, 0.0f, 0.01f);
 		{
 			auto keyData = platform.GetKey(flt::KeyCode::mouseLButton);
 			if (keyData)

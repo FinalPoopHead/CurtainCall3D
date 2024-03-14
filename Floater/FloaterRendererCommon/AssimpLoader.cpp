@@ -209,7 +209,6 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 		return;
 	}
 
-
 	for (unsigned int i = 0; i < assimpScene->mNumMeshes; ++i)
 	{
 		auto mesh = assimpScene->mMeshes[i];
@@ -367,6 +366,9 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 			// 머티리얼
 			uint32 materialIndex = mesh->mMaterialIndex;
 			rawMesh->material = *_materials[materialIndex];
+
+			// mesh 테스트
+			CheckVertexBoneName(rawMesh, mesh);
 		}
 	}
 
@@ -607,7 +609,15 @@ void flt::AssimpLoader::SetSkeletonRecursive(aiNode* assimpBone, RawSkeleton& sk
 {
 	RawSkeleton::Bone* bone = &skeleton.bones[index];
 	bone->name = ConvertToWstring(assimpBone->mName.C_Str());
-	_boneIndexMap[bone->name] = { &skeleton, index };
+	auto iter = _boneIndexMap.find(bone->name);
+	if (iter != _boneIndexMap.end())
+	{
+		ASSERT(false, "이미 존재하는 본 이름");
+	}
+	else
+	{
+		_boneIndexMap[bone->name] = { &skeleton, index };
+	}
 
 	aiVector3D position;
 	aiQuaternion rotation;
@@ -622,9 +632,8 @@ void flt::AssimpLoader::SetSkeletonRecursive(aiNode* assimpBone, RawSkeleton& sk
 	for (unsigned int i = 0; i < assimpBone->mNumChildren; ++i)
 	{
 		skeleton.bones.push_back(RawSkeleton::Bone{});
-		RawSkeleton::Bone* parentBone = &skeleton.bones[index];
 		auto& childBone = skeleton.bones.back();
-		childBone.transform.SetParent(&parentBone->transform);
+		childBone.transform.SetParent(&bone->transform);
 		SetSkeletonRecursive(assimpBone->mChildren[i], skeleton, (int)skeleton.bones.size() - 1);
 	}
 }
@@ -657,4 +666,32 @@ void flt::AssimpLoader::ClearPrivateData()
 		delete mesh.first;
 	}
 	_meshes.clear();
+}
+
+void flt::AssimpLoader::CheckVertexBoneName(RawMesh* pRawMesh, aiMesh* pAiMesh)
+{
+	auto& skeleton = _skeletonMap[pAiMesh->mBones[0]->mArmature];
+
+	for (unsigned int i = 0; i < pAiMesh->mNumBones; ++i)
+	{
+		auto bone = pAiMesh->mBones[i];
+		std::wstring boneName = ConvertToWstring(bone->mName.C_Str());
+		for (unsigned int j = 0; j < bone->mNumWeights; ++j)
+		{
+			auto weight = bone->mWeights[j];
+			auto vertex = pRawMesh->vertices[weight.mVertexId];
+
+			bool isExist = false;
+			for (auto& boneIndex : vertex.boneIndice)
+			{
+				auto bone = skeleton.bones[boneIndex];
+				if (bone.name == boneName)
+				{
+					isExist = true;
+					break;
+				}
+			}
+			ASSERT(isExist, "bone name not exist");
+		}
+	}
 }

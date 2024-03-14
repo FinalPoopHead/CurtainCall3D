@@ -42,6 +42,13 @@ namespace flt
 			GBUFFER_COUNT
 		};
 
+		enum RenderMode
+		{
+			FORWARD,
+			DEFERRED,
+			FORWARD_PLUS
+		};
+
 #pragma endregion
 	public:
 		RendererDX11();
@@ -57,6 +64,12 @@ namespace flt
 		virtual bool Test() override;
 	public:
 		bool Resize(unsigned __int32 windowWidth, unsigned __int32 windowHeight);
+
+	private:
+		bool ForwardRender(float deltaTime);
+		bool DeferredRender(float deltaTime);
+		bool ForwardPlusRender(float deltaTime);
+
 
 	private:
 		bool InitDisplayInfo();
@@ -80,6 +93,7 @@ namespace flt
 		bool _useVsync;
 		UINT _monitorIndex = 0;
 		UINT _refreshRatesIndex = 1;
+		RenderMode _renderMode;
 
 		unsigned __int32 _windowWidth = 1280;
 		unsigned __int32 _windowHeight = 720;
@@ -100,7 +114,10 @@ namespace flt
 		comptr<ID3D11Texture2D> _depthStencil;
 		comptr<ID3D11RenderTargetView> _renderTargetView;
 		comptr<ID3D11DepthStencilView> _depthStencilView;
-		comptr<ID3D11RasterizerState> _rasterizerState;
+		comptr<ID3D11RasterizerState> _solidCullRasterizerState;
+		comptr<ID3D11RasterizerState> _wireRasterizerState;
+		comptr<ID3D11BlendState> _blendState;
+		comptr<ID3D11DepthStencilState> _depthState;
 
 		// 디퍼드에 사용할 변수들
 		TextureRenderTarget _gBuffer[GBUFFER_COUNT];

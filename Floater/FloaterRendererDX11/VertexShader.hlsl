@@ -19,15 +19,15 @@ struct VS_INPUT
 {
     float3 Position : POSITION;
     float2 UV0 : TEXCOORD0;
-    float2 UV1 : TEXCOORD1;
-    float2 UV2 : TEXCOORD2;
-    float2 UV3 : TEXCOORD3;
-    float2 UV4 : TEXCOORD4;
-    float2 UV5 : TEXCOORD5;
-    float2 UV6 : TEXCOORD6;
-    float2 UV7 : TEXCOORD7;
-    float2 UV8 : TEXCOORD8;
-    float2 UV9 : TEXCOORD9;
+    //float2 UV1 : TEXCOORD1;
+    //float2 UV2 : TEXCOORD2;
+    //float2 UV3 : TEXCOORD3;
+    //float2 UV4 : TEXCOORD4;
+    //float2 UV5 : TEXCOORD5;
+    //float2 UV6 : TEXCOORD6;
+    //float2 UV7 : TEXCOORD7;
+    //float2 UV8 : TEXCOORD8;
+    //float2 UV9 : TEXCOORD9;
     float3 Normal : NORMAL;
     float3 binormal : BINORMAL;
     float3 tangent : TANGENT;

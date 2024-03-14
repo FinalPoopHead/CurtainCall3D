@@ -55,8 +55,8 @@ namespace flt
 
 	struct DX11VertexShaderBuilder : public IBuilder<DX11VertexShader>
 	{
-		DX11VertexShaderBuilder() : DX11VertexShaderBuilder(L"") {}
-		DX11VertexShaderBuilder(const std::wstring filePath) : IBuilder<DX11VertexShader>(filePath), filePath(filePath), pDevice(nullptr) {}
+		DX11VertexShaderBuilder() : filePath(L""), pDevice(nullptr) {}
+		DX11VertexShaderBuilder(const std::wstring filePath);
 		DX11VertexShaderBuilder(const DX11VertexShaderBuilder& other) = delete;
 		DX11VertexShaderBuilder(DX11VertexShaderBuilder&& other) noexcept : IBuilder<DX11VertexShader>(std::move(other)), pDevice(other.pDevice)
 		{
