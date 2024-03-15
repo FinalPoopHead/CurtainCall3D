@@ -8,8 +8,6 @@
 
 #if defined(DEBUG) || defined(_DEBUG)
 #include <dxgidebug.h>
-
-#pragma comment(lib, "dxguid.lib")
 #endif
 
 #pragma region testIncludes
@@ -19,6 +17,7 @@
 #pragma comment(lib, "DXGI.lib")
 #pragma comment(lib, "D3D11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
+#pragma comment(lib, "dxguid.lib")
 
 
 flt::RendererDX11::RendererDX11() :

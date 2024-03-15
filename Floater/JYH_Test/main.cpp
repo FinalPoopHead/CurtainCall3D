@@ -255,7 +255,7 @@ int main()
 			}
 		}
 
-		Sleep(1);
+		//Sleep(1);
 	}
 
 	renderer->DeregisterObject(objectID0);
