@@ -670,6 +670,14 @@ bool flt::RendererDX11::ForwardRender(float deltaTime)
 
 bool flt::RendererDX11::DeferredRender(float deltaTime)
 {
+	static float testElapsedTime = 0.0f;
+	testElapsedTime += deltaTime;
+	while (testElapsedTime > 200.0f)
+	{
+		testElapsedTime = 0.0f;
+	}
+
+
 	// 디퍼드 시작 일단 멀티 렌더타겟.
 	ID3D11RenderTargetView* rtvs[GBUFFER_COUNT] =
 	{
@@ -856,17 +864,36 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 				{
 					void* pData[2] = { &worldViewProj, _boneMatrices };
 
-					//for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
-					//{
-					//	auto& clip = node->pSkeleton->bones[i].clip;
+					for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
+					{
+						auto& clip = node->pSkeleton->bones[i].clip[0];
+						Transform& tr = node->pSkeleton->bones[i].tr;
 
-					//	if (clip.keyPosition.size() > 0)
-					//		node->pSkeleton->bones[i].tr.SetPosition(clip.keyPosition[0].position);
-					//	if (clip.keyRotation.size() > 0)
-					//		node->pSkeleton->bones[i].tr.SetRotation(clip.keyRotation[0].rotation);
-					//	if (clip.keyScale.size() > 0)
-					//		node->pSkeleton->bones[i].tr.SetScale(clip.keyScale[0].scale);
-					//}
+						Vector3f position = (Vector3f)tr.GetLocalPosition();
+						clip.GetPosition(testElapsedTime, &position);
+						if (position.Norm() > 0.0f)
+						{
+							tr.SetPosition(position);
+						}
+
+
+						Quaternion rotation = tr.GetLocalRotation();
+						clip.GetRotation(testElapsedTime, &rotation);
+						if (rotation.NormPow() > 0.0f)
+							tr.SetRotation(rotation);
+
+						Vector3f scale = (Vector3f)tr.GetLocalScale();
+						clip.GetScale(testElapsedTime, &scale);
+						if (scale.Norm() > 0.0f)
+							tr.SetScale(scale);
+
+						//if (clip.keyPosition.size() > 0)
+						//	node->pSkeleton->bones[i].tr.SetPosition(clip.keyPosition[0].position);
+						//if (clip.keyRotation.size() > 0)
+						//	node->pSkeleton->bones[i].tr.SetRotation(clip.keyRotation[0].rotation);
+						//if (clip.keyScale.size() > 0)
+						//	node->pSkeleton->bones[i].tr.SetScale(clip.keyScale[0].scale);
+					}
 					for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
 					{
 						Matrix4f boneMatrix = node->pSkeleton->bones[i].transform.GetWorldMatrix4f();
@@ -1209,7 +1236,7 @@ void flt::RendererDX11::SetDX11Node(DX11Node* dxNode, RawNode& node)
 
 		meshBuilder.psBuilder = DX11PixelShaderBuilder(L"../FloaterRendererDX11/DeferredPixelShader.hlsl");
 		meshBuilder.psBuilder.pDevice = _device.Get();
-		
+
 		dxNode->meshes[i].Set(meshBuilder);
 		ASSERT(dxNode->meshes[i].Get(), "Set Mesh fail");
 	}

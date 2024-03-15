@@ -75,6 +75,11 @@ void flt::Transform::SetPosition(float x, float y, float z)
 	_position.z = z;
 }
 
+void flt::Transform::SetPosition(const Vector3f& position)
+{
+	SetPosition(position.x, position.y, position.z);
+}
+
 void flt::Transform::SetPosition(double x, double y, double z)
 {
 	SetPosition(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z));
@@ -92,6 +97,11 @@ void flt::Transform::SetRotation(float degreeX, float degreeY, float degreeZ, Qu
 	MakeDirtyRecursive();
 
 	_rotation.SetEuler(degreeX, degreeY, degreeY, order);
+}
+
+void flt::Transform::SetRotation(Vector3f degree, Quaternion::AxisOrder order /*= Quaternion::AxisOrder::YXZ*/)
+{
+	SetRotation(degree.x, degree.y, degree.z, order);
 }
 
 void flt::Transform::SetRotation(float x, float y, float z, float w)
@@ -124,6 +134,11 @@ void flt::Transform::SetScale(float x, float y, float z)
 	_scale.x = x;
 	_scale.y = y;
 	_scale.z = z;
+}
+
+void flt::Transform::SetScale(const Vector3f& scale)
+{
+	SetScale(scale.x, scale.y, scale.z);
 }
 
 void flt::Transform::SetScale(double x, double y, double z)

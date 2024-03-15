@@ -32,11 +32,13 @@ namespace flt
 		Vector4f GetWorldPosition() noexcept;
 		void SetPosition(float x, float y, float z);
 		void SetPosition(double x, double y, double z);
+		void SetPosition(const Vector3f& position);
 		void SetPosition(const Vector4f& position);
 
 		Quaternion GetLocalRotation() const noexcept { return _rotation; }
 		void SetRotation(float degreeX, float degreeY, float degreeZ, Quaternion::AxisOrder order = Quaternion::AxisOrder::YXZ);
 		void SetRotation(double degreeX, double degreeY, double degreeZ, Quaternion::AxisOrder order = Quaternion::AxisOrder::YXZ);
+		void SetRotation(Vector3f degree, Quaternion::AxisOrder order = Quaternion::AxisOrder::YXZ);
 		void SetRotation(const Vector3f& axis, float radian);
 		void SetRotation(const Quaternion& q);
 		void SetRotation(float x, float y, float z, float w);
@@ -44,6 +46,7 @@ namespace flt
 		Vector4f GetLocalScale() const noexcept { return _scale; }
 		void SetScale(float x, float y, float z);
 		void SetScale(double x, double y, double z);
+		void SetScale(const Vector3f& scale);
 		void SetScale(const Vector4f& scale);
 
 		void AddLocalPosition(float x, float y, float z);

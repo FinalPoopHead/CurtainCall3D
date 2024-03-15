@@ -39,7 +39,6 @@ namespace flt
 
 			return ret;
 		}
-
 		std::partial_ordering operator<=>(const Vector4f& rhs) const noexcept
 		{
 			std::partial_ordering order = std::partial_ordering::unordered;
@@ -170,6 +169,12 @@ namespace flt
 		{
 			return sqrt(x * x + y * y + z * z + w * w);
 		}
+
+		float NormPow() const noexcept
+		{
+			return x * x + y * y + z * z + w * w;
+		}
+
 		Vector4f& Normalize() noexcept
 		{
 			float norm = Norm();

@@ -1,7 +1,9 @@
 ﻿#pragma once
 #include <vector>
+#include <unordered_map>
 #include "../FloaterRendererCommon/include/RawSkeleton.h"
 #include "../FloaterRendererCommon/include/TransformOwner.h"
+#include "DX11AnimationClip.h"
 
 namespace flt
 {
@@ -11,7 +13,7 @@ namespace flt
 		{
 			std::wstring name;
 			Matrix4f boneOffset;
-			RawAnimationClip clip;
+			std::vector<DX11AnimationClip> clip;
 		};
 
 		DX11Skeleton(RawSkeleton& rawSkeleton) :
@@ -24,7 +26,13 @@ namespace flt
 				bones[i].transform = rawSkeleton.bones[i].transform;
 				bones[i].name = rawSkeleton.bones[i].name;
 				bones[i].boneOffset = rawSkeleton.boneOffsets[i];
-				bones[i].clip = rawSkeleton.clips[i];
+
+				bones[i].clip.resize(rawSkeleton.animations.size());
+				for (int j = 0; j < rawSkeleton.animations.size(); ++j)
+				{
+					animationClipIndex[rawSkeleton.animations[j].name] = j;
+					bones[i].clip[j] = rawSkeleton.animations[j].clips[i];
+				}
 
 				auto& children = rawSkeleton.bones[i].transform.GetChildren();
 				for (int j = 0; j < children.size(); ++j)
@@ -37,7 +45,6 @@ namespace flt
 		}
 
 		std::vector<Bone> bones;
+		std::unordered_map<std::wstring, int> animationClipIndex;
 	};
 }
-
-

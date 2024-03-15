@@ -63,6 +63,9 @@
     <ClCompile Include="DX11Skeleton.cpp">
       <Filter>RendererResource</Filter>
     </ClCompile>
+    <ClCompile Include="DX11AnimationClip.cpp">
+      <Filter>RendererResource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX11Node.h">
@@ -114,6 +117,9 @@
       <Filter>RendererResource</Filter>
     </ClInclude>
     <ClInclude Include="DX11Skeleton.h">
+      <Filter>RendererResource</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11AnimationClip.h">
       <Filter>RendererResource</Filter>
     </ClInclude>
   </ItemGroup>

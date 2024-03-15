@@ -251,8 +251,9 @@ bool flt::FBXLoader::LoadToRawNode(fbxsdk::FbxNode& node, RawNode* outNode)
 	}
 
 	// animation 세팅
-	outNode->skeleton->clips.push_back(RawAnimationClip{});
-	SetAnimationClip(node, &outNode->skeleton->clips.back());
+	outNode->skeleton->animations.push_back(RawAnimation{});
+	outNode->skeleton->animations.back().clips.push_back(RawAnimationClip{});
+	SetAnimationClip(node, &outNode->skeleton->animations.back().clips.back());
 
 	return true;
 }

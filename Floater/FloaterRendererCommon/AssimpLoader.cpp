@@ -393,6 +393,7 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 				auto iter = _boneIndexMap.find(nodeName);
 
 				RawAnimationClip* clips = nullptr;
+				RawAnimation* rawAnimation = nullptr;
 				if (iter == _boneIndexMap.end())
 				{
 					// 본이 아닌 노드에 애니메이션을 넣어야함.
@@ -402,11 +403,18 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 				else
 				{
 					RawSkeleton& rawSkeleton = *_boneIndexMap[nodeName].first;
-					rawSkeleton.clips.resize(rawSkeleton.bones.size());
-					clips = &rawSkeleton.clips[_boneIndexMap[nodeName].second];
+					if (rawSkeleton.animations.size() < animationCount)
+					{
+						rawSkeleton.animations.resize(animationCount);
+					}
+
+					rawSkeleton.animations[i].clips.resize(rawSkeleton.bones.size());
+
+					rawAnimation = &rawSkeleton.animations[i];
+					clips = &rawSkeleton.animations[i].clips[_boneIndexMap[nodeName].second];
 				}
 
-				clips->name = ConvertToWstring(animName.C_Str());
+				rawAnimation->name = ConvertToWstring(animName.C_Str());
 
 				int keyCount = (int)nodeAnim->mNumPositionKeys;
 				clips->keyPosition.reserve(keyCount);
@@ -441,6 +449,8 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 					);
 				}
 			}
+
+
 		}
 	}
 

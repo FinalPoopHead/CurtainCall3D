@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="CommonMath.cpp" />
     <ClCompile Include="CreateRenderer.cpp" />
+    <ClCompile Include="DX11AnimationClip.cpp" />
     <ClCompile Include="DX11PixelShader.cpp" />
     <ClCompile Include="DX11Skeleton.cpp" />
     <ClCompile Include="DX11VertexShader.cpp" />
@@ -32,6 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX11Animation.h" />
+    <ClInclude Include="DX11AnimationClip.h" />
     <ClInclude Include="DX11Entity.h" />
     <ClInclude Include="DX11PixelShader.h" />
     <ClInclude Include="DX11PSConstantBuffer.h" />

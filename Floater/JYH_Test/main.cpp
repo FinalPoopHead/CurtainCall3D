@@ -96,8 +96,8 @@ int main()
 
 		ModelLoader loader;
 		//std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Ganondorf (TotK).fbx";
-		//std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Dying.fbx";
-		std::wstring filePath = L"..\\x64\\fbx\\Models\\A_TP_CH_Breathing.fbx";
+		std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Dying.fbx";
+		//std::wstring filePath = L"..\\x64\\fbx\\Models\\A_TP_CH_Breathing.fbx";
 		//std::wstring filePath = L"C:\\Users\\KOCCA56\\Desktop\\Bee.glb";
 		std::wstring zUpYForward = L"..\\x64\\fbx\\Test\\ZY.fbx";
 		std::wstring yUpZForward = L"..\\x64\\fbx\\Test\\YZ.fbx";
@@ -193,7 +193,7 @@ int main()
 			break;
 		}
 
-		renderer->Render(1.0f);
+		renderer->Render(0.1f);
 		//fbxObject.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, 0.01f);
 		renderable.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, -0.1f);
 
@@ -208,7 +208,7 @@ int main()
 				std::cout << "LL " << keyData.keyTime << " " << keyData.x << " " << keyData.y << std::endl;
 			}
 			keyData = platform.GetKey(flt::KeyCode::mouseRButton);
-			float cameraSpeed = 0.1f;
+			float cameraSpeed = 0.2f;
 			if (keyData)
 			{
 
@@ -255,7 +255,7 @@ int main()
 			}
 		}
 
-		Sleep(10);
+		Sleep(1);
 	}
 
 	renderer->DeregisterObject(objectID0);
