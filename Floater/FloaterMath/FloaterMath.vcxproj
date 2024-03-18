@@ -181,6 +181,9 @@
   <ItemGroup>
     <Natvis Include="include\FloaterMath.natvis" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="test.asm" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

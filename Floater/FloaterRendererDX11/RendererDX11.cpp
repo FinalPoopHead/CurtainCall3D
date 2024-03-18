@@ -875,7 +875,6 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 							tr.SetPosition(position);
 						}
 
-
 						Quaternion rotation = tr.GetLocalRotation();
 						clip.GetRotation(testElapsedTime, &rotation);
 						if (rotation.NormPow() > 0.0f)

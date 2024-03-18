@@ -92,7 +92,23 @@ int main()
 		Quaternion q1{ 0.0f, 0.0f, 0.0f, 1.0f };
 		q1.SetEuler(1.f, 2.f, 3.f);
 
-		Matrix4f m1;
+		//Matrix4f m1
+		//{
+		//	1.0f, 2.0f, 3.0f, 4.0f,
+		//	5.0f, 6.0f, 7.0f, 8.0f,
+		//	9.0f, 10.0f, 11.0f, 12.0f,
+		//	13.0f, 14.0f, 15.0f, 16.0f
+		//};
+
+		//Matrix4f m2
+		//{
+		//	1.0f, 2.0f, 3.0f, 4.0f,
+		//	5.0f, 6.0f, 7.0f, 8.0f,
+		//	9.0f, 10.0f, 11.0f, 12.0f,
+		//	13.0f, 14.0f, 15.0f, 16.0f
+		//};
+
+		//Matrix4f m3 = m1 * m2;
 
 		ModelLoader loader;
 		//std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Ganondorf (TotK).fbx";
@@ -186,6 +202,7 @@ int main()
 	auto objectID1 = renderer->RegisterObject(renderable);
 	renderable.transform.SetPosition(0.0f, 0.0f, 0.0f);
 
+	int loopCount = 0;
 	while (true)
 	{
 		if (!platform.Update())
@@ -211,7 +228,6 @@ int main()
 			float cameraSpeed = 0.2f;
 			if (keyData)
 			{
-
 				keyData = platform.GetKey(flt::KeyCode::w);
 				if (keyData)
 				{
@@ -255,6 +271,8 @@ int main()
 			}
 		}
 
+		ASSERT(loopCount < 10000, "정지");
+		loopCount++;
 		//Sleep(1);
 	}
 

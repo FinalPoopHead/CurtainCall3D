@@ -89,7 +89,7 @@ namespace flt
 		}
 		Matrix4f& operator-=(const Matrix4f& rhs)
 		{
-			// 내부에서 sse
+			// Vector4f 내부에서 sse
 			v[0] -= rhs.v[0];
 			v[1] -= rhs.v[1];
 			v[2] -= rhs.v[2];
@@ -104,9 +104,52 @@ namespace flt
 		}
 		Matrix4f& operator*=(const Matrix4f& rhs) noexcept
 		{
+			/*SSE version, dp_ps를 사용하지 않음. 5950x 기준으로 아래 버젼이 1.5배정도 더 빠름.
 			Matrix4f temp = *this;
+			Matrix4f transpose = rhs.Transpose();
 
-			//SSE version
+			const __m128 row0 = _mm_load_ps(transpose.e[0]);
+			const __m128 row1 = _mm_load_ps(transpose.e[1]);
+			const __m128 row2 = _mm_load_ps(transpose.e[2]);
+			const __m128 row3 = _mm_load_ps(transpose.e[3]);
+
+			__m128 col = _mm_load_ps(temp.e[0]);
+			__m128 X = _mm_mul_ps(col, row0);
+			__m128 Y = _mm_mul_ps(col, row1);
+			__m128 Z = _mm_mul_ps(col, row2);
+			__m128 W = _mm_mul_ps(col, row3);
+			__m128 R = _mm_hadd_ps(_mm_hadd_ps(X, Y), _mm_hadd_ps(Z, W));
+			_mm_store_ps(this->e[0], R);
+
+			col = _mm_load_ps(temp.e[1]);
+			X = _mm_mul_ps(col, row0);
+			Y = _mm_mul_ps(col, row1);
+			Z = _mm_mul_ps(col, row2);
+			W = _mm_mul_ps(col, row3);
+			R = _mm_hadd_ps(_mm_hadd_ps(X, Y), _mm_hadd_ps(Z, W));
+			_mm_store_ps(this->e[1], R);
+
+			col = _mm_load_ps(temp.e[2]);
+			X = _mm_mul_ps(col, row0);
+			Y = _mm_mul_ps(col, row1);
+			Z = _mm_mul_ps(col, row2);
+			W = _mm_mul_ps(col, row3);
+			R = _mm_hadd_ps(_mm_hadd_ps(X, Y), _mm_hadd_ps(Z, W));
+			_mm_store_ps(this->e[2], R);
+
+			col = _mm_load_ps(temp.e[3]);
+			X = _mm_mul_ps(col, row0);
+			Y = _mm_mul_ps(col, row1);
+			Z = _mm_mul_ps(col, row2);
+			W = _mm_mul_ps(col, row3);
+			R = _mm_hadd_ps(_mm_hadd_ps(X, Y), _mm_hadd_ps(Z, W));
+			_mm_store_ps(this->e[3], R);
+
+			return *this;*/
+
+
+			//SSE4.1 dp_ps version
+			Matrix4f temp = *this;
 			Vector4f tmp[4] =
 			{
 				{rhs.e[0][0], rhs.e[1][0], rhs.e[2][0], rhs.e[3][0]},
@@ -115,11 +158,6 @@ namespace flt
 				{rhs.e[0][3], rhs.e[1][3], rhs.e[2][3], rhs.e[3][3]}
 			};
 
-			auto a = _mm_dp_ps(temp.v[0].m, tmp[0].m, 0xFF);
-
-			//_mm_dp_ps 는 SSE4.1 이상에서만 사용 가능합니다.
-
-			// 혹은 SSE 명령어를 이용해
 			e[0][0] = _mm_cvtss_f32(_mm_dp_ps(temp.v[0].m, tmp[0].m, 0xFF));
 			e[0][1] = _mm_cvtss_f32(_mm_dp_ps(temp.v[0].m, tmp[1].m, 0xFF));
 			e[0][2] = _mm_cvtss_f32(_mm_dp_ps(temp.v[0].m, tmp[2].m, 0xFF));

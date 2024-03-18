@@ -209,6 +209,7 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 		return;
 	}
 
+	// 본 데이터 세팅
 	for (unsigned int i = 0; i < assimpScene->mNumMeshes; ++i)
 	{
 		auto mesh = assimpScene->mMeshes[i];
@@ -222,45 +223,30 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 
 				auto& skeleton = _skeletonMap[armature];
 				SetSkeleton(armature, skeleton);
-				PrintBoneNameRecursive(skeleton.bones[skeleton.rootBoneIndex]);
-
-				int meshCount = assimpScene->mNumMeshes;
-				for (int j = 0; j < meshCount; ++j)
-				{
-					int boneCount = assimpScene->mMeshes[j]->mNumBones;
-					for (int k = 0; k < boneCount; ++k)
-					{
-						auto& bone = assimpScene->mMeshes[j]->mBones[k];
-						std::wstring boneName = ConvertToWstring(bone->mName.C_Str());
-
-						auto& m = bone->mOffsetMatrix;
-						//Matrix4f offset{
-						//	m.a1, m.a2, m.a3, m.a4, 
-						//	m.b1, m.b2, m.b3, m.b4, 
-						//	m.c1, m.c2, m.c3, m.c4, 
-						//	m.d1, m.d2, m.d3, m.d4 
-						//};
-
-						Matrix4f offset{
-							m.a1, m.b1, m.c1, m.d1,
-							m.a2, m.b2, m.c2, m.d2,
-							m.a3, m.b3, m.c3, m.d3,
-							m.a4, m.b4, m.c4, m.d4
-						};
-
-						auto boneIndex = _boneIndexMap[boneName].second;
-						ASSERT((skeleton.boneOffsets[boneIndex] == Matrix4f::Zero() || skeleton.boneOffsets[boneIndex] == offset) , "assert");
-						skeleton.boneOffsets[boneIndex] = offset;
-					}
-				}
-
 			}
-			//for (unsigned int j = 0; j < mesh->mNumBones; ++j)
-			//{
-			//	auto bone = mesh->mBones[j];
-			//	std::wstring boneNodeName = ConvertToWstring(bone->mNode->mName.C_Str());
-			//	// 본 이름 세팅.
-			//}
+
+			auto& skeleton = _skeletonMap[armature];
+
+			int boneCount = assimpScene->mMeshes[i]->mNumBones;
+			for (int j = 0; j < boneCount; ++j)
+			{
+				auto& bone = assimpScene->mMeshes[i]->mBones[j];
+				std::wstring boneName = ConvertToWstring(bone->mName.C_Str());
+
+				auto& m = bone->mOffsetMatrix;
+
+				Matrix4f offset
+				{
+					m.a1, m.b1, m.c1, m.d1,
+					m.a2, m.b2, m.c2, m.d2,
+					m.a3, m.b3, m.c3, m.d3,
+					m.a4, m.b4, m.c4, m.d4
+				};
+
+				auto boneIndex = _boneIndexMap[boneName].second;
+				ASSERT((skeleton.boneOffsets[boneIndex] == Matrix4f::Zero() || skeleton.boneOffsets[boneIndex] == offset), "assert");
+				skeleton.boneOffsets[boneIndex] = offset;
+			}
 		}
 	}
 

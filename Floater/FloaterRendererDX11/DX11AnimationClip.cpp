@@ -7,31 +7,34 @@ void flt::DX11AnimationClip::GetPosition(float time, Vector3f* outPos)
 		return;
 	}
 
-	auto iter = keyPosition.begin();
-	for (; iter != keyPosition.end(); ++iter)
+	if (keyPosition[positionIndex].time > time)
 	{
-		if (iter->time > time)
-		{
-			iter--;
-			break;
-		}
+		positionIndex = 0;
 	}
 
-	if (iter == keyPosition.end())
+	int size = (int)keyPosition.size();
+	for (int i = positionIndex; i < size; ++i)
 	{
-		iter--;
-		outPos->x = iter->position.x;
-		outPos->y = iter->position.y;
-		outPos->z = iter->position.z;
+		if (keyPosition[i].time > time)
+		{
+			break;
+		}
+		positionIndex = i;
+	}
 
+	if (positionIndex == size - 1)
+	{
+		*outPos = (Vector3f)keyPosition[positionIndex].position;
 		return;
 	}
 
-	Vector3f curr = { iter->position.x, iter->position.y, iter->position.z };
-	iter++;
-	Vector3f next = { iter->position.x, iter->position.y, iter->position.z };
-	iter--;
-	*outPos = Vector3f::Lerp(curr, next, (time - iter->time) / (iter[1].time - iter->time));
+	Vector3f curr = (Vector3f)keyPosition[positionIndex].position;
+	Vector3f next = (Vector3f)keyPosition[positionIndex + 1].position;
+
+	float currTIme = keyPosition[positionIndex].time;
+	float nextTime = keyPosition[positionIndex + 1].time;
+
+	*outPos = Vector3f::Lerp(curr, next, (time - currTIme) / (nextTime - currTIme));
 }
 
 void flt::DX11AnimationClip::GetRotation(float time, Quaternion* outRot)
@@ -41,30 +44,34 @@ void flt::DX11AnimationClip::GetRotation(float time, Quaternion* outRot)
 		return;
 	}
 
-	auto iter = keyRotation.begin();
-	for (; iter != keyRotation.end(); ++iter)
+	if (keyRotation[rotationIndex].time > time)
 	{
-		if (iter->time > time)
-		{
-			iter--;
-			break;
-		}
+		rotationIndex = 0;
 	}
 
-	if (iter == keyRotation.end())
+	int size = (int)keyRotation.size();
+	for (int i = rotationIndex; i < size; ++i)
 	{
-		iter--;
-		*outRot = iter->rotation;
+		if (keyRotation[i].time > time)
+		{
+			break;
+		}
+		rotationIndex = i;
+	}
+
+	if (rotationIndex == size - 1)
+	{
+		*outRot = keyRotation[rotationIndex].rotation;
 		return;
 	}
 
-	Quaternion curr = iter->rotation;
-	iter++;
-	Quaternion next = iter->rotation;
-	iter--;
+	Quaternion curr = keyRotation[rotationIndex].rotation;
+	Quaternion next = keyRotation[rotationIndex + 1].rotation;
 
-	*outRot = Quaternion::Slerp(curr, next, (time - iter->time) / (iter[1].time - iter->time));
+	float currTIme = keyRotation[rotationIndex].time;
+	float nextTime = keyRotation[rotationIndex + 1].time;
 
+	*outRot = Quaternion::Slerp(curr, next, (time - currTIme) / (nextTime - currTIme));
 }
 
 void flt::DX11AnimationClip::GetScale(float time, Vector3f* outScl)
@@ -74,30 +81,32 @@ void flt::DX11AnimationClip::GetScale(float time, Vector3f* outScl)
 		return;
 	}
 
-	auto iter = keyScale.begin();
-	for (; iter != keyScale.end(); ++iter)
+	if (keyScale[scaleIndex].time > time)
 	{
-		if (iter->time > time)
-		{
-			iter--;
-			break;
-		}
+		scaleIndex = 0;
 	}
 
-	if (iter == keyScale.end())
+	int size = (int)keyScale.size();
+	for (int i = scaleIndex; i < size; ++i)
 	{
-		iter--;
-		outScl->x = iter->scale.x;
-		outScl->y = iter->scale.y;
-		outScl->z = iter->scale.z;
+		if (keyScale[i].time > time)
+		{
+			break;
+		}
+		scaleIndex = i;
+	}
 
+	if (scaleIndex == size - 1)
+	{
+		*outScl = (Vector3f)keyScale[scaleIndex].scale;
 		return;
 	}
 
-	Vector3f curr = { iter->scale.x, iter->scale.y, iter->scale.z };
-	iter++;
-	Vector3f next = { iter->scale.x, iter->scale.y, iter->scale.z };
-	iter--;
+	Vector3f curr = (Vector3f)keyScale[scaleIndex].scale;
+	Vector3f next = (Vector3f)keyScale[scaleIndex + 1].scale;
 
-	*outScl = Vector3f::Lerp(curr, next, (time - iter->time) / (iter[1].time - iter->time));
+	float currTIme = keyScale[scaleIndex].time;
+	float nextTime = keyScale[scaleIndex + 1].time;
+
+	*outScl = Vector3f::Lerp(curr, next, (time - currTIme) / (nextTime - currTIme));
 }

@@ -12,7 +12,7 @@ namespace flt
 		using KeyRotation = RawAnimationClip::KeyRotation;
 		using KeyScale = RawAnimationClip::KeyScale;
 #pragma endregion
-
+		DX11AnimationClip() : startTime(0.0f), endTime(0.0f), keyPosition(), keyRotation(), keyScale(), positionIndex(0), rotationIndex(0), scaleIndex(0) {}
 		DX11AnimationClip& operator=(const RawAnimationClip& other)
 		{
 			startTime = other.startTime;
@@ -35,6 +35,10 @@ namespace flt
 		std::vector<KeyPosition> keyPosition;
 		std::vector<KeyRotation> keyRotation;
 		std::vector<KeyScale> keyScale;
+
+		int positionIndex;
+		int rotationIndex;
+		int scaleIndex;
 	};
 }
 

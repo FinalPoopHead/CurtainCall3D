@@ -63,4 +63,9 @@
   <ItemGroup>
     <Natvis Include="include\FloaterMath.natvis" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="test.asm">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

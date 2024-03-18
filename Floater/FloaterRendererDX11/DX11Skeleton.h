@@ -19,7 +19,7 @@ namespace flt
 		DX11Skeleton(RawSkeleton& rawSkeleton) :
 			bones(rawSkeleton.bones.size())
 		{
-			int boneCount = rawSkeleton.bones.size();
+			int boneCount = (int)rawSkeleton.bones.size();
 
 			for (int i = 0; i < boneCount; i++)
 			{
