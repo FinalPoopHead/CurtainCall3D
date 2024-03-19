@@ -7,7 +7,7 @@ struct VS_OUTPUT
     float4 Position : SV_Position;
     //float3 PositionW : POSITION;
     float2 UV : TEXCOORD;
-    //float3 Normal : NORMAL;
+    float3 Normal : NORMAL;
 };
 
 struct PS_OUTPUT
@@ -26,10 +26,15 @@ PS_OUTPUT main(VS_OUTPUT input) : SV_Target
     float4 texColor = textureMap.Sample(g_Sampler, input.UV);
 
     float4 color = normalize(input.Position);
+    
+    
     output.depth = texColor;//float4(color.xyz, 1);
-    output.normal = float4(color.xxx, 1);
+    output.normal = float4(input.Normal, 0.0f);
     output.albedo = float4(color.yyy, 1);
     output.specular = float4(color.zzz, 1);
     output.emissive = float4(color.www, 1);
+    
+    output.depth = output.normal;
+    
     return output;
 }

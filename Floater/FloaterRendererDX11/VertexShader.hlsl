@@ -1,14 +1,8 @@
 cbuffer ConstantBuffer : register(b0)
 {
     float4x4 WorldViewProj;
+    float4x4 WorldInvTransp;
 };
-
-//cbuffer ConstantBuffer2 : register(b1)
-//{
-//    float4x4 World;
-//    float4x4 WorldInvTransp;
-//    float4x4 ViewProj;
-//};
 
 cbuffer BoneConstantBuffer : register(b1)
 {
@@ -40,7 +34,7 @@ struct VS_OUTPUT
     float4 Position : SV_Position;
     //float3 PositionW : POSITION;
     float2 UV : TEXCOORD;
-    //float3 Normal : NORMAL;
+    float3 Normal : NORMAL;
 };
 
 VS_OUTPUT main(VS_INPUT Input)
@@ -68,17 +62,11 @@ VS_OUTPUT main(VS_INPUT Input)
     float4 PosL = mul(bone, float4(Input.Position.xyz, 1.0f));
     Output.Position = mul(WorldViewProj, PosL);
     
-    //Output.PositionW = mul(World, PosL);
-    //// 아래 임시코드
-    //Output.PositionW = PosL;
-    
     Output.UV = Input.UV0;
     
-    //float3 normalL = mul((float3x3) bone, Input.Normal);
-    ////Output.Normal = mul((float3x3) WorldInvTransp, normalL);
-    ////Output.Normal = normalize(Output.Normal);
-    //// 아래 임시코드
-    //Output.Normal = normalize(normalL);
+    // TODO : 일단 본Matrix에는 scale 변환이 없다고 가정을 한 코드.
+    float3 NormalL = mul((float3x3)bone, Input.Normal);
+    Output.Normal = normalize(mul((float3x3) WorldInvTransp, NormalL));
 
     return Output;
 }

@@ -3,6 +3,7 @@
 #include "../FloaterUtil/include/ConvString.h"
 #include "./include/RawNode.h"
 #include "./include/RawAnimation.h"
+#include "./include/RawSkeleton.h"
 #include <iostream>
 
 

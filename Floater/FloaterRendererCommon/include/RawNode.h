@@ -2,9 +2,6 @@
 #include "TransformOwner.h"
 #include "RawMesh.h"
 #include "RawSkin.h"
-#include "RawSkeleton.h"
-#include "RawAnimation.h"
-#include "Camera.h"
 
 #include <string>
 #include <vector>
@@ -13,6 +10,11 @@
 
 namespace flt
 {
+	struct RawSkeleton;
+	struct RawAnimationClip;
+	struct Camera;
+	struct Light;
+
 	struct RawNode : public TransformOwner
 	{
 		RawNode() : RawNode(L"") {}
@@ -25,6 +27,7 @@ namespace flt
 		RawSkeleton* skeleton;
 		RawAnimationClip* animationClip;
 		Camera* camera;
+		Light* light;
 
 		RawNode* parent;
 		std::vector<RawNode*> children;

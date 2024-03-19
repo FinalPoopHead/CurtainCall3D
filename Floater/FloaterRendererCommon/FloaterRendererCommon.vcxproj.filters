@@ -96,9 +96,6 @@
     <ClInclude Include="AssimpLoader.h">
       <Filter>Loader\impl\Assimp</Filter>
     </ClInclude>
-    <ClInclude Include="AssimpRawMeshBuilder.h">
-      <Filter>Loader\impl\Assimp</Filter>
-    </ClInclude>
     <ClInclude Include="include\Rect.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -110,6 +107,9 @@
     </ClInclude>
     <ClInclude Include="include\RawAnimationClip.h">
       <Filter>RawData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Light.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -152,11 +152,11 @@
     <ClCompile Include="AssimpLoader.cpp">
       <Filter>Loader\impl\Assimp</Filter>
     </ClCompile>
-    <ClCompile Include="AssimpRawMeshBuilder.cpp">
-      <Filter>Loader\impl\Assimp</Filter>
-    </ClCompile>
     <ClCompile Include="RawScene.cpp">
       <Filter>RawData</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

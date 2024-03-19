@@ -271,8 +271,8 @@ int main()
 			}
 		}
 
-		ASSERT(loopCount < 10000, "정지");
-		loopCount++;
+		//ASSERT(loopCount < 10000, "정지");
+		//loopCount++;
 		//Sleep(1);
 	}
 

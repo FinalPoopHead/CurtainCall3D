@@ -836,8 +836,7 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 		{
 			Matrix4f worldMatrix = node->transform.GetWorldMatrix4f();
 			Matrix4f worldViewProjMatrix = worldMatrix * viewMatrix * projMatrix;
-			DirectX::XMMATRIX world = ConvertXMMatrix(worldMatrix);
-			DirectX::XMMATRIX worldViewProj = ConvertXMMatrix(worldViewProjMatrix);
+			DirectX::XMMATRIX constBuffer0[2] = { ConvertXMMatrix(worldViewProjMatrix), ConvertXMMatrix(worldMatrix.Inverse().Transpose()) };
 
 			for (auto& mesh : node->meshes)
 			{
@@ -856,12 +855,12 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 
 				if (!node->pSkeleton)
 				{
-					void* pData[1] = { &worldViewProj };
+					void* pData[1] = { constBuffer0 };
 					vertexShader->SetConstantBuffer(_immediateContext.Get(), pData, 1);
 				}
 				else
 				{
-					void* pData[2] = { &worldViewProj, _boneMatrices };
+					void* pData[2] = { constBuffer0, _boneMatrices };
 
 					for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
 					{

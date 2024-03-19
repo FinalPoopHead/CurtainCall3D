@@ -15,5 +15,3 @@ namespace flt
 		void LoadGLB(const std::wstring& filePath);
 	};
 }
-
-

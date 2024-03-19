@@ -9,7 +9,6 @@
 #include "./include/RawScene.h"
 #include "./include/RawMesh.h"
 #include "./include/RawMaterial.h"
-#include "AssimpRawMeshBuilder.h"
 
 #include <iostream>
 
@@ -18,6 +17,7 @@
 #else
 #pragma comment(lib, "../External/lib/x64/release/assimp-vc143-mt.lib")
 #endif
+
 
 void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene)
 {

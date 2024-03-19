@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AssimpLoader.h" />
-    <ClInclude Include="AssimpRawMeshBuilder.h" />
     <ClInclude Include="CoordSystem.h" />
     <ClInclude Include="FBXLoader.h" />
     <ClInclude Include="GLTFLoader.h" />
@@ -43,6 +42,7 @@
     <ClInclude Include="include\RawTexture.h" />
     <ClInclude Include="include\RawScene.h" />
     <ClInclude Include="include\TransformOwner.h" />
+    <ClInclude Include="include\Light.h" />
     <ClInclude Include="VertedDataLayer.h" />
     <ClInclude Include="VertexNormalData.h" />
   </ItemGroup>
@@ -56,11 +56,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssimpLoader.cpp" />
-    <ClCompile Include="AssimpRawMeshBuilder.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CoordSystem.cpp" />
     <ClCompile Include="FBXLoader.cpp" />
     <ClCompile Include="GLTFLoader.cpp" />
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="RawMaterial.cpp" />
     <ClCompile Include="RawMesh.cpp" />
