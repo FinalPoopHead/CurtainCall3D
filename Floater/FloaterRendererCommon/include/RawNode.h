@@ -12,7 +12,7 @@ namespace flt
 {
 	struct RawSkeleton;
 	struct RawAnimationClip;
-	struct Camera;
+	class Camera;
 	struct Light;
 
 	struct RawNode : public TransformOwner

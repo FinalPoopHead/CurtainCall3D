@@ -33,7 +33,10 @@ void flt::ResourceMgr::GetResource(ResourceBase* outResource, const IBuilderBase
 	else
 	{
 		// 관리중일 데이터일 경우 참조 카운트 증가
-		outResource->_pData = resources[builder.key].GetData();
+		ManagedData& data = resources[builder.key];
+		ASSERT(data.typeName == builder.GetTypeName(), "중복키 다른 타입");
+		outResource->_pData = data.GetData();
+
 	}
 }
 

@@ -8,12 +8,24 @@ struct VS_OUTPUT
 Texture2D textureMap : register(t0);
 SamplerState g_Sampler : register(s0);
 
-float4 main(VS_OUTPUT input) : SV_Target
+struct PS_OUTPUT
 {
-	// 텍스처 샘플링
-	//float4 texColor = (0.5, 0.5, 0, 0.9);
-    float4 texColor = textureMap.Sample(g_Sampler, input.UV);
-	//float4 texColor = {input.UV, 0, 1};
+    float4 depth : SV_Target0;
+    float4 normal : SV_Target1;
+    float4 albedo : SV_Target2;
+    float4 specular : SV_Target3;
+    float4 emissive : SV_Target4;
+};
 
-    return texColor;
+PS_OUTPUT main(VS_OUTPUT input) : SV_TARGET
+{
+    ////return float4(0.8, 0.8, 0.8, input.Opacity);
+    PS_OUTPUT output;
+    float4 color = textureMap.Sample(g_Sampler, input.UV);
+    output.depth = color;
+    output.normal = color;
+    output.albedo = color;
+    output.specular = float4(0.0f, 0.0f, 0.0f, 1.0f);
+    
+    return output;
 }

@@ -122,6 +122,8 @@ namespace flt
 		// 디퍼드에 사용할 변수들
 		TextureRenderTarget _gBuffer[GBUFFER_COUNT];
 		DX11Entity _screenQuad;
+		Resource<DX11VertexShader> _directVS;
+		Resource<DX11PixelShader> _directPS;
 
 		// 그리기 위한 오브젝트
 		std::vector<DX11Node*> _renderableObjects;

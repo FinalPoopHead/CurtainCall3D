@@ -278,6 +278,22 @@ bool flt::RendererDX11::Initialize(HWND hwnd, HWND debugHWnd /*= NULL*/)
 		ASSERT(_grids[i].node->meshes[0].Get(), "메쉬 생성 실패");
 	}
 
+	DX11VertexShaderBuilder directionalVSBuilder;
+	directionalVSBuilder.pDevice = _device.Get();
+	directionalVSBuilder.filePath = L"../FloaterRendererDX11/directionalLightVS.hlsl";
+	directionalVSBuilder.key = directionalVSBuilder.filePath;
+
+	_directVS.Set(directionalVSBuilder);
+	ASSERT(_directVS.Get(), "버텍스 쉐이더 생성 실패");
+
+	DX11PixelShaderBuilder directionalPSBuilder;
+	directionalPSBuilder.pDevice = _device.Get();
+	directionalPSBuilder.filePath = L"../FloaterRendererDX11/DirectionalLightPS.hlsl";
+	directionalPSBuilder.key = directionalPSBuilder.filePath;
+	_directPS.Set(directionalPSBuilder);
+	ASSERT(_directPS.Get(), "픽셀 쉐이더 생성 실패");
+
+
 	_isRunRenderEngine = true;
 	return true;
 }
@@ -630,24 +646,10 @@ bool flt::RendererDX11::ForwardRender(float deltaTime)
 				{
 					void* pData[2] = { &worldViewProj, _boneMatrices };
 
-					//for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
-					//{
-					//	auto& clip = node->pSkeleton->bones[i].clip;
-
-					//	if (clip.keyPosition.size() > 0)
-					//		node->pSkeleton->bones[i].tr.SetPosition(clip.keyPosition[0].position);
-					//	if (clip.keyRotation.size() > 0)
-					//		node->pSkeleton->bones[i].tr.SetRotation(clip.keyRotation[0].rotation);
-					//	if (clip.keyScale.size() > 0)
-					//		node->pSkeleton->bones[i].tr.SetScale(clip.keyScale[0].scale);
-					//}
 					for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
 					{
 						Matrix4f boneMatrix = node->pSkeleton->bones[i].transform.GetWorldMatrix4f();
-						auto testTranspose = boneMatrix.Transpose();
-						//boneMatrix *= worldMatrix;
 						_boneMatrices[i] = ConvertXMMatrix(node->pSkeleton->bones[i].boneOffset * boneMatrix);
-						//_boneMatrices[i] = ConvertXMMatrix(Matrix4f::Identity());
 					}
 
 					vertexShader->SetConstantBuffer(_immediateContext.Get(), pData, 2);
@@ -676,7 +678,6 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 		testElapsedTime = 0.0f;
 	}
 
-
 	// 디퍼드 시작 일단 멀티 렌더타겟.
 	ID3D11RenderTargetView* rtvs[GBUFFER_COUNT] =
 	{
@@ -699,7 +700,6 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 
 	{
 		//디버그용 그리드 그리기
-
 		auto& camera = _cameras[0];
 		Matrix4f viewMatrix = camera->GetViewMatrix();
 		Matrix4f projMatrix = camera->GetProjectionMatrix();
@@ -756,7 +756,6 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 			heightOpacitys[1] = 1.0f - heightOpacitys[1];
 			ASSERT(heightOpacitys[1] >= 0.0f && heightOpacitys[1] <= 1.0f, "높이 투명도 오류");
 		}
-
 
 		_grids[0].transform.SetScale(gridScale, gridScale, gridScale);
 		_grids[1].transform.SetScale(secondGridScale, secondGridScale, secondGridScale);
@@ -869,7 +868,7 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 
 						Vector3f position = (Vector3f)tr.GetLocalPosition();
 						clip.GetPosition(testElapsedTime, &position);
-						if (position.Norm() > 0.0f)
+						if (position.NormPow() > 0.0f)
 						{
 							tr.SetPosition(position);
 						}
@@ -881,15 +880,8 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 
 						Vector3f scale = (Vector3f)tr.GetLocalScale();
 						clip.GetScale(testElapsedTime, &scale);
-						if (scale.Norm() > 0.0f)
+						if (scale.NormPow() > 0.0f)
 							tr.SetScale(scale);
-
-						//if (clip.keyPosition.size() > 0)
-						//	node->pSkeleton->bones[i].tr.SetPosition(clip.keyPosition[0].position);
-						//if (clip.keyRotation.size() > 0)
-						//	node->pSkeleton->bones[i].tr.SetRotation(clip.keyRotation[0].rotation);
-						//if (clip.keyScale.size() > 0)
-						//	node->pSkeleton->bones[i].tr.SetScale(clip.keyScale[0].scale);
 					}
 					for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
 					{
@@ -915,15 +907,39 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 	}
 
 	float blend[4] = { 1,1,1, 1 };
-	_immediateContext->OMSetBlendState(_blendState.Get(), blend, 0xFFFFFFFF);
-	_immediateContext->OMSetDepthStencilState(_depthState.Get(), 0);
+	{
+		_immediateContext->OMSetBlendState(_blendState.Get(), blend, 0xFFFFFFFF);
+		_immediateContext->OMSetDepthStencilState(_depthState.Get(), 0);
 
-	// 빛 연산에 필요한 텍스쳐 픽셀쉐이더에 세팅.
-	/*_immediateContext->PSSetShaderResources(GBUFFER_DEPTH, 1, _gBuffer[GBUFFER_DEPTH].srv.GetAddressOf());
-	_immediateContext->PSSetShaderResources(GBUFFER_NORMAL, 1, _gBuffer[GBUFFER_NORMAL].srv.GetAddressOf());
-	_immediateContext->PSSetShaderResources(GBUFFER_ALBEDO, 1, _gBuffer[GBUFFER_ALBEDO].srv.GetAddressOf());*/
+		_immediateContext->OMSetRenderTargets(1, _gBuffer[GBUFFER_SPECULAR].rtv.GetAddressOf(), _depthStencilView.Get());
 
-	// 빛 연산 로직 구현 필요 TODO
+		// 빛 연산에 필요한 텍스쳐 픽셀쉐이더에 세팅.
+		_immediateContext->PSSetShaderResources(GBUFFER_DEPTH, 1, _gBuffer[GBUFFER_DEPTH].srv.GetAddressOf());
+		_immediateContext->PSSetShaderResources(GBUFFER_NORMAL, 1, _gBuffer[GBUFFER_NORMAL].srv.GetAddressOf());
+		_immediateContext->PSSetShaderResources(GBUFFER_ALBEDO, 1, _gBuffer[GBUFFER_ALBEDO].srv.GetAddressOf());
+
+		DX11Mesh* pMesh = _screenQuad.node->meshes[0].Get();
+		DX11VertexShader* vertexShader = _directVS.Get();
+		DX11PixelShader* pixelShader = _directPS.Get();
+
+		wchar_t vsName[256] = { 0, };
+		UINT dataSize = sizeof(vsName);
+		auto ret = pixelShader->pPixelShader->GetPrivateData(WKPDID_D3DDebugObjectNameW, &dataSize, vsName);
+
+		_immediateContext->IASetInputLayout(vertexShader->pInputLayout);
+		_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		_immediateContext->VSSetShader(vertexShader->pVertexShader, nullptr, 0);
+		_immediateContext->PSSetShader(pixelShader->pPixelShader, nullptr, 0);
+
+		_immediateContext->PSSetSamplers(0, 1, &pMesh->sampler);
+
+		UINT offset = 0;
+		_immediateContext->IASetVertexBuffers(0, 1, &pMesh->vertexBuffer, &pMesh->singleVertexSize, &offset);
+		_immediateContext->IASetIndexBuffer(pMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+		_immediateContext->DrawIndexed(pMesh->indexCount, 0, 0);
+	}
 
 	// 최종 연산 결과 화면에 출력
 	{

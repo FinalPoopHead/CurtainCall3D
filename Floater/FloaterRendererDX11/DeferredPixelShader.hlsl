@@ -30,8 +30,8 @@ PS_OUTPUT main(VS_OUTPUT input) : SV_Target
     
     output.depth = texColor;//float4(color.xyz, 1);
     output.normal = float4(input.Normal, 0.0f);
-    output.albedo = float4(color.yyy, 1);
-    output.specular = float4(color.zzz, 1);
+    output.albedo = texColor;
+    output.specular = float4(0.0f, 0.0f, 0.0f, 1.0f);
     output.emissive = float4(color.www, 1);
     
     output.depth = output.normal;

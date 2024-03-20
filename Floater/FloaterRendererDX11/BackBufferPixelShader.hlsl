@@ -13,6 +13,6 @@ SamplerState Sampler : register(s0);
 
 float4 main(VS_OUTPUT input) : SV_Target
 {
-    float4 texColor = Tex0.Sample(Sampler, input.uv);
+    float4 texColor = Tex3.Sample(Sampler, input.uv);
     return texColor;
 }

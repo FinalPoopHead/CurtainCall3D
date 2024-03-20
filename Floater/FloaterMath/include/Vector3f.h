@@ -133,6 +133,11 @@ namespace flt
 			return sqrtf(x * x + y * y + z * z);
 		}
 
+		float NormPow() const noexcept
+		{
+			return x * x + y * y + z * z;
+		}
+
 		Vector3f& Normalize() noexcept
 		{
 			float norm = Norm();

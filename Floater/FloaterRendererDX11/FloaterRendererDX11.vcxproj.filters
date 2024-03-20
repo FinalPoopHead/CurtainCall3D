@@ -31,6 +31,9 @@
     <Filter Include="Font">
       <UniqueIdentifier>{7febb21a-a802-4040-a664-5001c346adaf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HLSL\Deferred">
+      <UniqueIdentifier>{aca39489-d56d-4de9-8aec-b8ea8928c5b0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DX11Node.cpp">
@@ -124,38 +127,44 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="CubeVS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="CubePS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="VertexShader.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="DeferredPixelShader.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="BackBufferVertexShader.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="BackBufferPixelShader.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
     <FxCompile Include="DebugDataVertexShader.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
     <FxCompile Include="DebugDataPixelShader.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="GridVS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="GridPS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
     <FxCompile Include="ForwardPixelShader.hlsl">
       <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="BackBufferPixelShader.hlsl">
+      <Filter>HLSL\Deferred</Filter>
+    </FxCompile>
+    <FxCompile Include="BackBufferVertexShader.hlsl">
+      <Filter>HLSL\Deferred</Filter>
+    </FxCompile>
+    <FxCompile Include="CubePS.hlsl">
+      <Filter>HLSL\Deferred</Filter>
+    </FxCompile>
+    <FxCompile Include="CubeVS.hlsl">
+      <Filter>HLSL\Deferred</Filter>
+    </FxCompile>
+    <FxCompile Include="DeferredPixelShader.hlsl">
+      <Filter>HLSL\Deferred</Filter>
+    </FxCompile>
+    <FxCompile Include="VertexShader.hlsl">
+      <Filter>HLSL\Deferred</Filter>
+    </FxCompile>
+    <FxCompile Include="GridPS.hlsl">
+      <Filter>HLSL\Deferred</Filter>
+    </FxCompile>
+    <FxCompile Include="GridVS.hlsl">
+      <Filter>HLSL\Deferred</Filter>
+    </FxCompile>
+    <FxCompile Include="DirectionalLightVS.hlsl">
+      <Filter>HLSL\Deferred</Filter>
+    </FxCompile>
+    <FxCompile Include="DirectionalLightPS.hlsl">
+      <Filter>HLSL\Deferred</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

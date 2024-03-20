@@ -112,8 +112,8 @@ int main()
 
 		ModelLoader loader;
 		//std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Ganondorf (TotK).fbx";
-		std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Dying.fbx";
-		//std::wstring filePath = L"..\\x64\\fbx\\Models\\A_TP_CH_Breathing.fbx";
+		//std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Dying.fbx";
+		std::wstring filePath = L"..\\x64\\fbx\\Models\\A_TP_CH_Breathing.fbx";
 		//std::wstring filePath = L"C:\\Users\\KOCCA56\\Desktop\\Bee.glb";
 		std::wstring zUpYForward = L"..\\x64\\fbx\\Test\\ZY.fbx";
 		std::wstring yUpZForward = L"..\\x64\\fbx\\Test\\YZ.fbx";
@@ -211,7 +211,7 @@ int main()
 		}
 
 		renderer->Render(0.1f);
-		//fbxObject.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, 0.01f);
+		fbxObject.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, 0.01f);
 		renderable.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, -0.1f);
 
 		//fbxObject.transform.AddLocalPosition(0.0f, 0.0f, 0.01f);

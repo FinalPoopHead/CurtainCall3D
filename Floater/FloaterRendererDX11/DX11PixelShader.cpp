@@ -20,7 +20,7 @@ flt::DX11PixelShaderBuilder::DX11PixelShaderBuilder(const std::wstring filePath)
 	ASSERT(std::filesystem::exists(filePath), "파일을 찾을 수 없습니다.");
 }
 
-flt::DX11PixelShader* flt::DX11PixelShaderBuilder::build() const 
+flt::DX11PixelShader* flt::DX11PixelShaderBuilder::build() const
 {
 	if (pDevice == nullptr)
 	{
@@ -36,20 +36,13 @@ flt::DX11PixelShader* flt::DX11PixelShaderBuilder::build() const
 	comptr<ID3D10Blob> pixelShaderBlob;
 
 	HRESULT hResult = D3DCompileFromFile(filePath.c_str(), nullptr, nullptr, "main", "ps_5_0", flags1, 0, &pixelShaderBlob, nullptr);
-	if (hResult != S_OK)
-	{
-		ASSERT(false, "픽셀 쉐이더 컴파일 실패");
-		return nullptr;
-	}
+	ASSERT(hResult == S_OK, "픽셀 쉐이더 컴파일 실패");
 
 	ID3D11PixelShader* pixelShader;
 	hResult = pDevice->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), nullptr, &pixelShader);
-	if (hResult != S_OK)
-	{
-		ASSERT(false, "픽셀 쉐이더 생성 실패");
-		pixelShaderBlob->Release();
-		return nullptr;
-	}
+	ASSERT(hResult == S_OK, "픽셀 쉐이더 생성 실패");
+
+	pixelShader->SetPrivateData(WKPDID_D3DDebugObjectNameW, (filePath.size() + 1) * sizeof(wchar_t), filePath.c_str());
 
 	ID3D11Buffer* constantBuffer = nullptr;
 	D3D11_BUFFER_DESC constantBufferDesc = {};

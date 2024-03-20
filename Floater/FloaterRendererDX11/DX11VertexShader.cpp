@@ -43,6 +43,7 @@ flt::DX11VertexShader* flt::DX11VertexShaderBuilder::build() const
 	ID3D11VertexShader* vertexShader = nullptr;
 	hResult = pDevice->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), nullptr, &vertexShader);
 	ASSERT(hResult == S_OK, "버텍스 쉐이더 생성 실패");
+	vertexShader->SetPrivateData(WKPDID_D3DDebugObjectNameW, (filePath.size() + 1) * sizeof(wchar_t), filePath.c_str());
 
 	ID3D11ShaderReflection* pVertexShaderReflection = nullptr;
 	hResult = D3DReflect(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), IID_ID3D11ShaderReflection, (void**)&pVertexShaderReflection);
