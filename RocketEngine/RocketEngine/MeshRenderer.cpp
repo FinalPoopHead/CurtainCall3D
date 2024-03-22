@@ -2,20 +2,20 @@
 #include "GraphicsSystem.h"
 #include "GameObject.h"
 #include "Transform.h"
-#include "../GraphicsInterface/IMeshRenderer.h"
+#include "../RocketCommon/IMeshRenderer.h"
 
 namespace Rocket
 {
 	MeshRenderer::MeshRenderer()
-		: _meshRenderer(Core::GraphicsSystem::Instance().GetFactory()->CreateMeshRenderer())
+		: _meshRenderer(Core::GraphicsSystem::Instance().GetFactory()->CreateStaticModelRenderer())
 	{
 
 	}
 
-	void MeshRenderer::SetMesh(eMeshType meshType)
-	{
-		_meshRenderer->LoadMesh(meshType);
-	}
+// 	void StaticModelRenderer::SetMesh(eMeshType meshType)
+// 	{
+// 		_meshRenderer->LoadModel(meshType);
+// 	}
 
 	void MeshRenderer::SetMesh(std::string fileName)
 	{

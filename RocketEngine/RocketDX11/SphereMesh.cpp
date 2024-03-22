@@ -75,7 +75,7 @@ namespace Rocket::Core
 
 		D3D11_BUFFER_DESC vbd;
 		vbd.Usage = D3D11_USAGE_IMMUTABLE;
-		vbd.ByteWidth = sizeof(LightVertex) * vertices.size();
+		vbd.ByteWidth = sizeof(LightVertex) * (UINT)vertices.size();
 		vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		vbd.CPUAccessFlags = 0;
 		vbd.MiscFlags = 0;
@@ -87,7 +87,7 @@ namespace Rocket::Core
 
 		D3D11_BUFFER_DESC ibd;
 		ibd.Usage = D3D11_USAGE_IMMUTABLE;
-		ibd.ByteWidth = sizeof(UINT) * indices.size();
+		ibd.ByteWidth = sizeof(UINT) * (UINT)indices.size();
 		ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		ibd.CPUAccessFlags = 0;
 		ibd.MiscFlags = 0;
@@ -97,8 +97,8 @@ namespace Rocket::Core
 		iinitData.pSysMem = indices.data();
 		HR(device->CreateBuffer(&ibd, &iinitData, &_indexBuffer));
 
-		_vertexCount = vertices.size();
-		_indexCount = indices.size();
+		_vertexCount = (int)vertices.size();
+		_indexCount = (int)indices.size();
 	}
 
 }

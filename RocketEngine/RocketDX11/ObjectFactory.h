@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "..\\GraphicsInterface\\IFactory.h"
+#include "..\\RocketCommon\\IFactory.h"
 
 namespace Rocket::Core
 {
@@ -11,9 +11,8 @@ namespace Rocket::Core
 		ObjectFactory();
 
 	public:
-		virtual ITransform* CreateTransform() override;
 		virtual ICamera* CreateCamera() override;
-		virtual IStaticModelRenderer* CreateStaticModelRenderer() override;
+		virtual IMeshRenderer* CreateStaticModelRenderer() override;
 		virtual ITextRenderer* CreateTextRenderer() override;
 		virtual ISpriteRenderer* CreateSpriteRenderer() override;
 		virtual ILineRenderer* CreateLineRenderer() override;

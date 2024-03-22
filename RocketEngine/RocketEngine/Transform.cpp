@@ -1,12 +1,12 @@
 ﻿#include "Transform.h"
 #include "GameObject.h"
-#include "../GraphicsInterface/ITransform.h"
+#include "../RocketCommon/RocketTransform.h"
 #include "GraphicsSystem.h"
 
 namespace Rocket
 {
 	Transform::Transform()
-		: _transform(Core::GraphicsSystem::Instance().GetFactory()->CreateTransform()),
+		: _rocketTransform(new Core::RocketTransform()),
 		_parent(nullptr),
 		_children()
 	{
@@ -15,12 +15,12 @@ namespace Rocket
 
 	Vector3 Transform::GetPosition() const
 	{
-		return _transform->GetPosition();
+		return _rocketTransform->GetPosition();
 	}
 
 	Quaternion Transform::GetRotation() const
 	{
-		return _transform->GetRotation();
+		return _rocketTransform->GetRotation();
 	}
 
 	Vector3 Transform::GetEuler() const
@@ -30,27 +30,27 @@ namespace Rocket
 
 	Vector3 Transform::GetScale() const
 	{
-		return _transform->GetScale();
+		return _rocketTransform->GetScale();
 	}
 
 	void Transform::SetPosition(const Vector3& position)
 	{
-		_transform->SetPosition(position);
+		_rocketTransform->SetPosition(position);
 	}
 
 	void Transform::SetPosition(float x, float y, float z)
 	{
-		_transform->SetPosition({x,y,z});
+		_rocketTransform->SetPosition({x,y,z});
 	}
 
 	void Transform::SetRotation(const Quaternion& quaternion)
 	{
-		_transform->SetRotation(quaternion);
+		_rocketTransform->SetRotation(quaternion);
 	}
 
 	void Transform::SetRotation(float x, float y, float z, float w)
 	{
-		_transform->SetRotation({ x,y,z,w });
+		_rocketTransform->SetRotation({ x,y,z,w });
 	}
 
 	void Transform::SetRotationEuler(const Vector3& euler)
@@ -65,67 +65,67 @@ namespace Rocket
 
 	void Transform::SetScale(const Vector3& scale)
 	{
-		_transform->SetScale(scale);
+		_rocketTransform->SetScale(scale);
 	}
 
 	void Transform::SetScale(float x, float y, float z)
 	{
-		_transform->SetScale({ x,y,z });
+		_rocketTransform->SetScale({ x,y,z });
 	}
 
 	Vector3 Transform::GetLocalPosition() const
 	{
-		return _transform->GetLocalPosition();
+		return _rocketTransform->GetLocalPosition();
 	}
 
 	Quaternion Transform::GetLocalRotation() const
 	{
-		return _transform->GetLocalRotation();
+		return _rocketTransform->GetLocalRotation();
 	}
 
 	Vector3 Transform::GetLocalEuler() const
 	{
-		return _transform->GetLocalEuler();
+		return _rocketTransform->GetLocalEuler();
 	}
 
 	Vector3 Transform::GetLocalScale() const
 	{
-		return _transform->GetLocalScale();
+		return _rocketTransform->GetLocalScale();
 	}
 
 	Vector3* Transform::GetLocalPositionPointer()
 {
-		return _transform->GetLocalPositionPtr();
+		return _rocketTransform->GetLocalPositionPtr();
 	}
 
 	Quaternion* Transform::GetLocalRotationPointer()
 {
-		return _transform->GetLocalRotationPtr();
+		return _rocketTransform->GetLocalRotationPtr();
 	}
 
 	Vector3* Transform::GetLocalScalePointer()
 {
-		return _transform->GetLocalScalePtr();
+		return _rocketTransform->GetLocalScalePtr();
 	}	
 
 	void Transform::SetLocalPosition(const Vector3& position)
 	{
-		_transform->SetLocalPosition(position);
+		_rocketTransform->SetLocalPosition(position);
 	}
 
 	void Transform::SetLocalPosition(float x, float y, float z)
 	{
-		_transform->SetLocalPosition({ x,y,z });
+		_rocketTransform->SetLocalPosition({ x,y,z });
 	}
 
 	void Transform::SetLocalRotation(const Quaternion& quaternion)
 	{
-		_transform->SetLocalRotation(quaternion);
+		_rocketTransform->SetLocalRotation(quaternion);
 	}
 
 	void Transform::SetLocalRotation(float x, float y, float z, float w)
 	{
-		_transform->SetLocalRotation({ x,y,z,w });
+		_rocketTransform->SetLocalRotation({ x,y,z,w });
 	}
 
 	void Transform::SetLocalRotationEuler(const Vector3& euler)
@@ -135,7 +135,7 @@ namespace Rocket
 
 	void Transform::SetLocalRotationEuler(float angleX, float angleY, float angleZ)
 	{
-		_transform->SetLocalRotation(Quaternion::CreateFromYawPitchRoll(angleY, angleX, angleZ));
+		_rocketTransform->SetLocalRotation(Quaternion::CreateFromYawPitchRoll(angleY, angleX, angleZ));
 	}
 
 	void Transform::SetLocalRotationEulerXZConvert(float angleX, float angleY, float angleZ)
@@ -145,12 +145,12 @@ namespace Rocket
 
 	void Transform::SetLocalScale(const Vector3& scale)
 	{
-		_transform->SetLocalScale(scale);
+		_rocketTransform->SetLocalScale(scale);
 	}
 	
 	void Transform::SetLocalScale(float x, float y, float z)
 	{
-		_transform->SetLocalScale({ x,y,z });
+		_rocketTransform->SetLocalScale({ x,y,z });
 	}
 
 	Vector3 Transform::GetForward() const
@@ -170,58 +170,58 @@ namespace Rocket
 
 	Matrix Transform::GetLocalScaleMatrix() const
 	{
-		return _transform->GetLocalScaleMatrix();
+		return _rocketTransform->GetLocalScaleMatrix();
 	}
 
 	Matrix Transform::GetLocalRotationMatrix() const
 	{
-		return _transform->GetLocalRotationMatrix();
+		return _rocketTransform->GetLocalRotationMatrix();
 	}
 
 	Matrix Transform::GetLocalTranslateMatrix() const
 	{
-		return _transform->GetLocalTranslationMatrix();
+		return _rocketTransform->GetLocalTranslationMatrix();
 	}
 
 	Matrix Transform::GetWorldScaleMatrix() const
 	{
-		return _transform->GetScaleMatrix();
+		return _rocketTransform->GetScaleMatrix();
 	}
 
 	Matrix Transform::GetWorldRotationMatrix() const
 	{
-		return _transform->GetRotationMatrix();
+		return _rocketTransform->GetRotationMatrix();
 	}
 
 	Matrix Transform::GetWorldTranslateMatrix() const
 	{
-		return _transform->GetTranslationMatrix();
+		return _rocketTransform->GetTranslationMatrix();
 	}
 
 	Matrix Transform::GetWorldTM() const
 	{
-		return _transform->GetWorldTM();
+		return _rocketTransform->GetWorldTM();
 	}
 
 	void Transform::Translate(const Vector3& position)
 	{
-		_transform->Translate(position);
+		_rocketTransform->Translate(position);
 	}
 
 	void Transform::Translate(float x, float y, float z)
 	{
-		_transform->Translate({ x,y,z });
+		_rocketTransform->Translate({ x,y,z });
 	}
 
 	void Transform::Rotate(float angleX, float angleY, float angleZ)
 	{
 		Quaternion rot = Quaternion::CreateFromYawPitchRoll({ angleX, angleY, angleZ });
-		_transform->Rotate(rot);
+		_rocketTransform->Rotate(rot);
 	}
 
 	void Transform::Rotate(Quaternion quaternion)
 	{
-		_transform->Rotate(quaternion);
+		_rocketTransform->Rotate(quaternion);
 	}
 
 	/// <summary>
@@ -233,7 +233,7 @@ namespace Rocket
 	/// <param name="up"> 카메라가 right vector를 구할때 사용할 up 벡터</param>
 	void Transform::LookAt(const Vector3& target, const Vector3& up)
 	{
-		_transform->LookAt(target, up);
+		_rocketTransform->LookAt(target, up);
 	}
 
 	void Transform::SetParent(Transform* parent)
@@ -243,7 +243,7 @@ namespace Rocket
 			ReleaseParent();
 		}
 
-		_transform->SetParent(parent->_transform);
+		_rocketTransform->SetParent(parent->_rocketTransform);
 		_parent = parent;
 		_parent->AddChild(this);
 	}
@@ -275,7 +275,7 @@ namespace Rocket
 			return;
 		}
 
-		_transform->ReleaseParent();
+		_rocketTransform->ReleaseParent();
 		_parent->ReleaseChild(this);
 		_parent = nullptr;
 	}

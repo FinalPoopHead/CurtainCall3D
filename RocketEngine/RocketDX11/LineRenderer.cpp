@@ -1,4 +1,4 @@
-#include "LineRenderer.h"
+﻿#include "LineRenderer.h"
 
 namespace Rocket::Core
 {
@@ -32,7 +32,7 @@ namespace Rocket::Core
 		_lines.emplace_back(startVec, endVec, colorVec);
 	}
 
-	std::vector<Rocket::Core::LineRenderer::Line>& LineRenderer::GetLines()
+	std::vector<LineRenderer::Line>& LineRenderer::GetLines()
 	{
 		return _lines;
 	}

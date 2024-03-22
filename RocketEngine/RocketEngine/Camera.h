@@ -2,7 +2,7 @@
 #include "DLLExporter.h"
 #include "Component.h"
 #include "MathHeader.h"
-#include "../GraphicsInterface/ICamera.h"
+#include "../RocketCommon/ICamera.h"
 
 namespace Rocket::Core
 {

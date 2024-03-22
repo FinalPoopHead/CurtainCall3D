@@ -10,6 +10,7 @@ namespace Rocket::Core
 		SkinnedMesh(std::vector<VertexSkinned> vertices, std::vector<UINT> indices);
 
 		virtual void CreateBuffers() override;
+		virtual void SetNode(Node* node) override;
 
 	protected:
 		std::vector<VertexSkinned> _vertices;

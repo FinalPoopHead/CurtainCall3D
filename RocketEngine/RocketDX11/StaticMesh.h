@@ -10,6 +10,7 @@ namespace Rocket::Core
 		StaticMesh(std::vector<Vertex> vertices, std::vector<UINT> indices);
 
 		virtual void CreateBuffers() override;
+		virtual void SetNode(Node* node) override;
 
 	protected:
 		std::vector<Vertex> _vertices;

@@ -221,7 +221,8 @@ namespace Rocket::Core
 	void Camera::SetPositionAndRotation(const Vector3& pos, const Quaternion& rot)
 	{
 		SetPosition(pos.x, pos.y, pos.z);
-		SetRotation(rot.w, rot.x, rot.y, rot.z);
+		SetRotation(rot.w, rot.x, rot.y, rot.z);		
+		SetWorldTM(Matrix::CreateTranslation(pos) * Matrix::CreateFromQuaternion(rot));
 	}
 
 	void Camera::CreateCameraBuffer(ID3D11Device* device)
@@ -245,6 +246,11 @@ namespace Rocket::Core
 	ID3D11Buffer** Camera::GetAddressOfCameraBuffer()
 	{
 		return _cameraBuffer.GetAddressOf();
+	}
+
+	DirectX::XMMATRIX Camera::GetWorldMatrix() const
+	{
+		return DirectX::XMLoadFloat4x4(&_worldMatrix);
 	}
 
 }

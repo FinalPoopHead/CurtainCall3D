@@ -3,7 +3,7 @@
 #include <d3d11.h>
 #include <wrl.h>
 
-#include "../GraphicsInterface/ICamera.h"
+#include "../RocketCommon/ICamera.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -38,6 +38,7 @@ namespace Rocket::Core
 		void UpdateProjectionMatrix();
 		void UpdateViewMatrix();
 
+		DirectX::XMMATRIX GetWorldMatrix() const;				// 카메라의 worldTM을 반환
 		DirectX::XMMATRIX GetViewMatrix() const;				// 카메라의 로컬좌표'계'를 반환
 		DirectX::XMMATRIX GetProjectionMatrix() const;		// 카메라의 투영행렬을 반환
 		DirectX::XMMATRIX GetViewProjectionMatrix() const;	// 위의 두 행렬을 적절히 곱해서 반환(view의 역행렬을 곱해주겠지?)

@@ -84,7 +84,7 @@ namespace Rocket
 
 	Rocket::GameObject* Scene::CreateObject(std::string objName)
 	{
-		GameObject* gameObject = new GameObject(objName);
+		GameObject* gameObject = Rocket::Core::ObjectSystem::Instance().CreateObject(objName);
 		gameObject->SetScene(this);
 		_originalList.push_back(gameObject);
 		return gameObject;
@@ -93,6 +93,11 @@ namespace Rocket
 	Rocket::GameObject* Scene::CreateStaticObject(std::string objName)
 	{
 		return Rocket::Core::ObjectSystem::Instance().CreateStaticObject(objName);
+	}
+
+	Rocket::GameObject* Scene::CreateModelObject(const std::string& fileName)
+	{
+		return Rocket::Core::ObjectSystem::Instance().CreateModelObject(fileName);
 	}
 
 	bool Scene::DeleteObject(std::string gameObjectName)

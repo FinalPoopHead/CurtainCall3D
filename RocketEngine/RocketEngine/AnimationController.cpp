@@ -1,7 +1,7 @@
 ﻿#include "AnimationController.h"
 #include "GraphicsSystem.h"
 #include "ModelRendererBase.h"
-#include "StaticModelRenderer.h"
+#include "MeshRenderer.h"
 #include "DynamicModelRenderer.h"
 #include "GameObject.h"
 #include "Animator.h"

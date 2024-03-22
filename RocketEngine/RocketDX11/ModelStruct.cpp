@@ -2,6 +2,7 @@
 #include "Mesh.h"
 #include "StaticMesh.h"
 #include "SkinnedMesh.h"
+#include "../RocketCommon/RocketTransform.h"
 
 namespace Rocket::Core
 {

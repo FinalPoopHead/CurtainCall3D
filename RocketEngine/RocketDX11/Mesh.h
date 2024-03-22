@@ -36,7 +36,7 @@ namespace Rocket::Core
 		eVertexType GetVertexType() const;
 
 		Node* GetNode() const { return _node; }
-		void SetNode(Node* val) { _node = val; }
+		virtual void SetNode(Node* val) { _node = val; }
 
 	protected:
 		// std::vector<Vertex> _vertices;		// VertexType은 자식클래스인 Static,Skinned에서 정의

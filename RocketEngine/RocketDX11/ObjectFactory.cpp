@@ -1,9 +1,9 @@
 ﻿#include "ObjectFactory.h"
 #include "ObjectManager.h"
+#include "ResourceManager.h"
 
-#include "Transform.h"
 #include "Camera.h"
-#include "StaticModelRenderer.h"
+#include "MeshRenderer.h"
 #include "DynamicModelRenderer.h"
 #include "CubeMesh.h"
 #include "TextRenderer.h"
@@ -21,6 +21,11 @@ namespace Rocket::Core
 	{
 		delete instance;
 	}
+
+	IResourceManager* GetResourceManager()
+	{
+		return &ResourceManager::Instance();
+	}
 }
 
 namespace Rocket::Core
@@ -31,17 +36,12 @@ namespace Rocket::Core
 
 	}
 
-	ITransform* ObjectFactory::CreateTransform()
-	{
-		return new Transform();
-	}
-
 	ICamera* ObjectFactory::CreateCamera()
 	{
 		return _objectManager.CreateCamera();
 	}
 
-	IStaticModelRenderer* ObjectFactory::CreateStaticModelRenderer()
+	IMeshRenderer* ObjectFactory::CreateStaticModelRenderer()
 	{
 		return _objectManager.CreateStaticModelRenderer();
 	}
