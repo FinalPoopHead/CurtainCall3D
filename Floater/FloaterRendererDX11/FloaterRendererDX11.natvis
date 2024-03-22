@@ -8,4 +8,14 @@
 			<Item Name="[NodeNum]">_renderableObjects.size()</Item>
 		</Expand>
 	</Type>
+
+	<Type Name="flt::DX11Skeleton::Bone">
+		<DisplayString>Name = {name}</DisplayString>
+		<Expand>
+			<IndexListItems>
+				<Size>transform._children._Mypair._Myval2._Mylast - transform._children._Mypair._Myval2._Myfirst</Size>
+				<ValueNode>*(transform._children[$i]->_pOwner)</ValueNode>
+			</IndexListItems>
+		</Expand>
+	</Type>
 </AutoVisualizer>

@@ -246,18 +246,19 @@ bool flt::FBXLoader::LoadToRawNode(fbxsdk::FbxNode& node, RawNode* outNode)
 	fbxsdk::FbxMesh* pMesh = node.GetMesh();
 	if (pMesh != nullptr)
 	{
-		outNode->meshes.push_back(Resource<RawMesh>());
+		outNode->meshes.emplace_back();
 		CreateMesh(*pMesh, &outNode->meshes.back());
 	}
 
 	// animation 세팅
-	outNode->skeleton->clips.push_back(RawAnimationClip{});
-	SetAnimationClip(node, &outNode->skeleton->clips.back());
+	outNode->skeleton->animations.push_back(RawAnimation{});
+	outNode->skeleton->animations.back().clips.push_back(RawAnimationClip{});
+	SetAnimationClip(node, &outNode->skeleton->animations.back().clips.back());
 
 	return true;
 }
 
-bool flt::FBXLoader::CreateMesh(fbxsdk::FbxMesh& mesh, Resource<RawMesh>* outMesh)
+bool flt::FBXLoader::CreateMesh(fbxsdk::FbxMesh& mesh, RawMesh* outMesh)
 {
 	RawMeshBuilder builder(L"", ConvertToWstring(mesh.GetName()));
 
@@ -313,8 +314,6 @@ bool flt::FBXLoader::CreateMesh(fbxsdk::FbxMesh& mesh, Resource<RawMesh>* outMes
 	auto materialElement = mesh.GetElementMaterial();
 	auto materialMappingMode = materialElement->GetMappingMode();
 	auto materialReferenceMode = materialElement->GetReferenceMode();
-
-	outMesh->Set(builder);
 
 	return true;
 }

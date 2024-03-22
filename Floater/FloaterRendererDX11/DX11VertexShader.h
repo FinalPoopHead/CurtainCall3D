@@ -15,8 +15,7 @@ namespace flt
 			ENTITY_INIT_DATA = 0,
 			FRAME_PER_CAMERA = 1,
 			FRAME_PER_ENTITY = 2,
-			FRAME_PER_MATERIAL = 3,
-
+			FRAME_PER_MATERIAL = 3
 		};
 
 #pragma endregion
@@ -56,10 +55,10 @@ namespace flt
 
 	struct DX11VertexShaderBuilder : public IBuilder<DX11VertexShader>
 	{
-		DX11VertexShaderBuilder() : DX11VertexShaderBuilder(L"") {}
-		DX11VertexShaderBuilder(const std::wstring filePath) : IBuilder<DX11VertexShader>(filePath), filePath(filePath), pDevice(nullptr), inputLayoutDesc() {}
+		DX11VertexShaderBuilder() : filePath(L""), pDevice(nullptr) {}
+		DX11VertexShaderBuilder(const std::wstring filePath);
 		DX11VertexShaderBuilder(const DX11VertexShaderBuilder& other) = delete;
-		DX11VertexShaderBuilder(DX11VertexShaderBuilder&& other) noexcept : IBuilder<DX11VertexShader>(std::move(other)), pDevice(other.pDevice), inputLayoutDesc(std::move(other.inputLayoutDesc))
+		DX11VertexShaderBuilder(DX11VertexShaderBuilder&& other) noexcept : IBuilder<DX11VertexShader>(std::move(other)), pDevice(other.pDevice)
 		{
 			other.pDevice = nullptr;
 		}
@@ -69,7 +68,6 @@ namespace flt
 		{
 			IBuilder<DX11VertexShader>::operator=(std::move(other));
 			pDevice = other.pDevice;
-			inputLayoutDesc = other.inputLayoutDesc;
 			other.pDevice = nullptr;
 			return *this;
 		}
@@ -80,7 +78,7 @@ namespace flt
 
 		std::wstring filePath;
 		ID3D11Device* pDevice;
-		std::vector<D3D11_INPUT_ELEMENT_DESC> inputLayoutDesc;
+		//std::vector<D3D11_INPUT_ELEMENT_DESC> inputLayoutDesc;
 		std::vector<int> constantBufferSizes;
 	};
 }

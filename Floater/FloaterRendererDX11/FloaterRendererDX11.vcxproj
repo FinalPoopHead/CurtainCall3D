@@ -21,7 +21,9 @@
   <ItemGroup>
     <ClCompile Include="CommonMath.cpp" />
     <ClCompile Include="CreateRenderer.cpp" />
+    <ClCompile Include="DX11AnimationClip.cpp" />
     <ClCompile Include="DX11PixelShader.cpp" />
+    <ClCompile Include="DX11Skeleton.cpp" />
     <ClCompile Include="DX11VertexShader.cpp" />
     <ClCompile Include="DX11Mesh.cpp" />
     <ClCompile Include="DX11Node.cpp" />
@@ -31,9 +33,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX11Animation.h" />
+    <ClInclude Include="DX11AnimationClip.h" />
     <ClInclude Include="DX11Entity.h" />
     <ClInclude Include="DX11PixelShader.h" />
     <ClInclude Include="DX11PSConstantBuffer.h" />
+    <ClInclude Include="DX11Skeleton.h" />
     <ClInclude Include="DX11VertexShader.h" />
     <ClInclude Include="DX11VSConstantBuffer.h" />
     <ClInclude Include="Font.h" />
@@ -99,6 +103,12 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
+    <FxCompile Include="ForwardPixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="GridPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -115,7 +125,7 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="PixelShader.hlsl">
+    <FxCompile Include="DeferredPixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

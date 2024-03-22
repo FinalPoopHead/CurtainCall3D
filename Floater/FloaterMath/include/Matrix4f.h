@@ -27,6 +27,41 @@ namespace flt
 		constexpr Matrix4f& operator=(Matrix4f&&) noexcept = default;
 		~Matrix4f() noexcept = default;
 
+		bool operator==(const Matrix4f& rhs) const noexcept
+		{
+			return v[0] == rhs.v[0] && v[1] == rhs.v[1] && v[2] == rhs.v[2] && v[3] == rhs.v[3];
+		}
+
+		std::partial_ordering operator<=>(const Matrix4f& rhs) const noexcept
+		{
+			std::partial_ordering order = std::partial_ordering::unordered;
+
+			order = v[0] <=> rhs.v[0];
+
+			if (order != std::partial_ordering::equivalent)
+			{
+				return order;
+			}
+
+			order = v[1] <=> rhs.v[1];
+
+			if (order != std::partial_ordering::equivalent)
+			{
+				return order;
+			}
+
+			order = v[2] <=> rhs.v[2];
+
+			if (order != std::partial_ordering::equivalent)
+			{
+				return order;
+			}
+
+			order = v[3] <=> rhs.v[3];
+
+			return order;
+		}
+
 		///DX 의존성 제거를 위한 주석처리
 		//operator DirectX::XMMATRIX() const noexcept;
 
@@ -109,7 +144,7 @@ namespace flt
 		}
 		Matrix4f operator*(const Matrix4f& rhs) const noexcept
 		{
-			Matrix4f temp =* this;
+			Matrix4f temp = *this;
 			temp *= rhs;
 			return temp;
 		}
@@ -245,6 +280,19 @@ namespace flt
 				0.0f, 1.0f, 0.0f, 0.0f,
 				0.0f, 0.0f, 1.0f, 0.0f,
 				0.0f, 0.0f, 0.0f, 1.0f
+			};
+
+			return temp;
+		}
+
+		static Matrix4f Zero() noexcept
+		{
+			Matrix4f temp
+			{
+				0.0f, 0.0f, 0.0f, 0.0f,
+				0.0f, 0.0f, 0.0f, 0.0f,
+				0.0f, 0.0f, 0.0f, 0.0f,
+				0.0f, 0.0f, 0.0f, 0.0f
 			};
 
 			return temp;

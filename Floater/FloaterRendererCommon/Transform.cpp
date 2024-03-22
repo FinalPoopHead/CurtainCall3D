@@ -12,6 +12,34 @@ flt::Transform::~Transform()
 	//}
 }
 
+flt::Transform::Transform(const Transform& other) : 
+	_position(other._position),
+	_scale(other._scale),
+	_rotation(other._rotation),
+	_pParent(nullptr),
+	_children(),
+	_isDirty(true),
+	_pOwner(nullptr)
+{
+}
+
+flt::Transform& flt::Transform::operator=(const Transform& other)
+{
+	if (this == &other)
+	{
+		return *this;
+	}
+
+	_position = other._position;
+	_scale = other._scale;
+	_rotation = other._rotation;
+	//_pParent = nullptr;
+	//_children.clear();
+	_isDirty = true;
+
+	return *this;
+}
+
 void flt::Transform::SetMatrix(const Matrix4f& worldMatrix)
 {
 	MakeDirtyRecursive();
@@ -47,6 +75,11 @@ void flt::Transform::SetPosition(float x, float y, float z)
 	_position.z = z;
 }
 
+void flt::Transform::SetPosition(const Vector3f& position)
+{
+	SetPosition(position.x, position.y, position.z);
+}
+
 void flt::Transform::SetPosition(double x, double y, double z)
 {
 	SetPosition(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z));
@@ -64,6 +97,11 @@ void flt::Transform::SetRotation(float degreeX, float degreeY, float degreeZ, Qu
 	MakeDirtyRecursive();
 
 	_rotation.SetEuler(degreeX, degreeY, degreeY, order);
+}
+
+void flt::Transform::SetRotation(Vector3f degree, Quaternion::AxisOrder order /*= Quaternion::AxisOrder::YXZ*/)
+{
+	SetRotation(degree.x, degree.y, degree.z, order);
 }
 
 void flt::Transform::SetRotation(float x, float y, float z, float w)
@@ -96,6 +134,11 @@ void flt::Transform::SetScale(float x, float y, float z)
 	_scale.x = x;
 	_scale.y = y;
 	_scale.z = z;
+}
+
+void flt::Transform::SetScale(const Vector3f& scale)
+{
+	SetScale(scale.x, scale.y, scale.z);
 }
 
 void flt::Transform::SetScale(double x, double y, double z)
@@ -325,7 +368,7 @@ bool flt::Transform::SetParent(Transform* pParent)
 		checkRecursive = checkRecursive->_pParent;
 	}
 
-	// 이미 어떤 자식이 ㄹ경우에는 
+	// 이미 어떤 자식일 경우에는 
 	if (_pParent)
 	{
 		auto iter = std::find(_pParent->_children.begin(), _pParent->_children.end(), this);
@@ -345,6 +388,11 @@ bool flt::Transform::SetParent(Transform* pParent)
 	MakeDirtyRecursive();
 
 	return true;
+}
+
+bool flt::Transform::AddChild(Transform* pChild)
+{
+	return pChild->SetParent(this);
 }
 
 void flt::Transform::MakeDirtyRecursive() noexcept

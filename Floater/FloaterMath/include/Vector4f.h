@@ -23,6 +23,83 @@ namespace flt
 		constexpr Vector4f& operator=(const Vector4f&) noexcept = default;
 		~Vector4f() noexcept = default;
 
+		bool operator==(const Vector4f& rhs) const noexcept
+		{
+			float eps = FLOAT_EPSILON * fmaxf(fabsf(x), fabsf(rhs.x));
+			bool ret = fabsf(x - rhs.x) <= eps;
+
+			eps = FLOAT_EPSILON * fmaxf(fabsf(y), fabsf(rhs.y));
+			ret &= fabsf(y - rhs.y) <= eps;
+
+			eps = FLOAT_EPSILON * fmaxf(fabsf(z), fabsf(rhs.z));
+			ret &= fabsf(z - rhs.z) <= eps;
+
+			eps = FLOAT_EPSILON * fmaxf(fabsf(w), fabsf(rhs.w));
+			ret &= fabsf(w - rhs.w) <= eps;
+
+			return ret;
+		}
+		std::partial_ordering operator<=>(const Vector4f& rhs) const noexcept
+		{
+			std::partial_ordering order = std::partial_ordering::unordered;
+
+			float epsilonX = std::fabsf(std::fmaxf(x, rhs.x)) * FLOAT_EPSILON;
+			float sub = x - rhs.x;
+			if (sub < -epsilonX)
+			{
+				order = std::partial_ordering::less;
+			}
+			else if (sub > epsilonX)
+			{
+				order = std::partial_ordering::greater;
+			}
+			else
+			{
+				float epsilonY = std::fabsf(std::fmaxf(y, rhs.y)) * FLOAT_EPSILON;
+				sub = y - rhs.y;
+				if (sub < -epsilonY)
+				{
+					order = std::partial_ordering::less;
+				}
+				else if (sub > epsilonY)
+				{
+					order = std::partial_ordering::greater;
+				}
+				else
+				{
+					float epsilonZ = std::fabsf(std::fmaxf(z, rhs.z)) * FLOAT_EPSILON;
+					sub = z - rhs.z;
+					if (sub < -epsilonZ)
+					{
+						order = std::partial_ordering::less;
+					}
+					else if (sub > epsilonZ)
+					{
+						order = std::partial_ordering::greater;
+					}
+					else
+					{
+						float epsilonW = std::fabsf(std::fmaxf(w, rhs.w)) * FLOAT_EPSILON;
+						sub = w - rhs.w;
+						if (sub < -epsilonW)
+						{
+							order = std::partial_ordering::less;
+						}
+						else if (sub > epsilonW)
+						{
+							order = std::partial_ordering::greater;
+						}
+						else
+						{
+							order = std::partial_ordering::equivalent;
+						}
+					}
+				}
+			}
+
+			return order;
+		}
+
 		explicit operator Vector3f() const noexcept;
 		explicit operator __m128() const noexcept;
 
@@ -92,6 +169,12 @@ namespace flt
 		{
 			return sqrt(x * x + y * y + z * z + w * w);
 		}
+
+		float NormPow() const noexcept
+		{
+			return x * x + y * y + z * z + w * w;
+		}
+
 		Vector4f& Normalize() noexcept
 		{
 			float norm = Norm();

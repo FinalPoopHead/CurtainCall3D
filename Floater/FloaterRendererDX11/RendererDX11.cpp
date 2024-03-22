@@ -8,8 +8,6 @@
 
 #if defined(DEBUG) || defined(_DEBUG)
 #include <dxgidebug.h>
-
-#pragma comment(lib, "dxguid.lib")
 #endif
 
 #pragma region testIncludes
@@ -19,6 +17,7 @@
 #pragma comment(lib, "DXGI.lib")
 #pragma comment(lib, "D3D11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
+#pragma comment(lib, "dxguid.lib")
 
 
 flt::RendererDX11::RendererDX11() :
@@ -27,6 +26,7 @@ flt::RendererDX11::RendererDX11() :
 	_useVsync(false),
 	_monitorIndex(0),
 	_refreshRatesIndex(1),
+	_renderMode(RenderMode::DEFERRED),
 	_windowWidth(1280),
 	_windowHeight(720),
 	_displayWidth(0),
@@ -42,11 +42,13 @@ flt::RendererDX11::RendererDX11() :
 	_depthStencil(),
 	_renderTargetView(),
 	_depthStencilView(),
-	_rasterizerState(),
+	_solidCullRasterizerState(),
+	_wireRasterizerState(),
 	_gBuffer{},
 	_screenQuad(),
 	_renderableObjects(),
 	_cameras(),
+	_boneMatrices{},
 	_grids{}
 	//_debugHWnd(NULL),
 	//_isDebugMode(false)
@@ -164,25 +166,71 @@ bool flt::RendererDX11::Initialize(HWND hwnd, HWND debugHWnd /*= NULL*/)
 	//}
 
 	D3D11_RASTERIZER_DESC rasterizerDesc = { };
-	rasterizerDesc.AntialiasedLineEnable = false;
 	rasterizerDesc.CullMode = D3D11_CULL_BACK;
-	rasterizerDesc.DepthBias = 0;
-	rasterizerDesc.DepthBiasClamp = 0.0f;
-	rasterizerDesc.DepthClipEnable = true;
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 	rasterizerDesc.FrontCounterClockwise = false;
-	rasterizerDesc.MultisampleEnable = false;
-	rasterizerDesc.ScissorEnable = false;
+	rasterizerDesc.DepthBias = 0;
+	rasterizerDesc.DepthBiasClamp = 0.0f;
 	rasterizerDesc.SlopeScaledDepthBias = 0.0f;
+	rasterizerDesc.DepthClipEnable = true;
+	rasterizerDesc.ScissorEnable = false;
+	rasterizerDesc.MultisampleEnable = false;
+	rasterizerDesc.AntialiasedLineEnable = false;
 
-	result = _device->CreateRasterizerState(&rasterizerDesc, &_rasterizerState);
+	result = _device->CreateRasterizerState(&rasterizerDesc, &_solidCullRasterizerState);
 	if (result != S_OK)
 	{
 		ASSERT(false, "RasterizerState 생성 실패");
 		return false;
 	}
 
-	_immediateContext->RSSetState(_rasterizerState.Get());
+	D3D11_RASTERIZER_DESC wireFrameRasterizerDesc = {};
+	wireFrameRasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+	wireFrameRasterizerDesc.CullMode = D3D11_CULL_NONE;
+	wireFrameRasterizerDesc.FrontCounterClockwise = false;
+	wireFrameRasterizerDesc.DepthBias = 0;
+	wireFrameRasterizerDesc.DepthBiasClamp = 0.0f;
+	wireFrameRasterizerDesc.SlopeScaledDepthBias = 0.0f;
+	wireFrameRasterizerDesc.DepthClipEnable = true;
+	wireFrameRasterizerDesc.ScissorEnable = false;
+	wireFrameRasterizerDesc.MultisampleEnable = false;
+	wireFrameRasterizerDesc.AntialiasedLineEnable = false;
+
+	result = _device->CreateRasterizerState(&wireFrameRasterizerDesc, &_wireRasterizerState);
+	if (result != S_OK)
+	{
+		ASSERT(false, "와이어 프레임 레스터라이저 생성 실패");
+		return false;
+	}
+
+	D3D11_BLEND_DESC blendDesc = { };
+	blendDesc.AlphaToCoverageEnable = false;
+	blendDesc.IndependentBlendEnable = false;
+	blendDesc.RenderTarget[0].BlendEnable = true;
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+	result = _device->CreateBlendState(&blendDesc, &_blendState);
+	if (result != S_OK)
+	{
+		ASSERT(false, "블렌드 상태 생성 실패");
+		return false;
+	}
+
+	D3D11_DEPTH_STENCIL_DESC depthStencilDesc = {};
+	depthStencilDesc.DepthEnable = true;
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+
+	_device->CreateDepthStencilState(&depthStencilDesc, &_depthState);
+
+
+	_immediateContext->RSSetState(_solidCullRasterizerState.Get());
 
 	//if (debugHWnd != NULL)
 	//{
@@ -244,7 +292,7 @@ bool flt::RendererDX11::Finalize()
 	_depthStencil = nullptr;
 	_renderTargetView = nullptr;
 	_depthStencilView = nullptr;
-	_rasterizerState = nullptr;
+	_solidCullRasterizerState = nullptr;
 
 	for (auto& adapter : _adapters)
 	{
@@ -276,6 +324,15 @@ bool flt::RendererDX11::Finalize()
 	_renderableObjects.clear();
 	_cameras.clear();
 
+	for (auto& mat : _boneMatrices)
+	{
+		mat = DirectX::XMMATRIX(
+			1.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f
+		);
+	}
 	//#if defined(DEBUG) || defined(_DEBUG)
 	//	IDXGIDebug1* dxgiDebug;
 	//	DXGIGetDebugInterface1(0, __uuidof(IDXGIDebug1), (void**)&dxgiDebug);
@@ -287,318 +344,23 @@ bool flt::RendererDX11::Finalize()
 
 bool flt::RendererDX11::Render(float deltaTime)
 {
-	// 디퍼드 시작 일단 멀티 렌더타겟.
-	ID3D11RenderTargetView* rtvs[GBUFFER_COUNT] =
-	{
-		_gBuffer[GBUFFER_DEPTH].rtv.Get(),
-		_gBuffer[GBUFFER_NORMAL].rtv.Get(),
-		_gBuffer[GBUFFER_ALBEDO].rtv.Get(),
-		_gBuffer[GBUFFER_SPECULAR].rtv.Get(),
-		_gBuffer[GBUFFER_EMISSIVE].rtv.Get(),
-	};
+	bool ret = false;
 
-	for (int i = 0; i < GBUFFER_COUNT; ++i)
+	switch (_renderMode)
 	{
-		_immediateContext->ClearRenderTargetView(rtvs[i], DirectX::Colors::Yellow);
+		case RenderMode::FORWARD:
+			ret = ForwardRender(deltaTime);
+			break;
+		case RenderMode::DEFERRED:
+			ret = DeferredRender(deltaTime);
+			break;
+		case RenderMode::FORWARD_PLUS:
+			ret = ForwardPlusRender(deltaTime);
+			break;
+		default:
+			ASSERT(false, "알수 없는 렌더링 모드");
+			break;
 	}
-	_immediateContext->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-	_immediateContext->OMSetRenderTargets(GBUFFER_COUNT, rtvs, _depthStencilView.Get());
-
-	// 각 mesh별로 들어가야하지만 일단 여기서 만들자.
-	// 매번 만들지 않도록 수정해야함.
-	D3D11_RASTERIZER_DESC rasterizerDesc = { };
-	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerDesc.CullMode = D3D11_CULL_BACK;
-	rasterizerDesc.FrontCounterClockwise = false;
-	rasterizerDesc.DepthBias = 0;
-	rasterizerDesc.DepthBiasClamp = 0.0f;
-	rasterizerDesc.SlopeScaledDepthBias = 0.0f;
-	rasterizerDesc.DepthClipEnable = true;
-	rasterizerDesc.ScissorEnable = false;
-	rasterizerDesc.MultisampleEnable = false;
-	rasterizerDesc.AntialiasedLineEnable = false;
-
-	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerState;
-	_device->CreateRasterizerState(&rasterizerDesc, &rasterizerState);
-
-	_immediateContext->RSSetState(rasterizerState.Get());
-
-	{
-		//디버그용 그리드 그리기
-
-		auto& camera = _cameras[0];
-		Matrix4f viewMatrix = camera->GetViewMatrix();
-		Matrix4f projMatrix = camera->GetProjectionMatrix();
-
-		const Transform* cameraTransform = camera->GetTransform();
-		Vector4f cameraPosition = cameraTransform->GetLocalPosition();
-
-		// 투명으로 그리기위한 임시 블렌딩 상태 생성
-		D3D11_BLEND_DESC blendDesc = { };
-		blendDesc.RenderTarget[0].BlendEnable = TRUE;
-		blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-		blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-		blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-		blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-		blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-
-		ID3D11BlendState* blendState;
-		auto ret = _device->CreateBlendState(&blendDesc, &blendState);
-		ASSERT(ret == S_OK, "블렌드 상태 생성 실패");
-		float blend[4] = { 1.0f,1.0f,1.0f, 1.0f };
-		_immediateContext->OMSetBlendState(blendState, blend, 0xffffffff);
-		blendState->Release();
-
-		// 그리드 스케일은 카메라 높이에 따라서 1, 10, 100, 1000, 10000 중 하나.
-		float gridScale = 1.0f;
-
-		if (cameraPosition.y > 10000.0f)
-		{
-			gridScale = 10000.0f;
-		}
-		else if (cameraPosition.y > 1000.0f)
-		{
-			gridScale = 1000.0f;
-		}
-		else if (cameraPosition.y > 100.0f)
-		{
-			gridScale = 100.0f;
-		}
-		else if (cameraPosition.y > 10.0f)
-		{
-			gridScale = 10.0f;
-		}
-		float secondGridScale = (float)((int)gridScale / 10);
-		float heightOpacitys[2] = { 1.0f, 0.0f };
-
-		if (secondGridScale > 0.0f)
-		{
-			// 0~5 일경우는 0, 5~10일경우 0~1 사이로 변경.
-			heightOpacitys[1] = ((cameraPosition.y / gridScale) - 5.0f) * 2.0f;
-			heightOpacitys[1] < 0.0f ? heightOpacitys[1] = 0.0f : heightOpacitys[1];
-			heightOpacitys[1] /= 10.0f;
-			heightOpacitys[1] = 1.0f - heightOpacitys[1];
-			ASSERT(heightOpacitys[1] >= 0.0f && heightOpacitys[1] <= 1.0f, "높이 투명도 오류");
-		}
-
-
-		_grids[0].transform.SetScale(gridScale, gridScale, gridScale);
-		_grids[1].transform.SetScale(secondGridScale, secondGridScale, secondGridScale);
-
-		// 그리드의 위치는 카메라의 위치에서 가장 가까운 정수값위치 * 그리드 스케일
-		_grids[0].transform.SetPosition(
-			(int)(cameraPosition.x / gridScale) * gridScale,
-			0.0f,
-			(int)(cameraPosition.z / gridScale) * gridScale
-		);
-
-		_grids[1].transform.SetPosition(
-			(int)(cameraPosition.x / secondGridScale) * secondGridScale,
-			0.0f,
-			(int)(cameraPosition.z / secondGridScale) * secondGridScale
-		);
-
-
-		D3D11_RASTERIZER_DESC wireFrameRasterizerDesc = {};
-		wireFrameRasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
-		wireFrameRasterizerDesc.CullMode = D3D11_CULL_NONE;
-		wireFrameRasterizerDesc.FrontCounterClockwise = false;
-		wireFrameRasterizerDesc.DepthBias = 0;
-		wireFrameRasterizerDesc.DepthBiasClamp = 0.0f;
-		wireFrameRasterizerDesc.SlopeScaledDepthBias = 0.0f;
-		wireFrameRasterizerDesc.DepthClipEnable = true;
-		wireFrameRasterizerDesc.ScissorEnable = false;
-		wireFrameRasterizerDesc.MultisampleEnable = false;
-		wireFrameRasterizerDesc.AntialiasedLineEnable = false;
-
-		ID3D11RasterizerState* wireFrameRasterizer;
-		_device->CreateRasterizerState(&wireFrameRasterizerDesc, &wireFrameRasterizer);
-		_immediateContext->RSSetState(wireFrameRasterizer);
-		wireFrameRasterizer->Release();
-
-		int gridCounts[2] = { 161, 801 };
-		for (int i = 0; i < 2; ++i)
-		{
-			DX11Mesh* pGridMesh = _grids[i].node->meshes[0].Get();
-			DX11VertexShader* girdVsShader = pGridMesh->vertexShader.Get();
-			DX11PixelShader* pixelShader = pGridMesh->pixelShader.Get();
-			_immediateContext->IASetInputLayout(girdVsShader->pInputLayout);
-			_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-
-			_immediateContext->VSSetShader(girdVsShader->pVertexShader, nullptr, 0);
-			_immediateContext->PSSetShader(pixelShader->pPixelShader, nullptr, 0);
-
-			// 상수 버퍼 임시 세팅
-			struct {
-				unsigned int gridCount;
-			} entityInitData;
-			entityInitData.gridCount = gridCounts[i];
-
-			struct {
-				DirectX::XMFLOAT3 cameraPos;
-			}framePerCamera;
-			framePerCamera.cameraPos = { cameraPosition.x, cameraPosition.y, cameraPosition.z };
-
-			struct {
-				DirectX::XMMATRIX worldTranslate;
-				DirectX::XMMATRIX worldViewProj;
-				float heightOpacity;
-			}framePerEntity;
-
-			framePerEntity.worldTranslate = ConvertXMMatrix(_grids[i].transform.GetTranslateMatrix4f());
-			framePerEntity.worldViewProj = ConvertXMMatrix(_grids[i].transform.GetWorldMatrix4f() * viewMatrix * projMatrix);
-			framePerEntity.heightOpacity = heightOpacitys[i];
-
-			void* pData[3] = { &entityInitData , &framePerCamera , &framePerEntity };
-			girdVsShader->SetConstantBuffer(_immediateContext.Get(), pData, 3);
-
-			_immediateContext->PSSetSamplers(0, 1, &pGridMesh->sampler);
-
-			UINT offset = 0;
-			_immediateContext->IASetVertexBuffers(0, 1, &pGridMesh->vertexBuffer, &pGridMesh->singleVertexSize, &offset);
-			_immediateContext->IASetIndexBuffer(pGridMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-			_immediateContext->DrawIndexed(pGridMesh->indexCount, 0, 0);
-		}
-
-		// 원래 상태로 복구
-		_immediateContext->RSSetState(NULL);
-		_immediateContext->OMSetBlendState(NULL, blend, 0xFFFFFFFF);
-	}
-
-	for (auto& camera : _cameras)
-	{
-		Matrix4f viewMatrix = camera->GetViewMatrix();
-		Matrix4f projMatrix = camera->GetProjectionMatrix();
-
-		for (auto& node : _renderableObjects)
-		{
-			int meshCount = (int)node->meshes.size();
-
-			Matrix4f worldMatrix = node->transform.GetWorldMatrix4f();
-			Matrix4f worldViewProjMatrix = worldMatrix * viewMatrix * projMatrix;
-			DirectX::XMMATRIX world = ConvertXMMatrix(worldMatrix);
-			DirectX::XMMATRIX worldViewProj = ConvertXMMatrix(worldViewProjMatrix);
-
-			for (auto& mesh : node->meshes)
-			{
-				//if (mesh->pRootBoneTransform)
-				//{
-
-				//}
-
-				DX11Mesh* pMesh = mesh.Get();
-
-				DX11VertexShader* vertexShader = pMesh->vertexShader.Get();
-				DX11PixelShader* pixelShader = pMesh->pixelShader.Get();
-
-				_immediateContext->IASetInputLayout(vertexShader->pInputLayout);
-				_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-				_immediateContext->VSSetShader(vertexShader->pVertexShader, nullptr, 0);
-				_immediateContext->PSSetShader(pixelShader->pPixelShader, nullptr, 0);
-
-				_immediateContext->PSSetShaderResources(0, pMesh->srvCount, pMesh->srv);
-
-				void* pData = &worldViewProj;
-				vertexShader->SetConstantBuffer(_immediateContext.Get(), &pData, 1);
-
-				_immediateContext->PSSetSamplers(0, 1, &pMesh->sampler);
-
-				UINT offset = 0;
-				_immediateContext->IASetVertexBuffers(0, 1, &pMesh->vertexBuffer, &pMesh->singleVertexSize, &offset);
-				_immediateContext->IASetIndexBuffer(pMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-				_immediateContext->DrawIndexed(pMesh->indexCount, 0, 0);
-			}
-		}
-	}
-
-	// 마찬가지로 BlendState도 매번 만들지 않도록 수정해야함.
-	D3D11_BLEND_DESC blendDesc = { };
-	blendDesc.AlphaToCoverageEnable = false;
-	blendDesc.IndependentBlendEnable = false;
-	blendDesc.RenderTarget[0].BlendEnable = true;
-	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
-	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
-	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
-	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-
-	Microsoft::WRL::ComPtr<ID3D11BlendState> blendState;
-	_device->CreateBlendState(&blendDesc, &blendState);
-	float blend[4] = { 1,1,1, 1 };
-
-	D3D11_DEPTH_STENCIL_DESC depthStencilDesc = {};
-	depthStencilDesc.DepthEnable = true;
-	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
-
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthState;
-	_device->CreateDepthStencilState(&depthStencilDesc, &depthState);
-
-	_immediateContext->OMSetBlendState(blendState.Get(), blend, 0xFFFFFFFF);
-	_immediateContext->OMSetDepthStencilState(depthState.Get(), 0);
-
-	// 빛 연산에 필요한 텍스쳐 픽셀쉐이더에 세팅.
-	/*_immediateContext->PSSetShaderResources(GBUFFER_DEPTH, 1, _gBuffer[GBUFFER_DEPTH].srv.GetAddressOf());
-	_immediateContext->PSSetShaderResources(GBUFFER_NORMAL, 1, _gBuffer[GBUFFER_NORMAL].srv.GetAddressOf());
-	_immediateContext->PSSetShaderResources(GBUFFER_ALBEDO, 1, _gBuffer[GBUFFER_ALBEDO].srv.GetAddressOf());*/
-
-	// 빛 연산 로직 구현 필요 TODO
-
-	// 최종 연산 결과 화면에 출력
-	{
-		_immediateContext->ClearRenderTargetView(_renderTargetView.Get(), DirectX::Colors::Black);
-		_immediateContext->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		_immediateContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
-		_immediateContext->RSSetState(rasterizerState.Get());
-
-		DX11Mesh* pMesh = _screenQuad.node->meshes[0].Get();
-		DX11VertexShader* vertexShader = pMesh->vertexShader.Get();
-		DX11PixelShader* pixelShader = pMesh->pixelShader.Get();
-
-		_immediateContext->IASetInputLayout(vertexShader->pInputLayout);
-		_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		_immediateContext->VSSetShader(vertexShader->pVertexShader, nullptr, 0);
-		_immediateContext->PSSetShader(pixelShader->pPixelShader, nullptr, 0);
-
-		for (int i = 0; i < GBUFFER_COUNT; ++i)
-		{
-			_immediateContext->PSSetShaderResources(i, 1, _gBuffer[i].srv.GetAddressOf());
-		}
-
-		// 이 크기에 맞춰서 가로세로 x y 각각 0~1 사이의 값을 통해 조절
-		VSBackBuffer vsBackBuffer{ 1.f, 1.f, 0.5f, 0.5f };
-		void* pData = &vsBackBuffer;
-		vertexShader->SetConstantBuffer(_immediateContext.Get(), &pData, 1);
-
-		_immediateContext->PSSetSamplers(0, 1, &pMesh->sampler);
-
-		UINT offset = 0;
-		_immediateContext->IASetVertexBuffers(0, 1, &pMesh->vertexBuffer, &pMesh->singleVertexSize, &offset);
-		_immediateContext->IASetIndexBuffer(pMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-		_immediateContext->DrawIndexed(pMesh->indexCount, 0, 0);
-
-		// 디버깅 정보를 띄울경우에 출력
-		{
-
-		}
-
-		// 입력에 사용한 텍스쳐 정리
-		ID3D11ShaderResourceView* nullSRV[GBUFFER_COUNT] = { NULL, };
-		_immediateContext->PSSetShaderResources(0, GBUFFER_COUNT, nullSRV);
-	}
-
-	_immediateContext->RSSetState(NULL);
-	_immediateContext->OMSetBlendState(NULL, blend, 0xFFFFFFFF);
 
 	// 수직동기화 여부에 따라서 present
 	if (_useVsync)
@@ -607,15 +369,15 @@ bool flt::RendererDX11::Render(float deltaTime)
 	}
 	else
 	{
-		_swapChain->Present(0, 0);
+		_swapChain->Present(0, DXGI_PRESENT_ALLOW_TEARING);
 	}
 
-	return true;
+	return ret;
 }
 
 flt::HOBJECT flt::RendererDX11::RegisterObject(RendererObject& renderable)
 {
-	DX11Node* node = new DX11Node(renderable.node.transform, renderable.isDraw);
+	DX11Node* node = new DX11Node(renderable.transform, renderable.isDraw);
 	if (!node)
 	{
 		return false;
@@ -694,6 +456,532 @@ bool flt::RendererDX11::Resize(unsigned __int32 windowWidth, unsigned __int32 wi
 	_displayWidth = windowHeight;
 	_displayHeight = windowHeight;
 	return true;
+}
+
+bool flt::RendererDX11::ForwardRender(float deltaTime)
+{
+	_immediateContext->ClearRenderTargetView(_renderTargetView.Get(), DirectX::Colors::Black);
+	_immediateContext->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	_immediateContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
+	_immediateContext->RSSetState(_solidCullRasterizerState.Get());
+
+	{
+		//디버그용 그리드 그리기
+
+		auto& camera = _cameras[0];
+		Matrix4f viewMatrix = camera->GetViewMatrix();
+		Matrix4f projMatrix = camera->GetProjectionMatrix();
+
+		const Transform* cameraTransform = camera->GetTransform();
+		Vector4f cameraPosition = cameraTransform->GetLocalPosition();
+
+		// 투명으로 그리기위한 임시 블렌딩 상태 생성
+		D3D11_BLEND_DESC blendDesc = { };
+		blendDesc.RenderTarget[0].BlendEnable = TRUE;
+		blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+		blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+		ID3D11BlendState* blendState;
+		auto ret = _device->CreateBlendState(&blendDesc, &blendState);
+		ASSERT(ret == S_OK, "블렌드 상태 생성 실패");
+		float blend[4] = { 1.0f,1.0f,1.0f, 1.0f };
+		_immediateContext->OMSetBlendState(blendState, blend, 0xffffffff);
+		blendState->Release();
+
+		// 그리드 스케일은 카메라 높이에 따라서 1, 10, 100, 1000, 10000 중 하나.
+		float gridScale = 1.0f;
+
+		if (cameraPosition.y > 10000.0f)
+		{
+			gridScale = 10000.0f;
+		}
+		else if (cameraPosition.y > 1000.0f)
+		{
+			gridScale = 1000.0f;
+		}
+		else if (cameraPosition.y > 100.0f)
+		{
+			gridScale = 100.0f;
+		}
+		else if (cameraPosition.y > 10.0f)
+		{
+			gridScale = 10.0f;
+		}
+		float secondGridScale = (float)((int)gridScale / 10);
+		float heightOpacitys[2] = { 1.0f, 0.0f };
+
+		if (secondGridScale > 0.0f)
+		{
+			// 0~5 일경우는 0, 5~10일경우 0~1 사이로 변경.
+			heightOpacitys[1] = ((cameraPosition.y / gridScale) - 5.0f) * 2.0f;
+			heightOpacitys[1] < 0.0f ? heightOpacitys[1] = 0.0f : heightOpacitys[1];
+			heightOpacitys[1] /= 10.0f;
+			heightOpacitys[1] = 1.0f - heightOpacitys[1];
+			ASSERT(heightOpacitys[1] >= 0.0f && heightOpacitys[1] <= 1.0f, "높이 투명도 오류");
+		}
+
+
+		_grids[0].transform.SetScale(gridScale, gridScale, gridScale);
+		_grids[1].transform.SetScale(secondGridScale, secondGridScale, secondGridScale);
+
+		// 그리드의 위치는 카메라의 위치에서 가장 가까운 정수값위치 * 그리드 스케일
+		_grids[0].transform.SetPosition(
+			(int)(cameraPosition.x / gridScale) * gridScale,
+			0.0f,
+			(int)(cameraPosition.z / gridScale) * gridScale
+		);
+
+		_grids[1].transform.SetPosition(
+			(int)(cameraPosition.x / secondGridScale) * secondGridScale,
+			0.0f,
+			(int)(cameraPosition.z / secondGridScale) * secondGridScale
+		);
+
+		_immediateContext->RSSetState(_wireRasterizerState.Get());
+
+		int gridCounts[2] = { 161, 801 };
+		for (int i = 0; i < 2; ++i)
+		{
+			DX11Mesh* pGridMesh = _grids[i].node->meshes[0].Get();
+			DX11VertexShader* girdVsShader = pGridMesh->vertexShader.Get();
+			DX11PixelShader* pixelShader = pGridMesh->pixelShader.Get();
+			_immediateContext->IASetInputLayout(girdVsShader->pInputLayout);
+			_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+
+			_immediateContext->VSSetShader(girdVsShader->pVertexShader, nullptr, 0);
+			_immediateContext->PSSetShader(pixelShader->pPixelShader, nullptr, 0);
+
+			// 상수 버퍼 임시 세팅
+			struct {
+				unsigned int gridCount;
+			} entityInitData;
+			entityInitData.gridCount = gridCounts[i];
+
+			struct {
+				DirectX::XMFLOAT3 cameraPos;
+			}framePerCamera;
+			framePerCamera.cameraPos = { cameraPosition.x, cameraPosition.y, cameraPosition.z };
+
+			struct {
+				DirectX::XMMATRIX worldTranslate;
+				DirectX::XMMATRIX worldViewProj;
+				float heightOpacity;
+			}framePerEntity;
+
+			framePerEntity.worldTranslate = ConvertXMMatrix(_grids[i].transform.GetTranslateMatrix4f());
+			framePerEntity.worldViewProj = ConvertXMMatrix(_grids[i].transform.GetWorldMatrix4f() * viewMatrix * projMatrix);
+			framePerEntity.heightOpacity = heightOpacitys[i];
+
+			void* pData[3] = { &entityInitData , &framePerCamera , &framePerEntity };
+			girdVsShader->SetConstantBuffer(_immediateContext.Get(), pData, 3);
+
+			_immediateContext->PSSetSamplers(0, 1, &pGridMesh->sampler);
+
+			UINT offset = 0;
+			_immediateContext->IASetVertexBuffers(0, 1, &pGridMesh->vertexBuffer, &pGridMesh->singleVertexSize, &offset);
+			_immediateContext->IASetIndexBuffer(pGridMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+			_immediateContext->DrawIndexed(pGridMesh->indexCount, 0, 0);
+		}
+
+		// 원래 상태로 복구
+		_immediateContext->RSSetState(NULL);
+		_immediateContext->OMSetBlendState(NULL, blend, 0xFFFFFFFF);
+	}
+
+	for (auto& camera : _cameras)
+	{
+		Matrix4f viewMatrix = camera->GetViewMatrix();
+		Matrix4f projMatrix = camera->GetProjectionMatrix();
+
+		for (auto& node : _renderableObjects)
+		{
+			Matrix4f worldMatrix = node->transform.GetWorldMatrix4f();
+			Matrix4f worldViewProjMatrix = worldMatrix * viewMatrix * projMatrix;
+			DirectX::XMMATRIX world = ConvertXMMatrix(worldMatrix);
+			DirectX::XMMATRIX worldViewProj = ConvertXMMatrix(worldViewProjMatrix);
+
+			for (auto& mesh : node->meshes)
+			{
+				DX11Mesh* pMesh = mesh.Get();
+
+				DX11VertexShader* vertexShader = pMesh->vertexShader.Get();
+				DX11PixelShader* pixelShader = pMesh->pixelShader.Get();
+
+				_immediateContext->IASetInputLayout(vertexShader->pInputLayout);
+				_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+				_immediateContext->VSSetShader(vertexShader->pVertexShader, nullptr, 0);
+				_immediateContext->PSSetShader(pixelShader->pPixelShader, nullptr, 0);
+
+				_immediateContext->PSSetShaderResources(0, pMesh->srvCount, pMesh->srv);
+
+				if (!node->pSkeleton)
+				{
+					void* pData[1] = { &worldViewProj };
+					vertexShader->SetConstantBuffer(_immediateContext.Get(), pData, 1);
+				}
+				else
+				{
+					void* pData[2] = { &worldViewProj, _boneMatrices };
+
+					//for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
+					//{
+					//	auto& clip = node->pSkeleton->bones[i].clip;
+
+					//	if (clip.keyPosition.size() > 0)
+					//		node->pSkeleton->bones[i].tr.SetPosition(clip.keyPosition[0].position);
+					//	if (clip.keyRotation.size() > 0)
+					//		node->pSkeleton->bones[i].tr.SetRotation(clip.keyRotation[0].rotation);
+					//	if (clip.keyScale.size() > 0)
+					//		node->pSkeleton->bones[i].tr.SetScale(clip.keyScale[0].scale);
+					//}
+					for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
+					{
+						Matrix4f boneMatrix = node->pSkeleton->bones[i].transform.GetWorldMatrix4f();
+						auto testTranspose = boneMatrix.Transpose();
+						//boneMatrix *= worldMatrix;
+						_boneMatrices[i] = ConvertXMMatrix(node->pSkeleton->bones[i].boneOffset * boneMatrix);
+						//_boneMatrices[i] = ConvertXMMatrix(Matrix4f::Identity());
+					}
+
+					vertexShader->SetConstantBuffer(_immediateContext.Get(), pData, 2);
+				}
+
+				_immediateContext->PSSetSamplers(0, 1, &pMesh->sampler);
+
+				UINT offset = 0;
+				_immediateContext->IASetVertexBuffers(0, 1, &pMesh->vertexBuffer, &pMesh->singleVertexSize, &offset);
+				_immediateContext->IASetIndexBuffer(pMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+				_immediateContext->DrawIndexed(pMesh->indexCount, 0, 0);
+			}
+		}
+	}
+
+	return true;
+}
+
+bool flt::RendererDX11::DeferredRender(float deltaTime)
+{
+	static float testElapsedTime = 0.0f;
+	testElapsedTime += deltaTime;
+	while (testElapsedTime > 200.0f)
+	{
+		testElapsedTime = 0.0f;
+	}
+
+
+	// 디퍼드 시작 일단 멀티 렌더타겟.
+	ID3D11RenderTargetView* rtvs[GBUFFER_COUNT] =
+	{
+		_gBuffer[GBUFFER_DEPTH].rtv.Get(),
+		_gBuffer[GBUFFER_NORMAL].rtv.Get(),
+		_gBuffer[GBUFFER_ALBEDO].rtv.Get(),
+		_gBuffer[GBUFFER_SPECULAR].rtv.Get(),
+		_gBuffer[GBUFFER_EMISSIVE].rtv.Get(),
+	};
+
+	for (int i = 0; i < GBUFFER_COUNT; ++i)
+	{
+		_immediateContext->ClearRenderTargetView(rtvs[i], DirectX::Colors::Yellow);
+	}
+	_immediateContext->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	_immediateContext->OMSetRenderTargets(GBUFFER_COUNT, rtvs, _depthStencilView.Get());
+
+	_immediateContext->RSSetState(_solidCullRasterizerState.Get());
+
+	{
+		//디버그용 그리드 그리기
+
+		auto& camera = _cameras[0];
+		Matrix4f viewMatrix = camera->GetViewMatrix();
+		Matrix4f projMatrix = camera->GetProjectionMatrix();
+
+		const Transform* cameraTransform = camera->GetTransform();
+		Vector4f cameraPosition = cameraTransform->GetLocalPosition();
+
+		// 투명으로 그리기위한 임시 블렌딩 상태 생성
+		D3D11_BLEND_DESC blendDesc = { };
+		blendDesc.RenderTarget[0].BlendEnable = TRUE;
+		blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+		blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+		ID3D11BlendState* blendState;
+		auto ret = _device->CreateBlendState(&blendDesc, &blendState);
+		ASSERT(ret == S_OK, "블렌드 상태 생성 실패");
+		float blend[4] = { 1.0f,1.0f,1.0f, 1.0f };
+		_immediateContext->OMSetBlendState(blendState, blend, 0xffffffff);
+		blendState->Release();
+
+		// 그리드 스케일은 카메라 높이에 따라서 1, 10, 100, 1000, 10000 중 하나.
+		float gridScale = 1.0f;
+
+		if (cameraPosition.y > 10000.0f)
+		{
+			gridScale = 10000.0f;
+		}
+		else if (cameraPosition.y > 1000.0f)
+		{
+			gridScale = 1000.0f;
+		}
+		else if (cameraPosition.y > 100.0f)
+		{
+			gridScale = 100.0f;
+		}
+		else if (cameraPosition.y > 10.0f)
+		{
+			gridScale = 10.0f;
+		}
+		float secondGridScale = (float)((int)gridScale / 10);
+		float heightOpacitys[2] = { 1.0f, 0.0f };
+
+		if (secondGridScale > 0.0f)
+		{
+			// 0~5 일경우는 0, 5~10일경우 0~1 사이로 변경.
+			heightOpacitys[1] = ((cameraPosition.y / gridScale) - 5.0f) * 2.0f;
+			heightOpacitys[1] < 0.0f ? heightOpacitys[1] = 0.0f : heightOpacitys[1];
+			heightOpacitys[1] /= 10.0f;
+			heightOpacitys[1] = 1.0f - heightOpacitys[1];
+			ASSERT(heightOpacitys[1] >= 0.0f && heightOpacitys[1] <= 1.0f, "높이 투명도 오류");
+		}
+
+
+		_grids[0].transform.SetScale(gridScale, gridScale, gridScale);
+		_grids[1].transform.SetScale(secondGridScale, secondGridScale, secondGridScale);
+
+		// 그리드의 위치는 카메라의 위치에서 가장 가까운 정수값위치 * 그리드 스케일
+		_grids[0].transform.SetPosition(
+			(int)(cameraPosition.x / gridScale) * gridScale,
+			0.0f,
+			(int)(cameraPosition.z / gridScale) * gridScale
+		);
+
+		_grids[1].transform.SetPosition(
+			(int)(cameraPosition.x / secondGridScale) * secondGridScale,
+			0.0f,
+			(int)(cameraPosition.z / secondGridScale) * secondGridScale
+		);
+
+		_immediateContext->RSSetState(_wireRasterizerState.Get());
+
+		int gridCounts[2] = { 161, 801 };
+		for (int i = 0; i < 2; ++i)
+		{
+			DX11Mesh* pGridMesh = _grids[i].node->meshes[0].Get();
+			DX11VertexShader* girdVsShader = pGridMesh->vertexShader.Get();
+			DX11PixelShader* pixelShader = pGridMesh->pixelShader.Get();
+			_immediateContext->IASetInputLayout(girdVsShader->pInputLayout);
+			_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+
+			_immediateContext->VSSetShader(girdVsShader->pVertexShader, nullptr, 0);
+			_immediateContext->PSSetShader(pixelShader->pPixelShader, nullptr, 0);
+
+			// 상수 버퍼 임시 세팅
+			struct {
+				unsigned int gridCount;
+			} entityInitData;
+			entityInitData.gridCount = gridCounts[i];
+
+			struct {
+				DirectX::XMFLOAT3 cameraPos;
+			}framePerCamera;
+			framePerCamera.cameraPos = { cameraPosition.x, cameraPosition.y, cameraPosition.z };
+
+			struct {
+				DirectX::XMMATRIX worldTranslate;
+				DirectX::XMMATRIX worldViewProj;
+				float heightOpacity;
+			}framePerEntity;
+
+			framePerEntity.worldTranslate = ConvertXMMatrix(_grids[i].transform.GetTranslateMatrix4f());
+			framePerEntity.worldViewProj = ConvertXMMatrix(_grids[i].transform.GetWorldMatrix4f() * viewMatrix * projMatrix);
+			framePerEntity.heightOpacity = heightOpacitys[i];
+
+			void* pData[3] = { &entityInitData , &framePerCamera , &framePerEntity };
+			girdVsShader->SetConstantBuffer(_immediateContext.Get(), pData, 3);
+
+			_immediateContext->PSSetSamplers(0, 1, &pGridMesh->sampler);
+
+			UINT offset = 0;
+			_immediateContext->IASetVertexBuffers(0, 1, &pGridMesh->vertexBuffer, &pGridMesh->singleVertexSize, &offset);
+			_immediateContext->IASetIndexBuffer(pGridMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+			_immediateContext->DrawIndexed(pGridMesh->indexCount, 0, 0);
+		}
+
+		// 원래 상태로 복구
+		_immediateContext->RSSetState(NULL);
+		_immediateContext->OMSetBlendState(NULL, blend, 0xFFFFFFFF);
+	}
+
+	// 엔티티 그리기 루프.
+	for (auto& camera : _cameras)
+	{
+		Matrix4f viewMatrix = camera->GetViewMatrix();
+		Matrix4f projMatrix = camera->GetProjectionMatrix();
+
+		for (auto& node : _renderableObjects)
+		{
+			Matrix4f worldMatrix = node->transform.GetWorldMatrix4f();
+			Matrix4f worldViewProjMatrix = worldMatrix * viewMatrix * projMatrix;
+			DirectX::XMMATRIX world = ConvertXMMatrix(worldMatrix);
+			DirectX::XMMATRIX worldViewProj = ConvertXMMatrix(worldViewProjMatrix);
+
+			for (auto& mesh : node->meshes)
+			{
+				DX11Mesh* pMesh = mesh.Get();
+
+				DX11VertexShader* vertexShader = pMesh->vertexShader.Get();
+				DX11PixelShader* pixelShader = pMesh->pixelShader.Get();
+
+				_immediateContext->IASetInputLayout(vertexShader->pInputLayout);
+				_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+				_immediateContext->VSSetShader(vertexShader->pVertexShader, nullptr, 0);
+				_immediateContext->PSSetShader(pixelShader->pPixelShader, nullptr, 0);
+
+				_immediateContext->PSSetShaderResources(0, pMesh->srvCount, pMesh->srv);
+
+				if (!node->pSkeleton)
+				{
+					void* pData[1] = { &worldViewProj };
+					vertexShader->SetConstantBuffer(_immediateContext.Get(), pData, 1);
+				}
+				else
+				{
+					void* pData[2] = { &worldViewProj, _boneMatrices };
+
+					for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
+					{
+						auto& clip = node->pSkeleton->bones[i].clip[0];
+						Transform& tr = node->pSkeleton->bones[i].tr;
+
+						Vector3f position = (Vector3f)tr.GetLocalPosition();
+						clip.GetPosition(testElapsedTime, &position);
+						if (position.Norm() > 0.0f)
+						{
+							tr.SetPosition(position);
+						}
+
+
+						Quaternion rotation = tr.GetLocalRotation();
+						clip.GetRotation(testElapsedTime, &rotation);
+						if (rotation.NormPow() > 0.0f)
+							tr.SetRotation(rotation);
+
+						Vector3f scale = (Vector3f)tr.GetLocalScale();
+						clip.GetScale(testElapsedTime, &scale);
+						if (scale.Norm() > 0.0f)
+							tr.SetScale(scale);
+
+						//if (clip.keyPosition.size() > 0)
+						//	node->pSkeleton->bones[i].tr.SetPosition(clip.keyPosition[0].position);
+						//if (clip.keyRotation.size() > 0)
+						//	node->pSkeleton->bones[i].tr.SetRotation(clip.keyRotation[0].rotation);
+						//if (clip.keyScale.size() > 0)
+						//	node->pSkeleton->bones[i].tr.SetScale(clip.keyScale[0].scale);
+					}
+					for (int i = 0; i < node->pSkeleton->bones.size(); ++i)
+					{
+						Matrix4f boneMatrix = node->pSkeleton->bones[i].transform.GetWorldMatrix4f();
+						auto testTranspose = boneMatrix.Transpose();
+						//boneMatrix *= worldMatrix;
+						_boneMatrices[i] = ConvertXMMatrix(node->pSkeleton->bones[i].boneOffset * boneMatrix);
+						//_boneMatrices[i] = ConvertXMMatrix(Matrix4f::Identity());
+					}
+
+					vertexShader->SetConstantBuffer(_immediateContext.Get(), pData, 2);
+				}
+
+				_immediateContext->PSSetSamplers(0, 1, &pMesh->sampler);
+
+				UINT offset = 0;
+				_immediateContext->IASetVertexBuffers(0, 1, &pMesh->vertexBuffer, &pMesh->singleVertexSize, &offset);
+				_immediateContext->IASetIndexBuffer(pMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+				_immediateContext->DrawIndexed(pMesh->indexCount, 0, 0);
+			}
+		}
+	}
+
+	float blend[4] = { 1,1,1, 1 };
+	_immediateContext->OMSetBlendState(_blendState.Get(), blend, 0xFFFFFFFF);
+	_immediateContext->OMSetDepthStencilState(_depthState.Get(), 0);
+
+	// 빛 연산에 필요한 텍스쳐 픽셀쉐이더에 세팅.
+	/*_immediateContext->PSSetShaderResources(GBUFFER_DEPTH, 1, _gBuffer[GBUFFER_DEPTH].srv.GetAddressOf());
+	_immediateContext->PSSetShaderResources(GBUFFER_NORMAL, 1, _gBuffer[GBUFFER_NORMAL].srv.GetAddressOf());
+	_immediateContext->PSSetShaderResources(GBUFFER_ALBEDO, 1, _gBuffer[GBUFFER_ALBEDO].srv.GetAddressOf());*/
+
+	// 빛 연산 로직 구현 필요 TODO
+
+	// 최종 연산 결과 화면에 출력
+	{
+		_immediateContext->ClearRenderTargetView(_renderTargetView.Get(), DirectX::Colors::Black);
+		_immediateContext->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		_immediateContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
+		_immediateContext->RSSetState(_solidCullRasterizerState.Get());
+
+		DX11Mesh* pMesh = _screenQuad.node->meshes[0].Get();
+		DX11VertexShader* vertexShader = pMesh->vertexShader.Get();
+		DX11PixelShader* pixelShader = pMesh->pixelShader.Get();
+
+		_immediateContext->IASetInputLayout(vertexShader->pInputLayout);
+		_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		_immediateContext->VSSetShader(vertexShader->pVertexShader, nullptr, 0);
+		_immediateContext->PSSetShader(pixelShader->pPixelShader, nullptr, 0);
+
+		for (int i = 0; i < GBUFFER_COUNT; ++i)
+		{
+			_immediateContext->PSSetShaderResources(i, 1, _gBuffer[i].srv.GetAddressOf());
+		}
+
+		// 이 크기에 맞춰서 가로세로 x y 각각 0~1 사이의 값을 통해 조절
+		VSBackBuffer vsBackBuffer{ 1.f, 1.f, 0.5f, 0.5f };
+		void* pData = &vsBackBuffer;
+		vertexShader->SetConstantBuffer(_immediateContext.Get(), &pData, 1);
+
+		_immediateContext->PSSetSamplers(0, 1, &pMesh->sampler);
+
+		UINT offset = 0;
+		_immediateContext->IASetVertexBuffers(0, 1, &pMesh->vertexBuffer, &pMesh->singleVertexSize, &offset);
+		_immediateContext->IASetIndexBuffer(pMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+		_immediateContext->DrawIndexed(pMesh->indexCount, 0, 0);
+
+		// 디버깅 정보를 띄울경우에 출력
+		{
+
+		}
+
+		// 입력에 사용한 텍스쳐 정리
+		ID3D11ShaderResourceView* nullSRV[GBUFFER_COUNT] = { NULL, };
+		_immediateContext->PSSetShaderResources(0, GBUFFER_COUNT, nullSRV);
+	}
+
+	_immediateContext->RSSetState(NULL);
+	_immediateContext->OMSetBlendState(NULL, blend, 0xFFFFFFFF);
+
+	return true;
+}
+
+bool flt::RendererDX11::ForwardPlusRender(float deltaTime)
+{
+	ASSERT(false, "구현되지 않은 렌더링 모드");
+	return false;
 }
 
 bool flt::RendererDX11::InitDisplayInfo()
@@ -931,19 +1219,33 @@ bool flt::RendererDX11::SetVsConstantBuffer(ID3D11Buffer* vsConstantBuffer, void
 
 void flt::RendererDX11::SetDX11Node(DX11Node* dxNode, RawNode& node)
 {
+	dxNode->name = node.name;
+
 	int rawMeshCount = (int)node.meshes.size();
 	dxNode->meshes.resize(rawMeshCount);
 	for (int i = 0; i < rawMeshCount; ++i)
 	{
 		DX11MeshBuilder meshBuilder(node.name + std::to_wstring(i));
 		meshBuilder.pDevice = _device.Get();
-		meshBuilder.vsBuilder = DX11VertexShaderBuilder(L"flt::CubeVS");
 		meshBuilder.pImmediateContext = _immediateContext.Get();
-		meshBuilder.pRawMesh = node.meshes[i].Get();
+		meshBuilder.pRawMesh = &node.meshes[i];
+
+		meshBuilder.vsBuilder = DX11VertexShaderBuilder(L"../FloaterRendererDX11/VertexShader.hlsl");
+		meshBuilder.vsBuilder.pDevice = _device.Get();
+
+		meshBuilder.psBuilder = DX11PixelShaderBuilder(L"../FloaterRendererDX11/DeferredPixelShader.hlsl");
+		meshBuilder.psBuilder.pDevice = _device.Get();
 
 		dxNode->meshes[i].Set(meshBuilder);
 		ASSERT(dxNode->meshes[i].Get(), "Set Mesh fail");
 	}
+
+	if (node.skeleton)
+	{
+		dxNode->pSkeleton = new DX11Skeleton{ *node.skeleton };
+	}
+
+
 }
 
 flt::Resource<flt::DX11Mesh>* flt::RendererDX11::CreateBox()

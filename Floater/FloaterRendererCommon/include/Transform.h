@@ -20,17 +20,25 @@ namespace flt
 		Transform() : _position(), _scale(1.0f, 1.0f, 1.0f, 0.0f), _rotation(), _pParent(nullptr), _children(), _worldMatrix(), _isDirty(true), _pOwner(nullptr) {}
 		~Transform();
 
+		Transform(const Transform& other);
+		Transform& operator=(const Transform& other);
+
+		//Transform(Transform&& other) noexcept;
+		//Transform& operator=(Transform&& other) noexcept;
+
 		void SetMatrix(const Matrix4f& worldMatrix);
 
 		Vector4f GetLocalPosition() const noexcept { return _position; }
 		Vector4f GetWorldPosition() noexcept;
 		void SetPosition(float x, float y, float z);
 		void SetPosition(double x, double y, double z);
+		void SetPosition(const Vector3f& position);
 		void SetPosition(const Vector4f& position);
 
 		Quaternion GetLocalRotation() const noexcept { return _rotation; }
 		void SetRotation(float degreeX, float degreeY, float degreeZ, Quaternion::AxisOrder order = Quaternion::AxisOrder::YXZ);
 		void SetRotation(double degreeX, double degreeY, double degreeZ, Quaternion::AxisOrder order = Quaternion::AxisOrder::YXZ);
+		void SetRotation(Vector3f degree, Quaternion::AxisOrder order = Quaternion::AxisOrder::YXZ);
 		void SetRotation(const Vector3f& axis, float radian);
 		void SetRotation(const Quaternion& q);
 		void SetRotation(float x, float y, float z, float w);
@@ -38,6 +46,7 @@ namespace flt
 		Vector4f GetLocalScale() const noexcept { return _scale; }
 		void SetScale(float x, float y, float z);
 		void SetScale(double x, double y, double z);
+		void SetScale(const Vector3f& scale);
 		void SetScale(const Vector4f& scale);
 
 		void AddLocalPosition(float x, float y, float z);
@@ -67,6 +76,7 @@ namespace flt
 
 		Transform* GetChild(size_t index) const noexcept { return _children[index]; }
 		const std::vector<Transform*>& GetChildren() const noexcept { return _children; }
+		bool AddChild(Transform* pChild);
 
 		TransformOwner* GetOwner() const noexcept { return _pOwner; }
 

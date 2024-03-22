@@ -32,9 +32,11 @@ namespace flt
 				textures[i] = new(std::nothrow) RawTexture();
 			}
 		}
-		RawMaterial(const RawMaterial& other)
+		RawMaterial(const RawMaterial& other) :
+			name(other.name),
+			textures{},
+			baseColor{ other.baseColor[0], other.baseColor[1], other.baseColor[2] }, specular{ other.specular[0], other.specular[1], other.specular[2] }, emissiveColor{ other.emissiveColor[0], other.emissiveColor[1], other.emissiveColor[2] }, ambient{ other.ambient[0], other.ambient[1], other.ambient[2] }, metallic(other.metallic), roughness(other.roughness), opacity(other.opacity)
 		{
-			name = other.name;
 			for (int i = 0; i < MAX_TEXTURES; ++i)
 			{
 				textures[i] = new(std::nothrow) RawTexture();
@@ -47,18 +49,7 @@ namespace flt
 				textures[i]->name = other.textures[i]->name;
 				textures[i]->path = other.textures[i]->path;
 			}
-			for (int i = 0; i < 3; ++i)
-			{
-				baseColor[i] = other.baseColor[i];
-				specular[i] = other.specular[i];
-				emissiveColor[i] = other.emissiveColor[i];
-				ambient[i] = other.ambient[i];
-			}
-			metallic = other.metallic;
-			roughness = other.roughness;
-			opacity = other.opacity;
 		}
-
 		~RawMaterial()
 		{
 			for (int i = 0; i < MAX_TEXTURES; ++i)

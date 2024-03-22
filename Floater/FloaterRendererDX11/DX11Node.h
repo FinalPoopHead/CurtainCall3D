@@ -3,6 +3,7 @@
 #include "../FloaterRendererCommon/include/Camera.h"
 #include "../FloaterRendererCommon/include/RawNode.h"
 #include "DX11Mesh.h"
+#include "DX11Skeleton.h"
 
 #include <string>
 #include <vector>
@@ -26,6 +27,8 @@ namespace flt
 		const bool& isDraw;
 		std::vector<Resource<DX11Mesh>> meshes;
 		Camera* camera;
+
+		DX11Skeleton* pSkeleton;
 
 		int boneIndex;
 	};

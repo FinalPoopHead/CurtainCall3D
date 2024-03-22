@@ -97,6 +97,8 @@ int main()
 		ModelLoader loader;
 		//std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Ganondorf (TotK).fbx";
 		std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Dying.fbx";
+		//std::wstring filePath = L"..\\x64\\fbx\\Models\\A_TP_CH_Breathing.fbx";
+		//std::wstring filePath = L"C:\\Users\\KOCCA56\\Desktop\\Bee.glb";
 		std::wstring zUpYForward = L"..\\x64\\fbx\\Test\\ZY.fbx";
 		std::wstring yUpZForward = L"..\\x64\\fbx\\Test\\YZ.fbx";
 		std::wstring xUpYForward = L"..\\x64\\fbx\\Test\\XY.fbx";
@@ -119,14 +121,27 @@ int main()
 
 		//std::filesystem::path currPath = std::filesystem::current_path();
 
-		//loader.Load(L"..\\x64\\fbx\\PBR_BasicShader.blend");
-
-
 		loader.Load(filePath, &rawScene);
-		//loader.Load(zUpYForward);
-		//loader.Load(yUpZForward);
-		//loader.Load(xUpYForward);
 
+		auto& node = rawScene.nodes[0];
+
+		for (int i = 0; i < node->meshes.size(); ++i)
+		{
+			if (node->meshes[i].material.textures[0]->path == L"")
+			{
+				node->meshes[i].material.textures[0]->path = L"..\\x64\\fbx\\Models\\Textures\\T_TP_CH_Basic_001_001_D.png";
+			}
+		}
+
+		//node->meshes[0].material.textures[0]->path = L"..\\x64\\fbx\\Ganondorf - 3d - model - dl\\textures\\Npc_Ganondorf_Human_Face_1_Alb.png";
+		//node->meshes[1].material.textures[0]->path = L"..\\x64\\fbx\\Ganondorf - 3d - model - dl\\textures\\Npc_Ganondorf_Human_Metal_Alb.png";
+		//node->meshes[2].material.textures[0]->path = L"..\\x64\\fbx\\Ganondorf - 3d - model - dl\\textures\\Npc_Ganondorf_Human_Body_Dm_Alb.png";
+		//node->meshes[3].material.textures[0]->path = L"..\\x64\\fbx\\Ganondorf - 3d - model - dl\\textures\\Npc_Ganondorf_Human_Eyeball_Alb.png";
+		//node->meshes[4].material.textures[0]->path = L"..\\x64\\fbx\\Ganondorf - 3d - model - dl\\textures\\Npc_Ganondorf_Human_Face_2_Alb.png";
+		//node->meshes[5].material.textures[0]->path = L"..\\x64\\fbx\\Ganondorf - 3d - model - dl\\textures\\CmnTex_SecretStone_Dm_Ind.png";
+		//node->meshes[6].material.textures[0]->path = L"..\\x64\\fbx\\Ganondorf - 3d - model - dl\\textures\\Npc_Ganondorf_Human_Forehead_Alb.png";
+		//node->meshes[7].material.textures[0]->path = L"..\\x64\\fbx\\Ganondorf - 3d - model - dl\\textures\\Npc_Ganondorf_Human_Skin_Dm_Alb.png";
+		//node->meshes[8].material.textures[0]->path = L"..\\x64\\fbx\\Ganondorf - 3d - model - dl\\textures\\Npc_Ganondorf_Human_Hair_Alb.png";
 	}
 #pragma endregion
 
@@ -148,22 +163,28 @@ int main()
 	cameraNode.transform.SetRotation(0.0f, 0.0f, 0.0f);
 	cameraNode.camera = new flt::Camera(&cameraNode.transform);
 
-	flt::RendererObject cameraObject(cameraNode, isDraw, L"testCamera");
+	flt::Transform cameraTransform;
+	flt::RendererObject cameraObject(cameraTransform, cameraNode, isDraw, L"testCamera");
 	auto cameraID = renderer->RegisterObject(cameraObject);
 
 
 	flt::RawNode cubeNode(L"testNode");
 	cubeNode.transform.SetPosition(0.0f, 0.0f, 0.7f);
-	cubeNode.transform.SetScale(0.3f, 0.3f, 0.3f);
+	cubeNode.transform.SetScale(1.0f, 1.0f, 1.0f);
 
-	flt::RendererObject fbxObject(*rawScene.nodes[1], isDraw, L"test1");
+	flt::Transform fbxTransform;
+	flt::RendererObject fbxObject(fbxTransform, *rawScene.nodes[0], isDraw, L"test1");
+	//flt::RendererObject fbxObject(fbxTransform, *rawScene.nodes[0]->children[0]->children[0], isDraw, L"test1");
 	auto objectID0 = renderer->RegisterObject(fbxObject);
-	rawScene.nodes[1]->transform.SetScale(1.f, 1.f, 1.f);
-	rawScene.nodes[1]->transform.SetPosition(0.f, 0.f, 30.f);
+	fbxObject.transform.SetScale(1.0f, 1.0f, 1.0f);
+	fbxObject.transform.SetScale(0.05f, 0.05f, 0.05f);
+	//fbxObject.transform.SetRotation(90.0f, 0.0f, 0.0f);
+	fbxObject.transform.SetPosition(0.f, 0.f, 1.f);
 
-	flt::RendererObject renderable(cubeNode, isDraw, L"cube");
+	flt::Transform cubeTransform;
+	flt::RendererObject renderable(cubeTransform, cubeNode, isDraw, L"cube");
 	auto objectID1 = renderer->RegisterObject(renderable);
-	cubeNode.transform.SetPosition(0.0f, 0.0f, 0.0f);
+	renderable.transform.SetPosition(0.0f, 0.0f, 0.0f);
 
 	while (true)
 	{
@@ -172,9 +193,12 @@ int main()
 			break;
 		}
 
-		renderer->Render(1.0f);
-		rawScene.nodes[1]->transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, 0.01f);
-		cubeNode.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, -0.1f);
+		renderer->Render(0.1f);
+		//fbxObject.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, 0.01f);
+		renderable.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, -0.1f);
+
+		//fbxObject.transform.AddLocalPosition(0.0f, 0.0f, 0.01f);
+		//renderable.transform.AddLocalPosition(0.0f, 0.0f, 0.01f);
 		{
 			auto keyData = platform.GetKey(flt::KeyCode::mouseLButton);
 			if (keyData)
@@ -184,9 +208,10 @@ int main()
 				std::cout << "LL " << keyData.keyTime << " " << keyData.x << " " << keyData.y << std::endl;
 			}
 			keyData = platform.GetKey(flt::KeyCode::mouseRButton);
-			float cameraSpeed = 0.1f;
+			float cameraSpeed = 0.2f;
 			if (keyData)
 			{
+
 				keyData = platform.GetKey(flt::KeyCode::w);
 				if (keyData)
 				{
@@ -230,12 +255,12 @@ int main()
 			}
 		}
 
-		Sleep(10);
+		//Sleep(1);
 	}
 
 	renderer->DeregisterObject(objectID0);
 
-	//renderer->DeregisterObject(objectID1);
+	renderer->DeregisterObject(objectID1);
 	//renderer->DeregisterObject(objectID2);
 	platform.DestroyRenderer(renderer);
 	platform.Finalize();
