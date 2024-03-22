@@ -7,7 +7,6 @@
 
 namespace Rocket::Core
 {
-	class ITransform;
 	class ICamera;
 	class IMeshRenderer;
 	class IDynamicModelRenderer;

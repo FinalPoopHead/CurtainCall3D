@@ -43,7 +43,7 @@
       <Filter>Object\HelperObject</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
-      <Filter>Object\Camera</Filter>
+      <Filter>Component\Camera</Filter>
     </ClCompile>
     <ClCompile Include="CubeMesh.cpp">
       <Filter>Resource\Mesh\StaticMeshes\Primitive</Filter>
@@ -123,7 +123,7 @@
       <Filter>Object\HelperObject</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
-      <Filter>Object\Camera</Filter>
+      <Filter>Component\Camera</Filter>
     </ClInclude>
     <ClInclude Include="CubeMesh.h">
       <Filter>Resource\Mesh\StaticMeshes\Primitive</Filter>
@@ -229,9 +229,6 @@
     <Filter Include="Object">
       <UniqueIdentifier>{7dcc5874-dd39-4cbf-8c16-a378066fa391}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Object\Camera">
-      <UniqueIdentifier>{569834aa-0dc1-4d58-86a8-a5376e7b1fd6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Object\HelperObject">
       <UniqueIdentifier>{58879384-5c1a-44e3-9913-4dd22345d70c}</UniqueIdentifier>
     </Filter>
@@ -334,9 +331,6 @@
     <Filter Include="Resource\Mesh\SkinnedMesh">
       <UniqueIdentifier>{3841b88c-81d2-4e48-8f6b-5892ec1b3733}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Object\ModelRenderer">
-      <UniqueIdentifier>{6ae4cd4e-6ee6-456a-a2e8-112b65b8e534}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Object\CubeMap">
       <UniqueIdentifier>{b69fe248-0bba-4c99-9e53-0a598b73b05c}</UniqueIdentifier>
     </Filter>
@@ -351,6 +345,9 @@
     </Filter>
     <Filter Include="Component\MeshRenderer">
       <UniqueIdentifier>{b06c9dce-0c2e-4e80-9d78-36595b5a6d4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Camera">
+      <UniqueIdentifier>{569834aa-0dc1-4d58-86a8-a5376e7b1fd6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

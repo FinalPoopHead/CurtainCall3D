@@ -379,8 +379,6 @@ namespace Rocket::Core
 		RenderTexture();
 		RenderLine();
 
-		//_deviceContext->OMSetBlendState(nullptr, );
-		//_deviceContext->OMSetDepthStencilState();
 		RenderCubeMap();
 
 		EndRender();
