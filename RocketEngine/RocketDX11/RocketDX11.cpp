@@ -1,6 +1,7 @@
 ﻿#include <cassert>
 
 #include "RocketDX11.h"
+#include "Camera.h"
 #include "Grid.h"
 #include "Axis.h"
 #include "CubeMesh.h"
@@ -8,14 +9,15 @@
 #include "SpriteRenderer.h"
 #include "VertexShader.h"
 #include "PixelShader.h"
+#include "CubeMap.h"
 
 #include "GraphicsMacro.h"
 #include "DeviceBuilderDX11.h"
 
-#include "ResourceManager.h"
 #include "ObjectManager.h"
+#include "ResourceManager.h"
 
-#include "StaticModelRenderer.h"
+#include "MeshRenderer.h"
 #include "DynamicModelRenderer.h"
 #include "SpriteRenderer.h"
 #include "LineRenderer.h"
@@ -48,6 +50,7 @@ namespace Rocket::Core
 		_swapChain(), _backBuffer(),
 		_renderTargetView(), _depthStencilBuffer(), _depthStencilView(),
 		_viewport(),
+		_objectManager(ObjectManager::Instance()),
 		_resourceManager(ResourceManager::Instance()),
 		_axis(), _grid(),
 		_spriteBatch(), _lineBatch(), _basicEffect(),
@@ -173,38 +176,6 @@ namespace Rocket::Core
 
 		HR(_device->CreateTexture2D(&depthBufferDesc, nullptr, &_depthStencilBuffer));
 
-		D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-		//CD3D11_DEPTH_STENCIL_DESC depthStencilDesc();
-
-		// 스텐실 상태의 description을 초기화합니다.
-		ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
-
-		// 스텐실 상태의 description을 작성합니다.
-		depthStencilDesc.DepthEnable = true;
-		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-		depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-
-		depthStencilDesc.StencilEnable = true;
-		depthStencilDesc.StencilReadMask = 0xFF;
-		depthStencilDesc.StencilWriteMask = 0xFF;
-
-		// Stencil operations if pixel is front-facing.
-		depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-		depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
-		depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-		depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-
-		// Stencil operations if pixel is back-facing.
-		depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-		depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
-		depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-		depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-
-		HR(_device->CreateDepthStencilState(&depthStencilDesc, &_depthStencilState));
-
-		_deviceContext->OMSetDepthStencilState(_depthStencilState.Get(), 1);
-		//_deviceContext->OMSetDepthStencilState(_depthStencilState.Get(), 0);
-
 		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 		ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
 
@@ -215,6 +186,8 @@ namespace Rocket::Core
 
 		HR(_device->CreateDepthStencilView(_depthStencilBuffer.Get(), &depthStencilViewDesc, &_depthStencilView));
 		//HR(_device->CreateDepthStencilView(_depthStencilBuffer.Get(), NULL, &_depthStencilView));
+
+		CreateDepthStencilStates();
 
 		//BlendState Creation
 		CD3D11_BLEND_DESC tBlendDesc(D3D11_DEFAULT);
@@ -273,7 +246,7 @@ namespace Rocket::Core
 		/// RenderTargetView 와 DepthStencilBuffer를 출력 병합 단계(Output Merger Stage)에 바인딩
 		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
 
-		_deviceContext->OMSetDepthStencilState(_depthStencilState.Get(), 0);
+		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
 		////Blend State Set.
 		_deviceContext->OMSetBlendState(_defaultBlendState.Get(), nullptr, 0xFF);
 		return;
@@ -287,7 +260,7 @@ namespace Rocket::Core
 		color[0] = r;	// r
 		color[1] = g;	// g
 		color[2] = b;	// b
-		color[3] = a;	// a
+		color[3] = a;	// a                                
 		// Clear the back buffer.
 		_deviceContext->ClearRenderTargetView(_renderTargetView.Get(), color);
 		// Clear the depth buffer.
@@ -297,7 +270,7 @@ namespace Rocket::Core
 		/// RenderTargetView 와 DepthStencilBuffer를 출력 병합 단계(Output Merger Stage)에 바인딩
 		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
 
-		_deviceContext->OMSetDepthStencilState(_depthStencilState.Get(), 0);
+		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
 		////Blend State Set.
 		//_deviceContext->OMSetBlendState(_defaultBlendState.Get(), nullptr, 0xFF);
 		_deviceContext->OMSetBlendState(nullptr, nullptr, 0xFF);
@@ -327,12 +300,13 @@ namespace Rocket::Core
 			_deviceContext->VSSetConstantBuffers(bufferNumber, 1, mainCam->GetAddressOfCameraBuffer());
 		}
 
-		for (auto meshRenderer : ObjectManager::Instance().GetStaticModelRenderers())
+		// TODO : 전체 리스트에 있는 것들을 그리는 것이 아니라 현재 씬만 그려야 한다..
+		for (auto meshRenderer : _objectManager.GetStaticModelRenderers())
 		{
 			meshRenderer->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
 		}
 
-		for (auto skinnedMeshRenderer : ObjectManager::Instance().GetDynamicModelRenderers())
+		for (auto skinnedMeshRenderer : _objectManager.GetDynamicModelRenderers())
 		{
 			skinnedMeshRenderer->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
 		}
@@ -341,7 +315,7 @@ namespace Rocket::Core
 	void RocketDX11::RenderText()
 	{
 		_spriteBatch->Begin();
-		for (auto textRenderer : ObjectManager::Instance().GetTextList())
+		for (auto textRenderer : _objectManager.GetTextList())
 		{
 			textRenderer->Render(_spriteBatch);
 		}
@@ -352,7 +326,7 @@ namespace Rocket::Core
 	{
 		_spriteBatch->Begin();
 		// 이미지(UI)를 그리기 위한 함수
-		for (auto imageRenderer : ObjectManager::Instance().GetImageList())
+		for (auto imageRenderer : _objectManager.GetImageList())
 		{
 			imageRenderer->Render(_spriteBatch);
 		}
@@ -386,7 +360,7 @@ namespace Rocket::Core
 
 		Camera::GetMainCamera()->UpdateViewMatrix();
 		Camera::GetMainCamera()->UpdateProjectionMatrix();
-		//UpdateAnimation(deltaTime);
+		UpdateAnimation(deltaTime);
 	}
 
 	void RocketDX11::OnResize(int _width, int _height)
@@ -397,15 +371,17 @@ namespace Rocket::Core
 	void RocketDX11::Render()
 	{
 		BeginRender(0.0f, 0.0f, 0.0f, 1.0f);
+
 		RenderHelperObject();
 		RenderMesh();
 
 		RenderText();
 		RenderTexture();
-		//RenderLine();
+		RenderLine();
 
 		//_deviceContext->OMSetBlendState(nullptr, );
 		//_deviceContext->OMSetDepthStencilState();
+		RenderCubeMap();
 
 		EndRender();
 	}
@@ -439,21 +415,90 @@ namespace Rocket::Core
 
 		_lineBatch->Begin();
 
-		for (const auto& line : ObjectManager::Instance().GetLineRenderer()->GetLines())
+		if (_objectManager.GetLineRenderer())
 		{
-			_lineBatch->DrawLine(DirectX::VertexPositionColor(line.startPos, line.color), DirectX::VertexPositionColor(line.endPos, line.color));
+			for (const auto& line : _objectManager.GetLineRenderer()->GetLines())
+			{
+				_lineBatch->DrawLine(DirectX::VertexPositionColor(line.startPos, line.color), DirectX::VertexPositionColor(line.endPos, line.color));
+			}
 		}
 		_lineBatch->End();
 		
-		ObjectManager::Instance().GetLineRenderer()->Flush();
+		if (_objectManager.GetLineRenderer())
+		{
+			_objectManager.GetLineRenderer()->Flush();
+		}
 	}
 
 	void RocketDX11::UpdateAnimation(float deltaTime)
 	{
-		for (auto& dynamicModel : ObjectManager::Instance().GetDynamicModelRenderers())
+		for (auto& dynamicModel : _objectManager.GetDynamicModelRenderers())
 		{
 			dynamicModel->UpdateAnimation(deltaTime);
 		}
+	}
+
+	void RocketDX11::CreateDepthStencilStates()
+	{
+		/// Create Default DepthStencilState
+		D3D11_DEPTH_STENCIL_DESC defaultDepthStencilDesc;
+		//CD3D11_DEPTH_STENCIL_DESC depthStencilDesc();
+
+		// 스텐실 상태의 description을 초기화합니다.
+		ZeroMemory(&defaultDepthStencilDesc, sizeof(defaultDepthStencilDesc));
+
+		// 스텐실 상태의 description을 작성합니다.
+		defaultDepthStencilDesc.DepthEnable = true;
+		defaultDepthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		defaultDepthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+		defaultDepthStencilDesc.StencilEnable = true;
+		defaultDepthStencilDesc.StencilReadMask = 0xFF;
+		defaultDepthStencilDesc.StencilWriteMask = 0xFF;
+
+		// Stencil operations if pixel is front-facing.
+		defaultDepthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		defaultDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+		defaultDepthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		defaultDepthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+		// Stencil operations if pixel is back-facing.
+		defaultDepthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		defaultDepthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+		defaultDepthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		defaultDepthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+		HR(_device->CreateDepthStencilState(&defaultDepthStencilDesc, &_defaultDepthStencilState));
+
+		/// Create CubeMapDepthStencilState
+		D3D11_DEPTH_STENCIL_DESC cubeMapDepthStencilDesc;
+		ZeroMemory(&cubeMapDepthStencilDesc, sizeof(cubeMapDepthStencilDesc));
+
+		cubeMapDepthStencilDesc.DepthEnable = true;
+		cubeMapDepthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		cubeMapDepthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+
+		cubeMapDepthStencilDesc.StencilEnable = true;
+		cubeMapDepthStencilDesc.StencilReadMask = 0xFF;
+		cubeMapDepthStencilDesc.StencilWriteMask = 0xFF;
+
+		cubeMapDepthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		cubeMapDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+		cubeMapDepthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		cubeMapDepthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+		cubeMapDepthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		cubeMapDepthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+		cubeMapDepthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		cubeMapDepthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+		HR(_device->CreateDepthStencilState(&cubeMapDepthStencilDesc, &_cubeMapDepthStencilState));
+	}
+
+	void RocketDX11::RenderCubeMap()
+	{
+		_deviceContext->OMSetDepthStencilState(_cubeMapDepthStencilState.Get(), 0);
+		_resourceManager.GetDefaultCubeMap()->Render(_deviceContext.Get());
 	}
 
 }

@@ -7,21 +7,25 @@
 
 namespace Rocket::Core
 {
-	class ITransform;
+	class RocketTransform;
 }
 
 namespace Rocket
 {
 	class GameObject;
+	class DynamicModelRenderer;
+}
 
+namespace Rocket
+{
 	/// <summary>
-	/// GameObject에 붙을 Transform 클래스.
-	/// 
-	/// 23.06.29 강석원 인재원.
+	/// RocketTransform이라는 실제 Transform 클래스를 갖고있는 클래스.
+	/// 사실상 RocketTransform의 랩퍼 클래스다.
 	/// </summary>
 	class ROCKET_API Transform final : public Component
 	{
-		/// 생성자.
+		friend DynamicModelRenderer;
+
 	public:
 		Transform();		// 생성할 때 내 Entity가 무엇인지 저장한다.
 
@@ -110,7 +114,7 @@ namespace Rocket
 		std::vector<Transform*>& GetChildrenVec();
 
 	private:
-		Core::ITransform* _transform;
+		Core::RocketTransform* _rocketTransform;
 		Transform* _parent;
 		std::vector<Transform*> _children;
 

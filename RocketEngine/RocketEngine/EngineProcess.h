@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "DLLExporter.h"
 #include "IEngineProcess.h"
 #include <memory>
@@ -22,6 +22,7 @@ namespace Rocket::Core
 	class DebugSystem;
 	class UISystem;
 	class DataSystem;
+	class ResourceSystem;
 }
 
 namespace Rocket
@@ -36,34 +37,34 @@ namespace Rocket
 
 		/// Initialize, Finalize
 	public:
-		// ·ÎÄÏ·±Ã³ »ı¼ºÀÚ. SystemµéÀ» °¢°¢ÀÇ unique_ptr¿¡ »ı¼ºÇÑ´Ù.
+		// ë¡œì¼“ëŸ°ì²˜ ìƒì„±ì. Systemë“¤ì„ ê°ê°ì˜ unique_ptrì— ìƒì„±í•œë‹¤.
 		EngineProcess();
 
-		// ¿£Áø ÃÊ±âÈ­ ÇÔ¼ö. WindowÃ¢À» ÃÊ±âÈ­ÇÏ°í SystemµéÀ» ÃÊ±âÈ­ÇÑ´Ù.
+		// ì—”ì§„ ì´ˆê¸°í™” í•¨ìˆ˜. Windowì°½ì„ ì´ˆê¸°í™”í•˜ê³  Systemë“¤ì„ ì´ˆê¸°í™”í•œë‹¤.
 		long Initialize(void* hInstance, int nCmdShow) override;
 
-		// ¿£Áø ¸¶¹«¸® ÇÔ¼ö.
+		// ì—”ì§„ ë§ˆë¬´ë¦¬ í•¨ìˆ˜.
 		void Finalize() override;
 
-		/// ¿£Áø ¶óÀÌÇÁ»çÀÌÅ¬¿¡ °ü·ÃµÈ ÇÔ¼öµé.
+		/// ì—”ì§„ ë¼ì´í”„ì‚¬ì´í´ì— ê´€ë ¨ëœ í•¨ìˆ˜ë“¤.
 	public:
-		// ¿£ÁøÀ» ¶óÀÌÇÁ»çÀÌÅ¬¿¡ ¸ÂÃç ¹İº¹½ÃÅ²´Ù.
+		// ì—”ì§„ì„ ë¼ì´í”„ì‚¬ì´í´ì— ë§ì¶° ë°˜ë³µì‹œí‚¨ë‹¤.
 		void RunEngine() override;
 
 	private:
-		// ¿£ÁøÀ» ¶óÀÌÇÁ»çÀÌÅ¬¿¡ ¸Â°Ô 1È¸ µ¿ÀÛ½ÃÅ²´Ù.
+		// ì—”ì§„ì„ ë¼ì´í”„ì‚¬ì´í´ì— ë§ê²Œ 1íšŒ ë™ì‘ì‹œí‚¨ë‹¤.
 		void RunCycleOnce();
 
 
-		/// À©µµ¿ì °ü·Ã (Ã¢»çÀÌÁî º¯°æ, ¸¶¿ì½º ÀÔ·Â)
-		/// Resize ÇÔ¼ö.
+		/// ìœˆë„ìš° ê´€ë ¨ (ì°½ì‚¬ì´ì¦ˆ ë³€ê²½, ë§ˆìš°ìŠ¤ ì…ë ¥)
+		/// Resize í•¨ìˆ˜.
 	public:
 		void Resize(int width, int height) override;
 
-		/// Systemµé ½º¸¶Æ®Æ÷ÀÎÅÍ
-		/// ³»ºÎÀûÀ¸·Î¸¸ »ç¿ëÇÑ´Ù. ¾Æ¸¶ C4251 °æ°í°¡ ¹ß»ıÇÒ °Í.
-		/// °æ°í¸¦ ¾î¶»°Ô ÇØÁ¦ÇÒÁö Àß °í¹ÎÇØºÁ¾ß ÇÒµí.
-		/// 23.06.30 °­¼®¿ø ÀÎÀç¿ø.
+		/// Systemë“¤ ìŠ¤ë§ˆíŠ¸í¬ì¸í„°
+		/// ë‚´ë¶€ì ìœ¼ë¡œë§Œ ì‚¬ìš©í•œë‹¤. ì•„ë§ˆ C4251 ê²½ê³ ê°€ ë°œìƒí•  ê²ƒ.
+		/// ê²½ê³ ë¥¼ ì–´ë–»ê²Œ í•´ì œí• ì§€ ì˜ ê³ ë¯¼í•´ë´ì•¼ í• ë“¯.
+		/// 23.06.30 ê°•ì„ì› ì¸ì¬ì›.
 	private:
 		Rocket::Core::ObjectSystem& _objectSystem;
 		Rocket::Core::GraphicsSystem& _graphicsSystem;
@@ -75,10 +76,11 @@ namespace Rocket
 		Rocket::Core::SoundSystem& _soundSystem;
 		Rocket::Core::DebugSystem& _debugSystem;
 		Rocket::Core::UISystem& _uiSystem;
+		Rocket::Core::ResourceSystem& _resourceSystem;
 		//Rocket::Core::DataSystem& _dataSystem;
 
 
-		/// À©µµ¿ì °ü·Ã
+		/// ìœˆë„ìš° ê´€ë ¨
 	private:
 		HWND _hWnd;
 		MSG _msg;
@@ -92,7 +94,7 @@ namespace Rocket
 		BOOL InitInstance(HINSTANCE hInstance, int nCmdShow);
 		void ChangeDisplayResolution(int width, int height);
 
-		// ¸Ş½ÃÁö ÇÚµé·¯ (À©µµ Äİ¹é)
+		// ë©”ì‹œì§€ í•¸ë“¤ëŸ¬ (ìœˆë„ ì½œë°±)
 		static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 		// for Initialize

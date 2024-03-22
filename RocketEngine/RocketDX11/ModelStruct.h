@@ -9,6 +9,8 @@
 
 namespace Rocket::Core
 {
+	class RocketTransform;
+
 	class Mesh;
 	class StaticMesh;
 	class SkinnedMesh;
@@ -26,9 +28,8 @@ namespace Rocket::Core
 		// TODO : 여기에 가상 함수가 있는게 맞나?
 		virtual std::vector<Mesh*> GetMeshes();
 
-		std::string name;
-		Node* rootNode;
-		std::unordered_map<std::string, Node*> nodeMap;
+		std::string name = "";
+		Node* rootNode = nullptr;
 	};
 
 	struct StaticModel : public Model
@@ -55,20 +56,36 @@ namespace Rocket::Core
 		DirectX::XMMATRIX offsetMatrix = DirectX::XMMatrixIdentity();
 	};
 
+	// TODO : 여기다가 Transform을 넣으면 되지 않을까?
 	// structure to hold node hierarchy
 	struct Node
 	{
 		std::string name = "";
 		int index = -1;
 		Bone* bindedBone = nullptr;
+		RocketTransform* transform = nullptr;
 		DirectX::XMMATRIX transformMatrix = DirectX::XMMatrixIdentity();
+		DirectX::XMMATRIX worldTM = DirectX::XMMatrixIdentity();
 		Node* parent = nullptr;
 		std::vector<Node*> children = {};
+
+		void CalcWorldMatrix()
+		{
+			if (parent)
+			{
+				worldTM = transformMatrix * parent->GetWorldMatrix();
+			}
+			else
+			{
+				worldTM = transformMatrix;
+			}
+		}
 
 		DirectX::XMMATRIX GetWorldMatrix()
 		{
 			if (parent)
 			{
+
 				return transformMatrix * parent->GetWorldMatrix();
 			}
 			else
@@ -83,9 +100,9 @@ namespace Rocket::Core
 	{
 		std::string nodeName;
 
-		std::vector<float> positionTimestamps = {};
-		std::vector<float> rotationTimestamps = {};
-		std::vector<float> scaleTimestamps = {};
+		std::vector<double> positionTimestamps = {};
+		std::vector<double> rotationTimestamps = {};
+		std::vector<double> scaleTimestamps = {};
 
 		std::vector<Vector3> positions = {};
 		std::vector<Vector4> rotations = {};
@@ -96,8 +113,8 @@ namespace Rocket::Core
 	struct Animation
 	{
 		std::string name = "";
-		float duration = 0.0f;
-		float ticksPerSecond = 1.0f;
+		double duration = 0.0;
+		double ticksPerSecond = 1.0;
 		float accumulatedTime = 0.0f;
 		std::vector<NodeAnimationData*> nodeAnimations;
 	};

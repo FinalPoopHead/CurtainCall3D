@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <PxPhysics.h>
 #include <PxPhysicsAPI.h>
 #include <extensions/PxDefaultAllocator.h>
@@ -24,7 +24,7 @@ namespace Rocket::Core
 	{
 		friend Singleton;
 	private:
-		PhysicsSystem() = default;		// ½Ì±ÛÅÏÀÌ±â ¶§¹®¿¡ ¿ÜºÎ¿¡¼­ »ı¼ºÇÒ ¼ö ¾øµµ·Ï.
+		PhysicsSystem();		// ì‹±ê¸€í„´ì´ê¸° ë•Œë¬¸ì— ì™¸ë¶€ì—ì„œ ìƒì„±í•  ìˆ˜ ì—†ë„ë¡.
 
 	public:
 		void Initialize();
@@ -73,6 +73,5 @@ namespace Rocket::Core
 		physx::PxScene* _pxScene;
 		physx::PxMaterial* _material;
 		physx::PxPvd* _pvd;
-
 	};
 }

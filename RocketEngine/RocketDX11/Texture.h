@@ -19,7 +19,7 @@ namespace Rocket::Core
 
 	public:
 		void Shutdown();
-		ID3D11ShaderResourceView* GetTexture();
+		ID3D11ShaderResourceView* GetTextureView();
 		ID3D11ShaderResourceView** GetAddressOfTextureView();
 
 	private:

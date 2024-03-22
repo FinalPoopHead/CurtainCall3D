@@ -20,12 +20,17 @@ void TestScene::Initialize()
 	scene->GetMainCamera()->GetCamera().SetAsMainCamera();
 
 	/// 스태틱 메쉬 테스트
-// 	auto staticTest = scene->CreateObject("StaticTest");
-// 	staticTest->transform.SetPosition(1.0f, 0.0f, 0.0f);
-// 	auto staticTestRenderer = staticTest->AddComponent<Rocket::StaticModelRenderer>();
-// 	staticTestRenderer->SetMesh("SK_TP_CH_Default.fbx");
-// 	staticTestRenderer->SetTexture("T_TP_CH_Camo_006_003_D.png");
-// 	staticTest->AddComponent<PlayerController>();
+	/*
+	auto staticTest = scene->CreateObject("StaticTest");
+	staticTest->transform.SetPosition(1.0f, 0.0f, 0.0f);
+	auto staticTestRenderer = staticTest->AddComponent<Rocket::MeshRenderer>();
+	staticTestRenderer->SetMesh("SK_TP_CH_Default.fbx");
+	staticTestRenderer->SetTexture("T_TP_CH_Camo_006_003_D.png");
+	staticTest->AddComponent<PlayerController>();
+	*/
+
+	auto staticTest = scene->CreateModelObject("SK_TP_CH_Default.fbx");
+	staticTest->transform.SetPosition(1.0f, 0.0f, 0.0f);
 
 	/// 스태틱 메쉬 노드 하이어라키 테스트
 // 	auto boxTest = scene->CreateObject("boxTest");
@@ -36,11 +41,42 @@ void TestScene::Initialize()
 
 
 	/// 스킨드 메쉬 테스트
-	auto skinnedTest = scene->CreateObject("SkinnedTest");
-	auto skinnedMeshRenderer = skinnedTest->AddComponent<Rocket::DynamicModelRenderer>();
+	/*
+	auto skinnedTest1 = scene->CreateObject("SkinnedTest1");
+	auto skinnedMeshRenderer1 = skinnedTest1->AddComponent<Rocket::DynamicModelRenderer>();
+	skinnedTest1->transform.SetScale(0.05f, 0.05f, 0.05f);
+	skinnedTest1->transform.Translate(3.0f, 0.0f, 0.0f);
+	skinnedMeshRenderer1->LoadModel("A_TP_CH_Sprint_F.fbx");
+	skinnedMeshRenderer1->SetTexture("T_TP_CH_Camo_001_006_D.png");
+
+	auto skinnedTest2 = scene->CreateObject("SkinnedTest2");
+	auto skinnedMeshRenderer2 = skinnedTest2->AddComponent<Rocket::DynamicModelRenderer>();
+	skinnedTest2->transform.SetScale(0.005f, 0.005f, 0.005f);
+	skinnedTest2->transform.Translate(-3.0f, 0.0f, 0.0f);
+	skinnedMeshRenderer2->LoadModel("Dying.fbx" );
+	skinnedMeshRenderer2->SetTexture("T_TP_CH_Camo_001_006_D.png");
+	*/
+
+	auto skinnedTest1 = scene->CreateModelObject("Rob02.fbx");
+	skinnedTest1->transform.Translate(0.0f, 0.0f, 3.0f);
+	
+	auto skinnedTest2 = scene->CreateModelObject("A_TP_CH_Sprint_F.fbx");
+	skinnedTest2->transform.SetScale(0.05f, 0.05f, 0.05f);
+	skinnedTest2->transform.Translate(3.0f, 0.0f, 0.0f);
+
+ 	auto skinnedTest3 = scene->CreateModelObject("Dying.fbx");
+ 	skinnedTest3->transform.SetScale(0.005f, 0.005f, 0.005f);
+ 	skinnedTest3->transform.Translate(-3.0f, 0.0f, 0.0f);
+
+	/*
+	auto skinnedTest3 = scene->CreateObject("SkinnedTest");
+	auto skinnedMeshRenderer3 = skinnedTest3->AddComponent<Rocket::DynamicModelRenderer>();
 	//skinnedMeshRenderer->SetMesh("A_TP_CH_Sprint_F.fbx");
-	skinnedMeshRenderer->SetMesh("A_TP_CH_Breathing.fbx");
-	skinnedMeshRenderer->SetTexture("T_TP_CH_Camo_001_006_D.png");
+	skinnedTest3->transform.SetScale(0.01f, 0.01f, 0.01f);
+	//skinnedMeshRenderer->SetMesh("Dying.fbx");
+	skinnedMeshRenderer3->SetMesh("Monster2.fbx");
+	skinnedMeshRenderer3->SetTexture("T_TP_CH_Camo_001_006_D.png");
+	*/
 
 	/// 텍스트 테스트
 // 	auto text = scene->CreateObject("text");

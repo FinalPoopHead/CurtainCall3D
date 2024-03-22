@@ -4,9 +4,9 @@
 #include <vector>
 #include <memory>
 #include <unordered_map>
-#include "../GraphicsInterface/IDX11Renderer.h"
-#include "../GraphicsInterface/IFactory.h"
-#include "../GraphicsInterface/IGraphicsSystem.h"
+#include "../RocketCommon/IDX11Renderer.h"
+#include "../RocketCommon/IFactory.h"
+#include "../RocketCommon/IResourceManager.h"
 #define GRAPHICSDLL_PATH (L"RocketDX11.dll")
 
 namespace Rocket::Core
@@ -14,12 +14,10 @@ namespace Rocket::Core
 	class IRenderable;
 	class ISketchable;
 	class RenderConstantData;
-}
 
-namespace Rocket::Core
-{
 	class ModelRendererBase;
 	class UIRenderer;
+	class ResourceSystem;
 }
 
 namespace Rocket
@@ -36,9 +34,10 @@ namespace Rocket
 /// </summary>
 namespace Rocket::Core
 {
-	class GraphicsSystem : public Singleton<GraphicsSystem>, public IGraphicsSystem
+	class GraphicsSystem : public Singleton<GraphicsSystem>
 	{
 		friend Singleton;
+		friend ResourceSystem;
 	private:
 		GraphicsSystem();		// 싱글턴이기 때문에 외부에서 생성할 수 없도록.
 
@@ -84,6 +83,7 @@ namespace Rocket::Core
 		HMODULE hGraphicsModule;
 		std::unique_ptr<Rocket::Core::IDX11Renderer> _rocketGraphics;
 		std::unique_ptr<Rocket::Core::IFactory> _factory;
+		Rocket::Core::IResourceManager* _resourceManager;
 
 	public:
 		void AddToList(Component* comp);

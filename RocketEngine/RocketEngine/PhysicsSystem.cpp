@@ -1,4 +1,4 @@
-#include "PhysicsSystem.h"
+ï»¿#include "PhysicsSystem.h"
 #include "SceneSystem.h"
 #include "Scene.h"
 #include "GameObject.h"
@@ -16,38 +16,54 @@
 
 namespace Rocket::Core
 {
+	PhysicsSystem::PhysicsSystem()
+		: _rigidDynamics(),
+		_rigidStatics(),
+		_fixedJoints(),
+		_allocator(),
+		_errorCallback(),
+		_foundation(),
+		_physics(),
+		_dispatcher(),
+		_pxScene(),
+		_material(),
+		_pvd()
+	{
+
+	}
+
 	void PhysicsSystem::Initialize()
 	{
 		_foundation = PxCreateFoundation(PX_PHYSICS_VERSION, _allocator, _errorCallback);
 
-		// visual debugger ¼¼ÆÃ, ·ÎÄÃ¿¡ ¿¬°á
+		// visual debugger ì„¸íŒ…, ë¡œì»¬ì— ì—°ê²°
 		_pvd = PxCreatePvd(*_foundation);
 		physx::PxPvdTransport* transport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
 		_pvd->connect(*transport, physx::PxPvdInstrumentationFlag::eDEBUG);
 
-		// ¹öÀü, ¼¼ÆÃ, ´ÜÀ§ µîÀÇ Á¤º¸¸¦ ´ãÀº ¹°¸®
+		// ë²„ì „, ì„¸íŒ…, ë‹¨ìœ„ ë“±ì˜ ì •ë³´ë¥¼ ë‹´ì€ ë¬¼ë¦¬
 		_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *_foundation, physx::PxTolerancesScale(), true, _pvd);
 		_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *_foundation, physx::PxTolerancesScale(), true, nullptr);
 
 		//PxInitExtensions(*_physics, _pvd);
 
-		// ¹°¸® ¾ÀÀ» »ı¼º
+		// ë¬¼ë¦¬ ì”¬ì„ ìƒì„±
 		CreatePhysXScene();
 
-		// ¸ÓÆ¼¸®¾ó »ı¼º(ÀÓÀÇ)
+		// ë¨¸í‹°ë¦¬ì–¼ ìƒì„±(ì„ì˜)
 		_material = _physics->createMaterial(0.25f, 0.2f, 0.4f);
 
-		// collider ÀüºÎ ¸¸µé±â.
+		// collider ì „ë¶€ ë§Œë“¤ê¸°.
 		MakeAllCollider();
 	}
 
 	void PhysicsSystem::Finalize()
 	{
-		// initPhysics¿¡¼­ ÃÊ±âÈ­ÇØÁØ Àü¿ª º¯¼öµéÀ» release
+		// initPhysicsì—ì„œ ì´ˆê¸°í™”í•´ì¤€ ì „ì—­ ë³€ìˆ˜ë“¤ì„ release
 		PX_RELEASE(_pxScene);
 		PX_RELEASE(_dispatcher);
 		PX_RELEASE(_physics);
-		// visual debuggerµµ release
+		// visual debuggerë„ release
 		if (_pvd)
 		{
 			physx::PxPvdTransport* transport = _pvd->getTransport();
@@ -59,16 +75,16 @@ namespace Rocket::Core
 
 	void PhysicsSystem::CreatePhysXScene()
 	{
-		// ¾À¿¡ ´ëÇÑ ¼³Á¤
+		// ì”¬ì— ëŒ€í•œ ì„¤ì •
 		physx::PxSceneDesc sceneDesc(_physics->getTolerancesScale());
-		// ÀÓÀÇ·Î Áß·ÂÀ» 2¹è·Î Çß´Ù. 23.8.16.AJY.		3¹è·Î ´Ã¸² ¤¾¤¾
+		// ì„ì˜ë¡œ ì¤‘ë ¥ì„ 2ë°°ë¡œ í–ˆë‹¤. 23.8.16.AJY.		3ë°°ë¡œ ëŠ˜ë¦¼ ã…ã…
 		sceneDesc.gravity = physx::PxVec3(0.0f, -29.43f, 0.0f);
 		_dispatcher = physx::PxDefaultCpuDispatcherCreate(2);
 		sceneDesc.cpuDispatcher = _dispatcher;
 		sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
 		_pxScene = _physics->createScene(sceneDesc);
 
-		// Pvd¿¡ Á¤º¸ º¸³»±â
+		// Pvdì— ì •ë³´ ë³´ë‚´ê¸°
 		physx::PxPvdSceneClient* pvdClient = _pxScene->getScenePvdClient();
 		if (pvdClient)
 		{
@@ -88,12 +104,12 @@ namespace Rocket::Core
 				return;
 			}
 
-			// TODO : Scene¿¡ µû¶ó physX Scene µµ °³º°ÀûÀ¸·Î ¸¸µå´Â°Ô ÁÁÀ» µí.
+			// TODO : Sceneì— ë”°ë¼ physX Scene ë„ ê°œë³„ì ìœ¼ë¡œ ë§Œë“œëŠ”ê²Œ ì¢‹ì„ ë“¯.
 
 			for (auto& object : sceneIter.second->GetOriginalList())
 			{
-				// °¢°¢ÀÇ °´Ã¼°¡ º»ÀÎµéÀ» ±×¸®´Â °ÍÀÌ ¾Æ´Ñ
-				// RenderSystem¿¡¼­ °¢°¢ÀÇ °´Ã¼ÀÇ Á¤º¸¸¦ ¹ÙÅÁÀ¸·Î Graphics¿¡°Ô ±×¸®¶ó°í ½ÃÅ°´Â °Í
+				// ê°ê°ì˜ ê°ì²´ê°€ ë³¸ì¸ë“¤ì„ ê·¸ë¦¬ëŠ” ê²ƒì´ ì•„ë‹Œ
+				// RenderSystemì—ì„œ ê°ê°ì˜ ê°ì²´ì˜ ì •ë³´ë¥¼ ë°”íƒ•ìœ¼ë¡œ Graphicsì—ê²Œ ê·¸ë¦¬ë¼ê³  ì‹œí‚¤ëŠ” ê²ƒ
 				// object->GetRenderData();
 
 				MakePlaneCollider(object);
@@ -102,7 +118,7 @@ namespace Rocket::Core
 				MakeCapsuleCollider(object);
 				MakeStaticBoxCollider(object);
 			}
-		// fixedJoint¸¦ Àá±ñ Ãß°¡ÇØº¸ÀÚ
+		// fixedJointë¥¼ ì ê¹ ì¶”ê°€í•´ë³´ì
 		//_fixedJoints.push_back(MakeFixedJoint(player, plBody));
 		//_fixedJoints.push_back(MakeFixedJoint(player, plHead));
 		MakeFixedJoint();
@@ -114,7 +130,7 @@ namespace Rocket::Core
 	{
 		Rocket::Collider* temp = object->GetComponent<Rocket::PlaneCollider>();
 		
-		// PlaneCollider »ı¼º
+		// PlaneCollider ìƒì„±
 		if (temp)
 		{
 			auto colvec = object->GetComponents<Rocket::PlaneCollider>();
@@ -139,7 +155,7 @@ namespace Rocket::Core
 	{
 		Rocket::Collider* temp = object->GetComponent<Rocket::BoxCollider>();
 
-		// boxCollider »ı¼º
+		// boxCollider ìƒì„±
 		if (temp)
 		{
 			auto colvec = object->GetComponents<Rocket::BoxCollider>();
@@ -180,7 +196,7 @@ namespace Rocket::Core
 	{
 		Rocket::Collider* temp = object->GetComponent<Rocket::SphereCollider>();
 
-		// SphereCollider »ı¼º
+		// SphereCollider ìƒì„±
 		if (temp)
 		{
 			auto colvec = object->GetComponents<Rocket::SphereCollider>();
@@ -220,7 +236,7 @@ namespace Rocket::Core
 	{
 		Rocket::Collider* temp = object->GetComponent<Rocket::CapsuleCollider>();
 
-		// CapsuleCollider »ı¼º
+		// CapsuleCollider ìƒì„±
 		if (temp)
 		{
 			auto colvec = object->GetComponents<Rocket::CapsuleCollider>();
@@ -258,7 +274,7 @@ namespace Rocket::Core
 	{
 		Rocket::Collider* temp = object->GetComponent<Rocket::StaticBoxCollider>();
 
-		// StaticBoxCollider »ı¼º
+		// StaticBoxCollider ìƒì„±
 		if (temp)
 		{
 			auto colvec = object->GetComponents<Rocket::StaticBoxCollider>();
@@ -289,7 +305,7 @@ namespace Rocket::Core
 		//int i = 0;
 		//if (colliders[0] != nullptr)
 		//{
-		//	// StaticBoxCollider »ı¼º
+		//	// StaticBoxCollider ìƒì„±
 		//	for (const auto& col : colliders)
 		//	{
 		//		Rocket::StaticBoxCollider* staticBoxCol = dynamic_cast<Rocket::StaticBoxCollider*>(colliders[i++]);
@@ -314,11 +330,11 @@ namespace Rocket::Core
 
 	physx::PxFixedJoint* PhysicsSystem::MakeFixedJoint(physx::PxRigidDynamic* actor1, physx::PxRigidDynamic* actor2)
 	{
-		// actor1°ú actor2ÀÇ collider¸¦ ¹Ş¾Æ¿Â´Ù.
+		// actor1ê³¼ actor2ì˜ colliderë¥¼ ë°›ì•„ì˜¨ë‹¤.
 		//Rocket::BoxCollider* tempBox1 = static_cast<Rocket::BoxCollider*>(actor1->userData);
 		Rocket::CapsuleCollider* tempBox1 = static_cast<Rocket::CapsuleCollider*>(actor1->userData);
 		Rocket::DynamicCollider* tempBox2 = static_cast<Rocket::DynamicCollider*>(actor2->userData);
-		// actor2ÀÇ yÁÂÇ¥¸¦ (ÀÚ½ÅÀÇ localPosition + actor1ÀÇ ³ôÀÌ Àı¹İ) À¸·Î °íÁ¤ÇÑ´Ù. ³ª¸ÓÁö Á¤º¸´Â Identity·Î °íÁ¤.
+		// actor2ì˜ yì¢Œí‘œë¥¼ (ìì‹ ì˜ localPosition + actor1ì˜ ë†’ì´ ì ˆë°˜) ìœ¼ë¡œ ê³ ì •í•œë‹¤. ë‚˜ë¨¸ì§€ ì •ë³´ëŠ” Identityë¡œ ê³ ì •.
 		physx::PxTransform tempTransform(physx::PxIdentity);
 		tempTransform.p.y = (*tempBox2).gameObject->transform.GetLocalPosition().y + (*tempBox1).GetHalfHeight()
 			+ (*tempBox1).GetRadius();
@@ -385,16 +401,16 @@ namespace Rocket::Core
 
 		Rocket::Collider* hitCol = nullptr;
 
-		// ¸Â¾Ò´ÂÁö¸¦ ÆÇÁ¤.
+		// ë§ì•˜ëŠ”ì§€ë¥¼ íŒì •.
 		physx::PxRaycastBuffer _hit;
 		bool hitSomething = _pxScene->raycast(rayOrigin, rayDirection, length, _hit);
 
-		// ¸Â¾ÒÀ» ¶§ÀÇ µ¿ÀÛ. È÷Æ® ´ë»óÀÇ Æ÷ÀÎÅÍ, È÷Æ® À§Ä¡, ¼¼ºÎµ¿ÀÛ.
+		// ë§ì•˜ì„ ë•Œì˜ ë™ì‘. íˆíŠ¸ ëŒ€ìƒì˜ í¬ì¸í„°, íˆíŠ¸ ìœ„ì¹˜, ì„¸ë¶€ë™ì‘.
 		if (hitSomething)
 		{
-			physx::PxRigidActor* hitActor = _hit.block.actor;	// Ãæµ¹ÇÑ ¹°Ã¼ÀÇ actorÀÇ Æ÷ÀÎÅÍ
+			physx::PxRigidActor* hitActor = _hit.block.actor;	// ì¶©ëŒí•œ ë¬¼ì²´ì˜ actorì˜ í¬ì¸í„°
 
-			// ¹Ù´ÚÀÌ¶û Ãæµ¹ÇÑ °æ¿ì¿¡ ´ëÇÑ ¿¹¿Ü Ã³¸®.
+			// ë°”ë‹¥ì´ë‘ ì¶©ëŒí•œ ê²½ìš°ì— ëŒ€í•œ ì˜ˆì™¸ ì²˜ë¦¬.
 			if (hitActor->getType() == physx::PxActorType::eRIGID_STATIC)
 			{
 				hitActor = static_cast<physx::PxRigidStatic*>(hitActor);
@@ -414,12 +430,12 @@ namespace Rocket::Core
 
 			//physx::PxRigidDynamic* hitRigid = static_cast<physx::PxRigidDynamic*>(hitActor);
 
-			// ÇÇ°İ Á¤º¸¸¦ userdata¿¡ ÀúÀå
+			// í”¼ê²© ì •ë³´ë¥¼ userdataì— ì €ì¥
 			hitCol = static_cast<Rocket::Collider*>(hitActor->userData);
 
 			//hitCol->Collide();
 
-			// ¸Â´Â À§Ä¡µµ º¸³»¼­ ÆÄÆ¼Å¬ ÅÍ¶ß·Á¾ß ÇÔ.
+			// ë§ëŠ” ìœ„ì¹˜ë„ ë³´ë‚´ì„œ íŒŒí‹°í´ í„°ëœ¨ë ¤ì•¼ í•¨.
 			physx::PxVec3 hitPoint = _hit.block.position;
 		}
 
@@ -428,11 +444,11 @@ namespace Rocket::Core
 
 	void PhysicsSystem::PhysicsUpdate(float deltaTime)
 	{
-		// delta time ±â¹İ ½Ã¹Ä·¹ÀÌ¼Ç.
+		// delta time ê¸°ë°˜ ì‹œë®¬ë ˆì´ì…˜.
 		_pxScene->simulate(deltaTime);
 		_pxScene->fetchResults(true);
 
-		// °¢°¢ÀÇ GameObjectµé¿¡°Ô ¹°¸® ÀÌº¥Æ® ¹ß»ı.
+		// ê°ê°ì˜ GameObjectë“¤ì—ê²Œ ë¬¼ë¦¬ ì´ë²¤íŠ¸ ë°œìƒ.
 		for (auto& rigid : _rigidDynamics)
 		{
 			Rocket::DynamicCollider* col = static_cast<Rocket::DynamicCollider*>(rigid->userData);
@@ -452,7 +468,7 @@ namespace Rocket::Core
 			}
 		}
 
-		// ¹°¸® ¿¬»ê °á°ú¸¦ ¿ÀºêÁ§Æ®¿¡ Àû¿ë.
+		// ë¬¼ë¦¬ ì—°ì‚° ê²°ê³¼ë¥¼ ì˜¤ë¸Œì íŠ¸ì— ì ìš©.
 		Vector3 pos;
 		Quaternion quat;
 

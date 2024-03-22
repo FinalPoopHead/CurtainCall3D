@@ -31,6 +31,12 @@
     <FxCompile Include="SkinnedMeshPS.hlsl">
       <Filter>Resource\Shader\HLSL\SkinnedMesh</Filter>
     </FxCompile>
+    <FxCompile Include="CubeMapVS.hlsl">
+      <Filter>Resource\Shader\HLSL\CubeMap</Filter>
+    </FxCompile>
+    <FxCompile Include="CubeMapPS.hlsl">
+      <Filter>Resource\Shader\HLSL\CubeMap</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Axis.cpp">
@@ -69,8 +75,8 @@
     <ClCompile Include="RocketDX11.cpp">
       <Filter>GraphicsProcess</Filter>
     </ClCompile>
-    <ClCompile Include="StaticModelRenderer.cpp">
-      <Filter>Object\ModelRenderer\StaticModelRenderer</Filter>
+    <ClCompile Include="MeshRenderer.cpp">
+      <Filter>Component\MeshRenderer</Filter>
     </ClCompile>
     <ClCompile Include="TextRenderer.cpp">
       <Filter>Object\TextObject</Filter>
@@ -99,11 +105,8 @@
     <ClCompile Include="SkinnedMesh.cpp">
       <Filter>Resource\Mesh\SkinnedMesh</Filter>
     </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>Component\Transform</Filter>
-    </ClCompile>
     <ClCompile Include="DynamicModelRenderer.cpp">
-      <Filter>Object\ModelRenderer\DynamicModelRenderer</Filter>
+      <Filter>Component\DynamicModelRenderer</Filter>
     </ClCompile>
     <ClCompile Include="StaticMesh.cpp">
       <Filter>Resource\Mesh\StaticMeshes\StaticMesh</Filter>
@@ -164,8 +167,8 @@
     <ClInclude Include="GraphicsMacro.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="StaticModelRenderer.h">
-      <Filter>Object\ModelRenderer\StaticModelRenderer</Filter>
+    <ClInclude Include="MeshRenderer.h">
+      <Filter>Component\MeshRenderer</Filter>
     </ClInclude>
     <ClInclude Include="TextRenderer.h">
       <Filter>Object\TextObject</Filter>
@@ -206,11 +209,8 @@
     <ClInclude Include="SkinnedMesh.h">
       <Filter>Resource\Mesh\SkinnedMesh</Filter>
     </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>Component\Transform</Filter>
-    </ClInclude>
     <ClInclude Include="DynamicModelRenderer.h">
-      <Filter>Object\ModelRenderer\DynamicModelRenderer</Filter>
+      <Filter>Component\DynamicModelRenderer</Filter>
     </ClInclude>
     <ClInclude Include="StaticMesh.h">
       <Filter>Resource\Mesh\StaticMeshes\StaticMesh</Filter>
@@ -313,12 +313,6 @@
     <Filter Include="GraphicsProcess\Builder">
       <UniqueIdentifier>{019b1634-5a7c-4c1d-a75b-6f62aa5f71e2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Component">
-      <UniqueIdentifier>{38971765-e48e-41bc-b21b-d52fbd0feb59}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Component\Transform">
-      <UniqueIdentifier>{8f1b0f81-d5a9-451d-abf3-fc25780e3330}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource\Shader\HLSL\SkinnedMesh">
       <UniqueIdentifier>{a2656c4f-0de9-4c9a-be05-d5876d4313b1}</UniqueIdentifier>
     </Filter>
@@ -343,14 +337,20 @@
     <Filter Include="Object\ModelRenderer">
       <UniqueIdentifier>{6ae4cd4e-6ee6-456a-a2e8-112b65b8e534}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Object\ModelRenderer\StaticModelRenderer">
-      <UniqueIdentifier>{b06c9dce-0c2e-4e80-9d78-36595b5a6d4d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Object\ModelRenderer\DynamicModelRenderer">
-      <UniqueIdentifier>{51bf0425-9c14-4153-a750-4f08ac11fce2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Object\CubeMap">
       <UniqueIdentifier>{b69fe248-0bba-4c99-9e53-0a598b73b05c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Shader\HLSL\CubeMap">
+      <UniqueIdentifier>{2f2126ff-2452-470f-8b0e-1ff1900dc15b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component">
+      <UniqueIdentifier>{c6a26206-7bd0-412c-9938-aae0cc791990}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\DynamicModelRenderer">
+      <UniqueIdentifier>{51bf0425-9c14-4153-a750-4f08ac11fce2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\MeshRenderer">
+      <UniqueIdentifier>{b06c9dce-0c2e-4e80-9d78-36595b5a6d4d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -22,6 +22,9 @@ constexpr const char* FACTORY_CREATE_NAME = "CreateGraphicsObjectFactory";
 #define FACTORY_RELEASE_SIGNATURE void(*)(Rocket::Core::IFactory*)
 #define FACTORY_RELEASE_NAME "ReleaseFactory"
 
+using GET_RESOURCEMANAGER_SIGNATURE = Rocket::Core::IResourceManager* (*)(void);
+constexpr const char* GET_RESOURCEMANAGER_NAME = "GetResourceManager";
+
 namespace Rocket::Core
 {
 	GraphicsSystem::GraphicsSystem()
@@ -37,6 +40,7 @@ namespace Rocket::Core
 
 		_rocketGraphics.reset((reinterpret_cast<GRAPHICS_CREATE_SIGNATURE>(GetProcAddress(hGraphicsModule, GRAPHICS_CREATE_NAME)))());
 		_factory.reset((reinterpret_cast<FACTORY_CREATE_SIGNATURE>(GetProcAddress(hGraphicsModule, FACTORY_CREATE_NAME)))());
+		_resourceManager = (reinterpret_cast<GET_RESOURCEMANAGER_SIGNATURE>(GetProcAddress(hGraphicsModule, GET_RESOURCEMANAGER_NAME)))();
 	}
 
 	void GraphicsSystem::Initialize(HWND hWnd, int screenWidth, int screenHeight, bool isEditor /*= false*/)
@@ -52,6 +56,7 @@ namespace Rocket::Core
 	void GraphicsSystem::Finalize()
 	{
 		reinterpret_cast<GRAPHICS_RELEASE_SIGNATURE>(GetProcAddress(hGraphicsModule, GRAPHICS_RELEASE_NAME))(_rocketGraphics.release());
+		reinterpret_cast<FACTORY_RELEASE_SIGNATURE>(GetProcAddress(hGraphicsModule, FACTORY_RELEASE_NAME))(_factory.release());
 		FreeLibrary(hGraphicsModule);
 	}
 

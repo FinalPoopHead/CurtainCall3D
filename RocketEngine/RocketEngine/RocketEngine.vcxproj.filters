@@ -46,39 +46,6 @@
     <Filter Include="Component\AudioClip\RocketAudio">
       <UniqueIdentifier>{0062c001-16c1-4bdc-b12e-824fdca53de8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="System">
-      <UniqueIdentifier>{16b11710-e714-4506-9403-7489d6e5aa0d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="System\ObjectSystem">
-      <UniqueIdentifier>{51532ac2-f77c-4a40-a6a2-8b927580aef1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="System\EventSystem">
-      <UniqueIdentifier>{f6d4936b-4a81-468f-b773-0f2b01bb9d85}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="System\SceneSystem">
-      <UniqueIdentifier>{9412c5f7-4da0-487d-8755-03576fab53bf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="System\TimeSystem">
-      <UniqueIdentifier>{7ebf76c0-4136-413a-bf5b-ad9b5ce791bc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="System\InputSystem">
-      <UniqueIdentifier>{ae9de3e2-e80e-462e-814a-193ff14622af}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="System\TweenSystem">
-      <UniqueIdentifier>{8fe6be2c-8576-4f34-9610-a95557399ebb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="System\PhysicsSystem">
-      <UniqueIdentifier>{c649ab5e-7aaf-47f0-af69-2774bf26aba3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="System\SoundSystem">
-      <UniqueIdentifier>{7046ace3-7dca-474e-b565-65780bb86bbf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="System\DebugSystem">
-      <UniqueIdentifier>{df5329ff-4bcd-4e97-ae9a-2f22f85a7262}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="System\0_Singleton">
-      <UniqueIdentifier>{763abdf6-a9db-4932-b10e-dd4d8d2124b7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scene">
       <UniqueIdentifier>{0ac74e06-c5b8-4844-ad19-c955e8c11c14}</UniqueIdentifier>
     </Filter>
@@ -130,9 +97,6 @@
     <Filter Include="Component\Light\SpotLight">
       <UniqueIdentifier>{3aa5f243-ea89-42d2-8c66-19816cad0223}</UniqueIdentifier>
     </Filter>
-    <Filter Include="System\UISystem">
-      <UniqueIdentifier>{a6df6206-d72d-4f8b-ba3f-0a45b411341c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="0_Include\ForEditorAPI">
       <UniqueIdentifier>{f71cadf4-aa94-4fe2-a18e-ccc6f6adc83e}</UniqueIdentifier>
     </Filter>
@@ -157,20 +121,8 @@
     <Filter Include="00_Deprecated">
       <UniqueIdentifier>{98f3886e-2707-46da-8e63-ac34ce89915d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="System\DataSystem">
-      <UniqueIdentifier>{55ec3fdd-8059-4445-af94-2cc10ac17386}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="System\DataSystem\DataStruct">
-      <UniqueIdentifier>{d56bffaa-79c0-4903-ad68-dcf197877ecd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="System\DataSystem\DataSystem">
-      <UniqueIdentifier>{7dc47b8d-4054-482a-9901-11daddd445bf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="MathHeader">
       <UniqueIdentifier>{721eab2b-8d12-45a1-a9f3-238025499900}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="System\GraphicsSystem">
-      <UniqueIdentifier>{1554353f-8156-49ee-8340-7690958d55ed}</UniqueIdentifier>
     </Filter>
     <Filter Include="Component\Renderer\Model">
       <UniqueIdentifier>{7998041d-194f-4581-8e19-38f64ac9dea5}</UniqueIdentifier>
@@ -178,11 +130,62 @@
     <Filter Include="Component\Renderer\Model\BaseClass">
       <UniqueIdentifier>{023f3669-3073-45ee-91ac-c1e75cd0c8c0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Component\Renderer\Model\MeshRenderer">
-      <UniqueIdentifier>{ca4d48c7-1965-4fdf-bf7b-ded7efe3dc5b}</UniqueIdentifier>
+    <Filter Include="System&amp;Manager">
+      <UniqueIdentifier>{16b11710-e714-4506-9403-7489d6e5aa0d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Component\Renderer\Model\SkinnedMeshRenderer">
+    <Filter Include="System&amp;Manager\ObjectSystem">
+      <UniqueIdentifier>{51532ac2-f77c-4a40-a6a2-8b927580aef1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System&amp;Manager\EventSystem">
+      <UniqueIdentifier>{f6d4936b-4a81-468f-b773-0f2b01bb9d85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System&amp;Manager\SceneSystem">
+      <UniqueIdentifier>{9412c5f7-4da0-487d-8755-03576fab53bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System&amp;Manager\TimeSystem">
+      <UniqueIdentifier>{7ebf76c0-4136-413a-bf5b-ad9b5ce791bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System&amp;Manager\InputSystem">
+      <UniqueIdentifier>{ae9de3e2-e80e-462e-814a-193ff14622af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System&amp;Manager\TweenSystem">
+      <UniqueIdentifier>{8fe6be2c-8576-4f34-9610-a95557399ebb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System&amp;Manager\PhysicsSystem">
+      <UniqueIdentifier>{c649ab5e-7aaf-47f0-af69-2774bf26aba3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System&amp;Manager\SoundSystem">
+      <UniqueIdentifier>{7046ace3-7dca-474e-b565-65780bb86bbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System&amp;Manager\DebugSystem">
+      <UniqueIdentifier>{df5329ff-4bcd-4e97-ae9a-2f22f85a7262}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System&amp;Manager\0_Singleton">
+      <UniqueIdentifier>{763abdf6-a9db-4932-b10e-dd4d8d2124b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System&amp;Manager\UISystem">
+      <UniqueIdentifier>{a6df6206-d72d-4f8b-ba3f-0a45b411341c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System&amp;Manager\DataSystem">
+      <UniqueIdentifier>{55ec3fdd-8059-4445-af94-2cc10ac17386}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System&amp;Manager\DataSystem\DataStruct">
+      <UniqueIdentifier>{d56bffaa-79c0-4903-ad68-dcf197877ecd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System&amp;Manager\DataSystem\DataSystem">
+      <UniqueIdentifier>{7dc47b8d-4054-482a-9901-11daddd445bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System&amp;Manager\GraphicsSystem">
+      <UniqueIdentifier>{1554353f-8156-49ee-8340-7690958d55ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System&amp;Manager\ResourceSystem">
+      <UniqueIdentifier>{baf9cb67-da11-4b94-b424-8eb294c4c301}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Renderer\Model\DynamicModelRenderer">
       <UniqueIdentifier>{39f79bdb-8626-4e6b-9ef3-4bfc18c95330}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Renderer\Model\StaticMeshRenderer">
+      <UniqueIdentifier>{ca4d48c7-1965-4fdf-bf7b-ded7efe3dc5b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -190,16 +193,16 @@
       <Filter>2_EngineProcess</Filter>
     </ClInclude>
     <ClInclude Include="GraphicsSystem.h">
-      <Filter>System\GraphicsSystem</Filter>
+      <Filter>System&amp;Manager\GraphicsSystem</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>GameObject</Filter>
     </ClInclude>
     <ClInclude Include="ObjectSystem.h">
-      <Filter>System\ObjectSystem</Filter>
+      <Filter>System&amp;Manager\ObjectSystem</Filter>
     </ClInclude>
     <ClInclude Include="EventSystem.h">
-      <Filter>System\EventSystem</Filter>
+      <Filter>System&amp;Manager\EventSystem</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Component\Camera</Filter>
@@ -223,25 +226,25 @@
       <Filter>Component\Renderer\Model\BaseClass</Filter>
     </ClInclude>
     <ClInclude Include="SceneSystem.h">
-      <Filter>System\SceneSystem</Filter>
+      <Filter>System&amp;Manager\SceneSystem</Filter>
     </ClInclude>
     <ClInclude Include="RocketAPI.h">
       <Filter>0_Include\RocketAPI</Filter>
     </ClInclude>
     <ClInclude Include="TimeSystem.h">
-      <Filter>System\TimeSystem</Filter>
+      <Filter>System&amp;Manager\TimeSystem</Filter>
     </ClInclude>
-    <ClInclude Include="StaticModelRenderer.h">
-      <Filter>Component\Renderer\Model\MeshRenderer</Filter>
+    <ClInclude Include="MeshRenderer.h">
+      <Filter>Component\Renderer\Model\StaticMeshRenderer</Filter>
     </ClInclude>
     <ClInclude Include="InputSystem.h">
-      <Filter>System\InputSystem</Filter>
+      <Filter>System&amp;Manager\InputSystem</Filter>
     </ClInclude>
     <ClInclude Include="AnimationController.h">
       <Filter>Component\AnimationController</Filter>
     </ClInclude>
     <ClInclude Include="TweenSystem.h">
-      <Filter>System\TweenSystem</Filter>
+      <Filter>System&amp;Manager\TweenSystem</Filter>
     </ClInclude>
     <ClInclude Include="IRocketAPI.h">
       <Filter>0_Include\RocketAPI\Deprecated</Filter>
@@ -253,7 +256,7 @@
       <Filter>Tween\TweenTimer</Filter>
     </ClInclude>
     <ClInclude Include="DynamicModelRenderer.h">
-      <Filter>Component\Renderer\Model\SkinnedMeshRenderer</Filter>
+      <Filter>Component\Renderer\Model\DynamicModelRenderer</Filter>
     </ClInclude>
     <ClInclude Include="State.h">
       <Filter>Animation\State</Filter>
@@ -262,13 +265,13 @@
       <Filter>Animation\Animator</Filter>
     </ClInclude>
     <ClInclude Include="PhysicsSystem.h">
-      <Filter>System\PhysicsSystem</Filter>
+      <Filter>System&amp;Manager\PhysicsSystem</Filter>
     </ClInclude>
     <ClInclude Include="eSoundGroup.h">
-      <Filter>System\SoundSystem</Filter>
+      <Filter>System&amp;Manager\SoundSystem</Filter>
     </ClInclude>
     <ClInclude Include="SoundSystem.h">
-      <Filter>System\SoundSystem</Filter>
+      <Filter>System&amp;Manager\SoundSystem</Filter>
     </ClInclude>
     <ClInclude Include="AudioClip.h">
       <Filter>Component\AudioClip</Filter>
@@ -283,13 +286,13 @@
       <Filter>Component\UI\SpriteRenderer</Filter>
     </ClInclude>
     <ClInclude Include="DebugSystem.h">
-      <Filter>System\DebugSystem</Filter>
+      <Filter>System&amp;Manager\DebugSystem</Filter>
     </ClInclude>
     <ClInclude Include="UIRenderer.h">
       <Filter>Component\UI\BaseClass</Filter>
     </ClInclude>
     <ClInclude Include="Singleton.h">
-      <Filter>System\0_Singleton</Filter>
+      <Filter>System&amp;Manager\0_Singleton</Filter>
     </ClInclude>
     <ClInclude Include="Button.h">
       <Filter>Component\UI\Button</Filter>
@@ -328,7 +331,7 @@
       <Filter>Component\Light\SpotLight</Filter>
     </ClInclude>
     <ClInclude Include="UISystem.h">
-      <Filter>System\UISystem</Filter>
+      <Filter>System&amp;Manager\UISystem</Filter>
     </ClInclude>
     <ClInclude Include="CapsuleCollider.h">
       <Filter>Component\Collider\DynamicCollider</Filter>
@@ -337,13 +340,16 @@
       <Filter>0_Include\ForEditorAPI</Filter>
     </ClInclude>
     <ClInclude Include="Data.h">
-      <Filter>System\DataSystem\DataStruct</Filter>
+      <Filter>System&amp;Manager\DataSystem\DataStruct</Filter>
     </ClInclude>
     <ClInclude Include="DataSystem.h">
-      <Filter>System\DataSystem\DataSystem</Filter>
+      <Filter>System&amp;Manager\DataSystem\DataSystem</Filter>
     </ClInclude>
     <ClInclude Include="MathHeader.h">
       <Filter>MathHeader</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceSystem.h">
+      <Filter>System&amp;Manager\ResourceSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -351,16 +357,16 @@
       <Filter>2_EngineProcess</Filter>
     </ClCompile>
     <ClCompile Include="GraphicsSystem.cpp">
-      <Filter>System\GraphicsSystem</Filter>
+      <Filter>System&amp;Manager\GraphicsSystem</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
     <ClCompile Include="ObjectSystem.cpp">
-      <Filter>System\ObjectSystem</Filter>
+      <Filter>System&amp;Manager\ObjectSystem</Filter>
     </ClCompile>
     <ClCompile Include="EventSystem.cpp">
-      <Filter>System\EventSystem</Filter>
+      <Filter>System&amp;Manager\EventSystem</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Component\Camera</Filter>
@@ -378,25 +384,25 @@
       <Filter>Component\Renderer\Model\BaseClass</Filter>
     </ClCompile>
     <ClCompile Include="SceneSystem.cpp">
-      <Filter>System\SceneSystem</Filter>
+      <Filter>System&amp;Manager\SceneSystem</Filter>
     </ClCompile>
     <ClCompile Include="RocketAPI.cpp">
       <Filter>0_Include\RocketAPI</Filter>
     </ClCompile>
     <ClCompile Include="TimeSystem.cpp">
-      <Filter>System\TimeSystem</Filter>
+      <Filter>System&amp;Manager\TimeSystem</Filter>
     </ClCompile>
-    <ClCompile Include="StaticModelRenderer.cpp">
-      <Filter>Component\Renderer\Model\MeshRenderer</Filter>
+    <ClCompile Include="MeshRenderer.cpp">
+      <Filter>Component\Renderer\Model\StaticMeshRenderer</Filter>
     </ClCompile>
     <ClCompile Include="InputSystem.cpp">
-      <Filter>System\InputSystem</Filter>
+      <Filter>System&amp;Manager\InputSystem</Filter>
     </ClCompile>
     <ClCompile Include="AnimationController.cpp">
       <Filter>Component\AnimationController</Filter>
     </ClCompile>
     <ClCompile Include="TweenSystem.cpp">
-      <Filter>System\TweenSystem</Filter>
+      <Filter>System&amp;Manager\TweenSystem</Filter>
     </ClCompile>
     <ClCompile Include="Tween.cpp">
       <Filter>Tween\Tween</Filter>
@@ -405,7 +411,7 @@
       <Filter>Tween\TweenTimer</Filter>
     </ClCompile>
     <ClCompile Include="DynamicModelRenderer.cpp">
-      <Filter>Component\Renderer\Model\SkinnedMeshRenderer</Filter>
+      <Filter>Component\Renderer\Model\DynamicModelRenderer</Filter>
     </ClCompile>
     <ClCompile Include="State.cpp">
       <Filter>Animation\State</Filter>
@@ -414,10 +420,10 @@
       <Filter>Animation\Animator</Filter>
     </ClCompile>
     <ClCompile Include="PhysicsSystem.cpp">
-      <Filter>System\PhysicsSystem</Filter>
+      <Filter>System&amp;Manager\PhysicsSystem</Filter>
     </ClCompile>
     <ClCompile Include="SoundSystem.cpp">
-      <Filter>System\SoundSystem</Filter>
+      <Filter>System&amp;Manager\SoundSystem</Filter>
     </ClCompile>
     <ClCompile Include="AudioClip.cpp">
       <Filter>Component\AudioClip</Filter>
@@ -429,7 +435,7 @@
       <Filter>Component\UI\SpriteRenderer</Filter>
     </ClCompile>
     <ClCompile Include="DebugSystem.cpp">
-      <Filter>System\DebugSystem</Filter>
+      <Filter>System&amp;Manager\DebugSystem</Filter>
     </ClCompile>
     <ClCompile Include="UIRenderer.cpp">
       <Filter>Component\UI\BaseClass</Filter>
@@ -471,7 +477,7 @@
       <Filter>Component\Light\SpotLight</Filter>
     </ClCompile>
     <ClCompile Include="UISystem.cpp">
-      <Filter>System\UISystem</Filter>
+      <Filter>System&amp;Manager\UISystem</Filter>
     </ClCompile>
     <ClCompile Include="CapsuleCollider.cpp">
       <Filter>Component\Collider\DynamicCollider</Filter>
@@ -480,10 +486,13 @@
       <Filter>0_Include\ForEditorAPI</Filter>
     </ClCompile>
     <ClCompile Include="Data.cpp">
-      <Filter>System\DataSystem\DataStruct</Filter>
+      <Filter>System&amp;Manager\DataSystem\DataStruct</Filter>
     </ClCompile>
     <ClCompile Include="DataSystem.cpp">
-      <Filter>System\DataSystem\DataSystem</Filter>
+      <Filter>System&amp;Manager\DataSystem\DataSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceSystem.cpp">
+      <Filter>System&amp;Manager\ResourceSystem</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,10 +1,15 @@
-#include "DebugSystem.h"
+﻿#include "DebugSystem.h"
 #include "InputSystem.h"
 #include "SoundSystem.h"
 #include <windows.h>
 
 namespace Rocket::Core
 {
+	DebugSystem::DebugSystem()
+		:_isDebugMode(false)
+	{
+
+	}
 
 	void DebugSystem::Initialize()
 	{
