@@ -166,6 +166,12 @@
     <FxCompile Include="DirectionalLightPS.hlsl">
       <Filter>HLSL\Deferred</Filter>
     </FxCompile>
+    <FxCompile Include="PointLightPS.hlsl">
+      <Filter>HLSL\Deferred</Filter>
+    </FxCompile>
+    <FxCompile Include="PointLightVS.hlsl">
+      <Filter>HLSL\Deferred</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="FloaterRendererDX11.natvis">

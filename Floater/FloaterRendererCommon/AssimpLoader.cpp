@@ -354,7 +354,7 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 			rawMesh->material = *_materials[materialIndex];
 
 			// mesh 테스트
-			CheckVertexBoneName(rawMesh, mesh);
+			DEBUG_CODE(CheckVertexBoneName(rawMesh, mesh));
 		}
 	}
 

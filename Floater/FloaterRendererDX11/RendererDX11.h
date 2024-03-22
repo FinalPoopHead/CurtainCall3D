@@ -124,6 +124,8 @@ namespace flt
 		DX11Entity _screenQuad;
 		Resource<DX11VertexShader> _directVS;
 		Resource<DX11PixelShader> _directPS;
+		Resource<DX11VertexShader> _pointLightVS;
+		Resource<DX11PixelShader> _pointLightPS;
 
 		// 그리기 위한 오브젝트
 		std::vector<DX11Node*> _renderableObjects;

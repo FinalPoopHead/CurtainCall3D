@@ -280,7 +280,7 @@ bool flt::RendererDX11::Initialize(HWND hwnd, HWND debugHWnd /*= NULL*/)
 
 	DX11VertexShaderBuilder directionalVSBuilder;
 	directionalVSBuilder.pDevice = _device.Get();
-	directionalVSBuilder.filePath = L"../FloaterRendererDX11/directionalLightVS.hlsl";
+	directionalVSBuilder.filePath = L"../FloaterRendererDX11/DirectionalLightVS.hlsl";
 	directionalVSBuilder.key = directionalVSBuilder.filePath;
 
 	_directVS.Set(directionalVSBuilder);
@@ -292,6 +292,21 @@ bool flt::RendererDX11::Initialize(HWND hwnd, HWND debugHWnd /*= NULL*/)
 	directionalPSBuilder.key = directionalPSBuilder.filePath;
 	_directPS.Set(directionalPSBuilder);
 	ASSERT(_directPS.Get(), "픽셀 쉐이더 생성 실패");
+
+	DX11VertexShaderBuilder pointLightVSBuilder;
+	pointLightVSBuilder.pDevice = _device.Get();
+	pointLightVSBuilder.filePath = L"../FloaterRendererDX11/PointLightVS.hlsl";
+	pointLightVSBuilder.key = pointLightVSBuilder.filePath;
+
+	_pointLightVS.Set(pointLightVSBuilder);
+	ASSERT(_pointLightVS.Get(), "버텍스 쉐이더 생성 실패");
+
+	DX11PixelShaderBuilder pointLightPSBuilder;
+	pointLightPSBuilder.pDevice = _device.Get();
+	pointLightPSBuilder.filePath = L"../FloaterRendererDX11/PointLightPS.hlsl";
+	pointLightPSBuilder.key = pointLightPSBuilder.filePath;
+	_pointLightPS.Set(pointLightPSBuilder);
+	ASSERT(_pointLightPS.Get(), "픽셀 쉐이더 생성 실패");
 
 
 	_isRunRenderEngine = true;
@@ -718,12 +733,11 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 		blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-		ID3D11BlendState* blendState;
+		comptr<ID3D11BlendState> blendState;
 		auto ret = _device->CreateBlendState(&blendDesc, &blendState);
 		ASSERT(ret == S_OK, "블렌드 상태 생성 실패");
 		float blend[4] = { 1.0f,1.0f,1.0f, 1.0f };
-		_immediateContext->OMSetBlendState(blendState, blend, 0xffffffff);
-		blendState->Release();
+		_immediateContext->OMSetBlendState(blendState.Get(), blend, 0xffffffff);
 
 		// 그리드 스케일은 카메라 높이에 따라서 1, 10, 100, 1000, 10000 중 하나.
 		float gridScale = 1.0f;
@@ -906,10 +920,36 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 		}
 	}
 
-	float blend[4] = { 1,1,1, 1 };
+	float blend[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	
+	_immediateContext->ClearRenderTargetView(_gBuffer[GBUFFER_SPECULAR].rtv.Get(), DirectX::Colors::Black);
+
 	{
-		_immediateContext->OMSetBlendState(_blendState.Get(), blend, 0xFFFFFFFF);
-		_immediateContext->OMSetDepthStencilState(_depthState.Get(), 0);
+		// Directional Light
+		D3D11_BLEND_DESC blendDesc = { };
+		blendDesc.AlphaToCoverageEnable = false;
+		blendDesc.IndependentBlendEnable = false;
+		blendDesc.RenderTarget[0].BlendEnable = true;
+		blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+		blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+		blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+		blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+		comptr<ID3D11BlendState> blendState;
+		HRESULT ret = _device->CreateBlendState(&blendDesc, &blendState);
+		_immediateContext->OMSetBlendState(blendState.Get(), blend, 0xFFFFFFFF);
+
+		D3D11_DEPTH_STENCIL_DESC depthStencilDesc = {};
+		depthStencilDesc.DepthEnable = true;
+		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+
+		comptr<ID3D11DepthStencilState> depthState;
+		_device->CreateDepthStencilState(&depthStencilDesc, &depthState);
+		_immediateContext->OMSetDepthStencilState(depthState.Get(), 0);
 
 		_immediateContext->OMSetRenderTargets(1, _gBuffer[GBUFFER_SPECULAR].rtv.GetAddressOf(), _depthStencilView.Get());
 
@@ -921,10 +961,6 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 		DX11Mesh* pMesh = _screenQuad.node->meshes[0].Get();
 		DX11VertexShader* vertexShader = _directVS.Get();
 		DX11PixelShader* pixelShader = _directPS.Get();
-
-		wchar_t vsName[256] = { 0, };
-		UINT dataSize = sizeof(vsName);
-		auto ret = pixelShader->pPixelShader->GetPrivateData(WKPDID_D3DDebugObjectNameW, &dataSize, vsName);
 
 		_immediateContext->IASetInputLayout(vertexShader->pInputLayout);
 		_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -939,7 +975,28 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 		_immediateContext->IASetIndexBuffer(pMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 		_immediateContext->DrawIndexed(pMesh->indexCount, 0, 0);
+
+		//Point Light
+		//vertexShader = _pointLightVS.Get();
+		//pixelShader = _pointLightPS.Get();
+
+		//_immediateContext->IASetInputLayout(vertexShader->pInputLayout);
+		//_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		//_immediateContext->VSSetShader(vertexShader->pVertexShader, nullptr, 0);
+		//_immediateContext->PSSetShader(pixelShader->pPixelShader, nullptr, 0);
+
+		//_immediateContext->PSSetSamplers(0, 1, &pMesh->sampler);
+
+		//_immediateContext->IASetVertexBuffers(0, 1, &pMesh->vertexBuffer, &pMesh->singleVertexSize, &offset);
+		//_immediateContext->IASetIndexBuffer(pMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+		//_immediateContext->DrawIndexed(pMesh->indexCount, 0, 0);
 	}
+
+	_immediateContext->RSSetState(NULL);
+	_immediateContext->OMSetBlendState(NULL, blend, 0xFFFFFFFF);
+	_immediateContext->OMSetDepthStencilState(_depthState.Get(), 0);
 
 	// 최종 연산 결과 화면에 출력
 	{
