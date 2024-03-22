@@ -44,7 +44,12 @@ namespace Rocket
 
 	}
 
-	ROCKET_API Scene* CreateScene(const std::string& sceneName, bool withNoCam /*= false*/)
+	GameObject* CreateModelObject(const std::string& fileName)
+	{
+		return Rocket::Core::ObjectSystem::Instance().CreateModelObject(fileName);
+	}
+
+	Scene* CreateScene(const std::string& sceneName, bool withNoCam /*= false*/)
 	{
 		return Rocket::Core::SceneSystem::Instance().CreateScene(sceneName, withNoCam);
 	}

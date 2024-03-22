@@ -2,30 +2,36 @@
 #include "GraphicsSystem.h"
 #include "GameObject.h"
 #include "Transform.h"
-#include "../GraphicsInterface/IDynamicModelRenderer.h"
+#include "../RocketCommon/IDynamicModelRenderer.h"
 
 namespace Rocket
 {
 	DynamicModelRenderer::DynamicModelRenderer()
-		: _skinnedMeshRenderer(Core::GraphicsSystem::Instance().GetFactory()->CreateDynamicModelRenderer())
+		: _graphicsComponent(Core::GraphicsSystem::Instance().GetFactory()->CreateDynamicModelRenderer())
 	{
 
 	}
 
-	void DynamicModelRenderer::SetMesh(std::string fileName)
+	void DynamicModelRenderer::LoadModel(std::string fileName)
 	{
-		_skinnedMeshRenderer->LoadModel(fileName);
+		_graphicsComponent->LoadModel(fileName);
+
+		Transform* rootTransform = &(gameObject->transform);
+		while (rootTransform->GetParent() != nullptr)
+		{
+			rootTransform = rootTransform->GetParent();
+		}
+		_graphicsComponent->BindTransform(rootTransform->_rocketTransform);
 	}
 
 	void DynamicModelRenderer::SetTexture(std::string fileName)
 	{
-		_skinnedMeshRenderer->LoadTexture(fileName);
+		_graphicsComponent->LoadTexture(fileName);
 	}
 
 	void DynamicModelRenderer::UpdateRenderData()
 	{
-		_skinnedMeshRenderer->SetWorldTM(gameObject->transform.GetWorldTM());
+		_graphicsComponent->SetWorldTM(gameObject->transform.GetWorldTM());
 
 	}
-
 }

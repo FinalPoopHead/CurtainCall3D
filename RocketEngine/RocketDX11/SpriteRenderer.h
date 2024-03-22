@@ -1,11 +1,8 @@
 ﻿#pragma once
-#include <d3d11.h>
-#include <memory>
 #include <SpriteBatch.h>
-#include <WICTextureLoader.h>
-#include <wrl\client.h>
 
-#include "..\\GraphicsInterface\\ISpriteRenderer.h"
+#include "..\\RocketCommon\\ISpriteRenderer.h"
+#include "MathHeader.h"
 
 namespace Rocket::Core
 {

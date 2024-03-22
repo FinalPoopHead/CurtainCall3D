@@ -1,4 +1,4 @@
-#define _SILENCE_CXX20_CISO646_REMOVED_WARNING
+ï»¿#define _SILENCE_CXX20_CISO646_REMOVED_WARNING
 #include "EngineProcess.h"
 #include "ObjectSystem.h"
 #include "GraphicsSystem.h"
@@ -11,6 +11,7 @@
 #include "DebugSystem.h"
 #include "UISystem.h"
 #include "DataSystem.h"
+#include "ResourceSystem.h"
 
 constexpr int WIDTH = 1920;
 constexpr int HEIGHT = 1080;
@@ -20,7 +21,7 @@ static bool isInitialized = false;
 
 namespace Rocket
 {
-	/// dll°ü·Ã
+	/// dllê´€ë ¨
 	IEngineProcess* CreateEngine()
 	{
 		return new EngineProcess();
@@ -31,7 +32,7 @@ namespace Rocket
 		delete instance;
 	}
 
-	/// ÃÊ±âÈ­ °ü·Ã
+	/// ì´ˆê¸°í™” ê´€ë ¨
 	EngineProcess::EngineProcess()
 		: _objectSystem(Rocket::Core::ObjectSystem::Instance()),
 		_graphicsSystem(Rocket::Core::GraphicsSystem::Instance()),
@@ -43,14 +44,15 @@ namespace Rocket
 		_soundSystem(Rocket::Core::SoundSystem::Instance()),
 		_debugSystem(Rocket::Core::DebugSystem::Instance()),
 		_uiSystem(Rocket::Core::UISystem::Instance()),
+		_resourceSystem(Rocket::Core::ResourceSystem::Instance()),
 		//_dataSystem(Rocket::Core::DataSystem::Instance()),
 		_hWnd(), _msg(), _screenWidth(WIDTH),_screenHeight(HEIGHT),
 		CLASSNAME(L"V-Gun"), WINDOWNAME(L"V-Gun")
 	{
 		RENDERSYSTEM = &_graphicsSystem;
 
-		int screenWidth = GetSystemMetrics(SM_CXSCREEN); // ¸ğ´ÏÅÍÀÇ °¡·Î Å©±â
-		int screenHeight = GetSystemMetrics(SM_CYSCREEN); // ¸ğ´ÏÅÍÀÇ ¼¼·Î Å©±â
+		int screenWidth = GetSystemMetrics(SM_CXSCREEN); // ëª¨ë‹ˆí„°ì˜ ê°€ë¡œ í¬ê¸°
+		int screenHeight = GetSystemMetrics(SM_CYSCREEN); // ëª¨ë‹ˆí„°ì˜ ì„¸ë¡œ í¬ê¸°
 
 //  	_screenWidth = screenWidth;
 //  	_screenHeight = screenHeight;
@@ -65,7 +67,7 @@ namespace Rocket
 // #endif // _DEBUG
 		//ChangeDisplayResolution(1920, 1080);
 
-		/// À©µµ¿ì ÃÊ±âÈ­
+		/// ìœˆë„ìš° ì´ˆê¸°í™”
 		MyRegisterClass((HINSTANCE)hInstance);
 
 		if (!InitInstance((HINSTANCE)hInstance, nCmdShow))
@@ -87,6 +89,7 @@ namespace Rocket
 		_debugSystem.Initialize();
 		_uiSystem.Initialize();
 		//_dataSystem.Initialize();
+		_resourceSystem.Initialize();
 
 		isInitialized = true;
 
@@ -105,7 +108,7 @@ namespace Rocket
 		_soundSystem.Initialize();
 		_debugSystem.Initialize();
 		_uiSystem.Initialize();
-		//_dataSystem Àº ¿¡µğÅÍ¿¡¼­ ÇÊ¿ä ¾øÀ½. ÀÚÃ¼ÀûÀ¸·Î ¹º°¡ÀÖ±â¶§¹®.
+		//_dataSystem ì€ ì—ë””í„°ì—ì„œ í•„ìš” ì—†ìŒ. ìì²´ì ìœ¼ë¡œ ë­”ê°€ìˆê¸°ë•Œë¬¸.
 
 
 		return S_OK;
@@ -156,11 +159,11 @@ namespace Rocket
 	}
 
 	/// <summary>
-	/// ¿£ÁøÀÇ ¶óÀÌÇÁ½ÎÀÌÅ¬
+	/// ì—”ì§„ì˜ ë¼ì´í”„ì‹¸ì´í´
 	/// </summary>
 	void EngineProcess::RunEngine()
 	{
-		// ÇÁ·Î¼¼½º ³»¿¡¼­ ÇÏ³ªÀÇ ¿£Áø ÀÎ½ºÅÏ½º¸¸ µ¹°í ÀÖÀ» ¼ö ÀÖµµ·Ï ÇÔ
+		// í”„ë¡œì„¸ìŠ¤ ë‚´ì—ì„œ í•˜ë‚˜ì˜ ì—”ì§„ ì¸ìŠ¤í„´ìŠ¤ë§Œ ëŒê³  ìˆì„ ìˆ˜ ìˆë„ë¡ í•¨
 		static EngineProcess* instance;
 		if (instance == nullptr)
 		{
@@ -189,7 +192,7 @@ namespace Rocket
 			}
 		}
 
-		// ¿£ÁøÀÇ µ¿ÀÛÀÌ Á¾·áµÇ¸é instanceµµ nullptr·Î ÃÊ±âÈ­
+		// ì—”ì§„ì˜ ë™ì‘ì´ ì¢…ë£Œë˜ë©´ instanceë„ nullptrë¡œ ì´ˆê¸°í™”
 		instance = nullptr;
 	}
 
@@ -278,15 +281,15 @@ namespace Rocket
 		DEVMODE devMode = {};
 		devMode.dmSize = sizeof(DEVMODE);
 
-		// ÇöÀç µğ½ºÇÃ·¹ÀÌ ¸ğµå °¡Á®¿À±â
+		// í˜„ì¬ ë””ìŠ¤í”Œë ˆì´ ëª¨ë“œ ê°€ì ¸ì˜¤ê¸°
 		EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &devMode);
 
-		// »õ·Î¿î ÇØ»óµµ ¼³Á¤
-		devMode.dmPelsWidth = width; // ¿øÇÏ´Â °¡·Î ÇØ»óµµ
-		devMode.dmPelsHeight = height; // ¿øÇÏ´Â ¼¼·Î ÇØ»óµµ
+		// ìƒˆë¡œìš´ í•´ìƒë„ ì„¤ì •
+		devMode.dmPelsWidth = width; // ì›í•˜ëŠ” ê°€ë¡œ í•´ìƒë„
+		devMode.dmPelsHeight = height; // ì›í•˜ëŠ” ì„¸ë¡œ í•´ìƒë„
 		devMode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
 
-		// ÇØ»óµµ º¯°æ ½Ãµµ
+		// í•´ìƒë„ ë³€ê²½ ì‹œë„
 		LONG result = ChangeDisplaySettings(&devMode, CDS_FULLSCREEN);
 	}
 

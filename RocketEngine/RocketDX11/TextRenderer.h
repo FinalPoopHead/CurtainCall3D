@@ -5,7 +5,7 @@
 #include <string>
 #include <SpriteFont.h>
 
-#include "..\\GraphicsInterface\\ITextRenderer.h"
+#include "..\\RocketCommon\\ITextRenderer.h"
 
 namespace Rocket::Core
 {

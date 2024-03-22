@@ -49,4 +49,14 @@ namespace Rocket::Core
 		HR(ResourceManager::Instance().GetDevice()->CreateBuffer(&indexBufferDesc, &indexData, &_indexBuffer));
 	}
 
+	void SkinnedMesh::SetNode(Node* node)
+	{
+		_node = node;
+
+		for (auto& vertex : _vertices)
+		{
+			vertex.nodeIndex = _node->index;
+		}
+	}
+
 }

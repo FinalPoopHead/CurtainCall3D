@@ -3,6 +3,7 @@
 #include "VertexStruct.h"
 #include "ResourceManager.h"
 #include "SkinnedMesh.h"
+#include "../RocketCommon/RocketTransform.h"
 
 namespace Rocket::Core
 {
@@ -10,7 +11,10 @@ namespace Rocket::Core
 		: _model(nullptr),
 		_material(nullptr),
 		_isActive(true),
-		_worldTM(Matrix::Identity)
+		_worldTM(Matrix::Identity),
+		_animatedRootNode(nullptr),
+		_animationTime(0.0),
+		_animationTick(0.0)
 	{
 
 	}
@@ -28,12 +32,22 @@ namespace Rocket::Core
 	void DynamicModelRenderer::LoadModel(const std::string& fileName)
 	{
 		_model = reinterpret_cast<DynamicModel*>(ResourceManager::Instance().GetModel(fileName));
+		if(_model == nullptr)
+		{
+			MessageBox(NULL, TEXT("모델이 없습니다."), TEXT("모델 로드 실패"), MB_OK);
+			return;
+		}
 		_animatedRootNode = CopyNodeData(_model->rootNode);
 	}
 
 	void DynamicModelRenderer::LoadTexture(std::string fileName)
 	{
 		_material->SetTexture(ResourceManager::Instance().GetTexture(fileName));
+	}
+
+	void DynamicModelRenderer::BindTransform(RocketTransform* rootTransform)
+	{
+		BindTransformRecur(rootTransform, _animatedRootNode);
 	}
 
 	void DynamicModelRenderer::UpdateAnimation(float deltaTime)
@@ -45,12 +59,13 @@ namespace Rocket::Core
 
 		// TODO : 외부에서 애니메이션 세팅하고 재생할 수 있게 바꿔야함. 지금은 임시로 첫번째 애니메이션만 실행함.
 		Animation* anim = _model->animations.begin()->second;
+		//anim = _model->animations.at("Ani_Monster2_BattleIdle");
 		_nowAnimationName = anim->name;
 
-		if (_animationTime == anim->duration)
-		{
-			return;
-		}
+		//if (_animationTime == anim->duration)
+		//{
+		//	return;
+		//}
 
 		_animationTime += deltaTime;
 		_animationTick = _animationTime * anim->ticksPerSecond;
@@ -59,11 +74,19 @@ namespace Rocket::Core
 		{
 			if (_isLoop)
 			{
-				_animationTime -= anim->duration / anim->ticksPerSecond;
+				double secondPerTick = anim->duration / anim->ticksPerSecond;;
+				int count = 0;
+				while (secondPerTick * (count+1) < _animationTime)
+				{
+					count++;
+				}
+				_animationTime -= count * secondPerTick;
+				_animationTick = _animationTime * anim->ticksPerSecond;
 			}
 			else
 			{
 				_animationTime = anim->duration / anim->ticksPerSecond;
+				_animationTick = _animationTime * anim->ticksPerSecond;
 			}
 		}
 
@@ -94,8 +117,8 @@ namespace Rocket::Core
 				}
 				else
 				{
-					float t = (_animationTick - nodeAnim->positionTimestamps[positionIndex - 1]) / (nodeAnim->positionTimestamps[positionIndex] - nodeAnim->positionTimestamps[positionIndex - 1]);
-					position = DirectX::XMVectorLerp(nodeAnim->positions[positionIndex - 1], nodeAnim->positions[positionIndex], t);
+					double t = (_animationTick - nodeAnim->positionTimestamps[positionIndex - 1]) / (nodeAnim->positionTimestamps[positionIndex] - nodeAnim->positionTimestamps[positionIndex - 1]);
+					position = DirectX::XMVectorLerp(nodeAnim->positions[positionIndex - 1], nodeAnim->positions[positionIndex], (float)t);
 				}
 			}
 
@@ -117,8 +140,8 @@ namespace Rocket::Core
 				}
 				else
 				{
-					float t = (_animationTick - nodeAnim->rotationTimestamps[rotationIndex - 1]) / (nodeAnim->rotationTimestamps[rotationIndex] - nodeAnim->rotationTimestamps[rotationIndex - 1]);
-					rotation = DirectX::XMQuaternionSlerp(nodeAnim->rotations[rotationIndex - 1], nodeAnim->rotations[rotationIndex], t);
+					double t = (_animationTick - nodeAnim->rotationTimestamps[rotationIndex - 1]) / (nodeAnim->rotationTimestamps[rotationIndex] - nodeAnim->rotationTimestamps[rotationIndex - 1]);
+					rotation = DirectX::XMQuaternionSlerp(nodeAnim->rotations[rotationIndex - 1], nodeAnim->rotations[rotationIndex], (float)t);
 				}
 			}
 
@@ -140,12 +163,16 @@ namespace Rocket::Core
 				}
 				else
 				{
-					float t = (_animationTick - nodeAnim->scaleTimestamps[scaleIndex - 1]) / (nodeAnim->scaleTimestamps[scaleIndex] - nodeAnim->scaleTimestamps[scaleIndex - 1]);
-					scale = DirectX::XMVectorLerp(nodeAnim->scales[scaleIndex - 1], nodeAnim->scales[scaleIndex], t);
+					double t = (_animationTick - nodeAnim->scaleTimestamps[scaleIndex - 1]) / (nodeAnim->scaleTimestamps[scaleIndex] - nodeAnim->scaleTimestamps[scaleIndex - 1]);
+					scale = DirectX::XMVectorLerp(nodeAnim->scales[scaleIndex - 1], nodeAnim->scales[scaleIndex], (float)t);
 				}
 			}
 
 			node->transformMatrix = DirectX::XMMatrixAffineTransformation(scale, { 0,0,0,0 }, rotation, position);
+
+			node->transform->SetLocalPosition(position);
+			node->transform->SetLocalRotation(rotation);
+			node->transform->SetLocalScale(scale);			
 		}
 
 	}
@@ -161,7 +188,8 @@ namespace Rocket::Core
 		deviceContext->VSSetShader(_material->GetVertexShader()->GetVertexShader(), nullptr, 0);
 		deviceContext->PSSetShader(_material->GetPixelShader()->GetPixelShader(), nullptr, 0);
 
-		deviceContext->PSSetSamplers(0, 1, _material->GetVertexShader()->GetAddressOfSampleState());
+		// TODO : sampler 경고때문에 잠시주석처리. Sampler에 대해 다시 알아보자.
+		deviceContext->PSSetSamplers(0, 1, _material->GetPixelShader()->GetAddressOfSampleState());
 
 		// 입력 배치 객체 셋팅
 		deviceContext->IASetInputLayout(_material->GetVertexShader()->GetInputLayout());
@@ -218,7 +246,10 @@ namespace Rocket::Core
 
 			BoneBufferType* boneBufferDataPtr = (BoneBufferType*)mappedResource.pData;
 
-			SetBoneBuffer(_model->rootNode, boneBufferDataPtr);
+			// TODO : 이거 사실 둘 다 같은 본 데이터인건데 왜 매트릭스가 영행렬이 들어가있지..?
+			//SetBoneBuffer(_model->rootNode, boneBufferDataPtr);
+			SetBoneBuffer(_animatedRootNode, boneBufferDataPtr);
+			testCount = 0;
 
 			deviceContext->Unmap(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0);
 
@@ -289,12 +320,24 @@ namespace Rocket::Core
 		_material->SetRenderState(renderState);
 	}
 
+	void DynamicModelRenderer::CalcNodeWorldMatrix(Node* node)
+	{
+		node->CalcWorldMatrix();
+		for (int i = 0; i < node->children.size(); i++)
+		{
+			CalcNodeWorldMatrix(node->children[i]);
+		}
+	}
+
 	void DynamicModelRenderer::SetNodeBuffer(Node* node, NodeBufferType* nodeBuffer)
 	{
 		// DX에서 HLSL 로 넘어갈때 자동으로 전치가 되서 넘어간다.
 		// HLSL 에서도 Row Major 하게 작성하고 싶으므로 미리 전치를 시켜놓는다.
 		// 총 전치가 2번되므로 HLSL에서도 Row Major한 Matrix로 사용한다.
-		nodeBuffer->transformMatrix[node->index] = DirectX::XMMatrixTranspose(node->GetWorldMatrix());
+		// nodeBuffer->transformMatrix[node->index] = DirectX::XMMatrixTranspose(node->GetWorldMatrix());
+		nodeBuffer->transformMatrix[node->index] = DirectX::XMMatrixTranspose(node->transform->GetWorldTM());
+
+		//nodeBuffer->transformMatrix[node->index] = DirectX::XMMatrixTranspose(node->worldTM);
 		for (int i = 0; i < node->children.size(); i++)
 		{
 			SetNodeBuffer(node->children[i], nodeBuffer);
@@ -306,6 +349,7 @@ namespace Rocket::Core
 		Bone* bone = node->bindedBone;
 		if (bone)
 		{
+			testCount++;
 			boneBuffer->transformMatrix[bone->index] = DirectX::XMMatrixTranspose(bone->offsetMatrix);
 		}
 
@@ -342,6 +386,23 @@ namespace Rocket::Core
 		_animatedNodeMap.insert({ to->name,to });
 	}
 
+	void DynamicModelRenderer::BindTransformRecur(RocketTransform* transform, Node* node)
+	{
+		DirectX::XMVECTOR outScale;
+		DirectX::XMVECTOR outRotation;
+		DirectX::XMVECTOR outTranslation;
 
+		DirectX::XMMatrixDecompose(&outScale, &outRotation, &outTranslation, node->transformMatrix);
 
+		transform->SetLocalScale(outScale);
+		transform->SetLocalRotation(outRotation);
+		transform->SetLocalPosition(outTranslation);
+
+		node->transform = transform;
+
+		for (int i = 0; i < node->children.size(); i++)
+		{
+			BindTransformRecur(transform->GetChild(i), node->children[i]);
+		}
+	}
 }

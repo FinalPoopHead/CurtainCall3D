@@ -47,7 +47,8 @@
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="ModelRendererBase.h" />
     <ClInclude Include="IEngineProcess.h" />
-    <ClInclude Include="StaticModelRenderer.h" />
+    <ClInclude Include="ResourceSystem.h" />
+    <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="ObjectSystem.h" />
     <ClInclude Include="GraphicsSystem.h" />
     <ClInclude Include="DLLExporter.h" />
@@ -95,7 +96,8 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="Light.cpp" />
-    <ClCompile Include="StaticModelRenderer.cpp" />
+    <ClCompile Include="ResourceSystem.cpp" />
+    <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="ObjectSystem.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />
     <ClCompile Include="PlaneCollider.cpp" />
@@ -217,13 +219,13 @@
       <PreprocessorDefinitions>_EXPORT_API;_DX11;_DEBUG;_WINDOWS;_SILENCE_CXX20_CISO646_REMOVED_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)GraphicsInterface;$(SolutionDir)include\physX;$(SolutionDir)include\DXTK;$(SolutionDir)include\FMOD;$(SolutionDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)RocketCommon;$(SolutionDir)GraphicsInterface;$(SolutionDir)include\physX;$(SolutionDir)include\DXTK;$(SolutionDir)include\FMOD;$(SolutionDir)include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Lib\$(Configuration)\physX;$(SolutionDir)Lib\$(Configuration)\FMOD;$(SolutionDir)Lib\$(Configuration)\DXTK;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>PhysX_64.lib;PhysXCommon_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_64.lib;PhysXPvdSDK_static_64.lib;DirectXTK.lib;fmod_vc.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Build\$(Configuration);$(SolutionDir)Lib\$(Configuration)\physX;$(SolutionDir)Lib\$(Configuration)\FMOD;$(SolutionDir)Lib\$(Configuration)\DXTK;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>RocketCommon.lib;PhysX_64.lib;PhysXCommon_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_64.lib;PhysXPvdSDK_static_64.lib;DirectXTK.lib;fmod_vc.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)Lib\$(Configuration)\FMOD\fmod.dll" "$(SolutionDir)Build\$(Configuration)";
@@ -241,15 +243,15 @@ copy /Y "$(SolutionDir)Lib\$(Configuration)\physX\PhysXFoundation_64.dll" "$(Sol
       <PreprocessorDefinitions>_EXPORT_API;_DX11;NDEBUG;_WINDOWS;_SILENCE_CXX20_CISO646_REMOVED_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)GraphicsInterface;$(SolutionDir)include\physX;$(SolutionDir)include\DXTK;$(SolutionDir)include\FMOD;$(SolutionDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)RocketCommon;$(SolutionDir)GraphicsInterface;$(SolutionDir)include\physX;$(SolutionDir)include\DXTK;$(SolutionDir)include\FMOD;$(SolutionDir)include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Lib\$(Configuration)\physX;$(SolutionDir)Lib\$(Configuration)\FMOD;$(SolutionDir)Lib\$(Configuration)\DXTK;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>PhysX_64.lib;PhysXCommon_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_64.lib;PhysXPvdSDK_static_64.lib;DirectXTK.lib;fmod_vc.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Build\$(Configuration);$(SolutionDir)Lib\$(Configuration)\physX;$(SolutionDir)Lib\$(Configuration)\FMOD;$(SolutionDir)Lib\$(Configuration)\DXTK;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>RocketCommon.lib;PhysX_64.lib;PhysXCommon_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_64.lib;PhysXPvdSDK_static_64.lib;DirectXTK.lib;fmod_vc.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)Lib\$(Configuration)\FMOD\fmod.dll" "$(SolutionDir)Build\$(Configuration)";

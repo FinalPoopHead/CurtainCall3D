@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Transform">
+      <UniqueIdentifier>{89bdfe58-4f80-4ddf-bbe0-24c7b239b0a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MathHeader">
+      <UniqueIdentifier>{55e7f0ec-8b35-4aef-abc6-889c70be627e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ModelLoader">
+      <UniqueIdentifier>{c21a215a-9c3a-455a-a2da-054dc9f0ca9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ModelLoader\FBXLoader">
+      <UniqueIdentifier>{0f3b6b00-63cb-480a-887c-81303de2ae51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ModelLoader\RFBXLoader">
+      <UniqueIdentifier>{cefb3a29-f5ac-4d34-98b3-da529e970b73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ModelLoader\Struct">
+      <UniqueIdentifier>{facc2f6f-f700-4160-8fb5-5eb76abbef09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ModelLoader\FBXLoader\Utility">
+      <UniqueIdentifier>{b5fff86f-ef57-45d3-9a93-74005e59859d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{330685f8-7cd6-4a55-9b1e-63a2ef034275}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Component">
+      <UniqueIdentifier>{e3e63553-2c0d-4ae4-a2e4-2340c4bdaa13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\DX11Renderer">
+      <UniqueIdentifier>{2fc4ae40-db01-42a1-b811-a66135d0df49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Enum">
+      <UniqueIdentifier>{cdc519e9-eb95-4cce-b0c1-fe15ea26eaf2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Factory">
+      <UniqueIdentifier>{c35cb22d-950e-4cc7-9bfd-4d267be04e0c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="RocketTransform.cpp">
+      <Filter>Transform</Filter>
+    </ClCompile>
+    <ClCompile Include="RFBXLoader.cpp">
+      <Filter>ModelLoader\RFBXLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="FBXLoaderToRaw.cpp">
+      <Filter>ModelLoader\FBXLoader</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="RocketTransform.h">
+      <Filter>Transform</Filter>
+    </ClInclude>
+    <ClInclude Include="MathHeader.h">
+      <Filter>MathHeader</Filter>
+    </ClInclude>
+    <ClInclude Include="RFBXLoader.h">
+      <Filter>ModelLoader\RFBXLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="RawModelStruct.h">
+      <Filter>ModelLoader\Struct</Filter>
+    </ClInclude>
+    <ClInclude Include="FBXLoaderToRaw.h">
+      <Filter>ModelLoader\FBXLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="AssimpMathConverter.h">
+      <Filter>ModelLoader\FBXLoader\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="ICamera.h">
+      <Filter>Interface\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="IDynamicModelRenderer.h">
+      <Filter>Interface\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="ILineRenderer.h">
+      <Filter>Interface\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderable.h">
+      <Filter>Interface\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="ISpriteRenderer.h">
+      <Filter>Interface\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="IMeshRenderer.h">
+      <Filter>Interface\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="ITextRenderer.h">
+      <Filter>Interface\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="IDX11Renderer.h">
+      <Filter>Interface\DX11Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsEnum.h">
+      <Filter>Interface\Enum</Filter>
+    </ClInclude>
+    <ClInclude Include="IFactory.h">
+      <Filter>Interface\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="IMaterial.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="IResourceManager.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="ISketchable.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="PrimitiveHeader.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

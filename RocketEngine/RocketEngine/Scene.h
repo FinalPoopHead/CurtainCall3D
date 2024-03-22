@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include"DLLExporter.h"
 #include <vector>
 #include <string>
@@ -30,16 +30,16 @@ namespace Rocket::Core
 }
 
 /// <summary>
-/// °ÔÀÓÀÇ ¾À Å¬·¡½º.
+/// ê²Œì„ì˜ ì”¬ í´ë˜ìŠ¤.
 /// 
-/// 23.06.30 °­¼®¿ø ÀÎÀç¿ø.
+/// 23.06.30 ê°•ì„ì› ì¸ì¬ì›.
 /// </summary>
 namespace Rocket
 {
 	class ROCKET_API Scene
 	{
-		/// »ı¼ºÀÚ, ¼Ò¸êÀÚ.
-		/// ½Ã¸®¾ó¶óÀÌÁî°¡ SceneÀÇ µ¥ÀÌÅÍ¸¦ ¹Ş¾Æ¿Í¾ß ÇÔ
+		/// ìƒì„±ì, ì†Œë©¸ì.
+		/// ì‹œë¦¬ì–¼ë¼ì´ì¦ˆê°€ Sceneì˜ ë°ì´í„°ë¥¼ ë°›ì•„ì™€ì•¼ í•¨
 		friend class SAD::Serialize;
 	public:
 		Scene(std::string sceneName, bool fromEditor = false);
@@ -48,27 +48,28 @@ namespace Rocket
 
 		/// Scene LifeCycle.
 	public:
-		// µî·ÏµÇ¾îÀÖ´Â Á¤º¸·Î runningObject °»½Å.
+		// ë“±ë¡ë˜ì–´ìˆëŠ” ì •ë³´ë¡œ runningObject ê°±ì‹ .
 		void Initialize();
 
 		void Start();
 
-		// Scene¿¡ ÀÖ´Â Object ¾÷µ¥ÀÌÆ®.
+		// Sceneì— ìˆëŠ” Object ì—…ë°ì´íŠ¸.
 		void Update();
 
 		void LateUpdate();
 
-		// Scene ÀÌ Unload µÇ¸é È£Ãâ. RunningList Á¤¸®.
+		// Scene ì´ Unload ë˜ë©´ í˜¸ì¶œ. RunningList ì •ë¦¬.
 		void Finalize();
 
-		/// Scene¿¡ Object »ı¼º.
+		/// Sceneì— Object ìƒì„±.
 	public:
 		GameObject* CreateObject(std::string objName);
 		GameObject* CreateStaticObject(std::string objName);
+		GameObject* CreateModelObject(const std::string& fileName);
 		bool DeleteObject(std::string gameObjectName);
 
 
-		/// mainCamera °ü·Ã.
+		/// mainCamera ê´€ë ¨.
 	public:
 		Camera* GetMainCamera();
 		void SetMainCamera(Camera* mainCamera);
@@ -77,7 +78,7 @@ namespace Rocket
 		Camera* _mainCamera;
 
 
-		/// SceneName °ü·Ã.
+		/// SceneName ê´€ë ¨.
 	public:
 		std::string GetSceneName();
 		void SetSceneName(const std::string& sceneName);
@@ -89,21 +90,21 @@ namespace Rocket
 	public:
 		GameObject* FindObjectByName(std::string name);
 
-		/// Scene¿¡ µî·ÏµÇ¾îÀÖ´Â Object °ü¸®.
+		/// Sceneì— ë“±ë¡ë˜ì–´ìˆëŠ” Object ê´€ë¦¬.
 	public:
 		std::vector<GameObject*>& GetOriginalList();	// -> serialize
 		std::vector<GameObject*>& GetRunningList();
 
 
 	private:
-		// ¿øº» ¸®½ºÆ®
+		// ì›ë³¸ ë¦¬ìŠ¤íŠ¸
 		std::vector<GameObject*> _originalList;
 
-		// ÇöÀç ¸®½ºÆ®
+		// í˜„ì¬ ë¦¬ìŠ¤íŠ¸
 		std::vector<GameObject*> _runningList;
 
 
-		/// SceneÀÇ UI °ü·Ã
+		/// Sceneì˜ UI ê´€ë ¨
 	public:
 		void CheckFocus();
 
@@ -115,4 +116,3 @@ namespace Rocket
 		std::vector<Rocket::Core::UIRenderer*> _uiComponents;
 	};
 }
- 

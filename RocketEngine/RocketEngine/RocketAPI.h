@@ -24,7 +24,7 @@
 // 대체로 컴포넌트.
 #include "Component.h"
 #include "Camera.h"
-#include "StaticModelRenderer.h"
+#include "MeshRenderer.h"
 #include "DynamicModelRenderer.h"
 #include "Transform.h"
 #include "AnimationController.h"
@@ -57,6 +57,7 @@ namespace Rocket
 	/// 객체 생성 팩토리.
 	ROCKET_API GameObject* CreateObject(const std::string& objName);
 	ROCKET_API GameObject* CreateStaticObject(const std::string& objName);
+	ROCKET_API GameObject* CreateModelObject(const std::string& fileName);
 	ROCKET_API Scene* CreateScene(const std::string& sceneName, bool withNoCam = false);
 	ROCKET_API Tween* CreateTween();
 	ROCKET_API GameObject* CreateButton(const std::string& objName);

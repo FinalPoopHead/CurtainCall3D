@@ -26,7 +26,8 @@ namespace Rocket::Core
 
 	Texture::~Texture()
 	{
-
+		_texture->Release();
+		_textureView->Release();
 	}
 
 	void Texture::Shutdown()
@@ -45,7 +46,7 @@ namespace Rocket::Core
 		}
 	}
 
-	ID3D11ShaderResourceView* Texture::GetTexture()
+	ID3D11ShaderResourceView* Texture::GetTextureView()
 	{
 		return _textureView.Get();
 	}

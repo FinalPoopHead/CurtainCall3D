@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Singleton.h"
 #include "MathHeader.h"
 
@@ -44,7 +44,7 @@ namespace Rocket::Core
 	{
 		friend Singleton;
 	private:
-		DebugSystem() = default;
+		DebugSystem();
 
 	public:
 		void Initialize();

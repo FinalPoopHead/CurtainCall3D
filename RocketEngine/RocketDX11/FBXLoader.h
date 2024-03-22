@@ -12,6 +12,7 @@
 
 using Microsoft::WRL::ComPtr;
 
+// TODO : 머터리얼에 대한 정보도 처리할 수 있도록 해야 함.
 namespace Rocket::Core
 {
 	struct Node;
@@ -39,11 +40,14 @@ namespace Rocket::Core
 		Node* ReadNodeHierarchy(aiNode* ainode, const aiScene* scene);
 		void ReadNodeRecur(Node* node, aiNode* ainode, const aiScene* scene, UINT& index);
 
+		void ForSungchan(Node* node);
+			
 	private:
 		ComPtr<ID3D11Device> _device;
 		// TODO : 지금은 nowModel을 전역적으로 사용하는데 반환값을 이용해서 깔끔하게 정리하는게 낫지않을까?
 		Model* _nowModel;
 		std::unordered_map<aiNode*, Node*> _aiNodeToNodeMap;	// Bone에서 Node를 찾기위한 맵
 		std::unordered_map<std::string, Bone*> _boneMap;
+		int _sungchanBoneCount;
 	};
 }

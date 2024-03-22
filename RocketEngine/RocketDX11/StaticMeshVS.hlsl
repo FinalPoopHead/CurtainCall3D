@@ -12,11 +12,6 @@ cbuffer CameraBuffer : register(b1)
     float padding;
 };
 
-cbuffer NodeBuffer : register(b2)
-{
-    matrix nodeTransform[256];
-};
-
 struct VertexInputType
 {
     float3 position : POSITION;
@@ -40,9 +35,10 @@ PixelInputType main(VertexInputType input)
     
     // Calculate the position of the vertex against the world, view, and projection matrices.
     
-    matrix nodeTransformMatrix = nodeTransform[input.nodeIndex];
+    // matrix nodeTransformMatrix = nodeTransform[input.nodeIndex];
     
-    output.position = mul(float4(input.position, 1.0f), mul(nodeTransformMatrix, worldMatrix));
+    // output.position = mul(float4(input.position, 1.0f), mul(nodeTransformMatrix, worldMatrix));
+    output.position = mul(float4(input.position, 1.0f), worldMatrix);
     output.position = mul(output.position, viewMatrix);
     output.position = mul(output.position, projectionMatrix);
     
@@ -52,7 +48,8 @@ PixelInputType main(VertexInputType input)
     output.normal = mul(input.normal, (float3x3)transpose(worldInverse));
     output.normal = normalize(output.normal);
     
-    float4 worldPosition = mul(float4(input.position, 1.0f), mul(nodeTransformMatrix, worldMatrix));
+    // float4 worldPosition = mul(float4(input.position, 1.0f), mul(nodeTransformMatrix, worldMatrix));
+    float4 worldPosition = mul(float4(input.position, 1.0f), worldMatrix);
     
     output.viewDiretion = cameraPosition.xyz - worldPosition.xyz;
     

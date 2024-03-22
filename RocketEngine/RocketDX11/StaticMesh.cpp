@@ -22,11 +22,6 @@ namespace Rocket::Core
 
 	void StaticMesh::CreateBuffers()
 	{
-		for (auto& vertex : _vertices)
-		{
-			vertex.nodeIndex = _node->index;
-		}
-
 		D3D11_BUFFER_DESC vertexBufferDesc = {};
 		vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 		vertexBufferDesc.ByteWidth = sizeof(Vertex) * _vertexCount;
@@ -52,6 +47,16 @@ namespace Rocket::Core
 		indexData.pSysMem = _indices.data();
 
 		HR(ResourceManager::Instance().GetDevice()->CreateBuffer(&indexBufferDesc, &indexData, &_indexBuffer));
+	}
+
+	void StaticMesh::SetNode(Node* node)
+	{
+		_node = node;
+
+		for (auto& vertex : _vertices)
+		{
+			vertex.nodeIndex = _node->index;
+		}
 	}
 
 }

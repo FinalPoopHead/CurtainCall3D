@@ -4,7 +4,7 @@
 #include "MathHeader.h"
 #include "Component.h"
 #include "DLLExporter.h"
-#include "../GraphicsInterface/IRenderable.h"
+#include "../RocketCommon/IRenderable.h"
 
 namespace Rocket
 {

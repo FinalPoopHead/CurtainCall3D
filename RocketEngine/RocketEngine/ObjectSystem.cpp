@@ -1,10 +1,16 @@
+﻿#include <algorithm>
+#include <cassert>
+
 #include "ObjectSystem.h"
 #include "SceneSystem.h"
+#include "ResourceSystem.h"
 #include "Scene.h"
-#include <cassert>
 #include "GameObject.h"
+#include "Transform.h"
 #include "Component.h"
-#include <algorithm>
+#include "DynamicModelRenderer.h"
+#include "MeshRenderer.h"
+#include "../RocketCommon/RawModelStruct.h"
 
 namespace Rocket::Core
 {
@@ -148,10 +154,95 @@ namespace Rocket::Core
 		_disableList.push_back(obj);
 	}
 
-	Rocket::GameObject* ObjectSystem::CreateStaticObject(std::string objName)
+	Rocket::GameObject* ObjectSystem::CreateObject(const std::string& objName)
+	{
+		Rocket::GameObject* gameObject = new Rocket::GameObject(objName);
+		return gameObject;
+	}
+
+	Rocket::GameObject* ObjectSystem::CreateStaticObject(const std::string& objName)
 	{
 		Rocket::GameObject* gameObject = new Rocket::GameObject(objName);
 		_staticObjList.push_back(gameObject);
+		return gameObject;
+	}
+
+	Rocket::GameObject* ObjectSystem::CreateModelObject(const std::string& fileName)
+	{
+		RawModel* rawModel = ResourceSystem::Instance().GetModel(fileName);
+		Rocket::GameObject* resultGameObject = nullptr;
+
+		if (0 < rawModel->animations.size())
+		{
+			// 애니메이션이 있다면 (dynamic)
+			Rocket::DynamicModelRenderer* modelRenderer = nullptr;
+			resultGameObject = CreateDynamicModelObjectRecur(rawModel->rootNode, &modelRenderer);
+			modelRenderer->LoadModel(fileName);	// 구조가 다 만들어지고 나서 LoadModel을 해야 Transform 계층이 적용된다.
+		}
+		else
+		{
+			// 애니메이션이 없다면 (static)
+			resultGameObject = CreateStaticMeshObjectRecur(rawModel->rootNode);
+		}
+
+		resultGameObject->objName = fileName;
+
+		return resultGameObject;
+	}
+
+	Rocket::GameObject* ObjectSystem::CreateStaticMeshObjectRecur(RawNode* node)
+	{
+		Rocket::GameObject* gameObject = new Rocket::GameObject(node->name);
+
+		Vector3 position;
+		Quaternion rotation;
+		Vector3 scale;
+
+		node->transformMatrix.Decompose(scale, rotation, position);
+		gameObject->transform.SetLocalPosition(position);
+		gameObject->transform.SetLocalRotation(rotation);
+		gameObject->transform.SetLocalScale(scale);
+
+		for (auto& rawMesh : node->meshes)
+		{
+			Rocket::MeshRenderer* meshRenderer = gameObject->AddComponent<Rocket::MeshRenderer>();
+			meshRenderer->SetMesh(rawMesh->name);
+			// TODO : Texture도 자동으로 같이 Set 해주면 좋을 거 같긴 한데..
+		}
+
+		for (auto& child : node->children)
+		{
+			Rocket::GameObject* childObject = CreateStaticMeshObjectRecur(child);
+			childObject->transform.SetParent(gameObject);
+		}
+
+		return gameObject;
+	}
+
+	Rocket::GameObject* ObjectSystem::CreateDynamicModelObjectRecur(RawNode* node, Rocket::DynamicModelRenderer** outModelRenderer)
+	{
+		Rocket::GameObject* gameObject = new Rocket::GameObject(node->name);
+
+		Vector3 position;
+		Quaternion rotation;
+		Vector3 scale;
+
+		node->transformMatrix.Decompose(scale, rotation, position);
+		gameObject->transform.SetLocalPosition(position);
+		gameObject->transform.SetLocalRotation(rotation);
+		gameObject->transform.SetLocalScale(scale);
+
+		if (0 < node->meshes.size())
+		{
+			*outModelRenderer = gameObject->AddComponent<Rocket::DynamicModelRenderer>();
+		}
+
+		for (auto& child : node->children)
+		{
+			Rocket::GameObject* childObject = CreateDynamicModelObjectRecur(child, outModelRenderer);
+			childObject->transform.SetParent(gameObject);
+		}
+
 		return gameObject;
 	}
 
@@ -164,5 +255,4 @@ namespace Rocket::Core
 
 		_staticComponentList.push_back(component);
 	}
-
 }

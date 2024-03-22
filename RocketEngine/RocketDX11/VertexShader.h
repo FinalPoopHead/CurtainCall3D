@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <wrl.h>
 #include <vector>
+
 #include "ShaderBase.h"
 #include "VertexStruct.h"
 
@@ -22,7 +23,7 @@ namespace Rocket::Core
 		ID3D11Buffer* GetConstantBuffer(int registerSlot) const;
 		ID3D11Buffer** GetAddressOfConstantBuffer(int registerSlot);
 		ID3D11InputLayout* GetInputLayout() const;
-		ID3D11SamplerState** GetAddressOfSampleState();
+
 
 	public:
 		void SetVertexType(eVertexType type);
@@ -31,13 +32,11 @@ namespace Rocket::Core
 	private:
 		void CreateAndReflectShader(ID3D11Device* device, const std::wstring& path);
 		void ReflectShader(ID3D11Device* device, const std::wstring& path);		// 안쓰는 함수.
-		void CreateSamplerState(ID3D11Device* device);
 
 	private:
 		ComPtr<ID3D11VertexShader> _vertexShader;
 		std::vector<ComPtr<ID3D11Buffer>> _constantBuffers;
 		ComPtr<ID3D11InputLayout> _inputLayout;
-		ComPtr<ID3D11SamplerState> _sampleState;
 		eVertexType _vertexType;
 		unsigned int _numElements;
 	};
