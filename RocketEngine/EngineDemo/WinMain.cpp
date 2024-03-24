@@ -54,6 +54,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		staticTest->AddComponent<PlayerController>();
 		*/
 
+		/// 이 CreateModelObject를 하면
+		/// 1. FBX파일을 이때 읽으면서 Raw Data들을 만들어내고
+		/// 2. 그 Raw Data를 그래픽스한테도 넘겨줘서 리소스를 만들어두도록 하고
+		/// 3. 적절한 Renderer 컴포넌트를 부착하고 그래픽스와 연결해.
 		auto staticTest = scene->CreateModelObject("SK_TP_CH_Default.fbx");
 		staticTest->transform.SetPosition(1.0f, 0.0f, 0.0f);
 
@@ -82,6 +86,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		skinnedMeshRenderer2->SetTexture("T_TP_CH_Camo_001_006_D.png");
 		*/
 
+		/// 이 CreateModelObject를 하면
+		/// 1. FBX파일을 이때 읽으면서 Raw Data들을 만들어내고
+		/// 2. 그 Raw Data를 그래픽스한테도 넘겨줘서 리소스를 만들어두도록 하고
+		/// 3. 적절한 Renderer 컴포넌트를 부착하고 그래픽스와 연결해.
 		auto skinnedTest1 = scene->CreateModelObject("Rob02.fbx");
 		skinnedTest1->transform.Translate(0.0f, 0.0f, 3.0f);
 
