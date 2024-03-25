@@ -215,7 +215,11 @@ namespace Rocket
 
 	void Transform::Rotate(float angleX, float angleY, float angleZ)
 	{
-		Quaternion rot = Quaternion::CreateFromYawPitchRoll({ angleX, angleY, angleZ });
+		float radianX = DirectX::XMConvertToRadians(angleX);
+		float radianY = DirectX::XMConvertToRadians(angleY);
+		float radianZ = DirectX::XMConvertToRadians(angleZ);
+
+		Quaternion rot = Quaternion::CreateFromYawPitchRoll({ radianX, radianY, radianZ });
 		_rocketTransform->Rotate(rot);
 	}
 

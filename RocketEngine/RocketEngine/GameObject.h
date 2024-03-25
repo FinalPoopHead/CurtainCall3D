@@ -3,7 +3,9 @@
 #include <typeinfo>
 #include <string>
 #include <vector>
+
 #include "DLLExporter.h"
+#include "Transform.h"	// 상호참조 조심.
 
 namespace Rocket::Core
 {
@@ -110,6 +112,9 @@ namespace Rocket
 		std::vector<T*> GetComponents();
 
 		template <typename T>
+		std::vector<T*> GetComponentsFromAll();	// 본인과 모든 자식들의 컴포넌트를 가져옴.
+
+		template <typename T>
 		T* GetComponentDynamic();
 		
 		template <typename T>
@@ -131,6 +136,7 @@ namespace Rocket
 	{
 		T* component = new T();
 		component->gameObject = this;
+		component->BindTransform();
 		_components[typeid(T).name()].emplace_back(component);
 		return component;
 	}
@@ -169,6 +175,35 @@ namespace Rocket
 					result.push_back(temp);
 				}
 			}
+		}
+
+		return result;
+	}
+
+	template <typename T>
+	std::vector<T*>
+		GameObject::GetComponentsFromAll()
+	{
+		std::vector<T*> result;
+		T* temp;
+
+		auto iter = _components.find(typeid(T).name());
+		if (iter != _components.end())
+		{
+			for (auto& component : iter->second)
+			{
+				temp = dynamic_cast<T*>(component);
+				if (temp)
+				{
+					result.push_back(temp);
+				}
+			}
+		}
+
+		for (auto& child : transform.GetChildrenVec())
+		{
+			auto childComponents = child->gameObject->GetComponentsFromAll<T>();
+			result.insert(result.end(), childComponents.begin(), childComponents.end());
 		}
 
 		return result;

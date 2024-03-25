@@ -16,6 +16,7 @@ namespace Rocket::Core
 		virtual ITextRenderer* CreateTextRenderer() override;
 		virtual ISpriteRenderer* CreateSpriteRenderer() override;
 		virtual ILineRenderer* CreateLineRenderer() override;
+		virtual IDirectionalLight* CreateDirectionalLight() override;
 
 		// IFactory을(를) 통해 상속됨
 		virtual IDynamicModelRenderer* CreateDynamicModelRenderer() override;

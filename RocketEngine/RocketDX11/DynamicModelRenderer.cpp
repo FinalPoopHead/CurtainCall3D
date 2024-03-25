@@ -4,6 +4,9 @@
 #include "ResourceManager.h"
 #include "SkinnedMesh.h"
 #include "../RocketCommon/RocketTransform.h"
+#include "Camera.h"
+#include "ObjectManager.h"
+#include "DirectionalLight.h"
 
 namespace Rocket::Core
 {
@@ -52,6 +55,7 @@ namespace Rocket::Core
 
 	void DynamicModelRenderer::UpdateAnimation(float deltaTime)
 	{
+		// TODO : 애니메이션 해제하고 적용해보자
 		return;
 		if (_model->animations.empty())
 		{
@@ -227,6 +231,25 @@ namespace Rocket::Core
 
 			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
 
+			// 카메라 버퍼 세팅
+			{
+				Camera* mainCam = Camera::GetMainCamera();
+				// 버텍스 쉐이더
+				D3D11_MAPPED_SUBRESOURCE mappedResource;
+				HR(deviceContext->Map(mainCam->GetCameraBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+
+				CameraBufferType* cameraBufferDataPtr = (CameraBufferType*)mappedResource.pData;
+
+				cameraBufferDataPtr->cameraPosition = mainCam->GetPosition();
+				cameraBufferDataPtr->padding = 0.0f;
+
+				deviceContext->Unmap(mainCam->GetCameraBuffer(), 0);
+
+				unsigned int bufferNumber = 1;
+
+				deviceContext->VSSetConstantBuffers(bufferNumber, 1, mainCam->GetAddressOfCameraBuffer());
+			}
+
 			///
 			bufferNumber = 2;
 			HR(deviceContext->Map(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
@@ -264,11 +287,14 @@ namespace Rocket::Core
 
 			LightBufferType* lightBufferDataPtr = (LightBufferType*)mappedResource.pData;
 
-			lightBufferDataPtr->ambientColor = { 0.15f,0.15f,0.15f,1.0f };
-			lightBufferDataPtr->diffuseColor = { 1.0f,1.0f,1.0f,1.0f };
-			lightBufferDataPtr->lightDirection = { 1.0f,0.0f,0.0f };
-			lightBufferDataPtr->specularPower = 2.0f;
-			lightBufferDataPtr->specularColor = { 1.0f,1.0f,1.0f,1.0f };
+			for (auto& directionalLight : ObjectManager::Instance().GetDirectionalLightList())
+			{
+				lightBufferDataPtr->ambientColor = directionalLight->GetAmbientColor();
+				lightBufferDataPtr->diffuseColor = directionalLight->GetDiffuseColor();
+				lightBufferDataPtr->specularPower = directionalLight->GetSpecularPower();
+				lightBufferDataPtr->specularColor = directionalLight->GetSpecularColor();
+				lightBufferDataPtr->lightDirection = directionalLight->GetForward();
+			}
 
 			deviceContext->Unmap(_material->GetPixelShader()->GetConstantBuffer(bufferNumber), 0);
 
@@ -338,8 +364,8 @@ namespace Rocket::Core
 		if (node->index >= 0)
 		{
 			nodeBuffer->transformMatrix[node->index] = DirectX::XMMatrixTranspose(node->GetWorldMatrix());
-		}
 		// nodeBuffer->transformMatrix[node->index] = DirectX::XMMatrixTranspose(node->transform->GetWorldTM());
+		}
 
 		//nodeBuffer->transformMatrix[node->index] = DirectX::XMMatrixTranspose(node->worldTM);
 		for (int i = 0; i < node->children.size(); i++)

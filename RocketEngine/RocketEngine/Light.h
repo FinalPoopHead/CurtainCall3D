@@ -1,11 +1,11 @@
-#pragma once
+﻿#pragma once
 #include "DLLExporter.h"
 #include "Component.h"
 #include "MathHeader.h"
 
-namespace Rocket
+namespace Rocket::Core
 {
-	class GameObject;
+	class ILight;
 }
 
 namespace Rocket
@@ -14,18 +14,24 @@ namespace Rocket
 	{
 	public:
 		Light();
+		virtual ~Light() {}
 
 	public:
-		Vector4 GetAmbient() const;
-		void SetAmbient(Vector4 ambient);
-		Vector4 GetDiffuse() const;
-		void SetDiffuse(Vector4 diffuse);
-		Vector4 GetSpecular() const;
-		void SetSpecular(Vector4 specular);
+		virtual void BindTransform() override;
+		Color GetDiffuseColor() const { return _diffuseColor; }
+		void SetDiffuseColor(Color diffuse);
+		Color GetAmbientColor() const { return _ambientColor; }
+		void SetAmbientColor(Color ambient);
+		Color GetSpecularColor() const { return _specularColor; }
+		void SetSpecularColor(Color specular);
+		float GetSpecularPower() const { return _specularPower; }
+		void SetSpecularPower(float power);
 
 	protected:
-		Vector4 _ambient;
-		Vector4 _diffuse;
-		Vector4 _specular;
+		Core::ILight* _light;
+		Color _diffuseColor;
+		Color _ambientColor;
+		Color _specularColor;
+		float _specularPower;
 	};
 }

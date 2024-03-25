@@ -50,8 +50,7 @@ float4 main(PixelInputType input) : SV_TARGET
         float3 reflection = reflect(-lightDir, input.normal);
         
         // specular 계산 및 강도 조절
-        specular = pow(saturate(dot(reflection, input.viewDirection)), specularPower) * specularColor;
-
+        specular = pow(max(dot(reflection, input.viewDirection), 0.0f), specularPower) * specularColor;
     }
     
     // 텍스처 픽셀과 최종 확산 색을 곱하여 최종 픽셀 색상 결과를 얻음

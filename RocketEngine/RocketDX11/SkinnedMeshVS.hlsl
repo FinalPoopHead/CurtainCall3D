@@ -65,10 +65,10 @@ PixelInputType main(VertexInputType input)
     output.tex = input.tex;
     
     // TODO : offsetMatrix와 node matrix도 곱한 matrix의 역전치를 곱해야될거같은데 일단 보류
-    output.normal = mul(input.normal, (float3x3) transpose(worldInverse));
+    output.normal = mul(float4(input.normal, 0.0f), finalOffsetMatrix);
     output.normal = normalize(output.normal);
     
-    float4 worldPosition = mul(resultPosition, mul(nodeTransformMatrix, worldMatrix));
+    float4 worldPosition = resultPosition;
     
     output.viewDiretion = cameraPosition.xyz - worldPosition.xyz;
     

@@ -83,6 +83,7 @@ namespace Rocket::Core
 
 		DirectX::XMMATRIX GetWorldMatrix()
 		{
+			// For Floater
 			if (this->name == "Armature")
 			{
 				return transformMatrix;

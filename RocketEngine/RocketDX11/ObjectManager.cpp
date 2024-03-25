@@ -11,6 +11,7 @@
 #include "LineRenderer.h"
 #include "Mesh.h"
 #include "CubeMesh.h"
+#include "DirectionalLight.h"
 
 namespace Rocket::Core
 {
@@ -120,4 +121,16 @@ namespace Rocket::Core
 		return dynamicModelRenderer;
 	}
 
+	DirectionalLight* ObjectManager::CreateDirectionalLight()
+	{
+		DirectionalLight* directionalLight = new DirectionalLight();
+		_directionalLightList.emplace_back(directionalLight);
+
+		return directionalLight;
+	}
+
+	std::vector<DirectionalLight*>& ObjectManager::GetDirectionalLightList()
+	{
+		return _directionalLightList;
+	}
 }

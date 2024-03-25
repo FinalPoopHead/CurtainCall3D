@@ -14,6 +14,7 @@ namespace Rocket
 {
 	class GameObject;
 	class DynamicModelRenderer;
+	class Light;
 }
 
 namespace Rocket
@@ -25,6 +26,7 @@ namespace Rocket
 	class ROCKET_API Transform final : public Component
 	{
 		friend DynamicModelRenderer;
+		friend Light;
 
 	public:
 		Transform();		// 생성할 때 내 Entity가 무엇인지 저장한다.

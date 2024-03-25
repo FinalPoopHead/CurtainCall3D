@@ -65,6 +65,6 @@ void DebugCameraMove::OnMouseMove()
 
 	Vector2 mouseDelta = Rocket::GetMouseDelta();
 	mouseDelta = mouseDelta * Rocket::GetDeltaTime();
-	_camera->Pitch(mouseDelta.y * 2);
+	_camera->Pitch(mouseDelta.y * 20);
 	_camera->RotateY(mouseDelta.x * 2);
 }

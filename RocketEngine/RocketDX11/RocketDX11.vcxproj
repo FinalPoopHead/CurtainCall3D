@@ -154,6 +154,7 @@
     <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="CubeMesh.cpp" />
     <ClCompile Include="DeviceBuilderDX11.cpp" />
+    <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="ModelStruct.cpp" />
     <ClCompile Include="SkinnedMesh.cpp" />
     <ClCompile Include="DynamicModelRenderer.cpp" />
@@ -186,6 +187,7 @@
     <ClInclude Include="CubeMap.h" />
     <ClInclude Include="CubeMesh.h" />
     <ClInclude Include="DeviceBuilderDX11.h" />
+    <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="MathHeader.h" />
     <ClInclude Include="ModelStruct.h" />
     <ClInclude Include="SkinnedMesh.h" />

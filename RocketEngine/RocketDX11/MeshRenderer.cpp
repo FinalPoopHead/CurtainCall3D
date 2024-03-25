@@ -2,7 +2,10 @@
 #include "GraphicsMacro.h"
 #include "VertexStruct.h"
 #include "ResourceManager.h"
+#include "ObjectManager.h"
 #include "StaticMesh.h"
+#include "Camera.h"
+#include "DirectionalLight.h"
 
 namespace Rocket::Core
 {
@@ -94,6 +97,25 @@ namespace Rocket::Core
 
 			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
 
+			// 카메라 버퍼 세팅
+			{
+				Camera* mainCam = Camera::GetMainCamera();
+				// 버텍스 쉐이더
+				D3D11_MAPPED_SUBRESOURCE mappedResource;
+				HR(deviceContext->Map(mainCam->GetCameraBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+
+				CameraBufferType* cameraBufferDataPtr = (CameraBufferType*)mappedResource.pData;
+
+				cameraBufferDataPtr->cameraPosition = mainCam->GetPosition();
+				cameraBufferDataPtr->padding = 0.0f;
+
+				deviceContext->Unmap(mainCam->GetCameraBuffer(), 0);
+
+				unsigned int bufferNumber = 1;
+
+				deviceContext->VSSetConstantBuffers(bufferNumber, 1, mainCam->GetAddressOfCameraBuffer());
+			}
+
 			/// 노드버퍼를 세팅할 필요가 없어짐. 각각의 GameObject의 WorldTM을 이용하면 되므로..
 // 			bufferNumber = 2;
 // 
@@ -108,19 +130,22 @@ namespace Rocket::Core
 // 
 // 			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
 			///
+
 			// 픽셀 쉐이더
 			bufferNumber = 0;
 
 			HR(deviceContext->Map(_material->GetPixelShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
 		
 			LightBufferType* lightBufferDataPtr = (LightBufferType*)mappedResource.pData;
-
-			// TODO : LightDirection이 왜 Y축과 Z축이 바뀌어서 나오지? 해결해야한다.
-			lightBufferDataPtr->ambientColor = { 0.15f,0.15f,0.15f,1.0f };
-			lightBufferDataPtr->diffuseColor = { 1.0f,1.0f,1.0f,1.0f };
-			lightBufferDataPtr->lightDirection = { 1.0f,0.0f,0.0f };
-			lightBufferDataPtr->specularPower = 2.0f;
-			lightBufferDataPtr->specularColor = { 0.5f,0.5f,0.5f,1.0f };
+		
+			for (auto& directionalLight : ObjectManager::Instance().GetDirectionalLightList())
+			{
+				lightBufferDataPtr->ambientColor = directionalLight->GetAmbientColor();
+				lightBufferDataPtr->diffuseColor = directionalLight->GetDiffuseColor();
+				lightBufferDataPtr->specularPower = directionalLight->GetSpecularPower();
+				lightBufferDataPtr->specularColor = directionalLight->GetSpecularColor();
+				lightBufferDataPtr->lightDirection = directionalLight->GetForward();
+			}
 
 			deviceContext->Unmap(_material->GetPixelShader()->GetConstantBuffer(bufferNumber), 0);
 
@@ -208,7 +233,11 @@ namespace Rocket::Core
 		// DX에서 HLSL 로 넘어갈때 자동으로 전치가 되서 넘어간다.
 		// HLSL 에서도 Row Major 하게 작성하고 싶으므로 미리 전치를 시켜놓는다.
 		// 총 전치가 2번되므로 HLSL에서도 Row Major한 Matrix로 사용한다.
-		nodeBuffer->transformMatrix[node->index] = DirectX::XMMatrixTranspose(node->GetWorldMatrix());
+		if (node->index > 0)
+		{
+			nodeBuffer->transformMatrix[node->index] = DirectX::XMMatrixTranspose(node->GetWorldMatrix());
+		}
+
 		for (int i = 0; i < node->children.size(); i++)
 		{
 			SetNodeBuffer(node->children[i], nodeBuffer);

@@ -14,6 +14,7 @@ namespace Rocket::Core
 	class TextRenderer;
 	class SpriteRenderer;
 	class LineRenderer;
+	class DirectionalLight;
 
 	class ObjectManager : public Singleton<ObjectManager>
 	{
@@ -27,6 +28,7 @@ namespace Rocket::Core
 		std::vector<TextRenderer*>& GetTextList();
 		std::vector<SpriteRenderer*>& GetImageList();
 		LineRenderer* GetLineRenderer();
+		std::vector<DirectionalLight*>& GetDirectionalLightList();
 
 	public:
 		Camera* CreateCamera();
@@ -35,6 +37,7 @@ namespace Rocket::Core
 		TextRenderer* CreateText();
 		SpriteRenderer* CreateImage();
 		LineRenderer* CreateLineRenderer();
+		DirectionalLight* CreateDirectionalLight();
 
 	private:
 		std::vector<Camera*> _cameraList;
@@ -43,6 +46,7 @@ namespace Rocket::Core
 		std::vector<TextRenderer*> _textList;
 		std::vector<SpriteRenderer*> _ImageList;
 		LineRenderer* _lineRenderer;
+		std::vector<DirectionalLight*> _directionalLightList;
 
 	private:
 		ResourceManager& _resourceManager;

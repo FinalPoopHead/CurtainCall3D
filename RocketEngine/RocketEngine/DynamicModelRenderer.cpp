@@ -32,6 +32,5 @@ namespace Rocket
 	void DynamicModelRenderer::UpdateRenderData()
 	{
 		_graphicsComponent->SetWorldTM(gameObject->transform.GetWorldTM());
-
 	}
 }

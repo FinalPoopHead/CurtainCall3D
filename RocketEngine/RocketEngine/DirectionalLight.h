@@ -1,10 +1,10 @@
-#pragma once
+﻿#pragma once
 #include "DLLExporter.h"
 #include "Light.h"
 
-namespace Rocket
+namespace Rocket::Core
 {
-	class GameObject;
+	class IDirectionalLight;
 }
 
 namespace Rocket
@@ -14,14 +14,7 @@ namespace Rocket
 	public:
 		DirectionalLight();
 
-	public:
-		//Rocket::Core::DirectionalLightData GetLightData() const;
-
-	public:
-		float GetIntensity() const;
-		void SetIntensity(float intensity);
-
 	private:
-		float _intensity;
+		Core::IDirectionalLight* _directionalLight;
 	};
 }
