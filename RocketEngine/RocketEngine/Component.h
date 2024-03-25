@@ -54,12 +54,12 @@ namespace Rocket
 	protected:
 		virtual void UpdateRenderData() {}
 
-
 	public:
 		GameObject* gameObject;
 
 	private:
 		void SetRestart();
+		virtual void BindTransform() {}	// 그래픽스와 Transform을 연결할 필요가 있는 경우 연결하는 함수.
 
 	private:
 		bool _isStarted = false;

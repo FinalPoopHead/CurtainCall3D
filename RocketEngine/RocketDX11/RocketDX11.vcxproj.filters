@@ -43,7 +43,7 @@
       <Filter>Object\HelperObject</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
-      <Filter>Object\Camera</Filter>
+      <Filter>Component\Camera</Filter>
     </ClCompile>
     <ClCompile Include="CubeMesh.cpp">
       <Filter>Resource\Mesh\StaticMeshes\Primitive</Filter>
@@ -117,13 +117,16 @@
     <ClCompile Include="CubeMap.cpp">
       <Filter>Object\CubeMap</Filter>
     </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Component\Light</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Axis.h">
       <Filter>Object\HelperObject</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
-      <Filter>Object\Camera</Filter>
+      <Filter>Component\Camera</Filter>
     </ClInclude>
     <ClInclude Include="CubeMesh.h">
       <Filter>Resource\Mesh\StaticMeshes\Primitive</Filter>
@@ -221,6 +224,9 @@
     <ClInclude Include="CubeMap.h">
       <Filter>Object\CubeMap</Filter>
     </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>Component\Light</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="FBXLoader">
@@ -228,9 +234,6 @@
     </Filter>
     <Filter Include="Object">
       <UniqueIdentifier>{7dcc5874-dd39-4cbf-8c16-a378066fa391}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Object\Camera">
-      <UniqueIdentifier>{569834aa-0dc1-4d58-86a8-a5376e7b1fd6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Object\HelperObject">
       <UniqueIdentifier>{58879384-5c1a-44e3-9913-4dd22345d70c}</UniqueIdentifier>
@@ -351,6 +354,12 @@
     </Filter>
     <Filter Include="Component\MeshRenderer">
       <UniqueIdentifier>{b06c9dce-0c2e-4e80-9d78-36595b5a6d4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Light">
+      <UniqueIdentifier>{b61a15b9-7160-4481-b2da-9704f07873bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Camera">
+      <UniqueIdentifier>{569834aa-0dc1-4d58-86a8-a5376e7b1fd6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

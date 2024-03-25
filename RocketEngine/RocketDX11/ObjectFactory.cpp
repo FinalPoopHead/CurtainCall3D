@@ -9,6 +9,7 @@
 #include "TextRenderer.h"
 #include "SpriteRenderer.h"
 #include "LineRenderer.h"
+#include "DirectionalLight.h"
 
 namespace Rocket::Core
 {
@@ -79,5 +80,10 @@ namespace Rocket::Core
 	CylinderPrimitive* ObjectFactory::CreateCylinderPrimitive()
 	{
 		return nullptr;
+	}
+
+	IDirectionalLight* ObjectFactory::CreateDirectionalLight()
+	{
+		return _objectManager.CreateDirectionalLight();
 	}
 }

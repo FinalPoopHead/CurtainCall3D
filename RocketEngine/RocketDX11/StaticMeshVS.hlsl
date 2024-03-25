@@ -45,7 +45,7 @@ PixelInputType main(VertexInputType input)
     // Store the texture coordinates for the pixel shader.
     output.tex = input.tex;
     
-    output.normal = mul(input.normal, (float3x3)transpose(worldInverse));
+    output.normal = mul(float4(input.normal, 0.0f), (float4x4) transpose(worldInverse));
     output.normal = normalize(output.normal);
     
     // float4 worldPosition = mul(float4(input.position, 1.0f), mul(nodeTransformMatrix, worldMatrix));

@@ -37,6 +37,30 @@
     <Filter Include="Interface\Factory">
       <UniqueIdentifier>{c35cb22d-950e-4cc7-9bfd-4d267be04e0c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interface\Component\Camera">
+      <UniqueIdentifier>{c3769e2a-180c-48f1-95a0-5a95d5a6f28e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Component\Light">
+      <UniqueIdentifier>{9f5d6308-00c0-4b9b-b197-dbb23c445396}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Component\Renderer">
+      <UniqueIdentifier>{97f3e477-8fd9-43c8-a9d6-9232fe48a590}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Component\Light\BaseClass">
+      <UniqueIdentifier>{e4d9cd98-3444-4cb0-b4ae-39649d22e64e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Component\Renderer\3D">
+      <UniqueIdentifier>{6985b0c4-d472-4f06-897f-52fd36813865}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Component\Renderer\2D">
+      <UniqueIdentifier>{ade390e9-135e-4b5a-9056-5cf22ac7e60e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Component\Renderer\3D\BaseClass">
+      <UniqueIdentifier>{e71b4b20-7349-4b8f-bd7a-edf98d609698}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Component\Renderer\2D\BaseClass">
+      <UniqueIdentifier>{153f1c79-ab5d-4a9d-be51-94f13ed776e6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RocketTransform.cpp">
@@ -68,27 +92,6 @@
     <ClInclude Include="AssimpMathConverter.h">
       <Filter>ModelLoader\FBXLoader\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="ICamera.h">
-      <Filter>Interface\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="IDynamicModelRenderer.h">
-      <Filter>Interface\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="ILineRenderer.h">
-      <Filter>Interface\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="IRenderable.h">
-      <Filter>Interface\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="ISpriteRenderer.h">
-      <Filter>Interface\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="IMeshRenderer.h">
-      <Filter>Interface\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="ITextRenderer.h">
-      <Filter>Interface\Component</Filter>
-    </ClInclude>
     <ClInclude Include="IDX11Renderer.h">
       <Filter>Interface\DX11Renderer</Filter>
     </ClInclude>
@@ -104,11 +107,38 @@
     <ClInclude Include="IResourceManager.h">
       <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="ISketchable.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
     <ClInclude Include="PrimitiveHeader.h">
       <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="ICamera.h">
+      <Filter>Interface\Component\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="ILight.h">
+      <Filter>Interface\Component\Light\BaseClass</Filter>
+    </ClInclude>
+    <ClInclude Include="IDirectionalLight.h">
+      <Filter>Interface\Component\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="IMeshRenderer.h">
+      <Filter>Interface\Component\Renderer\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="IDynamicModelRenderer.h">
+      <Filter>Interface\Component\Renderer\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="ILineRenderer.h">
+      <Filter>Interface\Component\Renderer\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderable.h">
+      <Filter>Interface\Component\Renderer\3D\BaseClass</Filter>
+    </ClInclude>
+    <ClInclude Include="ISketchable.h">
+      <Filter>Interface\Component\Renderer\2D\BaseClass</Filter>
+    </ClInclude>
+    <ClInclude Include="ISpriteRenderer.h">
+      <Filter>Interface\Component\Renderer\2D\BaseClass</Filter>
+    </ClInclude>
+    <ClInclude Include="ITextRenderer.h">
+      <Filter>Interface\Component\Renderer\2D</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

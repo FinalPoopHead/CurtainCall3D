@@ -156,9 +156,11 @@
     <ClInclude Include="FBXLoaderToRaw.h" />
     <ClInclude Include="GraphicsEnum.h" />
     <ClInclude Include="ICamera.h" />
+    <ClInclude Include="IDirectionalLight.h" />
     <ClInclude Include="IDX11Renderer.h" />
     <ClInclude Include="IDynamicModelRenderer.h" />
     <ClInclude Include="IFactory.h" />
+    <ClInclude Include="ILight.h" />
     <ClInclude Include="ILineRenderer.h" />
     <ClInclude Include="IMaterial.h" />
     <ClInclude Include="IRenderable.h" />

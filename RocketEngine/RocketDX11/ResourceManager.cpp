@@ -299,12 +299,16 @@ namespace Rocket::Core
 		// RawNode정보 순회하면서 Node Hierarchy 만들기. Bone정보도 같이 처리함.
 		resultModel->rootNode = ProcessRawNodeRecur(rawModel->rootNode);
 
+		//이름이 겹치는 경우를 대비.
+		int index = 0;
+
 		// Mesh 정보 순회하면서 Mesh 만들기. Texture도 이때 로드해봄.
  		for (auto& rawMesh : rawModel->meshes)
 		{
 			StaticMesh* staticMesh = ProcessStaticMesh(rawMesh);
 			resultModel->meshes.push_back(staticMesh);
-			_meshes.insert({ rawMesh->name, staticMesh });
+			_meshes.insert({ rawMesh->name + std::to_string(index), staticMesh });
+			index++;
 		}
 
 		return resultModel;
