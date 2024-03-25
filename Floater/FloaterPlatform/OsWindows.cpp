@@ -8,6 +8,9 @@
 #include "../FloaterRendererDX11/include/CreateRenderer.h"
 #include "../FloaterUtil/include/ConvString.h"
 
+// TODO : include 폴더로 이동 해야함.
+#include "../RocketAdapter/include/CreateRenderer.h"
+
 #include "../FloaterRendererCommon/include/ResourceMgr.h"
 
 #include <DbgHelp.h>
@@ -259,6 +262,9 @@ flt::IRenderer* flt::OsWindows::CreateRenderer(RendererType type)
 		case flt::RendererType::DX12:
 
 			break;
+			case flt::RendererType::ROCKET_DX11:
+				renderer = CreateRendererRocketDX11(_hwnd);
+				break;
 		default:
 			ASSERT(false, "RendererType이 잘못되었습니다.");
 			break;

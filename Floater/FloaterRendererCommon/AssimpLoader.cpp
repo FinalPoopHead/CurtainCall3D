@@ -343,7 +343,7 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 					for (unsigned int k = 0; k < bone->mNumWeights; ++k)
 					{
 						aiVertexWeight weight = bone->mWeights[k];
-						rawMesh->vertices[weight.mVertexId].boneIndice.push_back(boneIndex);
+						rawMesh->vertices[weight.mVertexId].boneIndices.push_back(boneIndex);
 						rawMesh->vertices[weight.mVertexId].boneWeights.push_back(weight.mWeight);
 					}
 				}
@@ -678,7 +678,7 @@ void flt::AssimpLoader::CheckVertexBoneName(RawMesh* pRawMesh, aiMesh* pAiMesh)
 			auto vertex = pRawMesh->vertices[weight.mVertexId];
 
 			bool isExist = false;
-			for (auto& boneIndex : vertex.boneIndice)
+			for (auto& boneIndex : vertex.boneIndices)
 			{
 				auto bone = skeleton.bones[boneIndex];
 				if (bone.name == boneName)

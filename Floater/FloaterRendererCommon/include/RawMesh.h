@@ -16,7 +16,7 @@ namespace flt
 	{
 		RawVertex() = default;
 		RawVertex(const Vector3f& pos, const Vector2f uvs[10], const Vector3f& normal)
-			: pos(pos), uvs(), normal(normal), binormal(), tangent(), boneIndice(), boneWeights()
+			: pos(pos), uvs(), normal(normal), binormal(), tangent(), boneIndices(), boneWeights()
 		{
 			for (int i = 0; i < 10; ++i)
 			{
@@ -58,7 +58,7 @@ namespace flt
 		Vector3f normal;
 		Vector3f binormal;
 		Vector3f tangent;
-		std::vector<unsigned int> boneIndice;
+		std::vector<unsigned int> boneIndices;
 		std::vector<float> boneWeights;
 	};
 

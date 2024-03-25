@@ -16,6 +16,7 @@ namespace Rocket
 		_components()
 	{
 		_components[typeid(transform).name()].push_back(&transform);
+		transform.gameObject = this;
 	}
 
 	void GameObject::Destroy()

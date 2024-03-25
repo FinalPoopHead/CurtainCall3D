@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 namespace flt
 {
@@ -6,7 +6,8 @@ namespace flt
 	{
 		SOFTWARE,
 		DX11,
-		DX12
+		DX12,
+		ROCKET_DX11
 	};
 }
 

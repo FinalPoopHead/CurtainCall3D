@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <DirectXMath.h>
 #include <vector>
 #include <string>
 #include <unordered_map>
@@ -27,7 +26,7 @@ namespace Rocket::Core
 	{
 		std::string name = "";
 		RawNode* rootNode = nullptr;
-		std::vector<RawMesh*> meshes;
+		std::vector<RawMesh*> meshes;	// TODO : Deprecated. Node별로 들어있으니 그걸 쓰도록
 		std::unordered_map<std::string, RawAnimation*> animations;
 	};
 

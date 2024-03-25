@@ -174,6 +174,9 @@
     <ProjectReference Include="..\FloaterUtil\FloaterUtil.vcxproj">
       <Project>{cb145f87-3fe0-445e-bb70-582b466cbe74}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\RocketAdapter\RocketAdapter.vcxproj">
+      <Project>{790f4f45-5e14-4d4b-b7b0-54313e923713}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="include\FloaterPlatform.natvis" />

@@ -1,7 +1,7 @@
 ﻿#include "FBXLoaderToRaw.h"
 #include "AssimpMathConverter.h"
 
-const std::string MODEL_PATH = "Resources/Models/";
+const std::string MODEL_PATH = "../../RocketEngine/Resources/Models/";
 
 namespace Rocket::Core
 {

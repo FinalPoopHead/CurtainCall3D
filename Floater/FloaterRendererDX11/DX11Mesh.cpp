@@ -25,9 +25,9 @@ flt::DX11Mesh* flt::DX11MeshBuilder::build() const
 		vertices[i].normal = pRawMesh->vertices[i].normal;
 		vertices[i].binormal = pRawMesh->vertices[i].binormal;
 		vertices[i].tangent = pRawMesh->vertices[i].tangent;
-		for (int j = 0; j < pRawMesh->vertices[i].boneIndice.size(); ++j)
+		for (int j = 0; j < pRawMesh->vertices[i].boneIndices.size(); ++j)
 		{
-			vertices[i].BoneIndices[j] = pRawMesh->vertices[i].boneIndice[j];
+			vertices[i].BoneIndices[j] = pRawMesh->vertices[i].boneIndices[j];
 		}
 		for (int j = 0; j < pRawMesh->vertices[i].boneWeights.size(); ++j)
 		{

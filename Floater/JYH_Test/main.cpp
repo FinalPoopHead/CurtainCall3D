@@ -149,7 +149,8 @@ int main()
 	flt::Platform platform{ true };
 	platform.Initialize(1280, 720, L"title", L".\\path");
 
-	auto renderer = platform.CreateRenderer(flt::RendererType::DX11);
+	auto renderer = platform.CreateRenderer(flt::RendererType::ROCKET_DX11);
+	//auto renderer = platform.CreateRenderer(flt::RendererType::DX11);
 
 	bool isShowCurser = true;
 
