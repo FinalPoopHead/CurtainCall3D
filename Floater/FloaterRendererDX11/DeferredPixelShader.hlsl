@@ -19,7 +19,7 @@ struct PS_OUTPUT
     float4 emissive : SV_Target4;
 };
 
-PS_OUTPUT main(VS_OUTPUT input) : SV_Target
+PS_OUTPUT main(VS_OUTPUT input)
 {
     PS_OUTPUT output;
 

@@ -17,7 +17,7 @@ struct PS_OUTPUT
     float4 emissive : SV_Target4;
 };
 
-PS_OUTPUT main(VS_OUTPUT input) : SV_TARGET
+PS_OUTPUT main(VS_OUTPUT input)
 {
     ////return float4(0.8, 0.8, 0.8, input.Opacity);
     PS_OUTPUT output;
@@ -26,6 +26,7 @@ PS_OUTPUT main(VS_OUTPUT input) : SV_TARGET
     output.normal = color;
     output.albedo = color;
     output.specular = float4(0.0f, 0.0f, 0.0f, 1.0f);
+    output.emissive = float4(0.0f, 0.0f, 0.0f, 1.0f);
     
     return output;
 }

@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "../../FloaterRendererCommon/include/IRenderer.h"
 #include <windows.h>
+#include <set>
 
 namespace Rocket::Core
 {
@@ -9,6 +10,8 @@ namespace Rocket::Core
 
 namespace flt
 {
+	struct RocketObject;
+
 	class RocketAdapter : public IRenderer
 	{
 	public:
@@ -25,5 +28,7 @@ namespace flt
 		//virtual bool Test() { return false; };
 	private:
 		Rocket::Core::IDX11Renderer* _impl;
+
+		std::set<RocketObject*> _objects;
 	};
 }

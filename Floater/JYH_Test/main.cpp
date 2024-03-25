@@ -160,10 +160,10 @@ int main()
 	cameraNode.transform.SetPosition(0.0f, 0.0f, 0.0f);
 	cameraNode.transform.SetScale(1.0f, 1.0f, 1.0f);
 	cameraNode.transform.SetRotation(0.0f, 0.0f, 0.0f);
-	cameraNode.camera = new flt::Camera(&cameraNode.transform);
 
 	flt::Transform cameraTransform;
 	flt::RendererObject cameraObject(cameraTransform, cameraNode, isDraw, L"testCamera");
+	cameraObject.camera = new flt::Camera(&cameraObject.transform);
 	auto cameraID = renderer->RegisterObject(cameraObject);
 
 
@@ -215,41 +215,41 @@ int main()
 				if (keyData)
 				{
 					std::cout << "pressed w" << std::endl;
-					cameraNode.transform.AddLocalPosition(cameraNode.transform.Forward() * cameraSpeed);
+					cameraTransform.AddLocalPosition(cameraTransform.Forward() * cameraSpeed);
 				}
 				keyData = platform.GetKey(flt::KeyCode::a);
 				if (keyData)
 				{
-					cameraNode.transform.AddLocalPosition(cameraNode.transform.Right() * -cameraSpeed);
+					cameraTransform.AddLocalPosition(cameraTransform.Right() * -cameraSpeed);
 				}
 				keyData = platform.GetKey(flt::KeyCode::s);
 				if (keyData)
 				{
-					cameraNode.transform.AddLocalPosition(cameraNode.transform.Forward() * -cameraSpeed);
+					cameraTransform.AddLocalPosition(cameraTransform.Forward() * -cameraSpeed);
 				}
 				keyData = platform.GetKey(flt::KeyCode::d);
 				if (keyData)
 				{
-					cameraNode.transform.AddLocalPosition(cameraNode.transform.Right() * cameraSpeed);
+					cameraTransform.AddLocalPosition(cameraTransform.Right() * cameraSpeed);
 				}
 				keyData = platform.GetKey(flt::KeyCode::q);
 				if (keyData)
 				{
-					cameraNode.transform.AddWorldPosition(0.0f, cameraSpeed, 0.0f);
+					cameraTransform.AddWorldPosition(0.0f, cameraSpeed, 0.0f);
 				}
 				keyData = platform.GetKey(flt::KeyCode::e);
 				if (keyData)
 				{
-					cameraNode.transform.AddWorldPosition(0.0f, -cameraSpeed, 0.0f);
+					cameraTransform.AddWorldPosition(0.0f, -cameraSpeed, 0.0f);
 				}
 
 				keyData = platform.GetKey(flt::KeyCode::mouseRelativePos);
 				if (keyData)
 				{
-					cameraNode.transform.AddWorldRotation({ 0.0f, 1.0f, 0.0f }, keyData.x * 0.01f);
-					flt::Vector3f euler = cameraNode.transform.GetLocalRotation().GetEuler();
+					cameraTransform.AddWorldRotation({ 0.0f, 1.0f, 0.0f }, keyData.x * 0.01f);
+					flt::Vector3f euler = cameraTransform.GetLocalRotation().GetEuler();
 					euler.x = std::clamp(euler.x + flt::RadToDeg(keyData.y * 0.01f), -89.0f, 89.0f);
-					cameraNode.transform.SetRotation(flt::Quaternion(euler));
+					cameraTransform.SetRotation(flt::Quaternion(euler));
 				}
 			}
 		}

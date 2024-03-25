@@ -92,6 +92,17 @@ void flt::Transform::SetPosition(const Vector4f& position)
 	_position = position;
 }
 
+flt::Quaternion flt::Transform::GetWorldRotation() const noexcept
+{
+	Quaternion worldRot = _rotation;
+	if (_pParent)
+	{
+		worldRot = _pParent->GetWorldRotation() * worldRot;
+	}
+
+	return worldRot;
+}
+
 void flt::Transform::SetRotation(float degreeX, float degreeY, float degreeZ, Quaternion::AxisOrder order)
 {
 	MakeDirtyRecursive();

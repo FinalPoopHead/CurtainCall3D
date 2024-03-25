@@ -21,8 +21,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{91B32D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Rocket", "Rocket", "{4431D483-0F4F-46A7-A0B1-00DA2BCE24BB}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{AAE87663-CF8E-4E47-92B3-6315E66778B8}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RocketDX11", "..\RocketEngine\RocketDX11\RocketDX11.vcxproj", "{1D9E43E5-A3EC-4841-8DAB-32BFFF18BCC6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RocketCommon", "..\RocketEngine\RocketCommon\RocketCommon.vcxproj", "{47D8E40F-9380-4D3D-86E7-BAB4A833CE34}"

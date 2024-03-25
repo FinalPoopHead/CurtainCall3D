@@ -1,5 +1,9 @@
 ﻿#include "./include/RocketAdapter.h"
+#include "RocketObject.h"
 #include "RawNodeConverter.h"
+
+#pragma warning(push)
+#pragma warning(disable : 26495)
 #include "./RocketCommon/IDX11Renderer.h"
 #include "./RocketCommon/IFactory.h"
 
@@ -13,6 +17,7 @@
 #include "./RocketCommon/ILineRenderer.h"
 
 #include "./RocketCommon/IResourceManager.h"
+#pragma warning(pop)
 
 #pragma comment(lib, "RocketDX11.lib")
 #pragma comment(lib, "RocketCommon.lib")
@@ -47,6 +52,16 @@ bool flt::RocketAdapter::Finalize()
 
 bool flt::RocketAdapter::Render(float deltaTime)
 {
+	for (auto& obj : _objects)
+	{
+		if (obj->camera)
+		{
+			Vector3f pos = (Vector3f)obj->transform->GetWorldPosition();
+			Quaternion rot = obj->transform->GetWorldRotation();
+			obj->camera->SetPositionAndRotation({ pos.x, pos.y, pos.z }, { rot.x, rot.y, rot.z, rot.w });
+		}
+	}
+
 	_impl->Update(deltaTime);
 	_impl->Render();
 
@@ -55,21 +70,39 @@ bool flt::RocketAdapter::Render(float deltaTime)
 
 flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 {
-	Rocket::Core::RawModel* rkModel = ConvertModel(renderable.node);
-	Rocket::Core::IResourceManager* rsmgr = Rocket::Core::GetResourceManager();
-	
-	std::string pointer = std::to_string(reinterpret_cast<uint64_t>(rkModel));
-	rsmgr->LoadModel(pointer, rkModel);
+	RocketObject* rocketObject = new(std::nothrow) RocketObject();
+	ASSERT(rocketObject, "Failed to create RocketObject");
 
-	if (!renderable.camera)
+	rocketObject->transform = &renderable.transform;
+
+	rocketObject->rkModel = ConvertModel(renderable.node);
+	Rocket::Core::IResourceManager* rsmgr = Rocket::Core::GetResourceManager();
+
+	std::string pointer = std::to_string(reinterpret_cast<uint64_t>(rocketObject->rkModel));
+	rsmgr->LoadModel(pointer, rocketObject->rkModel);
+
+	auto factory = Rocket::Core::CreateGraphicsObjectFactory();
+
+	if (renderable.camera)
 	{
 		// 카메라 등록 로직
+		rocketObject->camera = factory->CreateCamera();
+		rocketObject->camera->SetAsMainCamera();
 	}
 
-// 	Rocket::Core::IFactory* factory = Rocket::Core::CreateGraphicsObjectFactory();
-// 	auto ret = factory->CreateDynamicModelRenderer();
-// 	ret->l
+	if (renderable.node.meshes.size() > 0)
+	{
+		rocketObject->renderer = factory->CreateDynamicModelRenderer();
+		rocketObject->renderer->LoadModel(pointer);
+	}
 
+	Rocket::Core::ReleaseFactory(factory);
+
+	// 	Rocket::Core::IFactory* factory = Rocket::Core::CreateGraphicsObjectFactory();
+	// 	auto ret = factory->CreateDynamicModelRenderer();
+	// 	ret->l
+
+	_objects.insert(rocketObject);
 	return 0;
 }
 

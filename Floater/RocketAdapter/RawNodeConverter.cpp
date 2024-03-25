@@ -6,7 +6,10 @@
 #include "../FloaterRendererCommon/include/RawNode.h"
 #include "../FloaterRendererCommon/include/RawSkeleton.h"
 
+#pragma warning(push)
+#pragma warning(disable: 26495)
 #include "./RocketCommon/RawModelStruct.h"
+#pragma warning(pop)
 
 #include <DirectXMath.h>
 
@@ -33,29 +36,30 @@ DirectX::XMMATRIX ConvertXMMatrix(const flt::Matrix4f& matrix)
 }
 
 
-using rkModel = Rocket::Core::RawModel;
-using rkNode = Rocket::Core::RawNode;
-using rkBone = Rocket::Core::RawBone;
-using rkMesh = Rocket::Core::RawMesh;
-using rkMaterial = Rocket::Core::RawMaterial;
-using rkRawAnimation = Rocket::Core::RawAnimation;
+using RkModel = Rocket::Core::RawModel;
+using RkNode = Rocket::Core::RawNode;
+using RkBone = Rocket::Core::RawBone;
+using RkMesh = Rocket::Core::RawMesh;
+using RkMaterial = Rocket::Core::RawMaterial;
+using RkRawAnimation = Rocket::Core::RawAnimation;
 
 
 Rocket::Core::RawModel* flt::ConvertModel(const flt::RawNode& rootNode)
 {
-	rkModel* model = new(std::nothrow) Rocket::Core::RawModel();
+	RkModel* model = new(std::nothrow) Rocket::Core::RawModel();
 	ASSERT(model, "Failed to allocate memory for model");
 
 	// TODO : 파일명을 넣어줘야함.
 	model->name = ConvertToString(rootNode.name);
 	model->rootNode = ConvertfltRawNodeTorocketRawNodeRecursive(rootNode);
+	CopyMeshesToModel(model->rootNode, model);
 
 	// TODO : 본 애니메이션 말고도 Node애니메이션도 넣어야하지만 나중에.
 	if (rootNode.skeleton)
 	{
 		for (const auto& animation : rootNode.skeleton->animations)
 		{
-			rkRawAnimation* rocketAnimation = new(std::nothrow) Rocket::Core::RawAnimation();
+			RkRawAnimation* rocketAnimation = new(std::nothrow) Rocket::Core::RawAnimation();
 			ASSERT(rocketAnimation, "Failed to allocate memory for animation");
 
 			rocketAnimation->name = ConvertToString(animation.name);
@@ -105,7 +109,7 @@ Rocket::Core::RawModel* flt::ConvertModel(const flt::RawNode& rootNode)
 
 Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt::RawNode& node)
 {
-	rkNode* rocketNode = new(std::nothrow) Rocket::Core::RawNode();
+	RkNode* rocketNode = new(std::nothrow) Rocket::Core::RawNode();
 	ASSERT(rocketNode, "Failed to allocate memory for node");
 
 	rocketNode->name = ConvertToString(node.name);
@@ -116,17 +120,17 @@ Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt:
 
 	for (const auto& mesh : node.meshes)
 	{
-		rkMesh* rocketMesh = new(std::nothrow) Rocket::Core::RawMesh();
+		RkMesh* rocketMesh = new(std::nothrow) Rocket::Core::RawMesh();
 		ASSERT(rocketMesh, "Failed to allocate memory for mesh");
 		rocketMesh->name = ConvertToString(node.name);
 		rocketMesh->bindedNode = rocketNode;
 
-		rocketMesh->material = new(std::nothrow) rkMaterial();
+		rocketMesh->material = new(std::nothrow) RkMaterial();
 		ASSERT(rocketMesh->material, "Failed to allocate memory for material");
 
 		// material 정보 입력
 		const flt::RawMaterial& material = mesh.material;
-		rkMaterial* rocketMaterial = rocketMesh->material;
+		RkMaterial* rocketMaterial = rocketMesh->material;
 		for (int i = 0; i < material.MAX_TEXTURES; ++i)
 		{
 			if (material.textures[i] == nullptr)
@@ -262,14 +266,14 @@ Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt:
 
 	for (const auto& child : node.children)
 	{
-		rkNode* rocketChild = ConvertfltRawNodeTorocketRawNodeRecursive(*child);
+		RkNode* rocketChild = ConvertfltRawNodeTorocketRawNodeRecursive(*child);
 		rocketNode->children.push_back(rocketChild);
 		rocketChild->parent = rocketNode;
 	}
 
 	if (node.skeleton)
 	{
-		rkNode* rocketChild = ConvertfltBoneTorocketNodeRecursive(node.skeleton->bones[node.skeleton->rootBoneIndex], &node.skeleton->bones[0]);
+		RkNode* rocketChild = ConvertfltBoneTorocketNodeRecursive(node.skeleton->bones[node.skeleton->rootBoneIndex], &node.skeleton->bones[0], node.skeleton);
 		rocketNode->children.push_back(rocketChild);
 		rocketChild->parent = rocketNode;
 	}
@@ -277,15 +281,18 @@ Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt:
 	return rocketNode;
 }
 
-Rocket::Core::RawNode* flt::ConvertfltBoneTorocketNodeRecursive(const flt::RawSkeleton::Bone& bone, const flt::RawSkeleton::Bone* const pIndexOffsetBone)
+Rocket::Core::RawNode* flt::ConvertfltBoneTorocketNodeRecursive(const flt::RawSkeleton::Bone& bone, const flt::RawSkeleton::Bone* const pIndexOffsetBone, const flt::RawSkeleton* const skeleton)
 {
-	rkNode* rocketNode = new(std::nothrow) Rocket::Core::RawNode();
+	RkNode* rocketNode = new(std::nothrow) Rocket::Core::RawNode();
 	ASSERT(rocketNode, "Failed to allocate memory for node");
 
 	rocketNode->name = ConvertToString(bone.name);
 	// TODO : index를 넣어줘야함.
 	rocketNode->index = (int)(&bone - pIndexOffsetBone);
-	rocketNode->bindedBone = new(std::nothrow) rkBone();
+	rocketNode->bindedBone = new(std::nothrow) RkBone();
+	ASSERT(rocketNode->bindedBone, "Failed to allocate memory for bone");
+	rocketNode->bindedBone->index = rocketNode->index;
+	rocketNode->bindedBone->offsetMatrix = ConvertXMMatrix(skeleton->boneOffsets[rocketNode->index]);
 	rocketNode->transformMatrix = ConvertXMMatrix(bone.transform.GetLocalMatrix4f());
 
 
@@ -294,7 +301,7 @@ Rocket::Core::RawNode* flt::ConvertfltBoneTorocketNodeRecursive(const flt::RawSk
 	{
 		auto owner = childTr->GetOwner();
 		const RawSkeleton::Bone* childBone = (RawSkeleton::Bone*)owner;
-		rkNode* rocketChild = ConvertfltBoneTorocketNodeRecursive(*childBone, pIndexOffsetBone);
+		RkNode* rocketChild = ConvertfltBoneTorocketNodeRecursive(*childBone, pIndexOffsetBone, skeleton);
 		rocketNode->children.push_back(rocketChild);
 		rocketChild->parent = rocketNode;
 	}
@@ -302,14 +309,27 @@ Rocket::Core::RawNode* flt::ConvertfltBoneTorocketNodeRecursive(const flt::RawSk
 	return rocketNode;
 }
 
-Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNode(const RawNode& node)
+void flt::CopyMeshesToModel(Rocket::Core::RawNode* node, Rocket::Core::RawModel* rocketModel)
 {
-	if (node.skeleton)
+	for (auto& mesh : node->meshes)
 	{
-
+		rocketModel->meshes.push_back(mesh);
 	}
-	else
+
+	for (auto& child : node->children)
 	{
-		return ConvertfltRawNodeTorocketRawNodeRecursive(node);
+		CopyMeshesToModel(child, rocketModel);
 	}
 }
+
+//Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNode(const RawNode& node)
+//{
+//	if (node.skeleton)
+//	{
+//		int i = 0;
+//	}
+//	else
+//	{
+//		return ConvertfltRawNodeTorocketRawNodeRecursive(node);
+//	}
+//}

@@ -36,6 +36,7 @@ namespace flt
 		void SetPosition(const Vector4f& position);
 
 		Quaternion GetLocalRotation() const noexcept { return _rotation; }
+		Quaternion GetWorldRotation() const noexcept;
 		void SetRotation(float degreeX, float degreeY, float degreeZ, Quaternion::AxisOrder order = Quaternion::AxisOrder::YXZ);
 		void SetRotation(double degreeX, double degreeY, double degreeZ, Quaternion::AxisOrder order = Quaternion::AxisOrder::YXZ);
 		void SetRotation(Vector3f degree, Quaternion::AxisOrder order = Quaternion::AxisOrder::YXZ);

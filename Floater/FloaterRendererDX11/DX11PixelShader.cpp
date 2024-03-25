@@ -42,7 +42,7 @@ flt::DX11PixelShader* flt::DX11PixelShaderBuilder::build() const
 	hResult = pDevice->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), nullptr, &pixelShader);
 	ASSERT(hResult == S_OK, "픽셀 쉐이더 생성 실패");
 
-	pixelShader->SetPrivateData(WKPDID_D3DDebugObjectNameW, (filePath.size() + 1) * sizeof(wchar_t), filePath.c_str());
+	pixelShader->SetPrivateData(WKPDID_D3DDebugObjectNameW, (UINT)((filePath.size() + 1) * sizeof(wchar_t)), filePath.c_str());
 
 	ID3D11Buffer* constantBuffer = nullptr;
 	D3D11_BUFFER_DESC constantBufferDesc = {};

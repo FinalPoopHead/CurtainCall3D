@@ -432,9 +432,9 @@ flt::HOBJECT flt::RendererDX11::RegisterObject(RendererObject& renderable)
 
 	_renderableObjects.push_back(node);
 
-	if (renderable.node.camera)
+	if (renderable.camera)
 	{
-		node->camera = renderable.node.camera;
+		node->camera = renderable.camera;
 		_cameras.push_back(node->camera);
 	}
 
@@ -591,19 +591,19 @@ bool flt::RendererDX11::ForwardRender(float deltaTime)
 			// 상수 버퍼 임시 세팅
 			struct {
 				unsigned int gridCount;
-			} entityInitData;
+			} entityInitData {};
 			entityInitData.gridCount = gridCounts[i];
 
 			struct {
 				DirectX::XMFLOAT3 cameraPos;
-			}framePerCamera;
+			}framePerCamera{};
 			framePerCamera.cameraPos = { cameraPosition.x, cameraPosition.y, cameraPosition.z };
 
 			struct {
 				DirectX::XMMATRIX worldTranslate;
 				DirectX::XMMATRIX worldViewProj;
 				float heightOpacity;
-			}framePerEntity;
+			}framePerEntity{};
 
 			framePerEntity.worldTranslate = ConvertXMMatrix(_grids[i].transform.GetTranslateMatrix4f());
 			framePerEntity.worldViewProj = ConvertXMMatrix(_grids[i].transform.GetWorldMatrix4f() * viewMatrix * projMatrix);
@@ -805,19 +805,19 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 			// 상수 버퍼 임시 세팅
 			struct {
 				unsigned int gridCount;
-			} entityInitData;
+			} entityInitData{};
 			entityInitData.gridCount = gridCounts[i];
 
 			struct {
 				DirectX::XMFLOAT3 cameraPos;
-			}framePerCamera;
+			}framePerCamera{};
 			framePerCamera.cameraPos = { cameraPosition.x, cameraPosition.y, cameraPosition.z };
 
 			struct {
 				DirectX::XMMATRIX worldTranslate;
 				DirectX::XMMATRIX worldViewProj;
 				float heightOpacity;
-			}framePerEntity;
+			}framePerEntity{};
 
 			framePerEntity.worldTranslate = ConvertXMMatrix(_grids[i].transform.GetTranslateMatrix4f());
 			framePerEntity.worldViewProj = ConvertXMMatrix(_grids[i].transform.GetWorldMatrix4f() * viewMatrix * projMatrix);

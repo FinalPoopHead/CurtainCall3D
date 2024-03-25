@@ -83,9 +83,13 @@ namespace Rocket::Core
 
 		DirectX::XMMATRIX GetWorldMatrix()
 		{
+			if (this->name == "Armature")
+			{
+				return transformMatrix;
+			}
+
 			if (parent)
 			{
-
 				return transformMatrix * parent->GetWorldMatrix();
 			}
 			else

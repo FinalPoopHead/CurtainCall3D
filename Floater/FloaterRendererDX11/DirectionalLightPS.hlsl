@@ -21,7 +21,7 @@ float4 main(VS_OUTPUT input) : SV_Target
     float4 albedo = Albedo.Sample(Sampler, input.uv);
     float4 depth = Depth.Sample(Sampler, input.uv);
     
-    float4 color;
+    float4 color = float4(0.0f, 0.0f, 0.0f, 1.0f);
     
     if(length(normal) > 0.0f)
     {
@@ -34,7 +34,7 @@ float4 main(VS_OUTPUT input) : SV_Target
         [flatten]
         if(lambertian > 0.0f)
         {
-            float viewDir = normalize(-viewPos);
+            float3 viewDir = normalize(-viewPos);
             float3 halfDir = normalize(lightDir + viewDir);
             float specAngle = max(dot(halfDir, normal), 0.0f);
             specular = pow(specAngle, 32.0f);
