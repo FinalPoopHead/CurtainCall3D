@@ -61,7 +61,10 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 	std::string pointer = std::to_string(reinterpret_cast<uint64_t>(rkModel));
 	rsmgr->LoadModel(pointer, rkModel);
 
-
+	if (!renderable.camera)
+	{
+		// 카메라 등록 로직
+	}
 
 // 	Rocket::Core::IFactory* factory = Rocket::Core::CreateGraphicsObjectFactory();
 // 	auto ret = factory->CreateDynamicModelRenderer();

@@ -171,7 +171,7 @@ Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt:
 				case flt::RawMaterial::TextureType::EMISSIVE:
 				{
 					rocketMaterial->emissiveTexture = new(std::nothrow) Rocket::Core::RawTexture();
-					ASSERT(rocketMaterial->shininessTexture, "Failed to allocate memory for texture");
+					ASSERT(rocketMaterial->emissiveTexture, "Failed to allocate memory for texture");
 					rocketMaterial->emissiveTexture->name = ConvertToString(material.textures[i]->name);
 					rocketMaterial->emissiveTexture->path = ConvertToString(material.textures[i]->path);
 				}
@@ -196,7 +196,7 @@ Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt:
 				break;
 
 				default:
-					ASSERT(false, "not defined type");
+					//ASSERT(false, "not defined type");
 					break;
 			}
 		}
