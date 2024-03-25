@@ -143,12 +143,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\RocketEngine\RocketCommon\RocketCommon.vcxproj">
-      <Project>{47d8e40f-9380-4d3d-86e7-bab4a833ce34}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\RocketEngine\RocketDX11\RocketDX11.vcxproj">
-      <Project>{1d9e43e5-a3ec-4841-8dab-32bfff18bcc6}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\FloaterMath\FloaterMath.vcxproj">
       <Project>{0bb76c52-c35f-4a26-88e7-04920c2b5dbe}</Project>
     </ProjectReference>

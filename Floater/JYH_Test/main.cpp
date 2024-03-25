@@ -235,12 +235,12 @@ int main()
 				keyData = platform.GetKey(flt::KeyCode::q);
 				if (keyData)
 				{
-					cameraTransform.AddWorldPosition(0.0f, cameraSpeed, 0.0f);
+					cameraTransform.AddWorldPosition(0.0f, -cameraSpeed, 0.0f);
 				}
 				keyData = platform.GetKey(flt::KeyCode::e);
 				if (keyData)
 				{
-					cameraTransform.AddWorldPosition(0.0f, -cameraSpeed, 0.0f);
+					cameraTransform.AddWorldPosition(0.0f, cameraSpeed, 0.0f);
 				}
 
 				keyData = platform.GetKey(flt::KeyCode::mouseRelativePos);
