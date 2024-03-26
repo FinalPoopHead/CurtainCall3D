@@ -1,44 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <FxCompile Include="ColorPS.hlsl">
-      <Filter>Resource\Shader\HLSL\Color</Filter>
-    </FxCompile>
-    <FxCompile Include="ColorVS.hlsl">
-      <Filter>Resource\Shader\HLSL\Color</Filter>
-    </FxCompile>
-    <FxCompile Include="TexturePS.hlsl">
-      <Filter>Resource\Shader\HLSL\Texture</Filter>
-    </FxCompile>
-    <FxCompile Include="TextureVS.hlsl">
-      <Filter>Resource\Shader\HLSL\Texture</Filter>
-    </FxCompile>
-    <FxCompile Include="LightVS.hlsl">
-      <Filter>Resource\Shader\HLSL\Light</Filter>
-    </FxCompile>
-    <FxCompile Include="LightPS.hlsl">
-      <Filter>Resource\Shader\HLSL\Light</Filter>
-    </FxCompile>
-    <FxCompile Include="StaticMeshVS.hlsl">
-      <Filter>Resource\Shader\HLSL\StaticMesh</Filter>
-    </FxCompile>
-    <FxCompile Include="StaticMeshPS.hlsl">
-      <Filter>Resource\Shader\HLSL\StaticMesh</Filter>
-    </FxCompile>
-    <FxCompile Include="SkinnedMeshVS.hlsl">
-      <Filter>Resource\Shader\HLSL\SkinnedMesh</Filter>
-    </FxCompile>
-    <FxCompile Include="SkinnedMeshPS.hlsl">
-      <Filter>Resource\Shader\HLSL\SkinnedMesh</Filter>
-    </FxCompile>
-    <FxCompile Include="CubeMapVS.hlsl">
-      <Filter>Resource\Shader\HLSL\CubeMap</Filter>
-    </FxCompile>
-    <FxCompile Include="CubeMapPS.hlsl">
-      <Filter>Resource\Shader\HLSL\CubeMap</Filter>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="Axis.cpp">
       <Filter>Object\HelperObject</Filter>
     </ClCompile>
@@ -349,5 +311,43 @@
     <Filter Include="Component\Light">
       <UniqueIdentifier>{1cb4a846-a9b5-414c-b3fa-5cfa50d7cdde}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="ColorPS.hlsl">
+      <Filter>Resource\Shader\HLSL\Color</Filter>
+    </FxCompile>
+    <FxCompile Include="ColorVS.hlsl">
+      <Filter>Resource\Shader\HLSL\Color</Filter>
+    </FxCompile>
+    <FxCompile Include="CubeMapVS.hlsl">
+      <Filter>Resource\Shader\HLSL\CubeMap</Filter>
+    </FxCompile>
+    <FxCompile Include="LightPS.hlsl">
+      <Filter>Resource\Shader\HLSL\Light</Filter>
+    </FxCompile>
+    <FxCompile Include="LightVS.hlsl">
+      <Filter>Resource\Shader\HLSL\Light</Filter>
+    </FxCompile>
+    <FxCompile Include="CubeMapPS.hlsl">
+      <Filter>Resource\Shader\HLSL\CubeMap</Filter>
+    </FxCompile>
+    <FxCompile Include="SkinnedMeshPS.hlsl">
+      <Filter>Resource\Shader\HLSL\SkinnedMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="SkinnedMeshVS.hlsl">
+      <Filter>Resource\Shader\HLSL\SkinnedMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="StaticMeshPS.hlsl">
+      <Filter>Resource\Shader\HLSL\StaticMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="StaticMeshVS.hlsl">
+      <Filter>Resource\Shader\HLSL\StaticMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="TextureVS.hlsl">
+      <Filter>Resource\Shader\HLSL\Texture</Filter>
+    </FxCompile>
+    <FxCompile Include="TexturePS.hlsl">
+      <Filter>Resource\Shader\HLSL\Texture</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
