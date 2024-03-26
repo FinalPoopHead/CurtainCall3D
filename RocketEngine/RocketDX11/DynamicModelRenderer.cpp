@@ -416,15 +416,15 @@ namespace Rocket::Core
 
 	void DynamicModelRenderer::BindTransformRecur(RocketTransform* transform, Node* node)
 	{
-		DirectX::XMVECTOR outScale;
-		DirectX::XMVECTOR outRotation;
-		DirectX::XMVECTOR outTranslation;
-
-		DirectX::XMMatrixDecompose(&outScale, &outRotation, &outTranslation, node->transformMatrix);
-
-		transform->SetLocalScale(outScale);
-		transform->SetLocalRotation(outRotation);
-		transform->SetLocalPosition(outTranslation);
+// 		DirectX::XMVECTOR outScale;
+// 		DirectX::XMVECTOR outRotation;
+// 		DirectX::XMVECTOR outTranslation;
+// 
+// 		DirectX::XMMatrixDecompose(&outScale, &outRotation, &outTranslation, node->transformMatrix);
+// 
+// 		transform->SetLocalScale(outScale);
+// 		transform->SetLocalRotation(outRotation);
+// 		transform->SetLocalPosition(outTranslation);
 
 		node->transform = transform;
 

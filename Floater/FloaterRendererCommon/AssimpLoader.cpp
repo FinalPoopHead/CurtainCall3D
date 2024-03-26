@@ -38,10 +38,10 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 	//	aiProcess_ConvertToLeftHanded |	aiProcess_CalcTangentSpace | aiProcess_PopulateArmatureData |
 	//	aiProcess_LimitBoneWeights;
 
-	std::string path = ConvertToString(filePath);
+	std::string path = ToString(filePath);
 	const aiScene* assimpScene = importer.ReadFile(path, flags);
 	size_t pos = path.find_last_of('\\');
-	std::wstring directory = ConvertToWstring(path.substr(0, pos + 1));
+	std::wstring directory = ToWstring(path.substr(0, pos + 1));
 
 	ClearPrivateData();
 	SetAINodeMapRecursive(assimpScene->mRootNode);
@@ -74,7 +74,7 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 			auto ret = material->Get(AI_MATKEY_NAME, outStr);
 			if (ret == AI_SUCCESS)
 			{
-				_materials[i]->name = ConvertToWstring(outStr.C_Str());
+				_materials[i]->name = ToWstring(outStr.C_Str());
 			}
 
 			aiColor3D diffuse;
@@ -121,13 +121,13 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 			ret = material->GetTexture(aiTextureType_DIFFUSE, 0, &outStr);
 			if (ret == AI_SUCCESS)
 			{
-				_materials[i]->textures[RawMaterial::ALBEDO_OPACITY]->path = directory + ConvertToWstring(outStr.C_Str());
+				_materials[i]->textures[RawMaterial::ALBEDO_OPACITY]->path = directory + ToWstring(outStr.C_Str());
 			}
 
 			ret = material->GetTexture(aiTextureType_NORMALS, 0, &outStr);
 			if (ret == AI_SUCCESS)
 			{
-				_materials[i]->textures[RawMaterial::NORMAL]->path = directory + ConvertToWstring(outStr.C_Str());
+				_materials[i]->textures[RawMaterial::NORMAL]->path = directory + ToWstring(outStr.C_Str());
 
 			}
 
@@ -137,37 +137,37 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 			ret = material->GetTexture(aiTextureType_EMISSIVE, 0, &outStr);
 			if (ret == AI_SUCCESS)
 			{
-				_materials[i]->textures[RawMaterial::EMISSIVE]->path = directory + ConvertToWstring(outStr.C_Str());
+				_materials[i]->textures[RawMaterial::EMISSIVE]->path = directory + ToWstring(outStr.C_Str());
 			}
 
 			ret = material->GetTexture(aiTextureType_AMBIENT, 0, &outStr);
 			if (ret == AI_SUCCESS)
 			{
-				_materials[i]->textures[RawMaterial::AO]->path = directory + ConvertToWstring(outStr.C_Str());
+				_materials[i]->textures[RawMaterial::AO]->path = directory + ToWstring(outStr.C_Str());
 			}
 
 			ret = material->GetTexture(aiTextureType_HEIGHT, 0, &outStr);
 			if (ret == AI_SUCCESS)
 			{
-				_materials[i]->textures[RawMaterial::HEIGHT]->path = directory + ConvertToWstring(outStr.C_Str());
+				_materials[i]->textures[RawMaterial::HEIGHT]->path = directory + ToWstring(outStr.C_Str());
 			}
 
 			ret = material->GetTexture(aiTextureType_OPACITY, 0, &outStr);
 			if (ret == AI_SUCCESS)
 			{
-				_materials[i]->textures[RawMaterial::OPACITY]->path = directory + ConvertToWstring(outStr.C_Str());
+				_materials[i]->textures[RawMaterial::OPACITY]->path = directory + ToWstring(outStr.C_Str());
 			}
 
 			ret = material->GetTexture(aiTextureType_SHININESS, 0, &outStr);
 			if (ret == AI_SUCCESS)
 			{
-				_materials[i]->textures[RawMaterial::ROUGHNESS]->path = directory + ConvertToWstring(outStr.C_Str());
+				_materials[i]->textures[RawMaterial::ROUGHNESS]->path = directory + ToWstring(outStr.C_Str());
 			}
 
 			ret = material->GetTexture(aiTextureType_UNKNOWN, 0, &outStr);
 			if (ret == AI_SUCCESS)
 			{
-				_materials[i]->textures[RawMaterial::UNKNOWN]->path = directory + ConvertToWstring(outStr.C_Str());
+				_materials[i]->textures[RawMaterial::UNKNOWN]->path = directory + ToWstring(outStr.C_Str());
 			}
 
 			/*ASSERT(!(material->GetTextureCount(aiTextureType_DIFFUSE)), "has Texture");
@@ -231,7 +231,7 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 			for (int j = 0; j < boneCount; ++j)
 			{
 				auto& bone = assimpScene->mMeshes[i]->mBones[j];
-				std::wstring boneName = ConvertToWstring(bone->mName.C_Str());
+				std::wstring boneName = ToWstring(bone->mName.C_Str());
 
 				auto& m = bone->mOffsetMatrix;
 
@@ -338,7 +338,7 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 				for (unsigned int j = 0; j < mesh->mNumBones; ++j)
 				{
 					aiBone* bone = mesh->mBones[j];
-					std::wstring boneName = ConvertToWstring(bone->mName.C_Str());
+					std::wstring boneName = ToWstring(bone->mName.C_Str());
 					int boneIndex = _boneIndexMap[boneName].second;
 					for (unsigned int k = 0; k < bone->mNumWeights; ++k)
 					{
@@ -374,7 +374,7 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 			for (int j = 0; j < channelCount; ++j)
 			{
 				aiNodeAnim* nodeAnim = animation->mChannels[j];
-				std::wstring nodeName = ConvertToWstring(nodeAnim->mNodeName.C_Str());
+				std::wstring nodeName = ToWstring(nodeAnim->mNodeName.C_Str());
 
 				auto iter = _boneIndexMap.find(nodeName);
 
@@ -400,7 +400,9 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 					clips = &rawSkeleton.animations[i].clips[_boneIndexMap[nodeName].second];
 				}
 
-				rawAnimation->name = ConvertToWstring(animName.C_Str());
+				rawAnimation->name = ToWstring(animName.C_Str());
+				rawAnimation->duration = (float)duration;
+				rawAnimation->ticksPerSecond = (float)ticksPerSecond;
 
 				int keyCount = (int)nodeAnim->mNumPositionKeys;
 				clips->keyPosition.reserve(keyCount);
@@ -445,7 +447,7 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 	//outRawScene->nodes.reserve(nodeCount);
 	for (int i = 0; i < nodeCount; ++i)
 	{
-		std::wstring nodeName = ConvertToWstring(assimpScene->mRootNode->mChildren[i]->mName.C_Str());
+		std::wstring nodeName = ToWstring(assimpScene->mRootNode->mChildren[i]->mName.C_Str());
 		if (_boneIndexMap.find(nodeName) != _boneIndexMap.end())
 		{
 			continue;
@@ -458,7 +460,7 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 
 void flt::AssimpLoader::SetAINodeMapRecursive(aiNode* pNode)
 {
-	_aiNodeMap.insert({ ConvertToWstring(pNode->mName.C_Str()), pNode });
+	_aiNodeMap.insert({ ToWstring(pNode->mName.C_Str()), pNode });
 
 	const int childCount = pNode->mNumChildren;
 	for (int i = 0; i < childCount; ++i)
@@ -472,7 +474,7 @@ void flt::AssimpLoader::SetHierarchyRawNodeRecursive(aiNode* pNode, RawNode* pRa
 	ASSERT(pNode, "pNode is nullptr");
 	ASSERT(pRawNode, "pRawNode is nullptr");
 
-	pRawNode->name = ConvertToWstring(pNode->mName.C_Str());
+	pRawNode->name = ToWstring(pNode->mName.C_Str());
 	_RawNodeMap.insert({ pRawNode->name , pRawNode });
 	std::wcout << pRawNode->name << std::endl;
 
@@ -538,7 +540,7 @@ void flt::AssimpLoader::SetHierarchyRawNodeRecursive(aiNode* pNode, RawNode* pRa
 	const int childCount = pNode->mNumChildren;
 	for (int i = 0; i < childCount; ++i)
 	{
-		std::wstring childName = ConvertToWstring(pNode->mChildren[i]->mName.C_Str());
+		std::wstring childName = ToWstring(pNode->mChildren[i]->mName.C_Str());
 		if (_boneIndexMap.find(childName) != _boneIndexMap.end())
 		{
 			continue;
@@ -560,7 +562,7 @@ void flt::AssimpLoader::PrintNodeNameRecursive(aiNode* pNode, int depth /*= 0*/)
 	{
 		std::wcout << L"| ";
 	}
-	std::wstring testName = ConvertToWstring(pNode->mName.C_Str());
+	std::wstring testName = ToWstring(pNode->mName.C_Str());
 	std::wcout << testName << std::endl;
 
 	if (pNode->mNumChildren == 0)
@@ -604,7 +606,7 @@ void flt::AssimpLoader::SetSkeleton(aiNode* armature, RawSkeleton& skeleton)
 void flt::AssimpLoader::SetSkeletonRecursive(aiNode* assimpBone, RawSkeleton& skeleton, const int index)
 {
 	RawSkeleton::Bone* bone = &skeleton.bones[index];
-	bone->name = ConvertToWstring(assimpBone->mName.C_Str());
+	bone->name = ToWstring(assimpBone->mName.C_Str());
 	auto iter = _boneIndexMap.find(bone->name);
 	if (iter != _boneIndexMap.end())
 	{
@@ -671,7 +673,7 @@ void flt::AssimpLoader::CheckVertexBoneName(RawMesh* pRawMesh, aiMesh* pAiMesh)
 	for (unsigned int i = 0; i < pAiMesh->mNumBones; ++i)
 	{
 		auto bone = pAiMesh->mBones[i];
-		std::wstring boneName = ConvertToWstring(bone->mName.C_Str());
+		std::wstring boneName = ToWstring(bone->mName.C_Str());
 		for (unsigned int j = 0; j < bone->mNumWeights; ++j)
 		{
 			auto weight = bone->mWeights[j];
