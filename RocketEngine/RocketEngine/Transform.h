@@ -14,6 +14,7 @@ namespace Rocket
 {
 	class GameObject;
 	class DynamicModelRenderer;
+	class MeshRenderer;
 	class Light;
 }
 
@@ -26,6 +27,7 @@ namespace Rocket
 	class ROCKET_API Transform final : public Component
 	{
 		friend DynamicModelRenderer;
+		friend MeshRenderer;
 		friend Light;
 
 	public:

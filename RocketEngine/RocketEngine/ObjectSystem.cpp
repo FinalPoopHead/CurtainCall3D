@@ -208,7 +208,7 @@ namespace Rocket::Core
 		for (auto& rawMesh : node->meshes)
 		{
 			Rocket::MeshRenderer* meshRenderer = gameObject->AddComponent<Rocket::MeshRenderer>();
-			meshRenderer->SetMesh(rawMesh->name + std::to_string(index));
+			meshRenderer->LoadMesh(rawMesh->name + std::to_string(index));
 			index++;
 			// TODO : Texture도 자동으로 같이 Set 해주면 좋을 거 같긴 한데..
 		}
@@ -216,7 +216,7 @@ namespace Rocket::Core
 		for (auto& child : node->children)
 		{
 			Rocket::GameObject* childObject = CreateStaticMeshObjectRecur(child);
-			childObject->transform.SetParent(gameObject);
+			childObject->transform.SetParent(gameObject, false);
 		}
 
 		return gameObject;
@@ -231,6 +231,7 @@ namespace Rocket::Core
 		Vector3 scale;
 
 		node->transformMatrix.Decompose(scale, rotation, position);
+
 		gameObject->transform.SetLocalPosition(position);
 		gameObject->transform.SetLocalRotation(rotation);
 		gameObject->transform.SetLocalScale(scale);
@@ -243,7 +244,7 @@ namespace Rocket::Core
 		for (auto& child : node->children)
 		{
 			Rocket::GameObject* childObject = CreateDynamicModelObjectRecur(child, outModelRenderer);
-			childObject->transform.SetParent(gameObject);
+			childObject->transform.SetParent(gameObject, false);
 		}
 
 		return gameObject;

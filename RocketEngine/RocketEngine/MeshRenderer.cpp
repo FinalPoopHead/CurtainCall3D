@@ -7,7 +7,7 @@
 namespace Rocket
 {
 	MeshRenderer::MeshRenderer()
-		: _meshRenderer(Core::GraphicsSystem::Instance().GetFactory()->CreateStaticModelRenderer())
+		: _graphicsRenderer(Core::GraphicsSystem::Instance().GetFactory()->CreateStaticModelRenderer())
 	{
 
 	}
@@ -17,20 +17,21 @@ namespace Rocket
 // 		_meshRenderer->LoadModel(meshType);
 // 	}
 
-	void MeshRenderer::SetMesh(std::string fileName)
+	void MeshRenderer::LoadMesh(std::string fileName)
 	{
-		_meshRenderer->LoadMesh(fileName);
+		_graphicsRenderer->LoadMesh(fileName);
+		_graphicsRenderer->BindTransform(gameObject->transform._rocketTransform);
 	}
 
 	void MeshRenderer::SetTexture(std::string fileName)
 	{
-		_meshRenderer->LoadTexture(fileName);
+		_graphicsRenderer->LoadTexture(fileName);
 	}
 
 	void MeshRenderer::UpdateRenderData()
 	{
-		_meshRenderer->SetWorldTM(gameObject->transform.GetWorldTM());
-		_meshRenderer->SetActive(gameObject->IsActive());
+		_graphicsRenderer->SetWorldTM(gameObject->transform.GetWorldTM());
+		_graphicsRenderer->SetActive(gameObject->IsActive());
 	}
 
 }
