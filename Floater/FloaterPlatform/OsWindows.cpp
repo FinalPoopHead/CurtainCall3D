@@ -270,12 +270,30 @@ flt::IRenderer* flt::OsWindows::CreateRenderer(RendererType type)
 			break;
 	}
 
+	_rendererMap[renderer] = type;
 	return renderer;
 }
 
 void flt::OsWindows::DestroyRenderer(IRenderer* renderer)
 {
-	DestroyRendererDX11(renderer);
+	RendererType type = _rendererMap[renderer];
+
+	switch (type)
+	{
+		case flt::RendererType::SOFTWARE:
+			break;
+		case flt::RendererType::DX11:
+			DestroyRendererDX11(renderer);
+			break;
+		case flt::RendererType::DX12:
+			break;
+		case flt::RendererType::ROCKET_DX11:
+			DestroyRendererRocketDX11(renderer);
+			break;
+		default:
+			break;
+	}
+
 
 	// 그래픽스 리소스가 해제되는지 체크하기 위한 코드.
 #if defined(DEBUG) || defined(_DEBUG)

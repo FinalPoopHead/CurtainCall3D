@@ -17,6 +17,7 @@
 #include "./RocketCommon/ILineRenderer.h"
 
 #include "./RocketCommon/IResourceManager.h"
+
 #pragma warning(pop)
 
 #pragma comment(lib, "RocketDX11.lib")
@@ -54,6 +55,15 @@ bool flt::RocketAdapter::Render(float deltaTime)
 {
 	for (auto& obj : _objects)
 	{
+		Vector4f wPos = obj->transform->GetWorldPosition();
+		obj->rocketTransform.SetLocalPosition({ wPos.x, wPos.y, wPos.z });
+
+		Quaternion wRot = obj->transform->GetWorldRotation();
+		obj->rocketTransform.SetLocalRotation({ wRot.x, wRot.y, wRot.z, wRot.w });
+
+		Vector4f wScale = obj->transform->GetWorldScale();
+		obj->rocketTransform.SetLocalScale({ wScale.x, wScale.y, wScale.z });
+
 		if (obj->camera)
 		{
 			Vector3f pos = (Vector3f)obj->transform->GetWorldPosition();
@@ -94,13 +104,10 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 	{
 		rocketObject->renderer = factory->CreateDynamicModelRenderer();
 		rocketObject->renderer->LoadModel(pointer);
+		rocketObject->renderer->BindTransform(&rocketObject->rocketTransform);
 	}
 
 	Rocket::Core::ReleaseFactory(factory);
-
-	// 	Rocket::Core::IFactory* factory = Rocket::Core::CreateGraphicsObjectFactory();
-	// 	auto ret = factory->CreateDynamicModelRenderer();
-	// 	ret->l
 
 	_objects.insert(rocketObject);
 	return 0;
@@ -110,4 +117,3 @@ bool flt::RocketAdapter::DeregisterObject(HOBJECT renderable)
 {
 	return false;
 }
-

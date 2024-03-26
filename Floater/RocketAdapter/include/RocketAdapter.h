@@ -2,6 +2,7 @@
 #include "../../FloaterRendererCommon/include/IRenderer.h"
 #include <windows.h>
 #include <set>
+#include <unordered_map>
 
 namespace Rocket::Core
 {
@@ -25,7 +26,7 @@ namespace flt
 		virtual HOBJECT RegisterObject(RendererObject& renderable);
 		virtual bool DeregisterObject(HOBJECT renderable);
 
-		//virtual bool Test() { return false; };
+
 	private:
 		Rocket::Core::IDX11Renderer* _impl;
 

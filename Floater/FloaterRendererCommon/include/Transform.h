@@ -29,7 +29,7 @@ namespace flt
 		void SetMatrix(const Matrix4f& worldMatrix);
 
 		Vector4f GetLocalPosition() const noexcept { return _position; }
-		Vector4f GetWorldPosition() noexcept;
+		Vector4f GetWorldPosition() const noexcept;
 		void SetPosition(float x, float y, float z);
 		void SetPosition(double x, double y, double z);
 		void SetPosition(const Vector3f& position);
@@ -45,6 +45,7 @@ namespace flt
 		void SetRotation(float x, float y, float z, float w);
 
 		Vector4f GetLocalScale() const noexcept { return _scale; }
+		Vector4f GetWorldScale() const noexcept;
 		void SetScale(float x, float y, float z);
 		void SetScale(double x, double y, double z);
 		void SetScale(const Vector3f& scale);
@@ -64,12 +65,12 @@ namespace flt
 		Matrix4f GetRotationMatrix4f() const noexcept;
 		Matrix4f GetScaleMatrix4f() const noexcept;
 		Matrix4f GetLocalMatrix4f() const noexcept;
-		Matrix4f GetWorldMatrix4f() noexcept;
+		Matrix4f GetWorldMatrix4f() const noexcept;
 
 		void LookAt(Vector4f target);
-		Vector4f Forward() noexcept;
-		Vector4f Right() noexcept;
-		Vector4f Up() noexcept;
+		Vector4f Forward() const noexcept;
+		Vector4f Right() const noexcept;
+		Vector4f Up() const noexcept;
 
 
 		Transform* GetParent() const noexcept { return _pParent; }
@@ -82,8 +83,8 @@ namespace flt
 		TransformOwner* GetOwner() const noexcept { return _pOwner; }
 
 	private:
-		void MakeDirtyRecursive() noexcept;
-		void CalcWorldMatrixRecursive() noexcept;
+		void MakeDirtyRecursive() const noexcept;
+		void CalcWorldMatrixRecursive() const noexcept;
 
 
 	private:
@@ -94,8 +95,8 @@ namespace flt
 		Transform* _pParent;
 		std::vector<Transform*> _children;
 
-		Matrix4f _worldMatrix;
-		bool _isDirty;
+		mutable Matrix4f _worldMatrix;
+		mutable bool _isDirty;
 
 		TransformOwner* _pOwner;
 	};

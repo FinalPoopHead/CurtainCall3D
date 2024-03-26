@@ -33,7 +33,11 @@ flt::DX11VertexShader* flt::DX11VertexShaderBuilder::build() const
 	UINT compileFlag = 0;
 #if defined(_DEBUG) || defined(_DEBUG)
 	compileFlag |= D3DCOMPILE_DEBUG;
-	compileFlag |= D3DCOMPILE_SKIP_OPTIMIZATION;
+	compileFlag |= D3DCOMPILE_SKIP_OPTIMIZATION; // 코드 생성 중에 최적화 단계 건너 뜀
+	compileFlag |= D3DCOMPILE_ENABLE_STRICTNESS; // 레거시 구문을 허용하지 않음.
+	compileFlag |= D3DCOMPILE_WARNINGS_ARE_ERRORS; // 경고를 에러로 처리
+	compileFlag |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR; // 행 우선으로 행렬 패킹 -> 일반적인 벡터 행렬곱이 벡터 * 행렬 순서가 됨.
+				 //D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR // 열 우선으로 행렬 패킹 -> 벡터 행렬 곱이 행렬 * 벡터 순서가 됨.
 #endif
 
 	comptr<ID3D10Blob> vertexShaderBlob = nullptr;

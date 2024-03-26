@@ -55,7 +55,7 @@ void flt::Transform::SetMatrix(const Matrix4f& worldMatrix)
 	DirectX::XMMatrixDecompose(&_scale.m, &_rotation.m, &_position.m, matrix);
 }
 
-flt::Vector4f flt::Transform::GetWorldPosition() noexcept
+flt::Vector4f flt::Transform::GetWorldPosition() const noexcept
 {
 	Vector4f worldPos = _position;
 	if (_pParent)
@@ -136,6 +136,19 @@ void flt::Transform::SetRotation(const Quaternion& q)
 
 	_rotation = q;
 	_rotation.Normalize();
+}
+
+flt::Vector4f flt::Transform::GetWorldScale() const noexcept
+{
+	Vector4f worldScl = _scale;
+	worldScl.w = 0.0f;
+
+	if (_pParent)
+	{
+		worldScl = worldScl * _pParent->GetWorldMatrix4f();
+	}
+
+	return worldScl;
 }
 
 void flt::Transform::SetScale(float x, float y, float z)
@@ -301,7 +314,7 @@ flt::Matrix4f flt::Transform::GetLocalMatrix4f() const noexcept
 	//return GetScaleMatrix4f() * GetRotationMatrix4f() * GetTransformMatrix4f();
 }
 
-flt::Matrix4f flt::Transform::GetWorldMatrix4f() noexcept
+flt::Matrix4f flt::Transform::GetWorldMatrix4f() const noexcept
 {
 	if (_isDirty)
 	{
@@ -351,17 +364,17 @@ void flt::Transform::LookAt(Vector4f target)
 	_rotation.Normalize();
 }
 
-flt::Vector4f flt::Transform::Forward() noexcept
+flt::Vector4f flt::Transform::Forward() const noexcept
 {
 	return (Vector4f(0.f, 0.f, 1.f, 0.f) * GetWorldMatrix4f()).Normalize();
 }
 
-flt::Vector4f flt::Transform::Right() noexcept
+flt::Vector4f flt::Transform::Right() const noexcept
 {
 	return (Vector4f(1.f, 0.f, 0.f, 0.f) * GetWorldMatrix4f()).Normalize();
 }
 
-flt::Vector4f flt::Transform::Up() noexcept
+flt::Vector4f flt::Transform::Up() const noexcept
 {
 	return (Vector4f(0.f, 1.f, 0.f, 0.f) * GetWorldMatrix4f()).Normalize();
 }
@@ -406,7 +419,7 @@ bool flt::Transform::AddChild(Transform* pChild)
 	return pChild->SetParent(this);
 }
 
-void flt::Transform::MakeDirtyRecursive() noexcept
+void flt::Transform::MakeDirtyRecursive() const noexcept
 {
 	if (_isDirty)
 	{
@@ -421,7 +434,7 @@ void flt::Transform::MakeDirtyRecursive() noexcept
 	}
 }
 
-void flt::Transform::CalcWorldMatrixRecursive() noexcept
+void flt::Transform::CalcWorldMatrixRecursive() const noexcept
 {
 	if (_pParent)
 	{

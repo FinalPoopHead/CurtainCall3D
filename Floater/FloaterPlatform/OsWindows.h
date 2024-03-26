@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include "include/KeyCode.h"
 #include "include/EnumType.h"
 #include "../FloaterUtil/include/Timer.h"
@@ -56,5 +57,6 @@ namespace flt
 
 	private:
 		static unsigned char _keyCodeMap[256];
+		std::unordered_map<IRenderer*, RendererType> _rendererMap;
 	};
 }
