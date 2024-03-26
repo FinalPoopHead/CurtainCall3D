@@ -240,21 +240,21 @@ namespace Rocket
 		_rocketTransform->LookAt(target, up);
 	}
 
-	void Transform::SetParent(Transform* parent)
+	void Transform::SetParent(Transform* parent, bool keepWorldPosition)
 	{	
 		if (_parent == nullptr)
 		{
 			ReleaseParent();
 		}
 
-		_rocketTransform->SetParent(parent->_rocketTransform);
+		_rocketTransform->SetParent(parent->_rocketTransform, keepWorldPosition);
 		_parent = parent;
 		_parent->AddChild(this);
 	}
 
-	void Transform::SetParent(GameObject* parentObj)
+	void Transform::SetParent(GameObject* parentObj, bool keepWorldPosition)
 	{
-		SetParent(&(parentObj->transform));
+		SetParent(&(parentObj->transform), keepWorldPosition);
 	}
 
 	Transform* Transform::GetParent()

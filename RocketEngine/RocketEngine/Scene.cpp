@@ -97,7 +97,10 @@ namespace Rocket
 
 	Rocket::GameObject* Scene::CreateModelObject(const std::string& fileName)
 	{
-		return Rocket::Core::ObjectSystem::Instance().CreateModelObject(fileName);
+		GameObject* rootObject = Rocket::Core::ObjectSystem::Instance().CreateModelObject(fileName);
+		rootObject->SetScene(this);
+		AddToOriginalListRecur(rootObject);
+		return rootObject;
 	}
 
 	bool Scene::DeleteObject(std::string gameObjectName)
@@ -146,6 +149,16 @@ namespace Rocket
 	std::vector<GameObject*>& Scene::GetRunningList()
 	{
 		return _runningList;
+	}
+
+	void Scene::AddToOriginalListRecur(GameObject* gameObj)
+	{
+		_originalList.push_back(gameObj);
+
+		for (auto& child : gameObj->transform.GetChildrenVec())
+		{
+			AddToOriginalListRecur(child->gameObject);
+		}
 	}
 
 	void Scene::CheckFocus()

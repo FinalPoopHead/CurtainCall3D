@@ -293,7 +293,7 @@ namespace Rocket::Core
 		_scale *= scale;
 	}
 
-	void RocketTransform::SetParent(RocketTransform* parent)
+	void RocketTransform::SetParent(RocketTransform* parent, bool keepWorldPosition)
 	{
 		if (parent == nullptr)
 		{
@@ -301,12 +301,15 @@ namespace Rocket::Core
 			return;
 		}
 
-		_position = Vector3::Transform(_position, parent->GetWorldTM().Invert());
-		Quaternion parentRot = parent->GetRotation();
-		parentRot.Conjugate();
-		_rotation = Quaternion::Concatenate(_rotation, parentRot);
-		_scale = Vector3::Transform(_scale, parent->GetScaleMatrix().Invert());
-
+		if (keepWorldPosition)
+		{
+			_position = Vector3::Transform(_position, parent->GetWorldTM().Invert());
+			Quaternion parentRot = parent->GetRotation();
+			parentRot.Conjugate();
+			_rotation = Quaternion::Concatenate(_rotation, parentRot);
+			_scale = Vector3::Transform(_scale, parent->GetScaleMatrix().Invert());
+		}
+		
 		_parent = parent;
 		parent->AddChild(this);
 	}

@@ -249,6 +249,7 @@ namespace Rocket::Core
 		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
 		////Blend State Set.
 		_deviceContext->OMSetBlendState(_defaultBlendState.Get(), nullptr, 0xFF);
+
 		return;
 	}
 
@@ -272,8 +273,7 @@ namespace Rocket::Core
 
 		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
 		////Blend State Set.
-		//_deviceContext->OMSetBlendState(_defaultBlendState.Get(), nullptr, 0xFF);
-		_deviceContext->OMSetBlendState(nullptr, nullptr, 0xFF);
+		_deviceContext->OMSetBlendState(_defaultBlendState.Get(), nullptr, 0xFF);
 
 		return;
 	}
@@ -288,9 +288,9 @@ namespace Rocket::Core
 			meshRenderer->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
 		}
 
-		for (auto skinnedMeshRenderer : _objectManager.GetDynamicModelRenderers())
+		for (auto dynamicModelRenderer : _objectManager.GetDynamicModelRenderers())
 		{
-			skinnedMeshRenderer->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
+			dynamicModelRenderer->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
 		}
 	}
 

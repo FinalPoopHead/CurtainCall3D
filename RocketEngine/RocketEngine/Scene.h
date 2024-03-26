@@ -94,6 +94,7 @@ namespace Rocket
 	public:
 		std::vector<GameObject*>& GetOriginalList();	// -> serialize
 		std::vector<GameObject*>& GetRunningList();
+		void AddToOriginalListRecur(GameObject* gameObj);
 
 
 	private:

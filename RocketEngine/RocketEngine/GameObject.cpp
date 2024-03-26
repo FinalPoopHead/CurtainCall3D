@@ -226,6 +226,16 @@ namespace Rocket
 		_isStarted = false;
 	}
 
+	void GameObject::SetScene(Scene* scene)
+	{
+		_scene = scene;
+
+		for (auto& child : transform.GetChildrenVec())
+		{
+			child->gameObject->SetScene(scene);
+		}
+	}
+
 	std::unordered_map<std::string, std::vector<Component*>>& GameObject::GetAllComponents()
 	{
 		return _components;

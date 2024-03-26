@@ -137,13 +137,13 @@ namespace Rocket::Core
 			HR(deviceContext->Map(_material->GetPixelShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
 		
 			LightBufferType* lightBufferDataPtr = (LightBufferType*)mappedResource.pData;
-		
+
 			for (auto& directionalLight : ObjectManager::Instance().GetDirectionalLightList())
 			{
 				lightBufferDataPtr->ambientColor = directionalLight->GetAmbientColor();
 				lightBufferDataPtr->diffuseColor = directionalLight->GetDiffuseColor();
 				lightBufferDataPtr->specularPower = directionalLight->GetSpecularPower();
-				lightBufferDataPtr->specularColor = directionalLight->GetSpecularColor();
+				lightBufferDataPtr->specularColor = directionalLight->GetSpecularColor();				
 				lightBufferDataPtr->lightDirection = directionalLight->GetForward();
 			}
 

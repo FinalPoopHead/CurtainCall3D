@@ -55,8 +55,6 @@ namespace Rocket::Core
 
 	void DynamicModelRenderer::UpdateAnimation(float deltaTime)
 	{
-		// TODO : 애니메이션 해제하고 적용해보자
-		return;
 		if (_model->animations.empty())
 		{
 			return;
@@ -363,8 +361,8 @@ namespace Rocket::Core
 		// 총 전치가 2번되므로 HLSL에서도 Row Major한 Matrix로 사용한다.
 		if (node->index >= 0)
 		{
-			nodeBuffer->transformMatrix[node->index] = DirectX::XMMatrixTranspose(node->GetWorldMatrix());
-		// nodeBuffer->transformMatrix[node->index] = DirectX::XMMatrixTranspose(node->transform->GetWorldTM());
+			// nodeBuffer->transformMatrix[node->index] = DirectX::XMMatrixTranspose(node->GetWorldMatrix());
+			nodeBuffer->transformMatrix[node->index] = DirectX::XMMatrixTranspose(node->transform->GetWorldTM());
 		}
 
 		//nodeBuffer->transformMatrix[node->index] = DirectX::XMMatrixTranspose(node->worldTM);

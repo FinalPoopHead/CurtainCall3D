@@ -25,15 +25,7 @@ void TestScene::Initialize()
 	lightComp->SetSpecularPower(4.0f);
 	lightObj->transform.Rotate(0.0f, 180.0f, 0.0f);
 
-	/// 스태틱 메쉬 테스트
-	auto staticTest = scene->CreateModelObject("SK_TP_CH_Default.fbx");
-	staticTest->transform.SetPosition(1.0f, 0.0f, 0.0f);
 
-	auto mr = staticTest->GetComponentsFromAll<Rocket::MeshRenderer>();
-	for (auto& m : mr)
-	{
-		m->SetTexture("T_TP_CH_Camo_006_003_D.png");
-	}
 
 	/// 스킨드 메쉬 테스트
 	auto skinnedTest1 = scene->CreateModelObject("Rob02.fbx");
@@ -54,6 +46,20 @@ void TestScene::Initialize()
 	{
 		m->SetTexture("T_TP_CH_Camo_001_006_D.png");
 	}
+
+	/// 스태틱 메쉬 테스트
+	auto staticTest = scene->CreateModelObject("SK_TP_CH_Default.fbx");
+	//staticTest->transform.SetPosition(1.0f, 0.0f, 0.0f);
+
+	auto mr = staticTest->GetComponentsFromAll<Rocket::MeshRenderer>();
+	for (auto& m : mr)
+	{
+		m->SetTexture("T_TP_CH_Camo_006_003_D.png");
+	}
+
+	auto hand = scene->FindObjectByName("hand_r");
+	staticTest->transform.SetParent(hand,false);
+	staticTest->transform.SetScale(1.0f, 1.0f, 1.0f);
 
  	auto skinnedTest3 = scene->CreateModelObject("Dying.fbx");
  	skinnedTest3->transform.SetScale(0.005f, 0.005f, 0.005f);

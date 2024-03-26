@@ -5,7 +5,7 @@
 /// </summary>
 
 namespace Rocket::Core
-{	
+{
 	class ICamera;
 	class IMeshRenderer;
 	class IDynamicModelRenderer;

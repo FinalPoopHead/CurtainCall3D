@@ -20,8 +20,17 @@
 
 #include "CubeMap.h"
 
+#ifdef _FLOATER
 const std::string TEXTURE_PATH = "../../RocketEngine/Resources/Textures/";
 const std::string MODEL_PATH = "../../RocketEngine/Resources/Models/";
+const std::wstring FONT_PATH = L"../../RocketEngine/Resources/Font/";
+const std::wstring HLSL_PATH = L"../../RocketEngine/RocketDX11/";
+#else
+const std::string TEXTURE_PATH = "Resources/Textures/";
+const std::string MODEL_PATH = "Resources/Models/";
+const std::wstring FONT_PATH = L"Resources/Font/";
+const std::wstring HLSL_PATH = L"RocketDX11/";
+#endif
 
 namespace Rocket::Core
 {
@@ -34,7 +43,7 @@ namespace Rocket::Core
 		_defaultTexture(),
 		_defaultMaterial()
 	{
-		
+
 	}
 
 	void ResourceManager::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext)
@@ -45,72 +54,72 @@ namespace Rocket::Core
 		// Color Shader
 		{
 			VertexShader* colorVS = new VertexShader();
-			colorVS->Initialize(_device.Get(), L"../../RocketEngine/RocketDX11/ColorVS.hlsl");
+			colorVS->Initialize(_device.Get(), HLSL_PATH + L"ColorVS.hlsl");
 			colorVS->SetVertexType(eVertexType::COLOR_VERTEX);
 			_vertexShaders["ColorVS"] = colorVS;
 
 			PixelShader* colorPS = new PixelShader();
-			colorPS->Initialize(_device.Get(), L"../../RocketEngine/RocketDX11/ColorPS.hlsl");
+			colorPS->Initialize(_device.Get(), HLSL_PATH + L"ColorPS.hlsl");
 			_pixelShaders["ColorPS"] = colorPS;
 		}
 
 		// Texture Shader
 		{
 			VertexShader* textureVS = new VertexShader();
-			textureVS->Initialize(_device.Get(), L"../../RocketEngine/RocketDX11/TextureVS.hlsl");
+			textureVS->Initialize(_device.Get(), HLSL_PATH + L"TextureVS.hlsl");
 			textureVS->SetVertexType(eVertexType::TEXTURE_VERTEX);
 			_vertexShaders["TextureVS"] = textureVS;
 
 			PixelShader* texturePS = new PixelShader();
-			texturePS->Initialize(_device.Get(), L"../../RocketEngine/RocketDX11/TexturePS.hlsl");
+			texturePS->Initialize(_device.Get(), HLSL_PATH + L"TexturePS.hlsl");
 			_pixelShaders["TexturePS"] = texturePS;
 		}
 
 		// Light Shader
 		{
 			VertexShader* lightVS = new VertexShader();
-			lightVS->Initialize(_device.Get(), L"../../RocketEngine/RocketDX11/LightVS.hlsl");
+			lightVS->Initialize(_device.Get(), HLSL_PATH + L"LightVS.hlsl");
 			lightVS->SetVertexType(eVertexType::LIGHT_VERTEX);
 			_vertexShaders["LightVS"] = lightVS;
 
 			PixelShader* lightPS = new PixelShader();
-			lightPS->Initialize(_device.Get(), L"../../RocketEngine/RocketDX11/LightPS.hlsl");
+			lightPS->Initialize(_device.Get(), HLSL_PATH + L"LightPS.hlsl");
 			_pixelShaders["LightPS"] = lightPS;
 		}
 
 		// StaticMesh Shader
 		{
 			VertexShader* staticMeshVS = new VertexShader();
-			staticMeshVS->Initialize(_device.Get(), L"../../RocketEngine/RocketDX11/StaticMeshVS.hlsl");
+			staticMeshVS->Initialize(_device.Get(), HLSL_PATH + L"StaticMeshVS.hlsl");
 			staticMeshVS->SetVertexType(eVertexType::VERTEX);
 			_vertexShaders["StaticMeshVS"] = staticMeshVS;
 
 			PixelShader* staticMeshPS = new PixelShader();
-			staticMeshPS->Initialize(_device.Get(), L"../../RocketEngine/RocketDX11/StaticMeshPS.hlsl");
+			staticMeshPS->Initialize(_device.Get(), HLSL_PATH + L"StaticMeshPS.hlsl");
 			_pixelShaders["StaticMeshPS"] = staticMeshPS;
 		}
 
 		// SkinnedMesh Shader
 		{
 			VertexShader* skinnedMeshVS = new VertexShader();
-			skinnedMeshVS->Initialize(_device.Get(), L"../../RocketEngine/RocketDX11/SkinnedMeshVS.hlsl");
+			skinnedMeshVS->Initialize(_device.Get(), HLSL_PATH + L"SkinnedMeshVS.hlsl");
 			skinnedMeshVS->SetVertexType(eVertexType::SKINNED_VERTEX);
 			_vertexShaders["SkinnedMeshVS"] = skinnedMeshVS;
 
 			PixelShader* skinnedMeshPS = new PixelShader();
-			skinnedMeshPS->Initialize(_device.Get(), L"../../RocketEngine/RocketDX11/SkinnedMeshPS.hlsl");
+			skinnedMeshPS->Initialize(_device.Get(), HLSL_PATH + L"SkinnedMeshPS.hlsl");
 			_pixelShaders["SkinnedMeshPS"] = skinnedMeshPS;
 		}
 
 		// CubeMap Shader
 		{
 			VertexShader* cubeMapVS = new VertexShader();
-			cubeMapVS->Initialize(_device.Get(), L"../../RocketEngine/RocketDX11/CubeMapVS.hlsl");
+			cubeMapVS->Initialize(_device.Get(), HLSL_PATH + L"CubeMapVS.hlsl");
 			cubeMapVS->SetVertexType(eVertexType::VERTEX);
 			_vertexShaders["CubeMapVS"] = cubeMapVS;
 
 			PixelShader* cubeMapPS = new PixelShader();
-			cubeMapPS->Initialize(_device.Get(), L"../../RocketEngine/RocketDX11/CubeMapPS.hlsl");
+			cubeMapPS->Initialize(_device.Get(), HLSL_PATH + L"CubeMapPS.hlsl");
 			_pixelShaders["CubeMapPS"] = cubeMapPS;
 		}
 
@@ -128,7 +137,7 @@ namespace Rocket::Core
 
 		_defaultTexture = LoadTextureFile("darkbrickdxt1.dds");
 
-		_defaultFont = new DirectX::SpriteFont(_device.Get(), L"../../RocketEngine/Resources/Font/NotoSansKR.spritefont");
+		_defaultFont = new DirectX::SpriteFont(_device.Get(), (FONT_PATH + L"NotoSansKR.spritefont").c_str());
 		
 		_defaultMaterial = new Material();
 		_defaultMaterial->SetVertexShader(GetVertexShader("StaticMeshVS"));

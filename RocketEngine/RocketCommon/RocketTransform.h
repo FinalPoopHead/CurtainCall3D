@@ -64,7 +64,7 @@ namespace Rocket::Core
 		void Scale(const Vector3& scale);
 
 		/// 계층구조 함수
-		void SetParent(RocketTransform* parent);
+		void SetParent(RocketTransform* parent, bool keepWorldPosition);
 		RocketTransform* GetParent() const;
 		RocketTransform* GetChild(int index) const;
 		int GetChildCount() const;

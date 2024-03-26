@@ -214,7 +214,7 @@ int main()
 				keyData = platform.GetKey(flt::KeyCode::w);
 				if (keyData)
 				{
-					std::cout << "pressed w" << std::endl;
+					//std::cout << "pressed w" << std::endl;
 					cameraTransform.AddLocalPosition(cameraTransform.Forward() * cameraSpeed);
 				}
 				keyData = platform.GetKey(flt::KeyCode::a);

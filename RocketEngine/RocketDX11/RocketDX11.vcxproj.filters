@@ -87,8 +87,8 @@
     <ClCompile Include="VertexShader.cpp">
       <Filter>Resource\Shader\VertexShader</Filter>
     </ClCompile>
-    <ClCompile Include="Light.cpp">
-      <Filter>Light</Filter>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Component\Light</Filter>
     </ClCompile>
     <ClCompile Include="Material.cpp">
       <Filter>Material</Filter>
@@ -116,9 +116,6 @@
     </ClCompile>
     <ClCompile Include="CubeMap.cpp">
       <Filter>Object\CubeMap</Filter>
-    </ClCompile>
-    <ClCompile Include="DirectionalLight.cpp">
-      <Filter>Component\Light</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -182,8 +179,8 @@
     <ClInclude Include="VertexShader.h">
       <Filter>Resource\Shader\VertexShader</Filter>
     </ClInclude>
-    <ClInclude Include="Light.h">
-      <Filter>Light</Filter>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>Component\Light</Filter>
     </ClInclude>
     <ClInclude Include="Singleton.h">
       <Filter>Singleton</Filter>
@@ -223,9 +220,6 @@
     </ClInclude>
     <ClInclude Include="CubeMap.h">
       <Filter>Object\CubeMap</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectionalLight.h">
-      <Filter>Component\Light</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -289,9 +283,6 @@
     <Filter Include="GraphicsProcess">
       <UniqueIdentifier>{783d888a-f61d-4e9b-906b-301a0c7c4c9a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Light">
-      <UniqueIdentifier>{1cb4a846-a9b5-414c-b3fa-5cfa50d7cdde}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource\Shader\HLSL\Light">
       <UniqueIdentifier>{cedef95d-8557-4c43-9eea-f305d33cb80a}</UniqueIdentifier>
     </Filter>
@@ -337,9 +328,6 @@
     <Filter Include="Resource\Mesh\SkinnedMesh">
       <UniqueIdentifier>{3841b88c-81d2-4e48-8f6b-5892ec1b3733}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Object\ModelRenderer">
-      <UniqueIdentifier>{6ae4cd4e-6ee6-456a-a2e8-112b65b8e534}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Object\CubeMap">
       <UniqueIdentifier>{b69fe248-0bba-4c99-9e53-0a598b73b05c}</UniqueIdentifier>
     </Filter>
@@ -355,11 +343,11 @@
     <Filter Include="Component\MeshRenderer">
       <UniqueIdentifier>{b06c9dce-0c2e-4e80-9d78-36595b5a6d4d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Component\Light">
-      <UniqueIdentifier>{b61a15b9-7160-4481-b2da-9704f07873bb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Component\Camera">
       <UniqueIdentifier>{569834aa-0dc1-4d58-86a8-a5376e7b1fd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Light">
+      <UniqueIdentifier>{1cb4a846-a9b5-414c-b3fa-5cfa50d7cdde}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

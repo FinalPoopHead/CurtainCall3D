@@ -102,8 +102,8 @@ namespace Rocket
 
 		/// 계층구조.
 	public:
-		void SetParent(Transform* parent);
-		void SetParent(GameObject* parentObj);
+		void SetParent(Transform* parent, bool keepWorldPosition = true);
+		void SetParent(GameObject* parentObj, bool keepWorldPosition = true);
 		Transform* GetParent();
 		Transform* GetChild(int index);
 

@@ -408,3 +408,6 @@ Acquitaine Engine/lib/Acquitaine Game Engine.lib
 # Resources
 Resources/
 Lib/
+
+# Build
+Build/

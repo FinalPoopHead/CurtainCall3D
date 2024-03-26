@@ -26,7 +26,7 @@ namespace Rocket::Core
 	{
 		std::string name = "";
 		RawNode* rootNode = nullptr;
-		std::vector<RawMesh*> meshes;	// TODO : Deprecated. Node별로 들어있으니 그걸 쓰도록
+		std::vector<RawMesh*> meshes;
 		std::unordered_map<std::string, RawAnimation*> animations;
 	};
 

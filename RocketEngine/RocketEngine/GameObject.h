@@ -93,7 +93,7 @@ namespace Rocket
 		bool _isStarted;
 
 	public:
-		void SetScene(Scene* scene) { _scene = scene; }
+		void SetScene(Scene* scene);
 		Scene* GetScene() { return _scene; }
 
 	private:
