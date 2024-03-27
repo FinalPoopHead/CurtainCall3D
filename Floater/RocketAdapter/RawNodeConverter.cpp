@@ -70,7 +70,7 @@ Rocket::Core::RawModel* flt::ConvertModel(const flt::RawNode& rootNode)
 			{
 				Rocket::Core::RawNodeAnimationData* rocketAnimData = new(std::nothrow) Rocket::Core::RawNodeAnimationData();
 				ASSERT(rocketAnimData, "Failed to allocate memory for channel");
-				rocketAnimData->nodeName = ToString(animation.name);
+				rocketAnimData->nodeName = ToString(rootNode.skeleton->bones[i].name);
 
 				for (const auto& key : animation.clips[i].keyPosition)
 				{
