@@ -294,6 +294,16 @@ namespace Rocket::Core
 				lightBufferDataPtr->lightDirection = directionalLight->GetForward();
 			}
 
+			// TODO : 라이트가 없는경우. 임시입니다.
+			if (ObjectManager::Instance().GetDirectionalLightList().size() == 0)
+			{
+				lightBufferDataPtr->ambientColor = { 0.3f,0.3f,0.3f,0.3f };
+				lightBufferDataPtr->diffuseColor = { 1.0f,1.0f,1.0f,1.0f };
+				lightBufferDataPtr->specularPower = 4.0f;
+				lightBufferDataPtr->specularColor = { 1.0f,1.0f ,1.0f ,1.0f };
+				lightBufferDataPtr->lightDirection = { 0.0f,-1.0f,0.0f };
+			}
+
 			deviceContext->Unmap(_material->GetPixelShader()->GetConstantBuffer(bufferNumber), 0);
 
 
@@ -416,6 +426,7 @@ namespace Rocket::Core
 
 	void DynamicModelRenderer::BindTransformRecur(RocketTransform* transform, Node* node)
 	{
+		// 앞 단에서 게임오브젝트 생성하면서 이미 Transform을 세팅해놨다.
 // 		DirectX::XMVECTOR outScale;
 // 		DirectX::XMVECTOR outRotation;
 // 		DirectX::XMVECTOR outTranslation;

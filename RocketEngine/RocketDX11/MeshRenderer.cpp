@@ -11,7 +11,6 @@ namespace Rocket::Core
 {
 	MeshRenderer::MeshRenderer()
 		: _mesh(nullptr),
-		_model(nullptr),
 		_material(nullptr),
 		_isActive(true),
 		_worldTM(Matrix::Identity)
@@ -79,10 +78,10 @@ namespace Rocket::Core
 			// HLSL 에서도 Row Major 하게 작성하고 싶으므로 미리 전치를 시켜놓는다.
 			// 총 전치가 2번되므로 HLSL에서도 Row Major한 Matrix로 사용한다.
 
-			DirectX::XMVECTOR det = DirectX::XMMatrixDeterminant(_worldTM);
-			DirectX::XMMATRIX worldInverse = DirectX::XMMatrixInverse(&det, _worldTM);
+			DirectX::XMVECTOR det = DirectX::XMMatrixDeterminant(_transform->GetWorldTM());
+			DirectX::XMMATRIX worldInverse = DirectX::XMMatrixInverse(&det, _transform->GetWorldTM());
 
-			DirectX::XMMATRIX w = DirectX::XMMatrixTranspose(_worldTM);
+			DirectX::XMMATRIX w = DirectX::XMMatrixTranspose(_transform->GetWorldTM());
 			DirectX::XMMATRIX wi = DirectX::XMMatrixTranspose(worldInverse);
 			DirectX::XMMATRIX v = DirectX::XMMatrixTranspose(view);
 			DirectX::XMMATRIX p = DirectX::XMMatrixTranspose(proj);
@@ -145,6 +144,16 @@ namespace Rocket::Core
 				lightBufferDataPtr->specularPower = directionalLight->GetSpecularPower();
 				lightBufferDataPtr->specularColor = directionalLight->GetSpecularColor();				
 				lightBufferDataPtr->lightDirection = directionalLight->GetForward();
+			}
+
+			// TODO : 라이트가 없는경우. 임시입니다.
+			if (ObjectManager::Instance().GetDirectionalLightList().size() == 0)
+			{
+				lightBufferDataPtr->ambientColor = { 0.3f,0.3f,0.3f,0.3f };
+				lightBufferDataPtr->diffuseColor = { 1.0f,1.0f,1.0f,1.0f };
+				lightBufferDataPtr->specularPower = 4.0f;
+				lightBufferDataPtr->specularColor = { 1.0f,1.0f ,1.0f ,1.0f };
+				lightBufferDataPtr->lightDirection = { 0.0f,-1.0f,0.0f };
 			}
 
 			deviceContext->Unmap(_material->GetPixelShader()->GetConstantBuffer(bufferNumber), 0);
@@ -243,4 +252,10 @@ namespace Rocket::Core
 			SetNodeBuffer(node->children[i], nodeBuffer);
 		}
 	}
+
+	void MeshRenderer::BindTransform(RocketTransform* transform)
+	{
+		_transform = transform;
+	}
+
 }

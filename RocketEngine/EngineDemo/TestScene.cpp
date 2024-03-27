@@ -65,6 +65,9 @@ void TestScene::Initialize()
  	skinnedTest3->transform.SetScale(0.005f, 0.005f, 0.005f);
  	skinnedTest3->transform.Translate(-3.0f, 0.0f, 0.0f);
 
+	/// 스태틱 메쉬 계층구조 테스트
+	auto hierarchyTest = scene->CreateModelObject("SM_Box_Cargo.fbx");
+
 	/// 텍스트 테스트
 // 	auto text = scene->CreateObject("text");
 // 	text->AddComponent<Rocket::TextBox>();

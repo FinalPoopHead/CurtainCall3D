@@ -10,6 +10,7 @@
 #include "ModelStruct.h"
 #include "StaticMesh.h"
 #include "Material.h"
+#include "../RocketCommon/RocketTransform.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -27,6 +28,7 @@ namespace Rocket::Core
 		virtual void SetActive(bool isActive) override;
 		virtual void LoadMesh(std::string fileName) override;
 		virtual void LoadTexture(std::string fileName) override;
+		virtual void BindTransform(RocketTransform* transform) override;
 
 	public:
 		void Render(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj);
@@ -41,8 +43,8 @@ namespace Rocket::Core
 		void SetNodeBuffer(Node* node, NodeBufferType* nodeBuffer);
 
 	private:
+		RocketTransform* _transform;
 		StaticMesh* _mesh;
-		StaticModel* _model;
 		Material* _material;
 		DirectX::XMMATRIX _worldTM;
 		bool _isActive;

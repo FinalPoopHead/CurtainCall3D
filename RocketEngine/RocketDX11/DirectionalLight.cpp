@@ -6,9 +6,9 @@ namespace Rocket::Core
 	DirectionalLight::DirectionalLight()
 		: _transform(nullptr),
 		_diffuseColor(1.0f, 1.0f, 1.0f, 1.0f),
-		_ambientColor(0.1f, 0.1f, 0.1f, 0.1f),
+		_ambientColor(0.3f, 0.3f, 0.3f, 0.3f),
 		_specularColor(1.0f, 1.0f, 1.0f, 1.0f),
-		_specularPower(1.0f)
+		_specularPower(4.0f)
 	{
 
 	}
