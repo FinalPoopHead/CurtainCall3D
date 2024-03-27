@@ -35,7 +35,8 @@ flt::OsWindows::OsWindows(bool useConsole) :
 	_pKeyDatas{ new(std::nothrow) KeyData[(int)KeyCode::MAX] },
 	_keyUp(),
 	_consoleHwnd(NULL),
-	_isShowCursor(true)
+	_isShowCursor(true),
+	_exePath()
 {
 	ASSERT(_pKeyDatas, "메모리 동적 할당 실패");
 	ASSERT(_pKeyStates, "메모리 동적 할당 실패");
@@ -133,8 +134,6 @@ ULONG CreateDump(void* param)
 	return retval;
 }
 
-
-
 LONG TopExceptionFilter(LPEXCEPTION_POINTERS pExp)
 {
 	LONG retval = 0;
@@ -215,11 +214,18 @@ bool flt::OsWindows::Initialize(int windowWidth, int windowHeight, const std::ws
 
 	SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)TopExceptionFilter);
 
+	wchar_t buffer[512];
+	DWORD result = GetModuleFileName(nullptr, buffer, 512);
+	ASSERT(result != 0, "가져오기 실패");
+	_exePath = buffer;
+	_exePath = _exePath.substr(0, _exePath.find_last_of(L"\\") + 1);
+
 	return true;
 }
 
 bool flt::OsWindows::Finalize()
 {
+	_exePath.clear();
 	return true;
 }
 
@@ -346,6 +352,11 @@ void flt::OsWindows::ShowCursor(bool isShow)
 	}
 
 	_isShowCursor = isShow;
+}
+
+std::wstring flt::OsWindows::GetExePath()
+{
+	return _exePath;
 }
 
 void flt::OsWindows::UpdateKeyState()

@@ -39,6 +39,8 @@ namespace flt
 
 		void ShowCursor(bool isShow);
 
+		std::wstring GetExePath();
+
 		//virtual void OnResize() {};
 		//virtual void OnFullScreen() {};
 		//virtual void OnClosed() {};

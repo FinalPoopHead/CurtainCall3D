@@ -74,7 +74,7 @@ void TestVectorPrint(const flt::Vector3f& up, const flt::Vector3f& front, const 
 	std::cout << "--------------------------------" << std::endl;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
 	setlocale(LC_ALL, ".UTF8");
 	std::cout << std::boolalpha;
@@ -107,8 +107,8 @@ int main()
 
 		ModelLoader loader;
 		//std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Ganondorf (TotK).fbx";
-		//std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Dying.fbx";
-		std::wstring filePath = L"..\\x64\\fbx\\Models\\A_TP_CH_Breathing.fbx";
+		std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Dying.fbx";
+		//std::wstring filePath = L"..\\x64\\fbx\\Models\\A_TP_CH_Breathing.fbx";
 		//std::wstring filePath = L"C:\\Users\\KOCCA56\\Desktop\\Bee.glb";
 		std::wstring zUpYForward = L"..\\x64\\fbx\\Test\\ZY.fbx";
 		std::wstring yUpZForward = L"..\\x64\\fbx\\Test\\YZ.fbx";
@@ -206,7 +206,7 @@ int main()
 			break;
 		}
 
-		renderer->Render(0.1f);
+		renderer->Render(0.01f);
 		//fbxObject.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, 0.01f);
 		renderable.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, -0.1f);
 
