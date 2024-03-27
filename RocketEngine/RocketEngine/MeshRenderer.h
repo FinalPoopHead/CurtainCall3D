@@ -22,14 +22,14 @@ namespace Rocket
 	public:
 		MeshRenderer();
 		//void SetMesh(eMeshType meshType);
-		void SetMesh(std::string fileName);
+		void LoadMesh(std::string fileName);
 		void SetTexture(std::string fileName);
 
 	protected:
 		virtual void UpdateRenderData() override;
 
 	private:
-		Core::IMeshRenderer* _meshRenderer;
+		Core::IMeshRenderer* _graphicsRenderer;
 	};
 }
 
