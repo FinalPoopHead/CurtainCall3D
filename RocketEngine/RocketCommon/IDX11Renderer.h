@@ -1,8 +1,8 @@
-#pragma once
+ï»¿#pragma once
 /// <summary>
-/// ·ÎÄÏ ¿£ÁøÀÌ »ç¿ëÇÒ ·»´õ·¯ÀÇ ÀÎÅÍÆäÀÌ½º
-/// ±×·¡ÇÈ½º ·»´õ·¯´Â ÀÌ ÀÎÅÍÆäÀÌ½º¸¦ »ó¼Ó¹Ş¾Æ ±¸ÇöÇØ¾ßÇÑ´Ù.
-/// ·ÎÄÏ ¿£Áø¿¡¼­´Â ÀÌ ÀÎÅÍÆäÀÌ½º¸¦ ÅëÇØ ·»´õ·¯¸¦ µ¿ÀÛ½ÃÅ²´Ù.
+/// ë¡œì¼“ ì—”ì§„ì´ ì‚¬ìš©í•  ë Œë”ëŸ¬ì˜ ì¸í„°í˜ì´ìŠ¤
+/// ê·¸ë˜í”½ìŠ¤ ë Œë”ëŸ¬ëŠ” ì´ ì¸í„°í˜ì´ìŠ¤ë¥¼ ìƒì†ë°›ì•„ êµ¬í˜„í•´ì•¼í•œë‹¤.
+/// ë¡œì¼“ ì—”ì§„ì—ì„œëŠ” ì´ ì¸í„°í˜ì´ìŠ¤ë¥¼ í†µí•´ ë Œë”ëŸ¬ë¥¼ ë™ì‘ì‹œí‚¨ë‹¤.
 /// </summary>
 
 namespace Rocket::Core
@@ -10,26 +10,26 @@ namespace Rocket::Core
 	class IDX11Renderer
 	{
 	public:
-		virtual void Initialize(void* hWnd, int screenWidth, int screenHeight) abstract;	//±×·¡ÇÈ½º ¿£ÁøÀ» ÃÊ±âÈ­ÇÑ´Ù.
+		virtual void Initialize(void* hWnd, int screenWidth, int screenHeight) abstract;	//ê·¸ë˜í”½ìŠ¤ ì—”ì§„ì„ ì´ˆê¸°í™”í•œë‹¤.
 
-		virtual void SetDebugMode(bool isDebug) abstract;	// µğ¹ö±× ¸ğµå¸¦ ¼³Á¤ÇÑ´Ù.
+		virtual void SetDebugMode(bool isDebug) abstract;	// ë””ë²„ê·¸ ëª¨ë“œë¥¼ ì„¤ì •í•œë‹¤.
 
-		virtual void Update(float deltaTime) abstract;		// ±×·¡ÇÈ½º ¿£ÁøÀ» ¾÷µ¥ÀÌÆ®ÇÑ´Ù.
+		virtual void Update(float deltaTime, int fps = 0) abstract;		// ê·¸ë˜í”½ìŠ¤ ì—”ì§„ì„ ì—…ë°ì´íŠ¸í•œë‹¤.
 
-		virtual void Render() abstract;						// ±×·¡ÇÈ½º ¿£ÁøÀ» ·»´õ¸µÇÑ´Ù.	
+		virtual void Render() abstract;						// ê·¸ë˜í”½ìŠ¤ ì—”ì§„ì„ ë Œë”ë§í•œë‹¤.	
 
-		virtual void OnResize(int _width, int _height) abstract;	// ±×·¡ÇÈ½º ¿£ÁøÀÇ À©µµ¿ì Å©±â¸¦ Á¶Á¤ÇÑ´Ù.
+		virtual void OnResize(int _width, int _height) abstract;	// ê·¸ë˜í”½ìŠ¤ ì—”ì§„ì˜ ìœˆë„ìš° í¬ê¸°ë¥¼ ì¡°ì •í•œë‹¤.
 
-		virtual void Finalize() abstract;					// ±×·¡ÇÈ½º ¿£ÁøÀ» Á¾·áÇÑ´Ù.
+		virtual void Finalize() abstract;					// ê·¸ë˜í”½ìŠ¤ ì—”ì§„ì„ ì¢…ë£Œí•œë‹¤.
 	};
 
-	/// dllexport ÇÏ´Â ·»´õ·¯¸¦ ¹İÈ¯ÇÏ´Â ÆÑÅä¸® ÇÔ¼ö.
+	/// dllexport í•˜ëŠ” ë Œë”ëŸ¬ë¥¼ ë°˜í™˜í•˜ëŠ” íŒ©í† ë¦¬ í•¨ìˆ˜.
 
-	// IRocketGraphics¸¦ »ó¼Ó¹Ş´Â ·»´õ·¯¸¦ »ı¼ºÇØ¼­ ¾÷Ä³½ºÆÃÇÏ¿© ¹İÈ¯ÇÑ´Ù.
+	// IRocketGraphicsë¥¼ ìƒì†ë°›ëŠ” ë Œë”ëŸ¬ë¥¼ ìƒì„±í•´ì„œ ì—…ìºìŠ¤íŒ…í•˜ì—¬ ë°˜í™˜í•œë‹¤.
 	extern "C" __declspec(dllexport) IDX11Renderer * CreateGraphicsInstance();
 
-	// ·»´õ·¯¸¦ ·ÎµåÇÑÂÊ¿¡¼­ ·»´õ·¯¸¦ ÇØÁ¦ÇÒ¶§ »ç¿ëÇÏ´Â ÇÔ¼ö.
-	// ·ÎµåÇÏ´ÂÂÊ¿¡¼­ deleteÇÏÁö ¾Ê°í dllÇÑÅ× ¿äÃ»ÇÏ´Â ½ÄÀ¸·Î ±¸¼ºÇß´Ù.
-	// °¢°¢ÀÇ ·»´õ·¯¿¡ ¸Â´Â Release µ¿ÀÛÀÌ Á¤ÀÇµÇ¾î ÀÖÀ» °ÍÀÌ´Ù.
+	// ë Œë”ëŸ¬ë¥¼ ë¡œë“œí•œìª½ì—ì„œ ë Œë”ëŸ¬ë¥¼ í•´ì œí• ë•Œ ì‚¬ìš©í•˜ëŠ” í•¨ìˆ˜.
+	// ë¡œë“œí•˜ëŠ”ìª½ì—ì„œ deleteí•˜ì§€ ì•Šê³  dllí•œí…Œ ìš”ì²­í•˜ëŠ” ì‹ìœ¼ë¡œ êµ¬ì„±í–ˆë‹¤.
+	// ê°ê°ì˜ ë Œë”ëŸ¬ì— ë§ëŠ” Release ë™ì‘ì´ ì •ì˜ë˜ì–´ ìˆì„ ê²ƒì´ë‹¤.
 	extern "C" __declspec(dllexport) void ReleaseGraphicsInstance(IDX11Renderer * instance);
 }

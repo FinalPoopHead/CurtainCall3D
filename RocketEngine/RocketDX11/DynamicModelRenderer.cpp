@@ -22,6 +22,14 @@ namespace Rocket::Core
 
 	}
 
+	DynamicModelRenderer::~DynamicModelRenderer()
+	{
+		// TODO : 원래는 ResourceManager에서 unique_ptr로 관리하고 있어야 하는데, 지금은 ObjectManager에서 생성할때 new Material()해서 받아온 것임.
+		//			ResourceManager에서 받아오도록 수정해야함.
+		delete _material;
+		DeleteCopiedNodeRecur(_animatedRootNode);
+	}
+
 	void DynamicModelRenderer::SetWorldTM(const Matrix& worldTM)
 	{
 		_worldTM = worldTM;
@@ -102,10 +110,12 @@ namespace Rocket::Core
 
 			Node* node = _animatedNodeMap[nodeAnim->nodeName];
 
+			// TODO : nodeAnim이 없을 경우도 있다? 그때를 대비한 코드를 작성해라. 내꺼에서는 이 범위기반 for문에서 없으면 애초에 들어오지 않으나. 들어왔지만 data가 없는 경우를 주의해야 한다.
+
 			// Position
 			{
 				int positionIndex = 0;
-				for (int i = 0; i < nodeAnim->positionTimestamps.size(); i++)
+ 				for (int i = 0; i < nodeAnim->positionTimestamps.size(); i++)
 				{
 					if (_animationTick < nodeAnim->positionTimestamps[i])
 					{
@@ -444,4 +454,15 @@ namespace Rocket::Core
 			BindTransformRecur(transform->GetChild(i), node->children[i]);
 		}
 	}
+
+	void DynamicModelRenderer::DeleteCopiedNodeRecur(Node* node)
+	{
+		for (int i = 0; i < node->children.size(); i++)
+		{
+			DeleteCopiedNodeRecur(node->children[i]);
+		}
+
+		delete node;
+	}
+
 }

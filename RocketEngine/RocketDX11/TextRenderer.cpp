@@ -1,13 +1,13 @@
 ﻿#include "TextRenderer.h"
-#include "ResourceManager.h"
 
 namespace Rocket::Core
 {
 	TextRenderer::TextRenderer()
 		: _isActive(true),
-		_font(ResourceManager::Instance().GetDefaultFont()), 
+		_font(nullptr), 
 		_text("Default Text"), 
-		_color(DirectX::Colors::White)
+		_color(DirectX::Colors::White),
+		_worldTM(Matrix::Identity)
 	{
 
 	}
@@ -55,4 +55,10 @@ namespace Rocket::Core
 	{
 		return _color;
 	}
+
+	void TextRenderer::SetFont(DirectX::SpriteFont* font)
+	{
+		_font = font;
+	}
+
 }

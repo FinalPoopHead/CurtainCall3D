@@ -131,6 +131,8 @@ namespace Rocket::Core
 			elementDesc.SemanticIndex = paramDesc.SemanticIndex;
 			elementDesc.InputSlot = 0;
 			elementDesc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+// 			elementDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+// 			elementDesc.InstanceDataStepRate = 0;
 			elementDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 			elementDesc.InstanceDataStepRate = 0;
 

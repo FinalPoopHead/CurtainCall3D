@@ -22,6 +22,7 @@ namespace Rocket::Core
 	{
 	public:
 		MeshRenderer();
+		~MeshRenderer();
 
 	public:
 		virtual void SetWorldTM(const Matrix& worldTM) override;

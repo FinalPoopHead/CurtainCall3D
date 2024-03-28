@@ -6,7 +6,6 @@
 #include "Camera.h"
 #include "MeshRenderer.h"
 #include "DynamicModelRenderer.h"
-#include "TextRenderer.h"
 #include "SpriteRenderer.h"
 #include "LineRenderer.h"
 #include "Mesh.h"
@@ -22,7 +21,63 @@ namespace Rocket::Core
 		_cameraList(),
 		_textList()
 	{
+	}
 
+
+	void ObjectManager::Initialize(ID3D11Device* device)
+	{
+		auto& _rscMgr = ResourceManager::Instance();
+
+		_fpsText.reset(new TextRenderer());
+		_fpsText->SetFont(_rscMgr.GetDefaultFont());
+
+		_axis.reset(new Axis());
+		_axis->Initialize(device);
+		_axis->SetRenderState(_rscMgr.GetRenderState(ResourceManager::eRenderState::WIREFRAME));
+		_axis->SetShader(_rscMgr.GetVertexShader("ColorVS"), _rscMgr.GetPixelShader("ColorPS"));
+
+		_grid.reset(new Grid());
+		_grid->Initialize(device);
+		_grid->SetRenderState(_rscMgr.GetRenderState(ResourceManager::eRenderState::WIREFRAME));
+		_grid->SetShader(_rscMgr.GetVertexShader("ColorVS"), _rscMgr.GetPixelShader("ColorPS"));
+
+		auto cubeMap = std::make_unique<CubeMap>();
+		cubeMap->Initialize(device);
+		cubeMap->LoadTexture("CloudCubeMap.dds");
+		_cubeMaps["CloudCubeMap"] = std::move(cubeMap);
+	}
+
+	void ObjectManager::Finalize()
+	{
+		for (auto& cam : _cameraList)
+		{
+			delete cam;
+		}
+
+		for (auto& mr : _staticModelRendererList)
+		{
+			delete mr;
+		}
+
+		for (auto& dmr : _dynamicModelRendererList)
+		{
+			delete dmr;
+		}
+
+		for (auto& tr : _textList)
+		{
+			delete tr;
+		}
+
+		for (auto& sr : _spriteList)
+		{
+			delete sr;
+		}
+
+		for (auto& dl : _directionalLightList)
+		{
+			delete dl;
+		}
 	}
 
 	Camera* ObjectManager::CreateCamera()
@@ -59,14 +114,14 @@ namespace Rocket::Core
 	{
 		SpriteRenderer* temp = new SpriteRenderer();
 		temp->SetImage("test.jpg");
-		_ImageList.emplace_back(temp);
+		_spriteList.emplace_back(temp);
 
 		return temp;
 	}
 
 	std::vector<SpriteRenderer*>& ObjectManager::GetImageList()
 	{
-		return _ImageList;
+		return _spriteList;
 	}
 
 	std::vector<MeshRenderer*>& ObjectManager::GetStaticModelRenderers()
@@ -76,9 +131,10 @@ namespace Rocket::Core
 
 	Rocket::Core::TextRenderer* ObjectManager::CreateText()
 	{
-		TextRenderer* TextObject = new TextRenderer();
-		_textList.emplace_back(TextObject);
-		return TextObject;
+		TextRenderer* textRenderer = new TextRenderer();
+		textRenderer->SetFont(ResourceManager::Instance().GetDefaultFont());
+		_textList.emplace_back(textRenderer);
+		return textRenderer;
 	}
 
 	std::vector<TextRenderer*>& ObjectManager::GetTextList()
@@ -88,13 +144,13 @@ namespace Rocket::Core
 
 	LineRenderer* ObjectManager::CreateLineRenderer()
 	{
-		_lineRenderer = new LineRenderer();
-		return _lineRenderer;
+		_lineRenderer = std::make_unique<LineRenderer>();
+		return _lineRenderer.get();
 	}
 
 	LineRenderer* ObjectManager::GetLineRenderer()
 	{
-		return _lineRenderer;
+		return _lineRenderer.get();
 	}
 
 	std::vector<DynamicModelRenderer*>& ObjectManager::GetDynamicModelRenderers()
@@ -132,6 +188,21 @@ namespace Rocket::Core
 	std::vector<DirectionalLight*>& ObjectManager::GetDirectionalLightList()
 	{
 		return _directionalLightList;
+	}
+
+	Rocket::Core::CubeMap* ObjectManager::GetCubeMap(const std::string& name)
+	{
+		if(_cubeMaps.find(name) == _cubeMaps.end())
+		{
+			return nullptr;
+		}
+
+		return _cubeMaps.at(name).get();
+	}
+
+	Rocket::Core::CubeMap* ObjectManager::GetDefaultCubeMap()
+	{
+		return _cubeMaps.begin()->second.get();
 	}
 
 }

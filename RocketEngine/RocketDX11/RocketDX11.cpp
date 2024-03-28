@@ -12,7 +12,6 @@
 #include "CubeMap.h"
 
 #include "GraphicsMacro.h"
-#include "DeviceBuilderDX11.h"
 
 #include "ObjectManager.h"
 #include "ResourceManager.h"
@@ -52,10 +51,10 @@ namespace Rocket::Core
 		_viewport(),
 		_objectManager(ObjectManager::Instance()),
 		_resourceManager(ResourceManager::Instance()),
-		_axis(), _grid(),
 		_spriteBatch(), _lineBatch(), _basicEffect(),
 		_lineInputLayout(),
-		_deltaTime()
+		_deltaTime(),
+		_isDebugMode(false)
 	{
 
 	}
@@ -67,19 +66,40 @@ namespace Rocket::Core
 
 	void RocketDX11::Initialize(void* hWnd, int screenWidth, int screenHeight)
 	{
-		// 매크로로 변경하려고 작업중
-		HRESULT hr = S_OK;
+ 		HRESULT hr = S_OK;
 
 		_hWnd = static_cast<HWND>(hWnd);
 		_screenWidth = screenWidth;
 		_screenHeight = screenHeight;
 
-		// device 빌더 클래스를 이용해 device와 deviceContext 생성.
-		DeviceBuilderDX11 deviceBuilder;
-		deviceBuilder.SetDevice(_device.GetAddressOf());
-		deviceBuilder.SetLevelHolder(&_featureLevel);
-		deviceBuilder.SetDeviceContext(_deviceContext.GetAddressOf());
-		HR(deviceBuilder.Build());
+		// device와 deviceContext 생성.
+		UINT _createDeviceFlags = 0;
+
+#if defined(DEBUG) || defined(_DEBUG)				// 디버그모드 빌드에서 디버그 계층을 활성화 하기위함!
+		_createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;		// 이 플래그를 지정하면 Direct3D는 VC++ 출력 창에 디버그 메시지를 보냄!
+#endif
+
+		D3D_FEATURE_LEVEL _levels[7] =
+		{
+			D3D_FEATURE_LEVEL_11_1,
+			D3D_FEATURE_LEVEL_11_0,
+			D3D_FEATURE_LEVEL_10_1,
+			D3D_FEATURE_LEVEL_10_0,
+			D3D_FEATURE_LEVEL_9_3,
+			D3D_FEATURE_LEVEL_9_2,
+			D3D_FEATURE_LEVEL_9_1 };
+
+		HR(D3D11CreateDevice(
+			nullptr,
+			D3D_DRIVER_TYPE_HARDWARE,
+			nullptr,
+			_createDeviceFlags,
+			_levels,
+			ARRAYSIZE(_levels),
+			D3D11_SDK_VERSION,
+			_device.GetAddressOf(),
+			&_featureLevel,
+			_deviceContext.GetAddressOf()));
 
 		/// 아래 if문은 용책에서의 코드
 		/// 버전이 11_0이 아닐때 false를 리턴한다.
@@ -94,7 +114,7 @@ namespace Rocket::Core
 		/// 멀티 샘플링 품질레벨 체크
 		/// Direct11 에서는 항상 지원되므로, 반환된 품질 수준 값은 반드시 0보다 커야 한다.
 		/// 23.04.07 강석원 인재원
-		hr = _device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, 4, &_m4xMsaaQuality);
+		HR(_device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, 4, &_m4xMsaaQuality));
 		assert(_m4xMsaaQuality > 0);
 
 		DXGI_SWAP_CHAIN_DESC swapChainDesc;
@@ -130,6 +150,7 @@ namespace Rocket::Core
 		Microsoft::WRL::ComPtr<IDXGIFactory> factory;
 
 		hr = dxgiDevice->GetAdapter(&adapter);
+		dxgiDevice.Reset();
 
 		if (SUCCEEDED(hr))
 		{
@@ -137,7 +158,6 @@ namespace Rocket::Core
 
 			hr = factory->CreateSwapChain(
 				_device.Get(),
-				//_device.Get(),
 				&swapChainDesc,
 				&_swapChain
 			);
@@ -204,14 +224,11 @@ namespace Rocket::Core
 			&_viewport
 		);
 
+		/// DX 초기화 끝났으니 Manager들 초기화해준다.
 		_resourceManager.Initialize(_device.Get(), _deviceContext.Get());
+		_objectManager.Initialize(_device.Get());
 
-		_axis = new Axis();
-		_axis->Initialize(_device.Get());
-
-		_grid = new Grid();
-		_grid->Initialize(_device.Get());
-
+		/// SpriteBatch, LineBatch, BasicEffect 초기화
 		_spriteBatch = new DirectX::SpriteBatch(_deviceContext.Get());
 		_lineBatch = new DirectX::PrimitiveBatch<DirectX::VertexPositionColor>(_deviceContext.Get());
 		_basicEffect = std::make_unique<DirectX::BasicEffect>(_device.Get());
@@ -334,15 +351,21 @@ namespace Rocket::Core
 
 	void Rocket::Core::RocketDX11::SetDebugMode(bool isDebug)
 	{
+		_isDebugMode = isDebug;
 	}
 
-	void RocketDX11::Update(float deltaTime)
+	void RocketDX11::Update(float deltaTime, int fps /*= 0*/)
 	{
 		_deltaTime = deltaTime;
 
 		Camera::GetMainCamera()->UpdateViewMatrix();
 		Camera::GetMainCamera()->UpdateProjectionMatrix();
 		UpdateAnimation(deltaTime);
+		
+		_objectManager._fpsText->SetText(
+			"deltaTime : " + std::to_string(_deltaTime)
+			+ "\n" + "fps : " + std::to_string(fps)
+		);
 	}
 
 	void RocketDX11::OnResize(int _width, int _height)
@@ -357,30 +380,37 @@ namespace Rocket::Core
 		RenderHelperObject();
 		RenderMesh();
 
+		RenderCubeMap();
+
+		RenderLine();
 		RenderText();
 		RenderTexture();
-		RenderLine();
 
-		RenderCubeMap();
+		if (_isDebugMode)
+		{
+			RenderDebug();
+		}
 
 		EndRender();
 	}
 
 	void RocketDX11::Finalize()
 	{
-		delete _grid;
-		delete _axis;
+		_objectManager.Finalize();
+		_resourceManager.Finalize();
+
+		delete _spriteBatch;
+		delete _lineBatch;
 	}
 
 	void RocketDX11::RenderHelperObject()
 	{
-		auto vs = _resourceManager.GetVertexShader("ColorVS");
-		auto ps = _resourceManager.GetPixelShader("ColorPS");
+		auto cam = Camera::GetMainCamera();
 
-		_grid->Update(DirectX::XMMatrixIdentity(), Camera::GetMainCamera()->GetViewMatrix(), Camera::GetMainCamera()->GetProjectionMatrix());
-		_grid->Render(_deviceContext.Get(), vs->GetVertexShader(), ps->GetPixelShader(), vs->GetConstantBuffer(0), vs->GetInputLayout());
-		_axis->Update(DirectX::XMMatrixIdentity(), Camera::GetMainCamera()->GetViewMatrix(), Camera::GetMainCamera()->GetProjectionMatrix());
-		_axis->Render(_deviceContext.Get(), vs->GetVertexShader(), ps->GetPixelShader(), vs->GetConstantBuffer(0), vs->GetInputLayout());
+		_objectManager._grid->Update(DirectX::XMMatrixIdentity(), cam->GetViewMatrix(), cam->GetProjectionMatrix());
+		_objectManager._grid->Render(_deviceContext.Get());
+		_objectManager._axis->Update(DirectX::XMMatrixIdentity(), cam->GetViewMatrix(), cam->GetProjectionMatrix());
+		_objectManager._axis->Render(_deviceContext.Get());
 	}
 
 	void RocketDX11::RenderLine()
@@ -478,7 +508,15 @@ namespace Rocket::Core
 	void RocketDX11::RenderCubeMap()
 	{
 		_deviceContext->OMSetDepthStencilState(_cubeMapDepthStencilState.Get(), 0);
-		_resourceManager.GetDefaultCubeMap()->Render(_deviceContext.Get());
+		_objectManager.GetDefaultCubeMap()->Render(_deviceContext.Get());
+		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
+	}
+
+	void RocketDX11::RenderDebug()
+	{
+		_spriteBatch->Begin();
+		_objectManager._fpsText->Render(_spriteBatch);
+		_spriteBatch->End();
 	}
 
 }

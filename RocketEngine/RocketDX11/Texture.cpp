@@ -26,8 +26,7 @@ namespace Rocket::Core
 
 	Texture::~Texture()
 	{
-		_texture->Release();
-		_textureView->Release();
+
 	}
 
 	void Texture::Shutdown()

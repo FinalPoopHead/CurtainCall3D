@@ -57,6 +57,7 @@ namespace Rocket::Core
 
 		/// 렌더링 관련
 	public:
+		void SetDebugMode(bool isDebug);
 		void DrawProcess();
 
  	private:
@@ -81,7 +82,7 @@ namespace Rocket::Core
 		/// DLL 관련
 	private:
 		HMODULE hGraphicsModule;
-		std::unique_ptr<Rocket::Core::IDX11Renderer> _rocketGraphics;
+		std::unique_ptr<Rocket::Core::IDX11Renderer> _graphicsRenderer;
 		std::unique_ptr<Rocket::Core::IFactory> _factory;
 		Rocket::Core::IResourceManager* _resourceManager;
 

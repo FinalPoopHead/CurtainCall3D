@@ -47,7 +47,8 @@ namespace Rocket
 		_resourceSystem(Rocket::Core::ResourceSystem::Instance()),
 		//_dataSystem(Rocket::Core::DataSystem::Instance()),
 		_hWnd(), _msg(), _screenWidth(WIDTH),_screenHeight(HEIGHT),
-		CLASSNAME(L"V-Gun"), WINDOWNAME(L"V-Gun")
+		CLASSNAME(L"V-Gun"), WINDOWNAME(L"V-Gun"),
+		_isDebugMode(false)
 	{
 		RENDERSYSTEM = &_graphicsSystem;
 
@@ -206,6 +207,12 @@ namespace Rocket
 // 		_physicsSystem.Flush();
 
 		_inputSystem.InputUpdate();
+
+		if (_inputSystem.GetKeyDown(VK_F1))
+		{
+			_isDebugMode = !_isDebugMode;
+			_graphicsSystem.SetDebugMode(_isDebugMode);
+		}
 
 		_uiSystem.CheckFocusCurrentScene();
 

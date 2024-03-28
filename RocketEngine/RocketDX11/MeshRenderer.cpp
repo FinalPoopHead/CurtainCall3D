@@ -18,6 +18,13 @@ namespace Rocket::Core
 
 	}
 
+	MeshRenderer::~MeshRenderer()
+	{
+		// TODO : 원래는 ResourceManager에서 unique_ptr로 관리하고 있어야 하는데, 지금은 ObjectManager에서 생성할때 new Material()해서 받아온 것임.
+		//			ResourceManager에서 받아오도록 수정해야함.
+		delete _material;
+	}
+
 	void MeshRenderer::SetWorldTM(const Matrix& worldTM)
 	{
 		_worldTM = worldTM;
@@ -257,5 +264,4 @@ namespace Rocket::Core
 	{
 		_transform = transform;
 	}
-
 }

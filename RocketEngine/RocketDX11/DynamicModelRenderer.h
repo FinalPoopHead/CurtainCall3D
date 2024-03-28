@@ -19,6 +19,7 @@ namespace Rocket::Core
 	{
 	public:
 		DynamicModelRenderer();
+		~DynamicModelRenderer();
 
 	public:
 		virtual void SetWorldTM(const Matrix& worldTM) override;
@@ -44,6 +45,7 @@ namespace Rocket::Core
 		Node* CopyNodeData(Node* originalRootNode);
 		void CopyNodeDataRecur(Node* from, Node* to);
 		void BindTransformRecur(RocketTransform* transform, Node* node);
+		void DeleteCopiedNodeRecur(Node* node);
 
 	private:
 		// TODO : 이거 상속구조 잘 만들던가.. 어떻게든 해서 ModelData와 SkinnedModelData 잘 나눠보자..ㅠㅠ
