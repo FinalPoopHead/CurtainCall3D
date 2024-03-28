@@ -23,6 +23,7 @@ namespace Rocket::Core
 		{
 			buffer.Reset();
 		}
+		_sampleState.Reset();
 	}
 
 	void PixelShader::Initialize(ID3D11Device* device, const std::wstring& path)

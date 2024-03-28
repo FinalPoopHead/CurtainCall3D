@@ -26,7 +26,10 @@ namespace Rocket::Core
 
 	CubeMap::~CubeMap()
 	{
-
+		_vertexBuffer.Reset();
+		_indexBuffer.Reset();
+		_cubeMapRenderState.Reset();
+		_samplerState.Reset();
 	}
 
 	void CubeMap::Initialize(ID3D11Device* device)
@@ -215,7 +218,7 @@ namespace Rocket::Core
 
 		D3D11_SUBRESOURCE_DATA vinitData;
 		vinitData.pSysMem = vertices;
-		HR(device->CreateBuffer(&vbd, &vinitData, &_vertexBuffer));
+		HR(device->CreateBuffer(&vbd, &vinitData, _vertexBuffer.GetAddressOf()));
 
 		UINT indices[] =
 		{
@@ -236,7 +239,7 @@ namespace Rocket::Core
 		ibd.StructureByteStride = 0;
 		D3D11_SUBRESOURCE_DATA iinitData;
 		iinitData.pSysMem = indices;
-		HR(device->CreateBuffer(&ibd, &iinitData, &_indexBuffer));
+		HR(device->CreateBuffer(&ibd, &iinitData, _indexBuffer.GetAddressOf()));
 
 		_vertexCount = ARRAYSIZE(vertices);
 		_indexCount = ARRAYSIZE(indices);

@@ -19,6 +19,7 @@ namespace Rocket::Core
 	{
 	public:
 		Mesh();
+		virtual ~Mesh();
 		// Mesh(std::vector<Vertex> vertices, std::vector<UINT> indices);
 		virtual void Initialize(ID3D11Device* device) {}
 		

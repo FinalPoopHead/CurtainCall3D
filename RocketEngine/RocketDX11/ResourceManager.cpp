@@ -458,7 +458,72 @@ namespace Rocket::Core
 
 	void ResourceManager::Finalize()
 	{
+		_cubeMesh.reset();
+		_sphereMesh.reset();
+		_defaultMaterial.reset();
+		_defaultTexture = nullptr;
+		_defaultFont.reset();
+		_cubePrimitive.reset();
+		_spherePrimitive.reset();
+		_cylinderPrimitive.reset();
 
+		for (auto& iter : _vertexShaders)
+		{
+			iter.second.reset();
+		}
+
+		for (auto& iter : _pixelShaders)
+		{
+			iter.second.reset();
+		}
+
+		for (auto& iter : _textures)
+		{
+			iter.second.reset();
+		}
+
+		for (auto& iter : _models)
+		{
+			DeleteNodeRecur(iter.second->rootNode);
+
+			auto temp = dynamic_cast<DynamicModel*>(iter.second.get());
+			if (temp)
+			{
+				for (auto& anim : temp->animations)
+				{
+					for (auto& nodeAnim : anim.second->nodeAnimations)
+					{
+						delete nodeAnim;
+					}
+					delete anim.second;
+				}
+			}
+			iter.second.reset();
+		}
+
+		for (auto& rs : _renderStates)
+		{
+			rs.Reset();
+		}
+
+		for (auto& iter : _meshes)
+		{
+			iter.second.reset();
+		}
 	}
 
+	void ResourceManager::DeleteNodeRecur(Node* node)
+	{
+		for (auto& child : node->children)
+		{
+			DeleteNodeRecur(child);
+		}
+
+		if (node->bindedBone)
+		{
+			delete node->bindedBone;
+		}
+
+		delete node;
+	}
 }

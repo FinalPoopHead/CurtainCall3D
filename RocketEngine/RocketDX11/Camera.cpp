@@ -24,7 +24,7 @@ namespace Rocket::Core
 
 	Camera::~Camera()
 	{
-
+		_cameraBuffer.Reset();
 	}
 
 	DirectX::XMFLOAT3 Camera::GetPosition() const

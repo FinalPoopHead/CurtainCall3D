@@ -34,7 +34,7 @@ namespace Rocket::Core
 		vbd.StructureByteStride = 0;
 		D3D11_SUBRESOURCE_DATA vinitData;
 		vinitData.pSysMem = vertices;
-		HR(device->CreateBuffer(&vbd, &vinitData, &_vertexBuffer));
+		HR(device->CreateBuffer(&vbd, &vinitData, _vertexBuffer.GetAddressOf()));
 
 
 		// 인덱스 버퍼를 생성한다.
@@ -60,7 +60,7 @@ namespace Rocket::Core
 		ibd.StructureByteStride = 0;
 		D3D11_SUBRESOURCE_DATA iinitData;
 		iinitData.pSysMem = indices;
-		HR(device->CreateBuffer(&ibd, &iinitData, &_indexBuffer));
+		HR(device->CreateBuffer(&ibd, &iinitData, _indexBuffer.GetAddressOf()));
 
 		_indexCount = 6;
 	}

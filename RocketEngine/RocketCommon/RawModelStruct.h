@@ -9,6 +9,8 @@
 /// Loader들을 통해 여기에 있는 구조체를 생성하고 데이터를 채워넣을 예정.
 /// Vertex에 대한 명세도 여기로 가져와야 되려나?
 
+// TODO : 여기서 vector나 그런걸로 포인터들을 들고있는데 new한 것들을 들고있는거란말이지? 그러면 delete를 해줘야하는건데.. struct에서는 포인터를 들고있지말고 실제 객체를 들고있어야되려나?
+
 namespace Rocket::Core
 {
 	struct RawModel;

@@ -401,6 +401,75 @@ namespace Rocket::Core
 
 		delete _spriteBatch;
 		delete _lineBatch;
+
+		// TODO : 여기서 Release를 먼저 해줬더니 아래에서 Reset 하면서 한번 더 지워서 RefCount가 -1이 되는 녀석이 하나 있다.. 뭐하는친구일까?
+// 
+// 		if (GetRefCount(_device) > 1)
+// 		{
+// 			_device->Release();
+// 		}
+// 
+// 		if (GetRefCount(_deviceContext) > 1)
+// 		{
+// 			_deviceContext->Release();
+// 		}
+// 
+// 		if (GetRefCount(_swapChain) > 1)
+// 		{
+// 			_swapChain->Release();
+// 		}
+// 
+// 		if (GetRefCount(_backBuffer) > 1)
+// 		{
+// 			_backBuffer->Release();
+// 		}
+// 
+// 		if (GetRefCount(_renderTargetView) > 1)
+// 		{
+// 			_renderTargetView->Release();
+// 		}
+// 
+// 		if (GetRefCount(_depthStencilBuffer) > 1)
+// 		{
+// 			_depthStencilBuffer->Release();
+// 		}
+// 
+// 		if (GetRefCount(_depthStencilView) > 1)
+// 		{
+// 			_depthStencilView->Release();
+// 		}
+// 
+// 		if (GetRefCount(_defaultDepthStencilState) > 1)
+// 		{
+// 			_defaultDepthStencilState->Release();
+// 		}
+// 
+// 		if (GetRefCount(_cubeMapDepthStencilState) > 1)
+// 		{
+// 			_cubeMapDepthStencilState->Release();
+// 		}
+// 
+// 		if (GetRefCount(_defaultBlendState) > 1)
+// 		{
+// 			_defaultBlendState->Release();
+// 		}
+// 
+// 		if (GetRefCount(_lineInputLayout) > 1)
+// 		{
+// 			_lineInputLayout->Release();
+// 		}
+
+		_device.Reset();
+		_deviceContext.Reset();
+		_swapChain.Reset();
+		_backBuffer.Reset();
+		_renderTargetView.Reset();
+		_depthStencilBuffer.Reset();
+		_depthStencilView.Reset();
+		_defaultDepthStencilState.Reset();
+		_cubeMapDepthStencilState.Reset();
+		_defaultBlendState.Reset();
+		_lineInputLayout.Reset();
 	}
 
 	void RocketDX11::RenderHelperObject()

@@ -18,7 +18,6 @@ namespace Rocket::Core
 		~Texture();
 
 	public:
-		void Shutdown();
 		ID3D11ShaderResourceView* GetTextureView();
 		ID3D11ShaderResourceView** GetAddressOfTextureView();
 

@@ -79,6 +79,9 @@ namespace Rocket::Core
 		Texture* LoadTextureFile(std::string fileName);
 
 	private:
+		void DeleteNodeRecur(Node* node);
+
+	private:
 		ID3D11Device* _device;
 		ID3D11DeviceContext* _deviceContext;
 

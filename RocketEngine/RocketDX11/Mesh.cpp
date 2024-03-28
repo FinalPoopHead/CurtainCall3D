@@ -14,6 +14,12 @@ namespace Rocket::Core
 
 	}
 
+	Mesh::~Mesh()
+	{
+		_vertexBuffer.Reset();
+		_indexBuffer.Reset();
+	}
+
 // 	Mesh::Mesh(std::vector<Vertex> vertices, std::vector<UINT> indices)
 // 		: _vertexBuffer(), _indexBuffer(),
 // 		_vertexCount((int)vertices.size()),

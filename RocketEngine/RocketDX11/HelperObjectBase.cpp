@@ -16,6 +16,9 @@ namespace Rocket::Core
 	{
 		// ComPtr 덕분에 해제할 필요 없다.
 		// RenderState는 준쪽에서 ComPtr로 관리하고 있다.
+		// 근데 명시적으로 해주는중..
+		_vertexBuffer.Reset();
+		_indexBuffer.Reset();
 	}
 
 	void HelperObjectBase::Update(const DirectX::XMMATRIX& world, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj)

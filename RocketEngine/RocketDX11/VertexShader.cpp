@@ -22,12 +22,12 @@ namespace Rocket::Core
 
 	VertexShader::~VertexShader()
 	{
-		_inputLayout.Reset();
 		_vertexShader.Reset();
 		for (auto& buffer : _constantBuffers)
 		{
 			buffer.Reset();
 		}
+		_inputLayout.Reset();
 	}
 
 	void VertexShader::Initialize(ID3D11Device* device, const std::wstring& path)

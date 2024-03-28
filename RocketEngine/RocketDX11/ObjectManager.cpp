@@ -23,7 +23,6 @@ namespace Rocket::Core
 	{
 	}
 
-
 	void ObjectManager::Initialize(ID3D11Device* device)
 	{
 		auto& _rscMgr = ResourceManager::Instance();
@@ -49,6 +48,11 @@ namespace Rocket::Core
 
 	void ObjectManager::Finalize()
 	{
+		_fpsText.reset();
+		_axis.reset();
+		_grid.reset();
+		_lineRenderer.reset();
+
 		for (auto& cam : _cameraList)
 		{
 			delete cam;
@@ -204,5 +208,4 @@ namespace Rocket::Core
 	{
 		return _cubeMaps.begin()->second.get();
 	}
-
 }

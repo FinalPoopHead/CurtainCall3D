@@ -26,23 +26,8 @@ namespace Rocket::Core
 
 	Texture::~Texture()
 	{
-
-	}
-
-	void Texture::Shutdown()
-	{
-		// 텍스쳐 뷰 리소스 해제
-		if (_textureView)
-		{
-			_textureView->Release();
-			_textureView = nullptr;
-		}
-
-		if (_texture)
-		{
-			_texture->Release();
-			_texture = nullptr;
-		}
+		_texture.Reset();
+		_textureView.Reset();
 	}
 
 	ID3D11ShaderResourceView* Texture::GetTextureView()
