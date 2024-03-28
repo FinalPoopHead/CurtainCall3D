@@ -39,7 +39,7 @@ void flt::FBXLoader::Load(const std::wstring& filePath, RawScene* outRawScene)
 {
 	ASSERT(outRawScene, "outRawScene is nullptr");
 
-	std::string filePathStr = flt::ConvertToString(filePath);
+	std::string filePathStr = flt::ToString(filePath);
 	if (!_importer->Initialize(filePathStr.c_str(), -1, _pManager->GetIOSettings()))
 	{
 		auto var = _importer->GetStatus().GetErrorString();
@@ -232,7 +232,7 @@ bool flt::FBXLoader::LoadToRawNode(fbxsdk::FbxNode& node, RawNode* outNode)
 {
 	ASSERT(outNode != nullptr, "outNode is nullptr");
 
-	outNode->name = ConvertToWstring(node.GetName());
+	outNode->name = ToWstring(node.GetName());
 
 	// Transform 세팅
 	LoadToTransform(node.EvaluateLocalTransform(), &outNode->transform);
@@ -261,7 +261,7 @@ bool flt::FBXLoader::LoadToRawNode(fbxsdk::FbxNode& node, RawNode* outNode)
 
 bool flt::FBXLoader::CreateMesh(fbxsdk::FbxMesh& mesh, RawMesh* outMesh)
 {
-	RawMeshBuilder builder(L"", ConvertToWstring(mesh.GetName()));
+	RawMeshBuilder builder(L"", ToWstring(mesh.GetName()));
 
 	// 아래 레이어들 특히 UV레이어는 여러개 있을 수 있음.
 	std::vector<Vector3f> testPositionVector;

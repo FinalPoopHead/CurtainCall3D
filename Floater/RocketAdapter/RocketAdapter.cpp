@@ -104,6 +104,10 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 	{
 		rocketObject->renderer = factory->CreateDynamicModelRenderer();
 		rocketObject->renderer->LoadModel(pointer);
+		Rocket::Core::RocketTransform* rootBoneTransform = new Rocket::Core::RocketTransform();
+		rootBoneTransform->SetParent(&rocketObject->rocketTransform, false);
+
+		GenerateTransformHierarchyRecursive(rootBoneTransform, &renderable.node.skeleton->bones[renderable.node.skeleton->rootBoneIndex].transform);
 		rocketObject->renderer->BindTransform(&rocketObject->rocketTransform);
 	}
 

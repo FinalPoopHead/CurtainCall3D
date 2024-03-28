@@ -37,7 +37,7 @@ namespace flt
 		using type = T;
 
 		IBuilder() = default;
-		IBuilder(const std::wstring& key) : IBuilderBase(key + L":" + ConvertToWstring(typeid(T).name())) {}
+		IBuilder(const std::wstring& key) : IBuilderBase(key + L":" + ToWstring(typeid(T).name())) {}
 		IBuilder(const IBuilder& other) : IBuilderBase(other) {}
 		IBuilder(IBuilder&& other) noexcept : IBuilderBase(std::move(other)) {}
 
@@ -59,7 +59,7 @@ namespace flt
 
 		virtual std::wstring GetTypeName() const final
 		{
-			return ConvertToWstring(typeid(T).name());
+			return ToWstring(typeid(T).name());
 		}
 
 		virtual T* build() const = 0;

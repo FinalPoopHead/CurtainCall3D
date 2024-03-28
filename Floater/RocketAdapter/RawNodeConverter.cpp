@@ -6,9 +6,12 @@
 #include "../FloaterRendererCommon/include/RawNode.h"
 #include "../FloaterRendererCommon/include/RawSkeleton.h"
 
+#include "RocketObject.h"
+
 #pragma warning(push)
 #pragma warning(disable: 26495)
 #include "./RocketCommon/RawModelStruct.h"
+#include "./RocketCommon/RocketTransform.h"
 #pragma warning(pop)
 
 #include <DirectXMath.h>
@@ -50,7 +53,7 @@ Rocket::Core::RawModel* flt::ConvertModel(const flt::RawNode& rootNode)
 	ASSERT(model, "Failed to allocate memory for model");
 
 	// TODO : 파일명을 넣어줘야함.
-	model->name = ConvertToString(rootNode.name);
+	model->name = ToString(rootNode.name);
 	model->rootNode = ConvertfltRawNodeTorocketRawNodeRecursive(rootNode);
 	CopyMeshesToModel(model->rootNode, model);
 
@@ -62,43 +65,37 @@ Rocket::Core::RawModel* flt::ConvertModel(const flt::RawNode& rootNode)
 			RkRawAnimation* rocketAnimation = new(std::nothrow) Rocket::Core::RawAnimation();
 			ASSERT(rocketAnimation, "Failed to allocate memory for animation");
 
-			rocketAnimation->name = ConvertToString(animation.name);
-
-			float duration = 0.0f;
 			rocketAnimation->nodeAnimations.reserve(animation.clips.size());
 			for (int i = 0; i < animation.clips.size(); ++i)
 			{
 				Rocket::Core::RawNodeAnimationData* rocketAnimData = new(std::nothrow) Rocket::Core::RawNodeAnimationData();
 				ASSERT(rocketAnimData, "Failed to allocate memory for channel");
-				rocketAnimData->nodeName = "";
+				rocketAnimData->nodeName = ToString(rootNode.skeleton->bones[i].name);
 
 				for (const auto& key : animation.clips[i].keyPosition)
 				{
 					rocketAnimData->positions.push_back({key.position.x, key.position.y, key.position.z});
 					rocketAnimData->positionTimestamps.push_back(key.time);
-					duration = BRANCHLESS_MAX(duration, key.time);
 				}
 
 				for (const auto& key : animation.clips[i].keyRotation)
 				{
 					rocketAnimData->rotations.push_back({ key.rotation.x, key.rotation.y, key.rotation.z, key.rotation.w });
 					rocketAnimData->rotationTimestamps.push_back(key.time);
-					duration = BRANCHLESS_MAX(duration, key.time);
 				}
 
 				for (const auto& key : animation.clips[i].keyScale)
 				{
 					rocketAnimData->scales.push_back({ key.scale.x, key.scale.y, key.scale.z });
 					rocketAnimData->scaleTimestamps.push_back(key.time);
-					duration = BRANCHLESS_MAX(duration, key.time);
 				}
 
 				rocketAnimation->nodeAnimations.push_back(rocketAnimData);
 			}
 
-			// TODO : 읽어와서 넣는걸로 바꿔야해
-			rocketAnimation->duration = duration;
-			rocketAnimation->ticksPerSecond = 30.0;
+			rocketAnimation->name = ToString(animation.name);
+			rocketAnimation->duration = animation.duration;
+			rocketAnimation->ticksPerSecond = animation.ticksPerSecond;
 
 			model->animations[rocketAnimation->name] = rocketAnimation;
 		}
@@ -112,7 +109,7 @@ Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt:
 	RkNode* rocketNode = new(std::nothrow) Rocket::Core::RawNode();
 	ASSERT(rocketNode, "Failed to allocate memory for node");
 
-	rocketNode->name = ConvertToString(node.name);
+	rocketNode->name = ToString(node.name);
 	// TODO : index를 넣어줘야함.
 	rocketNode->index = -1;
 	rocketNode->bindedBone = nullptr;
@@ -122,7 +119,7 @@ Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt:
 	{
 		RkMesh* rocketMesh = new(std::nothrow) Rocket::Core::RawMesh();
 		ASSERT(rocketMesh, "Failed to allocate memory for mesh");
-		rocketMesh->name = ConvertToString(node.name);
+		rocketMesh->name = ToString(node.name);
 		rocketMesh->bindedNode = rocketNode;
 
 		rocketMesh->material = new(std::nothrow) RkMaterial();
@@ -145,16 +142,16 @@ Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt:
 				{
 					rocketMaterial->diffuseTexture = new(std::nothrow) Rocket::Core::RawTexture();
 					ASSERT(rocketMaterial->diffuseTexture, "Failed to allocate memory for texture");
-					rocketMaterial->diffuseTexture->name = ConvertToString(material.textures[i]->name);
-					rocketMaterial->diffuseTexture->path = ConvertToString(material.textures[i]->path);
+					rocketMaterial->diffuseTexture->name = ToString(material.textures[i]->name);
+					rocketMaterial->diffuseTexture->path = ToString(material.textures[i]->path);
 				}
 				break;
 				case flt::RawMaterial::TextureType::NORMAL:
 				{
 					rocketMaterial->normalTexture = new(std::nothrow) Rocket::Core::RawTexture();
 					ASSERT(rocketMaterial->normalTexture, "Failed to allocate memory for texture");
-					rocketMaterial->normalTexture->name = ConvertToString(material.textures[i]->name);
-					rocketMaterial->normalTexture->path = ConvertToString(material.textures[i]->path);
+					rocketMaterial->normalTexture->name = ToString(material.textures[i]->name);
+					rocketMaterial->normalTexture->path = ToString(material.textures[i]->path);
 				}
 				break;
 				case flt::RawMaterial::TextureType::METALLIC:
@@ -176,8 +173,8 @@ Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt:
 				{
 					rocketMaterial->emissiveTexture = new(std::nothrow) Rocket::Core::RawTexture();
 					ASSERT(rocketMaterial->emissiveTexture, "Failed to allocate memory for texture");
-					rocketMaterial->emissiveTexture->name = ConvertToString(material.textures[i]->name);
-					rocketMaterial->emissiveTexture->path = ConvertToString(material.textures[i]->path);
+					rocketMaterial->emissiveTexture->name = ToString(material.textures[i]->name);
+					rocketMaterial->emissiveTexture->path = ToString(material.textures[i]->path);
 				}
 				break;
 				case flt::RawMaterial::TextureType::HEIGHT:
@@ -189,8 +186,8 @@ Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt:
 				{
 					rocketMaterial->opacityTexture = new(std::nothrow) Rocket::Core::RawTexture();
 					ASSERT(rocketMaterial->opacityTexture, "Failed to allocate memory for texture");
-					rocketMaterial->opacityTexture->name = ConvertToString(material.textures[i]->name);
-					rocketMaterial->opacityTexture->path = ConvertToString(material.textures[i]->path);
+					rocketMaterial->opacityTexture->name = ToString(material.textures[i]->name);
+					rocketMaterial->opacityTexture->path = ToString(material.textures[i]->path);
 				}
 				break;
 				case flt::RawMaterial::TextureType::UNKNOWN:
@@ -286,7 +283,7 @@ Rocket::Core::RawNode* flt::ConvertfltBoneTorocketNodeRecursive(const flt::RawSk
 	RkNode* rocketNode = new(std::nothrow) Rocket::Core::RawNode();
 	ASSERT(rocketNode, "Failed to allocate memory for node");
 
-	rocketNode->name = ConvertToString(bone.name);
+	rocketNode->name = ToString(bone.name);
 	// TODO : index를 넣어줘야함.
 	rocketNode->index = (int)(&bone - pIndexOffsetBone);
 	rocketNode->bindedBone = new(std::nothrow) RkBone();
@@ -319,6 +316,25 @@ void flt::CopyMeshesToModel(Rocket::Core::RawNode* node, Rocket::Core::RawModel*
 	for (auto& child : node->children)
 	{
 		CopyMeshesToModel(child, rocketModel);
+	}
+}
+
+void flt::GenerateTransformHierarchyRecursive(Rocket::Core::RocketTransform* rootRkTransform, Transform* rootTransform)
+{
+	Vector4f pos = rootTransform->GetLocalPosition();
+	rootRkTransform->SetLocalPosition({ pos.x, pos.y, pos.z });
+
+	Quaternion rot = rootTransform->GetLocalRotation();
+	rootRkTransform->SetLocalRotation({ rot.x, rot.y, rot.z, rot.w });
+
+	Vector4f scale = rootTransform->GetLocalScale();
+	rootRkTransform->SetLocalScale({ scale.x, scale.y, scale.z });
+
+	for (auto& child : rootTransform->GetChildren())
+	{
+		Rocket::Core::RocketTransform* rocketTrChild = new Rocket::Core::RocketTransform();
+		rocketTrChild->SetParent(rootRkTransform, false);
+		GenerateTransformHierarchyRecursive(rocketTrChild, child);
 	}
 }
 

@@ -68,14 +68,14 @@ VS_OUTPUT main(VS_INPUT Input)
     //float3 NormalL = mul((float3x3)bone, Input.Normal);
     //Output.Normal = normalize(mul((float3x3) WorldInvTransp, NormalL));
     
-    float4 PosL = mul(float4(Input.Position.xyz, 1.0f), bone);
-    Output.Position = mul(PosL, WorldViewProj);
+    float4 PosL = mul(bone, float4(Input.Position.xyz, 1.0f));
+    Output.Position = mul(WorldViewProj, PosL);
     
     Output.UV = Input.UV0;
     
     // TODO : 일단 본Matrix에는 scale 변환이 없다고 가정을 한 코드.
-    float3 NormalL = mul(Input.Normal, (float3x3) bone);
-    Output.Normal = normalize(mul(NormalL, (float3x3) WorldInvTransp));
+    float3 NormalL = mul((float3x3) bone, Input.Normal);
+    Output.Normal = normalize(mul((float3x3) WorldInvTransp, NormalL));
 
     return Output;
 }

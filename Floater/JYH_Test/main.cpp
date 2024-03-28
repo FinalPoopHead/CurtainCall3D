@@ -79,12 +79,25 @@ int main()
 	setlocale(LC_ALL, ".UTF8");
 	std::cout << std::boolalpha;
 
+	std::cout << "create rawScene" << std::endl;
 	flt::RawScene rawScene;
 
 #pragma region 테스트
 	{
 		using namespace flt;
 		using namespace flt::test;
+
+		std::string str1 = "안녕하세요";
+		std::wstring wstr = ToWstring(str1, flt::strEncoding::ANSI);
+		std::string str2 = ToString(wstr);
+		std::string str3 = ToString(wstr, flt::strEncoding::ANSI);
+
+		std::cout << str1 << std::endl;
+		std::wcout << wstr << std::endl;
+		std::cout << str2 << std::endl;
+		std::cout << str3 << std::endl;
+
+
 
 		//TesterRBTree tester;
 		//tester.Test();
@@ -102,7 +115,7 @@ int main()
 		std::wstring xUpYForward = L"..\\x64\\fbx\\Test\\XY.fbx";
 
 		char buffer[1024];
-		auto str = ConvertToString(L"..\\x64\\fbx\\Test\\*.*");
+		auto str = ToString(L"..\\x64\\fbx\\Test\\*.*");
 
 		WIN32_FIND_DATAA findData;
 		HANDLE handle = FindFirstFileA(str.c_str(), &findData);
@@ -194,7 +207,7 @@ int main()
 		}
 
 		renderer->Render(0.1f);
-		fbxObject.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, 0.01f);
+		//fbxObject.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, 0.01f);
 		renderable.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, -0.1f);
 
 		//fbxObject.transform.AddLocalPosition(0.0f, 0.0f, 0.01f);
