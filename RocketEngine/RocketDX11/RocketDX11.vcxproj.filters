@@ -41,7 +41,7 @@
       <Filter>Component\MeshRenderer</Filter>
     </ClCompile>
     <ClCompile Include="TextRenderer.cpp">
-      <Filter>Object\TextObject</Filter>
+      <Filter>Component\TextRenderer</Filter>
     </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>Resource\Texture</Filter>
@@ -54,9 +54,6 @@
     </ClCompile>
     <ClCompile Include="Material.cpp">
       <Filter>Material</Filter>
-    </ClCompile>
-    <ClCompile Include="DeviceBuilderDX11.cpp">
-      <Filter>GraphicsProcess\DX11DeviceBuilder</Filter>
     </ClCompile>
     <ClCompile Include="SphereMesh.cpp">
       <Filter>Resource\Mesh\StaticMeshes\Primitive</Filter>
@@ -78,6 +75,9 @@
     </ClCompile>
     <ClCompile Include="CubeMap.cpp">
       <Filter>Object\CubeMap</Filter>
+    </ClCompile>
+    <ClCompile Include="HelperObjectBase.cpp">
+      <Filter>Object\HelperObject\BaseClass</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -133,7 +133,7 @@
       <Filter>Component\MeshRenderer</Filter>
     </ClInclude>
     <ClInclude Include="TextRenderer.h">
-      <Filter>Object\TextObject</Filter>
+      <Filter>Component\TextRenderer</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>Resource\Texture</Filter>
@@ -149,12 +149,6 @@
     </ClInclude>
     <ClInclude Include="Material.h">
       <Filter>Material</Filter>
-    </ClInclude>
-    <ClInclude Include="DeviceBuilderDX11.h">
-      <Filter>GraphicsProcess\DX11DeviceBuilder</Filter>
-    </ClInclude>
-    <ClInclude Include="IBuilder.h">
-      <Filter>GraphicsProcess\Builder</Filter>
     </ClInclude>
     <ClInclude Include="SphereMesh.h">
       <Filter>Resource\Mesh\StaticMeshes\Primitive</Filter>
@@ -183,6 +177,12 @@
     <ClInclude Include="CubeMap.h">
       <Filter>Object\CubeMap</Filter>
     </ClInclude>
+    <ClInclude Include="HelperObjectBase.h">
+      <Filter>Object\HelperObject\BaseClass</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourcePath.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="FBXLoader">
@@ -199,9 +199,6 @@
     </Filter>
     <Filter Include="Object\LineRenderer">
       <UniqueIdentifier>{29601c1e-6dd6-412d-8f40-c8d66e78a994}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Object\TextObject">
-      <UniqueIdentifier>{4e5df295-451d-4a52-87a7-90d2884ebebf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource">
       <UniqueIdentifier>{5a459304-e098-43fa-9b09-91426347a350}</UniqueIdentifier>
@@ -263,12 +260,6 @@
     <Filter Include="Material">
       <UniqueIdentifier>{bfe75a22-e57e-483a-bb7c-22c13248a61e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GraphicsProcess\DX11DeviceBuilder">
-      <UniqueIdentifier>{55b87733-0089-4254-9c2c-20eb7765c321}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GraphicsProcess\Builder">
-      <UniqueIdentifier>{019b1634-5a7c-4c1d-a75b-6f62aa5f71e2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource\Shader\HLSL\SkinnedMesh">
       <UniqueIdentifier>{a2656c4f-0de9-4c9a-be05-d5876d4313b1}</UniqueIdentifier>
     </Filter>
@@ -310,6 +301,12 @@
     </Filter>
     <Filter Include="Component\Light">
       <UniqueIdentifier>{1cb4a846-a9b5-414c-b3fa-5cfa50d7cdde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\TextRenderer">
+      <UniqueIdentifier>{4e5df295-451d-4a52-87a7-90d2884ebebf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\HelperObject\BaseClass">
+      <UniqueIdentifier>{6a1e7798-5f44-48f6-afb6-b1ec30452067}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

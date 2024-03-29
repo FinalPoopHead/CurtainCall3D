@@ -30,7 +30,7 @@ namespace Rocket::Core
 	GraphicsSystem::GraphicsSystem()
 		:_hWnd(), _screenWidth(), _screenHeight(),
 		hGraphicsModule(LoadLibrary(GRAPHICSDLL_PATH)),
-		_rocketGraphics(), _factory()
+		_graphicsRenderer(), _factory()
 	{
 		DWORD error_code = GetLastError();
 		assert(hGraphicsModule);
@@ -38,7 +38,7 @@ namespace Rocket::Core
 		auto a = GetProcAddress(hGraphicsModule, GRAPHICS_CREATE_NAME);
 		error_code = GetLastError();
 
-		_rocketGraphics.reset((reinterpret_cast<GRAPHICS_CREATE_SIGNATURE>(GetProcAddress(hGraphicsModule, GRAPHICS_CREATE_NAME)))());
+		_graphicsRenderer.reset((reinterpret_cast<GRAPHICS_CREATE_SIGNATURE>(GetProcAddress(hGraphicsModule, GRAPHICS_CREATE_NAME)))());
 		_factory.reset((reinterpret_cast<FACTORY_CREATE_SIGNATURE>(GetProcAddress(hGraphicsModule, FACTORY_CREATE_NAME)))());
 		_resourceManager = (reinterpret_cast<GET_RESOURCEMANAGER_SIGNATURE>(GetProcAddress(hGraphicsModule, GET_RESOURCEMANAGER_NAME)))();
 	}
@@ -50,12 +50,13 @@ namespace Rocket::Core
 		_screenHeight = screenHeight;
 		_isEditor = isEditor;
 
-		_rocketGraphics->Initialize(static_cast<void*>(hWnd), screenWidth, screenHeight);
+		_graphicsRenderer->Initialize(static_cast<void*>(hWnd), screenWidth, screenHeight);
 	}
 
 	void GraphicsSystem::Finalize()
 	{
-		reinterpret_cast<GRAPHICS_RELEASE_SIGNATURE>(GetProcAddress(hGraphicsModule, GRAPHICS_RELEASE_NAME))(_rocketGraphics.release());
+		_graphicsRenderer->Finalize();
+		reinterpret_cast<GRAPHICS_RELEASE_SIGNATURE>(GetProcAddress(hGraphicsModule, GRAPHICS_RELEASE_NAME))(_graphicsRenderer.release());
 		reinterpret_cast<FACTORY_RELEASE_SIGNATURE>(GetProcAddress(hGraphicsModule, FACTORY_RELEASE_NAME))(_factory.release());
 		FreeLibrary(hGraphicsModule);
 	}
@@ -68,8 +69,8 @@ namespace Rocket::Core
 	void GraphicsSystem::DrawProcess()
 	{
 		UpdateRenderData(); //SetRenderData + 전체 렌더 시작,
-		_rocketGraphics->Update(TimeSystem::GetDeltaTime());
-		_rocketGraphics->Render();
+		_graphicsRenderer->Update(TimeSystem::GetDeltaTime(), TimeSystem::GetFrameRate());
+		_graphicsRenderer->Render();
 	}
 
 	void GraphicsSystem::UpdateRenderData()
@@ -106,6 +107,11 @@ namespace Rocket::Core
 	void GraphicsSystem::DestroyWindow()
 	{
 		::DestroyWindow(_hWnd);
+	}
+
+	void GraphicsSystem::SetDebugMode(bool isDebug)
+	{
+		_graphicsRenderer->SetDebugMode(isDebug);
 	}
 
 // 	void GraphicsSystem::MakeRenderableAll()

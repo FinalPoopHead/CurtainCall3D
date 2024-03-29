@@ -80,6 +80,9 @@ namespace Rocket
 		//Rocket::Core::DataSystem& _dataSystem;
 
 
+	private:
+		bool _isDebugMode;
+
 		/// 윈도우 관련
 	private:
 		HWND _hWnd;

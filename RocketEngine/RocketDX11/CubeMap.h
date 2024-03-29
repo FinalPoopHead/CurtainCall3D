@@ -25,7 +25,6 @@ namespace Rocket::Core
 		void Initialize(ID3D11Device* device);
 		void Render(ID3D11DeviceContext* deviceContext);
 		void LoadTexture(const std::string& fileName);
-		void SetTexture(ID3D11Resource* texture, ID3D11ShaderResourceView* textureView);
 
 	private:
 		void BuildGeometryBuffers(ID3D11Device* device);

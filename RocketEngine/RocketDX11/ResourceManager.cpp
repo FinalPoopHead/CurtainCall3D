@@ -1,36 +1,33 @@
-﻿#include <DDSTextureLoader.h>
-#include <WICTextureLoader.h>
-#include <cassert>
+﻿#include <cassert>
 
+#include "ResourcePath.h"
 #include "ResourceManager.h"
 #include "Camera.h"
-#include "CubeMesh.h"
-#include "SphereMesh.h"
-#include "Mesh.h"
 #include "StaticMesh.h"
 #include "SkinnedMesh.h"
-#include "VertexShader.h"
-#include "PixelShader.h"
 #include "TextRenderer.h"
 #include "SpriteRenderer.h"
 #include "GraphicsMacro.h"
-#include "texture.h"
-#include "material.h"
 #include "VertexStruct.h"
-
 #include "CubeMap.h"
 
-#ifdef _FLOATER
-const std::string TEXTURE_PATH = "../../RocketEngine/Resources/Textures/";
-const std::string MODEL_PATH = "../../RocketEngine/Resources/Models/";
-const std::wstring FONT_PATH = L"../../RocketEngine/Resources/Font/";
-const std::wstring HLSL_PATH = L"../../RocketEngine/Resources/Shaders/";
-#else
-const std::string TEXTURE_PATH = "Resources/Textures/";
-const std::string MODEL_PATH = "Resources/Models/";
-const std::wstring FONT_PATH = L"Resources/Font/";
-const std::wstring HLSL_PATH = L"Resources/Shaders/";
-#endif
+namespace Rocket::Core
+{
+	template <typename T>
+	ULONG GetRefCount(const ComPtr<T>& p)
+	{
+		T* temp = p.Get();
+
+		ULONG ret = 0;
+		if (temp != nullptr)
+		{
+			ret = temp->AddRef();
+			ret = temp->Release();
+		}
+
+		return ret;
+	}
+}
 
 namespace Rocket::Core
 {
@@ -53,93 +50,89 @@ namespace Rocket::Core
 
 		// Color Shader
 		{
-			VertexShader* colorVS = new VertexShader();
-			colorVS->Initialize(_device.Get(), HLSL_PATH + L"ColorVS.hlsl");
+			std::unique_ptr<VertexShader> colorVS = std::make_unique<VertexShader>();
+			colorVS->Initialize(_device, HLSL_PATH + L"ColorVS.hlsl");
 			colorVS->SetVertexType(eVertexType::COLOR_VERTEX);
-			_vertexShaders["ColorVS"] = colorVS;
+			_vertexShaders["ColorVS"] = std::move(colorVS);
 
-			PixelShader* colorPS = new PixelShader();
-			colorPS->Initialize(_device.Get(), HLSL_PATH + L"ColorPS.hlsl");
-			_pixelShaders["ColorPS"] = colorPS;
+			std::unique_ptr<PixelShader> colorPS = std::make_unique<PixelShader>();
+			colorPS->Initialize(_device, HLSL_PATH + L"ColorPS.hlsl");
+			_pixelShaders["ColorPS"] = std::move(colorPS);
 		}
 
 		// Texture Shader
 		{
-			VertexShader* textureVS = new VertexShader();
-			textureVS->Initialize(_device.Get(), HLSL_PATH + L"TextureVS.hlsl");
+			std::unique_ptr<VertexShader> textureVS = std::make_unique<VertexShader>();
+			textureVS->Initialize(_device, HLSL_PATH + L"TextureVS.hlsl");
 			textureVS->SetVertexType(eVertexType::TEXTURE_VERTEX);
-			_vertexShaders["TextureVS"] = textureVS;
+			_vertexShaders["TextureVS"] = std::move(textureVS);
 
-			PixelShader* texturePS = new PixelShader();
-			texturePS->Initialize(_device.Get(), HLSL_PATH + L"TexturePS.hlsl");
-			_pixelShaders["TexturePS"] = texturePS;
+			std::unique_ptr<PixelShader> texturePS = std::make_unique<PixelShader>();
+			texturePS->Initialize(_device, HLSL_PATH + L"TexturePS.hlsl");
+			_pixelShaders["TexturePS"] = std::move(texturePS);
 		}
 
 		// Light Shader
 		{
-			VertexShader* lightVS = new VertexShader();
-			lightVS->Initialize(_device.Get(), HLSL_PATH + L"LightVS.hlsl");
+			std::unique_ptr<VertexShader> lightVS = std::make_unique<VertexShader>();
+			lightVS->Initialize(_device, HLSL_PATH + L"LightVS.hlsl");
 			lightVS->SetVertexType(eVertexType::LIGHT_VERTEX);
-			_vertexShaders["LightVS"] = lightVS;
+			_vertexShaders["LightVS"] = std::move(lightVS);
 
-			PixelShader* lightPS = new PixelShader();
-			lightPS->Initialize(_device.Get(), HLSL_PATH + L"LightPS.hlsl");
-			_pixelShaders["LightPS"] = lightPS;
+			std::unique_ptr<PixelShader> lightPS = std::make_unique<PixelShader>();
+			lightPS->Initialize(_device, HLSL_PATH + L"LightPS.hlsl");
+			_pixelShaders["LightPS"] = std::move(lightPS);
 		}
 
 		// StaticMesh Shader
 		{
-			VertexShader* staticMeshVS = new VertexShader();
-			staticMeshVS->Initialize(_device.Get(), HLSL_PATH + L"StaticMeshVS.hlsl");
+			std::unique_ptr<VertexShader> staticMeshVS = std::make_unique<VertexShader>();
+			staticMeshVS->Initialize(_device, HLSL_PATH + L"StaticMeshVS.hlsl");
 			staticMeshVS->SetVertexType(eVertexType::VERTEX);
-			_vertexShaders["StaticMeshVS"] = staticMeshVS;
+			_vertexShaders["StaticMeshVS"] = std::move(staticMeshVS);
 
-			PixelShader* staticMeshPS = new PixelShader();
-			staticMeshPS->Initialize(_device.Get(), HLSL_PATH + L"StaticMeshPS.hlsl");
-			_pixelShaders["StaticMeshPS"] = staticMeshPS;
+			std::unique_ptr<PixelShader> staticMeshPS = std::make_unique<PixelShader>();
+			staticMeshPS->Initialize(_device, HLSL_PATH + L"StaticMeshPS.hlsl");
+			_pixelShaders["StaticMeshPS"] = std::move(staticMeshPS);
 		}
 
 		// SkinnedMesh Shader
 		{
-			VertexShader* skinnedMeshVS = new VertexShader();
-			skinnedMeshVS->Initialize(_device.Get(), HLSL_PATH + L"SkinnedMeshVS.hlsl");
+			std::unique_ptr<VertexShader> skinnedMeshVS = std::make_unique<VertexShader>();
+			skinnedMeshVS->Initialize(_device, HLSL_PATH + L"SkinnedMeshVS.hlsl");
 			skinnedMeshVS->SetVertexType(eVertexType::SKINNED_VERTEX);
-			_vertexShaders["SkinnedMeshVS"] = skinnedMeshVS;
+			_vertexShaders["SkinnedMeshVS"] = std::move(skinnedMeshVS);
 
-			PixelShader* skinnedMeshPS = new PixelShader();
-			skinnedMeshPS->Initialize(_device.Get(), HLSL_PATH + L"SkinnedMeshPS.hlsl");
-			_pixelShaders["SkinnedMeshPS"] = skinnedMeshPS;
+			std::unique_ptr<PixelShader> skinnedMeshPS = std::make_unique<PixelShader>();
+			skinnedMeshPS->Initialize(_device, HLSL_PATH + L"SkinnedMeshPS.hlsl");
+			_pixelShaders["SkinnedMeshPS"] = std::move(skinnedMeshPS);
 		}
 
 		// CubeMap Shader
 		{
-			VertexShader* cubeMapVS = new VertexShader();
-			cubeMapVS->Initialize(_device.Get(), HLSL_PATH + L"CubeMapVS.hlsl");
+			std::unique_ptr<VertexShader> cubeMapVS = std::make_unique<VertexShader>();
+			cubeMapVS->Initialize(_device, HLSL_PATH + L"CubeMapVS.hlsl");
 			cubeMapVS->SetVertexType(eVertexType::VERTEX);
-			_vertexShaders["CubeMapVS"] = cubeMapVS;
+			_vertexShaders["CubeMapVS"] = std::move(cubeMapVS);
 
-			PixelShader* cubeMapPS = new PixelShader();
-			cubeMapPS->Initialize(_device.Get(), HLSL_PATH + L"CubeMapPS.hlsl");
-			_pixelShaders["CubeMapPS"] = cubeMapPS;
+			std::unique_ptr<PixelShader> cubeMapPS = std::make_unique<PixelShader>();
+			cubeMapPS->Initialize(_device, HLSL_PATH + L"CubeMapPS.hlsl");
+			_pixelShaders["CubeMapPS"] = std::move(cubeMapPS);
 		}
 
 		CreateRenderStates();
 
-		_cubeMesh = new CubeMesh();
+		_cubeMesh = std::make_unique<CubeMesh>();
 		_cubeMesh->Initialize(device);
 
-		_sphereMesh = new SphereMesh();
+		_sphereMesh = std::make_unique<SphereMesh>();
 		_sphereMesh->Initialize(device);
 
-		_cubeMap = new CubeMap();
-		_cubeMap->Initialize(device);
-		_cubeMap->LoadTexture("CloudCubeMap.dds");
+		_defaultTexture = GetTexture("darkbrickdxt1.dds");
 
-		_defaultTexture = LoadTextureFile("darkbrickdxt1.dds");
-
-		_defaultFont = new DirectX::SpriteFont(_device.Get(), (FONT_PATH + L"NotoSansKR.spritefont").c_str());
+		_defaultFont = std::make_unique<DirectX::SpriteFont>(_device, (FONT_PATH + L"NotoSansKR.spritefont").c_str());
 		
-		_defaultMaterial = new Material();
+		_defaultMaterial = std::make_unique<Material>();
 		_defaultMaterial->SetVertexShader(GetVertexShader("StaticMeshVS"));
 		_defaultMaterial->SetPixelShader(GetPixelShader("StaticMeshPS"));
 		_defaultMaterial->SetRenderState(GetRenderState(eRenderState::SOLID));
@@ -154,13 +147,13 @@ namespace Rocket::Core
 	{
 		if (rawModel->animations.empty())
 		{
-			_models.insert({ fileName,new StaticModel });
-			StaticModel* staticModel = ProcessStaticModel(fileName, rawModel);
+			_models.insert({ fileName,std::make_unique<StaticModel>() });
+			ProcessStaticModel(fileName, rawModel);
 		}
 		else
 		{
-			_models.insert({ fileName, new DynamicModel });
-			DynamicModel* dynamicModel = ProcessDynamicModel(fileName, rawModel);
+			_models.insert({ fileName, std::make_unique<DynamicModel>() });
+			ProcessDynamicModel(fileName, rawModel);
 		}
 	}
 
@@ -171,7 +164,7 @@ namespace Rocket::Core
 			return nullptr;
 		}
 
-		return _vertexShaders[name];
+		return _vertexShaders[name].get();
 	}
 
 	PixelShader* ResourceManager::GetPixelShader(const std::string& name)
@@ -181,22 +174,22 @@ namespace Rocket::Core
 			return nullptr;
 		}
 
-		return _pixelShaders[name];
+		return _pixelShaders[name].get();
 	}
 
-	DirectX::SpriteFont* ResourceManager::GetDefaultFont()
-	{
-		return _defaultFont;
+	DirectX::SpriteFont* ResourceManager::GetDefaultFont() const
+{
+		return _defaultFont.get();
 	}
 
 	ID3D11Device* ResourceManager::GetDevice()
 	{
-		return _device.Get();
+		return _device;
 	}
 
 	ID3D11DeviceContext* ResourceManager::GetDeviceContext()
 	{
-		return _deviceContext.Get();
+		return _deviceContext;
 	}
 
 	void ResourceManager::CreateRenderStates()
@@ -210,7 +203,10 @@ namespace Rocket::Core
 		solidDesc.DepthClipEnable = true;
 		ID3D11RasterizerState* solid;
 		HR(_device->CreateRasterizerState(&solidDesc, &solid));
-		_renderStates.emplace_back(solid);
+		_renderStates.emplace_back(solid);		// TODO : 왜 refCount가 증가하는거지? 이해가 안되네..
+		solid->Release();						// TODO : 이거 Release 해버리면 내가 vector 에 넣은것도 날라가는거 아닌가? 왜 refCount가 감소하고 Release 되지 않는거지..?
+		solid->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"SOLID RASTER") - 1, L"SOLID RASTER");
+		
 
 		D3D11_RASTERIZER_DESC wireframeDesc;
 		ZeroMemory(&wireframeDesc, sizeof(D3D11_RASTERIZER_DESC));
@@ -221,11 +217,14 @@ namespace Rocket::Core
 		ID3D11RasterizerState* wireframe;
 		HR(_device->CreateRasterizerState(&wireframeDesc, &wireframe));
 		_renderStates.emplace_back(wireframe);
+		wireframe->Release();
+		wireframe->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"WIREFRAME RASTER") - 1, L"WIREFRAME RASTER");
+
 	}
 
 	ID3D11RasterizerState* ResourceManager::GetRenderState(eRenderState eState)
 	{
-		return _renderStates[static_cast<int>(eState)];
+		return _renderStates[static_cast<int>(eState)].Get();
 	}
 
 	Mesh* ResourceManager::GetMesh(eMeshType meshType) const
@@ -233,9 +232,9 @@ namespace Rocket::Core
 		switch (meshType)
 		{
 		case eMeshType::CUBE:
-			return _cubeMesh;
+			return _cubeMesh.get();
 		case eMeshType::SPHERE:
-			return _sphereMesh;
+			return _sphereMesh.get();
 		default:
 			return nullptr;
 		}
@@ -248,47 +247,19 @@ namespace Rocket::Core
 			return nullptr;
 		}
 
-		return _meshes.at(fileName);
+		return _meshes.at(fileName).get();
 	}
 
 	Texture* ResourceManager::GetTexture(std::string fileName)
 	{
 		if (_textures.find(fileName) == _textures.end())
 		{
-			return LoadTextureFile(fileName);
+			std::unique_ptr<Texture> texture = std::make_unique<Texture>();
+			texture->LoadFromFile(_device, fileName);
+			_textures.insert({ fileName,std::move(texture) });
 		}
 
-		return _textures.at(fileName);
-	}
-
-	Texture* ResourceManager::LoadTextureFile(std::string fileName)
-	{
-		std::string fullPath = TEXTURE_PATH + fileName;
-		std::wstring wFileName(fullPath.begin(), fullPath.end());
-
-		std::string extension = fileName.substr(fileName.find_last_of(".") + 1);
-
-		ID3D11Resource* rawTexture = nullptr;
-		ID3D11ShaderResourceView* textureView = nullptr;
-
-		if (extension == "dds")
-		{
-			HR(DirectX::CreateDDSTextureFromFile(_device.Get(), wFileName.c_str(), &rawTexture, &textureView));
-		}
-		else if (extension == "jpg" || extension == "png")
-		{
-			HR(DirectX::CreateWICTextureFromFile(_device.Get(), wFileName.c_str(), &rawTexture, &textureView));
-		}
-		else
-		{
-			assert(false);
-		}
-
-		Texture* texture = new Texture(rawTexture, textureView);
-
-		_textures.insert({ fileName,texture });
-
-		return texture;
+		return _textures.at(fileName).get();
 	}
 
 	Model* ResourceManager::GetModel(const std::string& fileName)
@@ -298,12 +269,12 @@ namespace Rocket::Core
 			return nullptr;
 		}
 
-		return _models[fileName];
+		return _models[fileName].get();
 	}
 
 	StaticModel* ResourceManager::ProcessStaticModel(const std::string& fileName, const RawModel* rawModel)
 	{
-		StaticModel* resultModel = reinterpret_cast<StaticModel*>(_models.at(fileName));
+		StaticModel* resultModel = reinterpret_cast<StaticModel*>(_models.at(fileName).get());
 
 		// RawNode정보 순회하면서 Node Hierarchy 만들기. Bone정보도 같이 처리함.
 		resultModel->rootNode = ProcessRawNodeRecur(rawModel->rootNode);
@@ -314,9 +285,9 @@ namespace Rocket::Core
 		// Mesh 정보 순회하면서 Mesh 만들기. Texture도 이때 로드해봄.
  		for (auto& rawMesh : rawModel->meshes)
 		{
-			StaticMesh* staticMesh = ProcessStaticMesh(rawMesh);
-			resultModel->meshes.push_back(staticMesh);
-			_meshes.insert({ rawMesh->name + std::to_string(meshNameCount[rawMesh->name]), staticMesh});	// TODO : 근데 다른 노드인데 이름이 같은 경우면 어떡하지? 세상에~
+			std::unique_ptr<StaticMesh> staticMesh(ProcessStaticMesh(rawMesh));
+			resultModel->meshes.push_back(staticMesh.get());
+			_meshes.insert({ rawMesh->name + std::to_string(meshNameCount[rawMesh->name]), std::move(staticMesh)});	// TODO : 근데 다른 노드인데 이름이 같은 경우면 어떡하지? 세상에~
 			meshNameCount[rawMesh->name]++;
 		}
 
@@ -325,7 +296,7 @@ namespace Rocket::Core
 
 	DynamicModel* ResourceManager::ProcessDynamicModel(const std::string& fileName, const RawModel* rawModel)
 	{
-		DynamicModel* resultModel = reinterpret_cast<DynamicModel*>(_models.at(fileName));
+		DynamicModel* resultModel = reinterpret_cast<DynamicModel*>(_models.at(fileName).get());
 
 		// RawNode정보 순회하면서 Node Hierarchy 만들기. Bone정보도 같이 처리함.
 		resultModel->rootNode = ProcessRawNodeRecur(rawModel->rootNode);
@@ -418,10 +389,7 @@ namespace Rocket::Core
 		{
 			for (auto& rawTexture : rawMesh->material->textures)
 			{
-				if (_textures.find(rawTexture->path) == _textures.end())
-				{
-					LoadTextureFile(rawTexture->path);
-				}
+				GetTexture(rawTexture->path);
 			}
 		}
 
@@ -454,10 +422,7 @@ namespace Rocket::Core
 		{
 			for (auto& rawTexture : rawMesh->material->textures)
 			{
-				if (_textures.find(rawTexture->path) == _textures.end())
-				{
-					LoadTextureFile(rawTexture->path);
-				}
+				GetTexture(rawTexture->path);
 			}
 		}
 
@@ -467,4 +432,82 @@ namespace Rocket::Core
 		return skinnedMesh;
 	}
 
+	void ResourceManager::Finalize()
+	{
+		_cubeMesh.reset();
+		_sphereMesh.reset();
+		_defaultMaterial.reset();
+		_defaultTexture = nullptr;
+		_defaultFont.reset();
+		_cubePrimitive.reset();
+		_spherePrimitive.reset();
+		_cylinderPrimitive.reset();
+
+		for (auto& iter : _vertexShaders)
+		{
+			iter.second.reset();
+		}
+
+		for (auto& iter : _pixelShaders)
+		{
+			iter.second.reset();
+		}
+
+		for (auto& iter : _textures)
+		{
+			iter.second.reset();
+		}
+
+		delete _defaultTexture;
+
+		for (auto& iter : _models)
+		{
+			DeleteNodeRecur(iter.second->rootNode);
+
+			auto temp = dynamic_cast<DynamicModel*>(iter.second.get());
+			if (temp)
+			{
+				for (auto& anim : temp->animations)
+				{
+					for (auto& nodeAnim : anim.second->nodeAnimations)
+					{
+						delete nodeAnim;
+					}
+					delete anim.second;
+				}
+			}
+
+			for (auto& mesh : iter.second.get()->GetMeshes())
+			{
+				delete mesh;
+			}
+
+			iter.second.reset();
+		}
+
+		for (auto& rs : _renderStates)
+		{
+			rs.Reset();
+		}
+
+		for (auto& iter : _meshes)
+		{
+			iter.second.reset();
+		}
+	}
+
+	void ResourceManager::DeleteNodeRecur(Node* node)
+	{
+		for (auto& child : node->children)
+		{
+			DeleteNodeRecur(child);
+		}
+
+		if (node->bindedBone)
+		{
+			delete node->bindedBone;
+		}
+
+		delete node;
+	}
 }

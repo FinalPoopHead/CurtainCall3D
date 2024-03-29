@@ -33,7 +33,7 @@ namespace Rocket::Core
 		D3D11_SUBRESOURCE_DATA vertexData = {};
 		vertexData.pSysMem = _vertices.data();
 
-		HR(ResourceManager::Instance().GetDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, &_vertexBuffer));
+		HR(ResourceManager::Instance().GetDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, _vertexBuffer.GetAddressOf()));
 
 		D3D11_BUFFER_DESC indexBufferDesc = {};
 		indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -46,7 +46,10 @@ namespace Rocket::Core
 		D3D11_SUBRESOURCE_DATA indexData = {};
 		indexData.pSysMem = _indices.data();
 
-		HR(ResourceManager::Instance().GetDevice()->CreateBuffer(&indexBufferDesc, &indexData, &_indexBuffer));
+		HR(ResourceManager::Instance().GetDevice()->CreateBuffer(&indexBufferDesc, &indexData, _indexBuffer.GetAddressOf()));
+	
+		_vertexBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"STATIC v-Buffer") - 1, L"STATIC v-Buffer");
+		_indexBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"STATIC i-Buffer") - 1, L"STATIC i-Buffer");
 	}
 
 	void StaticMesh::SetNode(Node* node)

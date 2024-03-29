@@ -24,7 +24,7 @@ namespace Rocket::Core
 
 	Camera::~Camera()
 	{
-
+		_cameraBuffer.Reset();
 	}
 
 	DirectX::XMFLOAT3 Camera::GetPosition() const
@@ -236,6 +236,7 @@ namespace Rocket::Core
 		cameraBufferDesc.StructureByteStride = 0;
 
 		HR(device->CreateBuffer(&cameraBufferDesc, NULL, &_cameraBuffer));
+		_cameraBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"CameraConstantBuffer") - 1, L"CameraConstantBuffer");
 	}
 
 	ID3D11Buffer* Camera::GetCameraBuffer() const

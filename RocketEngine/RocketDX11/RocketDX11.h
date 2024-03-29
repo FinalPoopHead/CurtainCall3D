@@ -18,14 +18,8 @@ using Microsoft::WRL::ComPtr;
 
 namespace Rocket::Core
 {
-	class Grid;
-	class Axis;
-	class CubeMesh;
-	class VertexShader;
-	class PixelShader;
 	class ObjectManager;
 	class ResourceManager;
-	class SpriteRenderer;
 	
 	class RocketDX11 final : public IDX11Renderer
 	{
@@ -37,7 +31,7 @@ namespace Rocket::Core
 		//그래픽스 엔진을 초기화한다.
 		virtual void Initialize(void* hWnd, int screenWidth, int screenHeight) override;
 		virtual void SetDebugMode(bool isDebug) override;
-		virtual void Update(float deltaTime) override;
+		virtual void Update(float deltaTime, int fps = 0) override;
 		virtual void Render() override;
 		virtual void OnResize(int _width, int _height) override;
 		virtual void Finalize() override;
@@ -53,6 +47,7 @@ namespace Rocket::Core
 		void RenderLine();
 		void RenderTexture();
 		void RenderCubeMap();
+		void RenderDebug();
 		void EndRender();
 
 		void UpdateAnimation(float deltaTime);
@@ -64,6 +59,7 @@ namespace Rocket::Core
 		int _screenHeight;
 		bool _vSyncEnabled;
 		float _deltaTime;
+		bool _isDebugMode;
 
 		/// 초기화 관련
 	private:
@@ -80,13 +76,11 @@ namespace Rocket::Core
 		ComPtr<ID3D11DepthStencilState> _defaultDepthStencilState;
 		ComPtr<ID3D11DepthStencilState> _cubeMapDepthStencilState;
 		ComPtr<ID3D11DepthStencilView> _depthStencilView;
-		ComPtr<ID3D11BlendState > _defaultBlendState;
+		ComPtr<ID3D11BlendState> _defaultBlendState;
 		
 		D3D11_VIEWPORT _viewport;
 
 	private:
-		Grid* _grid;
-		Axis* _axis;
 		DirectX::SpriteBatch* _spriteBatch;
 		DirectX::PrimitiveBatch<DirectX::VertexPositionColor>* _lineBatch;
 		std::unique_ptr<DirectX::BasicEffect> _basicEffect;

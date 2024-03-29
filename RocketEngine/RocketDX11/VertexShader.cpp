@@ -22,12 +22,12 @@ namespace Rocket::Core
 
 	VertexShader::~VertexShader()
 	{
-		_inputLayout.Reset();
 		_vertexShader.Reset();
 		for (auto& buffer : _constantBuffers)
 		{
 			buffer.Reset();
 		}
+		_inputLayout.Reset();
 	}
 
 	void VertexShader::Initialize(ID3D11Device* device, const std::wstring& path)
@@ -106,6 +106,8 @@ namespace Rocket::Core
 			assert(false);
 		}
 
+		_vertexShader->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"vertexShader") - 1, L"vertexShader");
+
 		/// Shader Reflection
 		ID3D11ShaderReflection* pReflector = nullptr;
 
@@ -131,6 +133,8 @@ namespace Rocket::Core
 			elementDesc.SemanticIndex = paramDesc.SemanticIndex;
 			elementDesc.InputSlot = 0;
 			elementDesc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+// 			elementDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+// 			elementDesc.InstanceDataStepRate = 0;
 			elementDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 			elementDesc.InstanceDataStepRate = 0;
 
@@ -166,6 +170,7 @@ namespace Rocket::Core
 
 		// Shader InputLayout 생성..
 		HR(device->CreateInputLayout(&inputLayoutDesc[0], (UINT)inputLayoutDesc.size(), vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &_inputLayout));
+		_inputLayout->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"vertexShaderInputLayout"), L"vertexShaderInputLayout");
 
 		/// ConstantBuffer Reflection
 		// Vertex Shader ConstantBuffer..e
@@ -187,10 +192,15 @@ namespace Rocket::Core
 				// 해당 Constant Buffer 생성..
 				HR(device->CreateBuffer(&cBufferDesc, nullptr, &_constantBuffers[bindDesc.BindPoint]));
 
+				_constantBuffers[bindDesc.BindPoint]->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"vertexCBuffer") - 1, L"vertexCBuffer");
+
 				// Constant Buffer Register Slot Number..
 				//cbuffer_register_slot = bindDesc.BindPoint;
 			}
 		}
+
+		vertexShaderBlob->Release();
+		pReflector->Release();
 	}
 
 	void VertexShader::SetVertexType(eVertexType type)

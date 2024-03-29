@@ -2,6 +2,7 @@
 #include <d3d11.h>
 #include <dxgi.h>
 #include <wrl.h>
+#include <string>
 
 #include "IResource.h"
 
@@ -18,7 +19,7 @@ namespace Rocket::Core
 		~Texture();
 
 	public:
-		void Shutdown();
+		void LoadFromFile(ID3D11Device* device, std::string fileName);
 		ID3D11ShaderResourceView* GetTextureView();
 		ID3D11ShaderResourceView** GetAddressOfTextureView();
 
