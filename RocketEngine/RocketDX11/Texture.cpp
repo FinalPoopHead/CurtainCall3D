@@ -59,8 +59,15 @@ namespace Rocket::Core
 			assert(false);
 		}
 
-		_texture->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"TEXTUREtexture") - 1, L"TEXTUREtexture");
-		_textureView->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"TEXTUREtextureView") - 1, L"TEXTUREtextureView");
+		if(_texture)
+		{
+			_texture->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"TEXTUREtexture") - 1, L"TEXTUREtexture");
+		}
+
+		if (_textureView)
+		{
+			_textureView->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"TEXTUREtextureView") - 1, L"TEXTUREtextureView");
+		}
 	}
 
 	ID3D11ShaderResourceView* Texture::GetTextureView()

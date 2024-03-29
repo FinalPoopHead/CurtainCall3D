@@ -13,8 +13,8 @@ namespace Rocket::Core
 
 	SphereMesh::~SphereMesh()
 	{
-		_vertexBuffer.Reset();
-		_indexBuffer.Reset();
+// 		_vertexBuffer.Reset();
+// 		_indexBuffer.Reset();
 	}
 
 	void SphereMesh::Initialize(ID3D11Device* device)

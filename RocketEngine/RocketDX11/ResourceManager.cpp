@@ -475,11 +475,11 @@ namespace Rocket::Core
 					}
 					delete anim.second;
 				}
-			}
 
-			for (auto& mesh : iter.second.get()->GetMeshes())
-			{
-				delete mesh;
+				for (auto& mesh : iter.second.get()->GetMeshes())
+				{
+					delete mesh;
+				}
 			}
 
 			iter.second.reset();

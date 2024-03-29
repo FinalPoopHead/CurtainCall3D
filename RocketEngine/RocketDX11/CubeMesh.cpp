@@ -12,8 +12,8 @@ namespace Rocket::Core
 
 	CubeMesh::~CubeMesh()
 	{
-		_vertexBuffer.Reset();
-		_indexBuffer.Reset();
+// 		_vertexBuffer.Reset();
+// 		_indexBuffer.Reset();
 	}
 
 	void CubeMesh::Initialize(ID3D11Device* device)
