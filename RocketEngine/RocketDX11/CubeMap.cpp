@@ -42,7 +42,6 @@ namespace Rocket::Core
 		cubeMapDesc.CullMode = D3D11_CULL_NONE;
 		cubeMapDesc.FrontCounterClockwise = false;
 		cubeMapDesc.DepthClipEnable = true;
-		ID3D11RasterizerState* cubemapRS;
 		HR(device->CreateRasterizerState(&cubeMapDesc, _cubeMapRenderState.GetAddressOf()));
 
 		// TODO : 이것도 얘가 리소스매니저한테 접근해서 받아오지말고 리소스매니저가 얘한테 부여하게끔 해야하나?

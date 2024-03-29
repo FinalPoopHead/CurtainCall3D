@@ -47,7 +47,7 @@ namespace Rocket::Core
 		Matrix GetScaleMatrix() const;
 		Matrix GetRotationMatrix() const;
 		Matrix GetTranslationMatrix() const;
-		Matrix GetWorldTM() const;
+		Matrix GetWorldTM();
 
 		/// Local 기준 행렬
 		Matrix GetLocalScaleMatrix() const;
@@ -74,6 +74,7 @@ namespace Rocket::Core
 	protected:
 		void AddChild(RocketTransform* child);
 		void ReleaseChild(RocketTransform* child);
+		void SetDirtyRecur(RocketTransform* transform);
 
 	private:
 		Vector3 _position;
@@ -82,5 +83,7 @@ namespace Rocket::Core
 
 		RocketTransform* _parent;
 		std::vector<RocketTransform*> _children;
+		bool _isDirty;
+		Matrix _worldTM;
 	};
 }

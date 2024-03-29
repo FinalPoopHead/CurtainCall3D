@@ -10,9 +10,6 @@
     <ClCompile Include="CubeMesh.cpp">
       <Filter>Resource\Mesh\StaticMeshes\Primitive</Filter>
     </ClCompile>
-    <ClCompile Include="FBXLoader.cpp">
-      <Filter>FBXLoader</Filter>
-    </ClCompile>
     <ClCompile Include="Grid.cpp">
       <Filter>Object\HelperObject</Filter>
     </ClCompile>
@@ -89,9 +86,6 @@
     </ClInclude>
     <ClInclude Include="CubeMesh.h">
       <Filter>Resource\Mesh\StaticMeshes\Primitive</Filter>
-    </ClInclude>
-    <ClInclude Include="FBXLoader.h">
-      <Filter>FBXLoader</Filter>
     </ClInclude>
     <ClInclude Include="VertexStruct.h">
       <Filter>Struct</Filter>
@@ -185,9 +179,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="FBXLoader">
-      <UniqueIdentifier>{9e7db707-89b2-42b9-94c7-8b4977f88a36}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Object">
       <UniqueIdentifier>{7dcc5874-dd39-4cbf-8c16-a378066fa391}</UniqueIdentifier>
     </Filter>
