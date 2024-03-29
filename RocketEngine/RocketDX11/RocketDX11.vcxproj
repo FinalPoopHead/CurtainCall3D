@@ -204,8 +204,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\Build\$(Configuration);$(ProjectDir)..\Lib\$(Configuration)\assimp;$(ProjectDir)..\Lib\$(Configuration)\DXTK;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>RocketCommon.lib;DirectXTK.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\Build\$(Configuration);$(ProjectDir)..\Lib\$(Configuration)\DXTK;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>RocketCommon.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "*.hlsl" "$(ProjectDir)..\Resources\Shaders";</Command>
@@ -223,8 +223,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Build\$(Configuration);$(SolutionDir)Lib\$(Configuration)\assimp;$(SolutionDir)Lib\$(Configuration)\DXTK;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>RocketCommon.lib;DirectXTK.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Build\$(Configuration);$(SolutionDir)Lib\$(Configuration)\DXTK;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>RocketCommon.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)Lib\$(Configuration)\assimp\assimp-vc143-mtd.dll" "$(SolutionDir)Build\$(Configuration)";
@@ -247,8 +247,8 @@ copy /Y "*.hlsl" "$(SolutionDir)Resources\Shaders";</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\Build\$(Configuration);$(ProjectDir)..\Lib\$(Configuration)\assimp;$(ProjectDir)..\Lib\$(Configuration)\DXTK;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>RocketCommon.lib;DirectXTK.lib;assimp-vc143-mt.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\Build\$(Configuration);$(ProjectDir)..\Lib\$(Configuration)\DXTK;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>RocketCommon.lib;DirectXTK.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "*.hlsl" "$(ProjectDir)..\Resources\Shaders";</Command>
@@ -270,7 +270,7 @@ copy /Y "*.hlsl" "$(SolutionDir)Resources\Shaders";</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Build\$(Configuration);$(SolutionDir)Lib\$(Configuration)\assimp;$(SolutionDir)Lib\$(Configuration)\DXTK;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Build\$(Configuration);$(SolutionDir)Lib\$(Configuration)\DXTK;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>RocketCommon.lib;DirectXTK.lib;assimp-vc143-mt.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
