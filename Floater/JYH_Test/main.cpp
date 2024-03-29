@@ -183,8 +183,8 @@ int main(int argc, char* argv[])
 	flt::Platform platform{ true };
 	platform.Initialize(1280, 720, L"title", L".\\path");
 
-	auto renderer = platform.CreateRenderer(flt::RendererType::ROCKET_DX11);
-	//auto renderer = platform.CreateRenderer(flt::RendererType::DX11);
+	//auto renderer = platform.CreateRenderer(flt::RendererType::ROCKET_DX11);
+	auto renderer = platform.CreateRenderer(flt::RendererType::DX11);
 
 	bool isShowCurser = true;
 
@@ -293,8 +293,8 @@ int main(int argc, char* argv[])
 			}
 		}
 
-		//ASSERT(loopCount < 10000, "정지");
-		//loopCount++;
+		ASSERT(loopCount < 1000, "정지");
+		loopCount++;
 		//Sleep(1);
 	}
 

@@ -102,10 +102,10 @@ namespace flt
 			temp -= rhs;
 			return temp;
 		}
-		Matrix4f& operator*=(const Matrix4f& rhs) noexcept
+		inline Matrix4f& operator*=(const Matrix4f& rhs) noexcept
 		{
-			/*SSE version, dp_ps를 사용하지 않음. 5950x 기준으로 아래 버젼이 1.5배정도 더 빠름.
-			Matrix4f temp = *this;
+			///SSE version, dp_ps를 사용하지 않음. 5950x 기준으로 아래 버젼이 1.5배정도 더 빠름.
+			/*Matrix4f temp = *this;
 			Matrix4f transpose = rhs.Transpose();
 
 			const __m128 row0 = _mm_load_ps(transpose.e[0]);
@@ -147,8 +147,7 @@ namespace flt
 
 			return *this;*/
 
-
-			//SSE4.1 dp_ps version
+			///SSE4.1 dp_ps version
 			Matrix4f temp = *this;
 			Vector4f tmp[4] =
 			{
@@ -179,6 +178,70 @@ namespace flt
 			e[3][3] = _mm_cvtss_f32(_mm_dp_ps(temp.v[3].m, tmp[3].m, 0xFF));
 
 			return *this;
+
+			/// Not Work
+			/*Matrix4f temp;
+			// Use vW to hold the original row
+			__m128 vW = this->v[0].m;
+			__m128 vX = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(0, 0, 0, 0));
+			__m128 vY = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(1, 1, 1, 1));
+			__m128 vZ = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(2, 2, 2, 2));
+			vW = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(3, 3, 3, 3));
+
+			// Perform the operation on the first row
+			vX = _mm_mul_ps(vX, rhs.v[0].m);
+			vY = _mm_mul_ps(vY, rhs.v[1].m);
+			vZ = _mm_mul_ps(vZ, rhs.v[2].m);
+			vW = _mm_mul_ps(vW, rhs.v[3].m);
+			// Perform a binary add to reduce cumulative errors
+			vX = _mm_add_ps(vX, vZ);
+			vY = _mm_add_ps(vY, vW);
+			vX = _mm_add_ps(vX, vY);
+			this->v[0] = vX;
+
+			vW = temp.v[1].m;
+			vX = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(0, 0, 0, 0));
+			vY = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(1, 1, 1, 1));
+			vZ = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(2, 2, 2, 2));
+			vW = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(3, 3, 3, 3));
+			vX = _mm_mul_ps(vX, rhs.v[0].m);
+			vY = _mm_mul_ps(vY, rhs.v[1].m);
+			vZ = _mm_mul_ps(vZ, rhs.v[2].m);
+			vW = _mm_mul_ps(vW, rhs.v[3].m);
+			vX = _mm_add_ps(vX, vZ);
+			vY = _mm_add_ps(vY, vW);
+			vX = _mm_add_ps(vX, vY);
+			this->v[1] = vX;
+
+			vW = temp.v[2].m;
+			vX = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(0, 0, 0, 0));
+			vY = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(1, 1, 1, 1));
+			vZ = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(2, 2, 2, 2));
+			vW = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(3, 3, 3, 3));
+			vX = _mm_mul_ps(vX, rhs.v[0].m);
+			vY = _mm_mul_ps(vY, rhs.v[1].m);
+			vZ = _mm_mul_ps(vZ, rhs.v[2].m);
+			vW = _mm_mul_ps(vW, rhs.v[3].m);
+			vX = _mm_add_ps(vX, vZ);
+			vY = _mm_add_ps(vY, vW);
+			vX = _mm_add_ps(vX, vY);
+			this->v[2] = vX;
+
+			vW = temp.v[3].m;
+			vX = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(0, 0, 0, 0));
+			vY = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(1, 1, 1, 1));
+			vZ = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(2, 2, 2, 2));
+			vW = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(3, 3, 3, 3));
+			vX = _mm_mul_ps(vX, rhs.v[0].m);
+			vY = _mm_mul_ps(vY, rhs.v[1].m);
+			vZ = _mm_mul_ps(vZ, rhs.v[2].m);
+			vW = _mm_mul_ps(vW, rhs.v[3].m);
+			vX = _mm_add_ps(vX, vZ);
+			vY = _mm_add_ps(vY, vW);
+			vX = _mm_add_ps(vX, vY);
+			this->v[3] = vX;
+
+			return *this;*/
 		}
 		Matrix4f operator*(const Matrix4f& rhs) const noexcept
 		{
