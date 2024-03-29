@@ -143,6 +143,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FloaterGameEngine\FloaterGameEngine.vcxproj">
+      <Project>{ecbd9ca3-cc41-4494-a682-aa7b0c481fa8}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\FloaterMath\FloaterMath.vcxproj">
       <Project>{0bb76c52-c35f-4a26-88e7-04920c2b5dbe}</Project>
     </ProjectReference>
