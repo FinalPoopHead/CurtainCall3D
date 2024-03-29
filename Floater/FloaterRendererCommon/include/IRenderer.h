@@ -16,12 +16,12 @@ namespace flt
 
 	struct RendererObject
 	{
-		RendererObject(Transform& transform, RawNode& rawNode, const bool& isDraw, const std::wstring& name) : 
+		RendererObject(Transform& transform, const bool& isDraw) : 
 			transform(transform),
-			node(rawNode), 
 			isDraw(isDraw),
+			node(nullptr),
 			camera(nullptr),
-			name(name) {}
+			name() {}
 		// 1. 그릴때 필요한것들.
 		// 2. 게임 엔진상에서 데이터를 바꾸고 싶은것들.
 
@@ -30,8 +30,8 @@ namespace flt
 		// material, texture
 		// shader
 		Transform& transform;
-		RawNode& node;
 		const bool& isDraw;
+		RawNode* node;
 		Camera* camera;
 		std::wstring name;
 	};

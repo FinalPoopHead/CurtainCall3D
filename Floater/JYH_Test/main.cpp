@@ -31,6 +31,11 @@
 
 #include <windows.h>
 
+#include "../FloaterGameEngine/include/Component.h"
+
+#pragma endregion
+
+
 #pragma warning(push)
 #pragma warning(disable: 4717)
 void StackOverflow()
@@ -87,16 +92,21 @@ int main(int argc, char* argv[])
 		using namespace flt;
 		using namespace flt::test;
 
-		std::string str1 = "안녕하세요";
-		std::wstring wstr = ToWstring(str1, flt::strEncoding::ANSI);
-		std::string str2 = ToString(wstr);
-		std::string str3 = ToString(wstr, flt::strEncoding::ANSI);
+		struct Test1 : public ComponentBase<Test1>
+		{
 
-		std::cout << str1 << std::endl;
-		std::wcout << wstr << std::endl;
-		std::cout << str2 << std::endl;
-		std::cout << str3 << std::endl;
+		};
 
+		struct Test2 : public ComponentBase<Test2>
+		{
+
+		};
+
+		Test1 test111;
+		Test2 test222;
+
+		test111.PrintIndex();
+		test222.PrintIndex();
 
 
 		//TesterRBTree tester;
@@ -169,13 +179,8 @@ int main(int argc, char* argv[])
 
 	bool isDraw = true;
 
-	flt::RawNode cameraNode(L"testCamera");
-	cameraNode.transform.SetPosition(0.0f, 0.0f, 0.0f);
-	cameraNode.transform.SetScale(1.0f, 1.0f, 1.0f);
-	cameraNode.transform.SetRotation(0.0f, 0.0f, 0.0f);
-
 	flt::Transform cameraTransform;
-	flt::RendererObject cameraObject(cameraTransform, cameraNode, isDraw, L"testCamera");
+	flt::RendererObject cameraObject(cameraTransform, isDraw);
 	cameraObject.camera = new flt::Camera(&cameraObject.transform);
 	auto cameraID = renderer->RegisterObject(cameraObject);
 
@@ -184,17 +189,27 @@ int main(int argc, char* argv[])
 	cubeNode.transform.SetPosition(0.0f, 0.0f, 0.7f);
 	cubeNode.transform.SetScale(1.0f, 1.0f, 1.0f);
 
-	flt::Transform fbxTransform;
-	flt::RendererObject fbxObject(fbxTransform, *rawScene.nodes[0], isDraw, L"test1");
-	//flt::RendererObject fbxObject(fbxTransform, *rawScene.nodes[0]->children[0]->children[0], isDraw, L"test1");
-	auto objectID0 = renderer->RegisterObject(fbxObject);
-	fbxObject.transform.SetScale(1.0f, 1.0f, 1.0f);
-	fbxObject.transform.SetScale(0.05f, 0.05f, 0.05f);
-	//fbxObject.transform.SetRotation(90.0f, 0.0f, 0.0f);
-	fbxObject.transform.SetPosition(0.f, 0.f, 1.f);
+	constexpr int fbxObjectCount = 10;
+	flt::Transform* fbxTransforms[fbxObjectCount];
+	flt::RendererObject* fbxObjects[fbxObjectCount];
+	flt::HOBJECT objectIDs[fbxObjectCount];
+
+	for (int i = 0; i < fbxObjectCount; ++i)
+	{
+		fbxTransforms[i] = new flt::Transform();
+		fbxObjects[i] = new flt::RendererObject(*fbxTransforms[i], isDraw);
+		fbxObjects[i]->node = rawScene.nodes[0];
+		objectIDs[i] = renderer->RegisterObject(*fbxObjects[i]);
+
+		float scale = 0.002f;
+		fbxObjects[i]->transform.SetScale(scale, scale, scale);
+		fbxObjects[i]->transform.SetPosition((float)((-(fbxObjectCount / 2) + i) * 4), 0.f, 1.f);
+	}
 
 	flt::Transform cubeTransform;
-	flt::RendererObject renderable(cubeTransform, cubeNode, isDraw, L"cube");
+	flt::RendererObject renderable(cubeTransform, isDraw);
+	renderable.node = &cubeNode;
+	renderable.name = L"cube";
 	auto objectID1 = renderer->RegisterObject(renderable);
 	renderable.transform.SetPosition(0.0f, 0.0f, 0.0f);
 
@@ -206,7 +221,7 @@ int main(int argc, char* argv[])
 			break;
 		}
 
-		renderer->Render(0.01f);
+		renderer->Render(0.1f);
 		//fbxObject.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, 0.01f);
 		renderable.transform.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, -0.1f);
 
@@ -272,7 +287,12 @@ int main(int argc, char* argv[])
 		//Sleep(1);
 	}
 
-	renderer->DeregisterObject(objectID0);
+	for(int i = 0; i < fbxObjectCount; ++i)
+	{
+		renderer->DeregisterObject(objectIDs[i]);
+		delete fbxObjects[i];
+		delete fbxTransforms[i];
+	}
 
 	renderer->DeregisterObject(objectID1);
 	//renderer->DeregisterObject(objectID2);

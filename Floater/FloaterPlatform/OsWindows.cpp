@@ -268,9 +268,9 @@ flt::IRenderer* flt::OsWindows::CreateRenderer(RendererType type)
 		case flt::RendererType::DX12:
 
 			break;
-			case flt::RendererType::ROCKET_DX11:
-				renderer = CreateRendererRocketDX11(_hwnd);
-				break;
+		case flt::RendererType::ROCKET_DX11:
+			renderer = CreateRendererRocketDX11(_hwnd);
+			break;
 		default:
 			ASSERT(false, "RendererType이 잘못되었습니다.");
 			break;
@@ -299,7 +299,6 @@ void flt::OsWindows::DestroyRenderer(IRenderer* renderer)
 		default:
 			break;
 	}
-
 
 	// 그래픽스 리소스가 해제되는지 체크하기 위한 코드.
 #if defined(DEBUG) || defined(_DEBUG)
