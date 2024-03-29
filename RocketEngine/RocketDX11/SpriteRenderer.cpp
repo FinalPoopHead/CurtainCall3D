@@ -1,6 +1,9 @@
-﻿#include "SpriteRenderer.h"
+﻿#include <wrl.h>
+#include "SpriteRenderer.h"
 #include "ResourceManager.h"
 #include "Texture.h"
+
+using Microsoft::WRL::ComPtr;
 
 namespace Rocket::Core
 {
@@ -21,9 +24,9 @@ namespace Rocket::Core
 		_texture = ResourceManager::Instance().GetTexture(fileName);
 
 		D3D11_TEXTURE2D_DESC textureDesc;
-		ID3D11Resource* resource;
-		_texture->GetTextureView()->GetResource(&resource);
-		ID3D11Texture2D* texture2D = static_cast<ID3D11Texture2D*>(resource);
+		ComPtr<ID3D11Resource> resource;
+		_texture->GetTextureView()->GetResource(resource.GetAddressOf());
+		ComPtr<ID3D11Texture2D> texture2D = static_cast<ID3D11Texture2D*>(resource.Get());
 		texture2D->GetDesc(&textureDesc);
 
 		_imageWidth = static_cast<float>(textureDesc.Width);

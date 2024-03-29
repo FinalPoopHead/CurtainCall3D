@@ -31,6 +31,8 @@ namespace flt
 		//virtual void OnClosed();
 		void ShowCursor(bool isShow);
 
+		std::wstring GetExePath();
+
 	private:
 		void UpdateKeyState();
 
@@ -54,6 +56,7 @@ namespace flt
 		bool _isShowCursor;
 
 		HWND _consoleHwnd;
+		std::wstring _exePath;
 
 	private:
 		static unsigned char _keyCodeMap[256];

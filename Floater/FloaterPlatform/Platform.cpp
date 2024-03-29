@@ -64,3 +64,8 @@ void flt::Platform::ShowCursor(bool isShow)
 {
 	_pOsImpl->ShowCursor(isShow);
 }
+
+std::wstring flt::Platform::GetExePath()
+{
+	return _pOsImpl->GetExePath();
+}

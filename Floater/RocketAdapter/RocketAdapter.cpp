@@ -83,15 +83,9 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 	RocketObject* rocketObject = new(std::nothrow) RocketObject();
 	ASSERT(rocketObject, "Failed to create RocketObject");
 
-	rocketObject->transform = &renderable.transform;
-
-	rocketObject->rkModel = ConvertModel(renderable.node);
-	Rocket::Core::IResourceManager* rsmgr = Rocket::Core::GetResourceManager();
-
-	std::string pointer = std::to_string(reinterpret_cast<uint64_t>(rocketObject->rkModel));
-	rsmgr->LoadModel(pointer, rocketObject->rkModel);
-
 	auto factory = Rocket::Core::CreateGraphicsObjectFactory();
+
+	rocketObject->transform = &renderable.transform;
 
 	if (renderable.camera)
 	{
@@ -100,16 +94,27 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 		rocketObject->camera->SetAsMainCamera();
 	}
 
-	if (renderable.node.meshes.size() > 0)
+	if (renderable.node != nullptr)
 	{
-		rocketObject->renderer = factory->CreateDynamicModelRenderer();
-		rocketObject->renderer->LoadModel(pointer);
-		Rocket::Core::RocketTransform* rootBoneTransform = new Rocket::Core::RocketTransform();
-		rootBoneTransform->SetParent(&rocketObject->rocketTransform, false);
+		rocketObject->rkModel = ConvertModel(*renderable.node);
+		Rocket::Core::IResourceManager* rsmgr = Rocket::Core::GetResourceManager();
 
-		GenerateTransformHierarchyRecursive(rootBoneTransform, &renderable.node.skeleton->bones[renderable.node.skeleton->rootBoneIndex].transform);
-		rocketObject->renderer->BindTransform(&rocketObject->rocketTransform);
+		std::string pointer = std::to_string(reinterpret_cast<uint64_t>(rocketObject->rkModel));
+		rsmgr->LoadModel(pointer, rocketObject->rkModel);
+
+		if (renderable.node->meshes.size() > 0)
+		{
+			rocketObject->renderer = factory->CreateDynamicModelRenderer();
+			rocketObject->renderer->LoadModel(pointer);
+			Rocket::Core::RocketTransform* rootBoneTransform = new Rocket::Core::RocketTransform();
+			rootBoneTransform->SetParent(&rocketObject->rocketTransform, false);
+
+			RawSkeleton*& skeleton = renderable.node->skeleton;
+			GenerateTransformHierarchyRecursive(rootBoneTransform, &skeleton->bones[skeleton->rootBoneIndex].transform);
+			rocketObject->renderer->BindTransform(&rocketObject->rocketTransform);
+		}
 	}
+
 
 	Rocket::Core::ReleaseFactory(factory);
 

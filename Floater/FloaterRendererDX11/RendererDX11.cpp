@@ -427,7 +427,10 @@ flt::HOBJECT flt::RendererDX11::RegisterObject(RendererObject& renderable)
 	}
 	else
 	{
-		SetDX11Node(node, renderable.node);
+		if (renderable.node != nullptr)
+		{
+			SetDX11Node(node, *renderable.node);
+		}
 	}
 
 	_renderableObjects.push_back(node);
