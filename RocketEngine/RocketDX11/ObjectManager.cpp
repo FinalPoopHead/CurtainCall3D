@@ -82,6 +82,11 @@ namespace Rocket::Core
 		{
 			delete dl;
 		}
+
+		for (auto& iter : _cubeMaps)
+		{
+			iter.second.reset();
+		}
 	}
 
 	Camera* ObjectManager::CreateCamera()

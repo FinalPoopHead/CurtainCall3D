@@ -41,19 +41,3 @@ namespace Rocket::Core
 		unsigned int _numElements;
 	};
 }
-
-
-template <typename T>
-ULONG GetRefCount(const ComPtr<T>& p)
-{
-	T* temp = p.Get();
-
-	ULONG ret = 0;
-	if (temp != nullptr)
-	{
-		ret = temp->AddRef();
-		ret = temp->Release();
-	}
-
-	return ret;
-}

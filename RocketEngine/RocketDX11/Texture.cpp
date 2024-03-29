@@ -1,5 +1,28 @@
-﻿#include "Texture.h"
+﻿#include <cassert>
+#include <DDSTextureLoader.h>
+#include <WICTextureLoader.h>
+
+#include "Texture.h"
+#include "ResourcePath.h"
 #include "GraphicsMacro.h"
+
+namespace Rocket::Core
+{
+	template <typename T>
+	ULONG GetRefCount(const ComPtr<T>& p)
+	{
+		T* temp = p.Get();
+
+		ULONG ret = 0;
+		if (temp != nullptr)
+		{
+			ret = temp->AddRef();
+			ret = temp->Release();
+		}
+
+		return ret;
+	}
+}
 
 namespace Rocket::Core
 {
@@ -10,24 +33,34 @@ namespace Rocket::Core
 
 	}
 
-	Texture::Texture(const Texture& other)
-		: _texture(other._texture),
-		_textureView(other._textureView)
-	{
-
-	}
-
-	Texture::Texture(ID3D11Resource* texture, ID3D11ShaderResourceView* textureView)
-		: _texture(texture),
-		_textureView(textureView)
-	{
-
-	}
-
 	Texture::~Texture()
 	{
 		_texture.Reset();
 		_textureView.Reset();
+	}
+
+	void Texture::LoadFromFile(ID3D11Device* device, std::string fileName)
+	{
+		std::string fullPath = TEXTURE_PATH + fileName;
+		std::wstring wFileName(fullPath.begin(), fullPath.end());
+
+		std::string extension = fileName.substr(fileName.find_last_of(".") + 1);
+
+		if (extension == "dds")
+		{
+			HR(DirectX::CreateDDSTextureFromFile(device, wFileName.c_str(), _texture.GetAddressOf(), _textureView.GetAddressOf()));
+		}
+		else if (extension == "jpg" || extension == "png")
+		{
+			HR(DirectX::CreateWICTextureFromFile(device, wFileName.c_str(), _texture.GetAddressOf(), _textureView.GetAddressOf()));
+		}
+		else
+		{
+			assert(false);
+		}
+
+		_texture->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"TEXTUREtexture") - 1, L"TEXTUREtexture");
+		_textureView->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"TEXTUREtextureView") - 1, L"TEXTUREtextureView");
 	}
 
 	ID3D11ShaderResourceView* Texture::GetTextureView()

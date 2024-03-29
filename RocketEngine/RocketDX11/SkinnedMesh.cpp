@@ -47,6 +47,9 @@ namespace Rocket::Core
 		indexData.pSysMem = _indices.data();
 
 		HR(ResourceManager::Instance().GetDevice()->CreateBuffer(&indexBufferDesc, &indexData, _indexBuffer.GetAddressOf()));
+	
+		_vertexBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"SKINNED v-Buffer") - 1, L"SKINNED v-Buffer");
+		_indexBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"SKINNED i-Buffer") - 1, L"SKINNED i-Buffer");
 	}
 
 	void SkinnedMesh::SetNode(Node* node)
@@ -58,5 +61,4 @@ namespace Rocket::Core
 			vertex.nodeIndex = _node->index;
 		}
 	}
-
 }

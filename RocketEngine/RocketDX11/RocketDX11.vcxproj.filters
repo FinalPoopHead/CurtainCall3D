@@ -180,6 +180,9 @@
     <ClInclude Include="HelperObjectBase.h">
       <Filter>Object\HelperObject\BaseClass</Filter>
     </ClInclude>
+    <ClInclude Include="ResourcePath.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="FBXLoader">

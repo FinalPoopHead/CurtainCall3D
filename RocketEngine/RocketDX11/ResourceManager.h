@@ -76,7 +76,6 @@ namespace Rocket::Core
 
 	private:
 		void CreateRenderStates();
-		Texture* LoadTextureFile(std::string fileName);
 
 	private:
 		void DeleteNodeRecur(Node* node);

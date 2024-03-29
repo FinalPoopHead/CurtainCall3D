@@ -29,7 +29,7 @@ namespace Rocket::Core
 
 	private:
 		ComPtr<ID3D11PixelShader> _pixelShader;
-		std::vector<ComPtr<ID3D11Buffer>> _constantBuffer;
+		std::vector<ComPtr<ID3D11Buffer>> _constantBuffers;
 		ComPtr<ID3D11SamplerState> _sampleState;
 	};
 }

@@ -19,7 +19,7 @@ namespace Rocket::Core
 	PixelShader::~PixelShader()
 	{
 		_pixelShader.Reset();
-		for (auto& buffer : _constantBuffer)
+		for (auto& buffer : _constantBuffers)
 		{
 			buffer.Reset();
 		}
@@ -63,6 +63,8 @@ namespace Rocket::Core
 			assert(false);
 		}
 
+		_pixelShader->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"pixelShader") - 1, L"pixelShader");
+
 		/// Shader Reflection
 		ID3D11ShaderReflection* pReflector = nullptr;
 
@@ -75,7 +77,7 @@ namespace Rocket::Core
 
 		/// ConstantBuffer Reflection
 		// Pixel Shader ConstantBuffer..
-		_constantBuffer.resize(shaderDesc.ConstantBuffers);
+		_constantBuffers.resize(shaderDesc.ConstantBuffers);
 
 		for (unsigned int cbindex = 0; cbindex < shaderDesc.ConstantBuffers; cbindex++)
 		{
@@ -90,22 +92,27 @@ namespace Rocket::Core
 				pReflector->GetResourceBindingDescByName(bufferDesc.Name, &bindDesc);
 
 				// 해당 Constant Buffer 생성..
-				HR(device->CreateBuffer(&cBufferDesc, nullptr, &_constantBuffer[bindDesc.BindPoint]));
+				HR(device->CreateBuffer(&cBufferDesc, nullptr, &_constantBuffers[bindDesc.BindPoint]));
+
+				_constantBuffers[bindDesc.BindPoint]->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"pixelCBuffer") - 1, L"pixelCBuffer");
 
 				// Constant Buffer Register Slot Number..
 				//cbuffer_register_slot = bindDesc.BindPoint;
 			}
 		}
+
+		pixelShaderBlob->Release();
+		pReflector->Release();
 	}
 
 	ID3D11Buffer* PixelShader::GetConstantBuffer(int registerSlot) const
 {
-		return _constantBuffer[registerSlot].Get();
+		return _constantBuffers[registerSlot].Get();
 	}
 
 	ID3D11Buffer** PixelShader::GetAddressOfConstantBuffer(int registerSlot)
 {
-		return _constantBuffer[registerSlot].GetAddressOf();
+		return _constantBuffers[registerSlot].GetAddressOf();
 	}
 
 	void PixelShader::CreateSamplerState(ID3D11Device* device)
@@ -128,6 +135,8 @@ namespace Rocket::Core
 
 		// 텍스처 샘플러 상태를 만듭니다.
 		HR(device->CreateSamplerState(&samplerDesc, &_sampleState));
+
+		_sampleState->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"pixelShaderSampleState") - 1, L"pixelShaderSampleState");
 	}
 
 	ID3D11SamplerState** PixelShader::GetAddressOfSampleState()

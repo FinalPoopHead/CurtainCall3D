@@ -22,6 +22,23 @@
 #include "LineRenderer.h"
 #include "GraphicsMacro.h"
 
+namespace Rocket::Core
+{
+	template <typename T>
+	ULONG GetRefCount(const ComPtr<T>& p)
+	{
+		T* temp = p.Get();
+
+		ULONG ret = 0;
+		if (temp != nullptr)
+		{
+			ret = temp->AddRef();
+			ret = temp->Release();
+		}
+
+		return ret;
+	}
+}
 
 namespace Rocket::Core
 {
@@ -162,6 +179,12 @@ namespace Rocket::Core
 				&_swapChain
 			);
 		}
+
+		adapter->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"RocketDX11Adapter") - 1, L"RocketDX11Adapter");
+		factory->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"RocketDX11Factory") - 1, L"RocketDX11Factory");
+
+		adapter.Reset();
+		factory.Reset();
 
 		hr = _swapChain->GetBuffer(
 			0,
@@ -400,7 +423,8 @@ namespace Rocket::Core
 		_resourceManager.Finalize();
 
 		delete _spriteBatch;
-		delete _lineBatch;
+		delete _lineBatch;		
+		_basicEffect.reset();
 
 		// TODO : 여기서 Release를 먼저 해줬더니 아래에서 Reset 하면서 한번 더 지워서 RefCount가 -1이 되는 녀석이 하나 있다.. 뭐하는친구일까?
 // 
@@ -458,6 +482,19 @@ namespace Rocket::Core
 // 		{
 // 			_lineInputLayout->Release();
 // 		}
+
+
+		_device->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETdevice") - 1, L"ROCKETdevice");
+		_deviceContext->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETdeviceContext") - 1, L"ROCKETdeviceContext");
+		_swapChain->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETswapChain") - 1, L"ROCKETswapChain");
+		_backBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETbackBuffer") - 1, L"ROCKETbackBuffer");
+		_renderTargetView->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETrenderTargetView") - 1, L"ROCKETrenderTargetView");
+		_depthStencilBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETdepthStencilBuffer") - 1, L"ROCKETdepthStencilBuffer");
+		_depthStencilView->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETdepthStencilView") - 1, L"ROCKETdepthStencilView");
+		_defaultDepthStencilState->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETdefaultDepthStencilState") - 1, L"ROCKETdefaultDepthStencilState");
+		_cubeMapDepthStencilState->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETcubeMapDepthStencilState") - 1, L"ROCKETcubeMapDepthStencilState");
+		_defaultBlendState->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETdefaultBlendState") - 1, L"ROCKETdefaultBlendState");
+		_lineInputLayout->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETlineInputLayout") - 1, L"ROCKETlineInputLayout");
 
 		_device.Reset();
 		_deviceContext.Reset();

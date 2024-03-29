@@ -43,8 +43,7 @@ namespace Rocket::Core
 		cubeMapDesc.FrontCounterClockwise = false;
 		cubeMapDesc.DepthClipEnable = true;
 		ID3D11RasterizerState* cubemapRS;
-		HR(device->CreateRasterizerState(&cubeMapDesc, &cubemapRS));
-		_cubeMapRenderState = cubemapRS;
+		HR(device->CreateRasterizerState(&cubeMapDesc, _cubeMapRenderState.GetAddressOf()));
 
 		// TODO : 이것도 얘가 리소스매니저한테 접근해서 받아오지말고 리소스매니저가 얘한테 부여하게끔 해야하나?
 		_vertexShader = ResourceManager::Instance().GetVertexShader("CubeMapVS");
@@ -69,6 +68,9 @@ namespace Rocket::Core
 
 		// 텍스처 샘플러 상태를 만듭니다.
 		HR(device->CreateSamplerState(&samplerDesc, &_samplerState));
+
+		_cubeMapRenderState->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"cubeMapRenderState") - 1, L"cubeMapRenderState");
+		_samplerState->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"samplerState") - 1, L"samplerState");
 	}
 
 	void CubeMap::Render(ID3D11DeviceContext* deviceContext)
@@ -125,17 +127,6 @@ namespace Rocket::Core
 	void CubeMap::LoadTexture(const std::string& fileName)
 	{
 		_texture = ResourceManager::Instance().GetTexture(fileName);
-	}
-
-	void CubeMap::SetTexture(ID3D11Resource* texture, ID3D11ShaderResourceView* textureView)
-	{
-		if (_texture)
-		{
-			delete _texture;
-			_texture = nullptr;
-		}
-
-		_texture = new Texture(texture, textureView);
 	}
 
 	void CubeMap::BuildGeometryBuffers(ID3D11Device* device)
@@ -243,6 +234,9 @@ namespace Rocket::Core
 
 		_vertexCount = ARRAYSIZE(vertices);
 		_indexCount = ARRAYSIZE(indices);
+
+		_vertexBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"vertexBuffer") - 1, L"vertexBuffer");
+		_indexBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"indexBuffer") - 1, L"indexBuffer");
 	}
 
 }

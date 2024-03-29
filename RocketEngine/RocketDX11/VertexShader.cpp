@@ -106,6 +106,8 @@ namespace Rocket::Core
 			assert(false);
 		}
 
+		_vertexShader->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"vertexShader") - 1, L"vertexShader");
+
 		/// Shader Reflection
 		ID3D11ShaderReflection* pReflector = nullptr;
 
@@ -168,6 +170,7 @@ namespace Rocket::Core
 
 		// Shader InputLayout 생성..
 		HR(device->CreateInputLayout(&inputLayoutDesc[0], (UINT)inputLayoutDesc.size(), vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &_inputLayout));
+		_inputLayout->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"vertexShaderInputLayout"), L"vertexShaderInputLayout");
 
 		/// ConstantBuffer Reflection
 		// Vertex Shader ConstantBuffer..e
@@ -189,10 +192,15 @@ namespace Rocket::Core
 				// 해당 Constant Buffer 생성..
 				HR(device->CreateBuffer(&cBufferDesc, nullptr, &_constantBuffers[bindDesc.BindPoint]));
 
+				_constantBuffers[bindDesc.BindPoint]->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"vertexCBuffer") - 1, L"vertexCBuffer");
+
 				// Constant Buffer Register Slot Number..
 				//cbuffer_register_slot = bindDesc.BindPoint;
 			}
 		}
+
+		vertexShaderBlob->Release();
+		pReflector->Release();
 	}
 
 	void VertexShader::SetVertexType(eVertexType type)

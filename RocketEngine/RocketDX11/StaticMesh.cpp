@@ -47,6 +47,9 @@ namespace Rocket::Core
 		indexData.pSysMem = _indices.data();
 
 		HR(ResourceManager::Instance().GetDevice()->CreateBuffer(&indexBufferDesc, &indexData, _indexBuffer.GetAddressOf()));
+	
+		_vertexBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"STATIC v-Buffer") - 1, L"STATIC v-Buffer");
+		_indexBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"STATIC i-Buffer") - 1, L"STATIC i-Buffer");
 	}
 
 	void StaticMesh::SetNode(Node* node)

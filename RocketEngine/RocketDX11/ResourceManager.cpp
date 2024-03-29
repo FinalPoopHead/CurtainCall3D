@@ -1,7 +1,6 @@
-﻿#include <DDSTextureLoader.h>
-#include <WICTextureLoader.h>
-#include <cassert>
+﻿#include <cassert>
 
+#include "ResourcePath.h"
 #include "ResourceManager.h"
 #include "Camera.h"
 #include "StaticMesh.h"
@@ -10,20 +9,25 @@
 #include "SpriteRenderer.h"
 #include "GraphicsMacro.h"
 #include "VertexStruct.h"
-
 #include "CubeMap.h"
 
-#ifdef _FLOATER
-const std::string TEXTURE_PATH = "../../RocketEngine/Resources/Textures/";
-const std::string MODEL_PATH = "../../RocketEngine/Resources/Models/";
-const std::wstring FONT_PATH = L"../../RocketEngine/Resources/Font/";
-const std::wstring HLSL_PATH = L"../../RocketEngine/Resources/Shaders/";
-#else
-const std::string TEXTURE_PATH = "Resources/Textures/";
-const std::string MODEL_PATH = "Resources/Models/";
-const std::wstring FONT_PATH = L"Resources/Font/";
-const std::wstring HLSL_PATH = L"Resources/Shaders/";
-#endif
+namespace Rocket::Core
+{
+	template <typename T>
+	ULONG GetRefCount(const ComPtr<T>& p)
+	{
+		T* temp = p.Get();
+
+		ULONG ret = 0;
+		if (temp != nullptr)
+		{
+			ret = temp->AddRef();
+			ret = temp->Release();
+		}
+
+		return ret;
+	}
+}
 
 namespace Rocket::Core
 {
@@ -124,7 +128,7 @@ namespace Rocket::Core
 		_sphereMesh = std::make_unique<SphereMesh>();
 		_sphereMesh->Initialize(device);
 
-		_defaultTexture = LoadTextureFile("darkbrickdxt1.dds");
+		_defaultTexture = GetTexture("darkbrickdxt1.dds");
 
 		_defaultFont = std::make_unique<DirectX::SpriteFont>(_device, (FONT_PATH + L"NotoSansKR.spritefont").c_str());
 		
@@ -199,7 +203,10 @@ namespace Rocket::Core
 		solidDesc.DepthClipEnable = true;
 		ID3D11RasterizerState* solid;
 		HR(_device->CreateRasterizerState(&solidDesc, &solid));
-		_renderStates.emplace_back(solid);
+		_renderStates.emplace_back(solid);		// TODO : 왜 refCount가 증가하는거지? 이해가 안되네..
+		solid->Release();						// TODO : 이거 Release 해버리면 내가 vector 에 넣은것도 날라가는거 아닌가? 왜 refCount가 감소하고 Release 되지 않는거지..?
+		solid->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"SOLID RASTER") - 1, L"SOLID RASTER");
+		
 
 		D3D11_RASTERIZER_DESC wireframeDesc;
 		ZeroMemory(&wireframeDesc, sizeof(D3D11_RASTERIZER_DESC));
@@ -210,6 +217,9 @@ namespace Rocket::Core
 		ID3D11RasterizerState* wireframe;
 		HR(_device->CreateRasterizerState(&wireframeDesc, &wireframe));
 		_renderStates.emplace_back(wireframe);
+		wireframe->Release();
+		wireframe->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"WIREFRAME RASTER") - 1, L"WIREFRAME RASTER");
+
 	}
 
 	ID3D11RasterizerState* ResourceManager::GetRenderState(eRenderState eState)
@@ -244,40 +254,12 @@ namespace Rocket::Core
 	{
 		if (_textures.find(fileName) == _textures.end())
 		{
-			return LoadTextureFile(fileName);
+			std::unique_ptr<Texture> texture = std::make_unique<Texture>();
+			texture->LoadFromFile(_device, fileName);
+			_textures.insert({ fileName,std::move(texture) });
 		}
 
 		return _textures.at(fileName).get();
-	}
-
-	Texture* ResourceManager::LoadTextureFile(std::string fileName)
-	{
-		std::string fullPath = TEXTURE_PATH + fileName;
-		std::wstring wFileName(fullPath.begin(), fullPath.end());
-
-		std::string extension = fileName.substr(fileName.find_last_of(".") + 1);
-
-		ID3D11Resource* rawTexture = nullptr;
-		ID3D11ShaderResourceView* textureView = nullptr;
-
-		if (extension == "dds")
-		{
-			HR(DirectX::CreateDDSTextureFromFile(_device, wFileName.c_str(), &rawTexture, &textureView));
-		}
-		else if (extension == "jpg" || extension == "png")
-		{
-			HR(DirectX::CreateWICTextureFromFile(_device, wFileName.c_str(), &rawTexture, &textureView));
-		}
-		else
-		{
-			assert(false);
-		}
-
-		std::unique_ptr<Texture> texture = std::make_unique<Texture>(rawTexture, textureView);
-		Texture* result = texture.get();
-		_textures.insert({ fileName,std::move(texture)});
-
-		return result;
 	}
 
 	Model* ResourceManager::GetModel(const std::string& fileName)
@@ -407,10 +389,7 @@ namespace Rocket::Core
 		{
 			for (auto& rawTexture : rawMesh->material->textures)
 			{
-				if (_textures.find(rawTexture->path) == _textures.end())
-				{
-					LoadTextureFile(rawTexture->path);
-				}
+				GetTexture(rawTexture->path);
 			}
 		}
 
@@ -443,10 +422,7 @@ namespace Rocket::Core
 		{
 			for (auto& rawTexture : rawMesh->material->textures)
 			{
-				if (_textures.find(rawTexture->path) == _textures.end())
-				{
-					LoadTextureFile(rawTexture->path);
-				}
+				GetTexture(rawTexture->path);
 			}
 		}
 
@@ -482,6 +458,8 @@ namespace Rocket::Core
 			iter.second.reset();
 		}
 
+		delete _defaultTexture;
+
 		for (auto& iter : _models)
 		{
 			DeleteNodeRecur(iter.second->rootNode);
@@ -498,6 +476,12 @@ namespace Rocket::Core
 					delete anim.second;
 				}
 			}
+
+			for (auto& mesh : iter.second.get()->GetMeshes())
+			{
+				delete mesh;
+			}
+
 			iter.second.reset();
 		}
 

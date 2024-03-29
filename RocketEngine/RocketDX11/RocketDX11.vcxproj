@@ -320,6 +320,7 @@ copy /Y "*.hlsl" "$(SolutionDir)Resources\Shaders";</Command>
     <ClInclude Include="HelperObjectBase.h" />
     <ClInclude Include="MathHeader.h" />
     <ClInclude Include="ModelStruct.h" />
+    <ClInclude Include="ResourcePath.h" />
     <ClInclude Include="SkinnedMesh.h" />
     <ClInclude Include="DynamicModelRenderer.h" />
     <ClInclude Include="SpriteRenderer.h" />
