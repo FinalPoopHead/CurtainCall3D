@@ -1,6 +1,5 @@
 ﻿#include "RocketTransform.h"
 
-
 namespace Rocket::Core
 {
 	RocketTransform::RocketTransform()
@@ -9,6 +8,8 @@ namespace Rocket::Core
 		, _scale(Vector3::One)
 		, _parent(nullptr)
 		, _children()
+		, _isDirty(false)
+		, _worldTM(Matrix::Identity)
 	{
 
 	}
@@ -23,6 +24,7 @@ namespace Rocket::Core
 		}
 
 		_position = result;
+		SetDirtyRecur(this);
 	}
 
 	void RocketTransform::SetRotation(const Quaternion& rotation)
@@ -38,6 +40,7 @@ namespace Rocket::Core
 		}
 
 		_rotation = result;
+		SetDirtyRecur(this);
 	}
 
 	void RocketTransform::SetRotationEuler(const Vector3& euler)
@@ -58,6 +61,7 @@ namespace Rocket::Core
 		}
 
 		_scale = result;
+		SetDirtyRecur(this);
 	}
 
 	Vector3 RocketTransform::GetPosition() const
@@ -107,22 +111,26 @@ namespace Rocket::Core
 	void RocketTransform::SetLocalPosition(const Vector3& position)
 	{
 		_position = position;
+		SetDirtyRecur(this);
 	}
 
 	void RocketTransform::SetLocalRotation(const Quaternion& quaternion)
 	{
 		_rotation = quaternion;
 		_rotation.Normalize();
+		SetDirtyRecur(this);
 	}
 
 	void RocketTransform::SetLocalRotationEuler(const Vector3& euler)
 	{
 		_rotation = Quaternion::CreateFromYawPitchRoll({ euler.x, euler.y , euler.z });
+		SetDirtyRecur(this);
 	}
 
 	void RocketTransform::SetLocalScale(const Vector3& scale)
 	{
 		_scale = scale;
+		SetDirtyRecur(this);
 	}
 
 	Vector3 RocketTransform::GetLocalPosition() const
@@ -203,10 +211,15 @@ namespace Rocket::Core
 		return result;
 	}
 
-	Matrix RocketTransform::GetWorldTM() const
+	Matrix RocketTransform::GetWorldTM()
 	{
 		// 이거 한번 써봐야 할듯?
 		// return Matrix::CreateWorld(_position, GetForward(), GetUp());
+
+		if(!_isDirty)
+		{
+			return _worldTM;
+		}
 
 		Matrix result = GetLocalTM();
 
@@ -214,6 +227,9 @@ namespace Rocket::Core
 		{
 			result *= _parent->GetWorldTM();
 		}
+
+		_worldTM = result;
+		_isDirty = false;
 
 		return result;
 	}
@@ -246,11 +262,13 @@ namespace Rocket::Core
 	void RocketTransform::Translate(const Vector3& translation)
 	{
 		_position += translation;
+		SetDirtyRecur(this);
 	}
 
 	void RocketTransform::Rotate(const Quaternion& quaternion)
 	{
 		_rotation = Quaternion::Concatenate(_rotation, quaternion);
+		SetDirtyRecur(this);
 	}
 
 	void RocketTransform::LookAt(const Vector3& target, const Vector3& up /*= Vector3::Up*/)
@@ -263,6 +281,7 @@ namespace Rocket::Core
 		upVec.Normalize();
 
 		_rotation = Quaternion::CreateFromRotationMatrix(Matrix::CreateWorld(GetPosition(), forward, upVec));
+		SetDirtyRecur(this);
 	}
 
 	void RocketTransform::LookAt(const RocketTransform* target, const Vector3& up /*= Vector3::Up*/)
@@ -277,6 +296,7 @@ namespace Rocket::Core
 		upVec.Normalize();
 
 		_rotation = Quaternion::CreateFromRotationMatrix(Matrix::CreateWorld(GetPosition(), forward, upVec));
+		SetDirtyRecur(this);
 	}
 
 	void RocketTransform::RotateAround(const Vector3& point, const Vector3& axis, float angle)
@@ -286,11 +306,13 @@ namespace Rocket::Core
 		Matrix rotation = Matrix::CreateFromAxisAngle(axis, angle);
 		direction = Vector3::Transform(direction, rotation);
 		SetPosition(point + direction);
+		SetDirtyRecur(this);
 	}
 
 	void RocketTransform::Scale(const Vector3& scale)
 	{
 		_scale *= scale;
+		SetDirtyRecur(this);
 	}
 
 	void RocketTransform::SetParent(RocketTransform* parent, bool keepWorldPosition)
@@ -309,9 +331,10 @@ namespace Rocket::Core
 			_rotation = Quaternion::Concatenate(_rotation, parentRot);
 			_scale = Vector3::Transform(_scale, parent->GetScaleMatrix().Invert());
 		}
-		
+
 		_parent = parent;
 		parent->AddChild(this);
+		SetDirtyRecur(this);
 	}
 
 	RocketTransform* RocketTransform::GetParent() const
@@ -346,6 +369,7 @@ namespace Rocket::Core
 		{
 			_children.erase(iter);
 		}
+		SetDirtyRecur(this);
 	}
 
 	void RocketTransform::ReleaseParent()
@@ -361,6 +385,7 @@ namespace Rocket::Core
 
 		_parent->ReleaseChild(this);
 		_parent = nullptr;
+		SetDirtyRecur(this);
 	}
 
 	std::vector<RocketTransform*>& RocketTransform::GetChildren()
@@ -383,4 +408,13 @@ namespace Rocket::Core
 		return &_scale;
 	}
 
+	void RocketTransform::SetDirtyRecur(RocketTransform* transform)
+	{
+		_isDirty = true;
+
+		for (auto& child : _children)
+		{
+			child->SetDirtyRecur(child);
+		}
+	}
 }

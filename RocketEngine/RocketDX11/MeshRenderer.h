@@ -10,9 +10,13 @@
 #include "ModelStruct.h"
 #include "StaticMesh.h"
 #include "Material.h"
-#include "../RocketCommon/RocketTransform.h"
 
 using Microsoft::WRL::ComPtr;
+
+namespace Rocket::Core
+{
+	class RocketTransform;
+}
 
 namespace Rocket::Core
 {

@@ -7,11 +7,15 @@
 
 #include "..\\RocketCommon\\IDynamicModelRenderer.h"
 #include "../RocketCommon/GraphicsEnum.h"
-#include "../RocketCommon/RocketTransform.h"
 #include "ModelStruct.h"
 #include "Material.h"
 
 using Microsoft::WRL::ComPtr;
+
+namespace Rocket::Core
+{
+	class RocketTransform;
+}
 
 namespace Rocket::Core
 {

@@ -39,18 +39,15 @@ float4 main(PixelInputType input) : SV_TARGET
     // 이 픽셀의 빛의 양을 계산
     lightIntensity = saturate(dot(input.normal, lightDir));
     
-    if (lightIntensity > 0.0f)
-    {
-        // 빛의 강도와 결합 된 확산 색을 기준으로 최종 색상을 결정
-        color += (diffuseColor * lightIntensity);
+    // 빛의 강도와 결합 된 확산 색을 기준으로 최종 색상을 결정
+    color += (diffuseColor * lightIntensity);
         
-        color = saturate(color);
+    color = saturate(color);
     
-        float3 reflection = normalize(2 * lightIntensity * input.normal - lightDir);
+    float3 reflection = normalize(2 * lightIntensity * input.normal - lightDir);
         
-        specular = pow(saturate(dot(reflection, input.viewDirection)), specularPower);
+    specular = pow(saturate(dot(reflection, input.viewDirection)), specularPower);
 
-    }
     
     // 텍스처 픽셀과 최종 확산 색을 곱하여 최종 픽셀 색상 결과를 얻음
     color = color * textureColor;
