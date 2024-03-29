@@ -6,6 +6,7 @@
 #include "StaticMesh.h"
 #include "Camera.h"
 #include "DirectionalLight.h"
+#include "../RocketCommon/RocketTransform.h"
 
 namespace Rocket::Core
 {

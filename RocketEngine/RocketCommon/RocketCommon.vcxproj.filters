@@ -63,20 +63,17 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="RocketTransform.cpp">
-      <Filter>Transform</Filter>
-    </ClCompile>
     <ClCompile Include="RFBXLoader.cpp">
       <Filter>ModelLoader\RFBXLoader</Filter>
     </ClCompile>
     <ClCompile Include="FBXLoaderToRaw.cpp">
       <Filter>ModelLoader\FBXLoader</Filter>
     </ClCompile>
+    <ClCompile Include="RocketTransform.cpp">
+      <Filter>Transform</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RocketTransform.h">
-      <Filter>Transform</Filter>
-    </ClInclude>
     <ClInclude Include="MathHeader.h">
       <Filter>MathHeader</Filter>
     </ClInclude>
@@ -139,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="ITextRenderer.h">
       <Filter>Interface\Component\Renderer\2D</Filter>
+    </ClInclude>
+    <ClInclude Include="RocketTransform.h">
+      <Filter>Transform</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
