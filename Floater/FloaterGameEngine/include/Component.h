@@ -32,7 +32,7 @@ namespace flt
 			std::cout << s_index << std::endl;
 		}
 	protected:
-		static inline int s_index = Component::GetComponentIndex();
+		static const inline int s_index = Component::GetComponentIndex();
 
 	private:
 

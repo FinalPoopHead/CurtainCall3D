@@ -104,9 +104,20 @@ int main(int argc, char* argv[])
 
 		Test1 test111;
 		Test2 test222;
+		Test1 test112;
+		Test1 test113;
 
 		test111.PrintIndex();
+		test112.PrintIndex();
+		test113.PrintIndex();
 		test222.PrintIndex();
+
+		struct Test3 : public ComponentBase<Test3>
+		{
+
+		} test3;
+
+		test3.PrintIndex();
 
 
 		//TesterRBTree tester;
