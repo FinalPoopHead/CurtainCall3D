@@ -4,6 +4,7 @@
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
 #pragma comment(lib, "D3DCompiler.lib")
+#pragma comment(lib, "dxguid.lib")
 
 #include "PixelShader.h"
 #include "GraphicsMacro.h"

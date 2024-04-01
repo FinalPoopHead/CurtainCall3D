@@ -385,7 +385,7 @@ namespace Rocket::Core
 		Camera::GetMainCamera()->UpdateProjectionMatrix();
 		UpdateAnimation(deltaTime);
 		
-		_objectManager._fpsText->SetText(
+		_objectManager._debugText->SetText(
 			"deltaTime : " + std::to_string(_deltaTime)
 			+ "\n" + "fps : " + std::to_string(fps)
 		);
@@ -621,7 +621,7 @@ namespace Rocket::Core
 	void RocketDX11::RenderDebug()
 	{
 		_spriteBatch->Begin();
-		_objectManager._fpsText->Render(_spriteBatch);
+		_objectManager._debugText->Render(_spriteBatch);
 		_spriteBatch->End();
 	}
 
