@@ -52,7 +52,7 @@ namespace Rocket::Core
 
 		/// Debug 객체들.
 	public:
-		std::unique_ptr<TextRenderer> _fpsText;
+		std::unique_ptr<TextRenderer> _debugText;
 		std::unique_ptr<Axis> _axis;
 		std::unique_ptr<Grid> _grid;
 
