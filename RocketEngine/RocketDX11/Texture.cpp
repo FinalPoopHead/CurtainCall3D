@@ -1,6 +1,7 @@
 ﻿#include <cassert>
 #include <DDSTextureLoader.h>
 #include <WICTextureLoader.h>
+#include <io.h>
 
 #include "Texture.h"
 #include "ResourcePath.h"
@@ -46,6 +47,11 @@ namespace Rocket::Core
 
 		std::string extension = fileName.substr(fileName.find_last_of(".") + 1);
 
+		if (_access(fullPath.c_str(), 0) == -1)
+		{
+			return;
+		}
+		
 		if (extension == "dds")
 		{
 			HR(DirectX::CreateDDSTextureFromFile(device, wFileName.c_str(), _texture.GetAddressOf(), _textureView.GetAddressOf()));

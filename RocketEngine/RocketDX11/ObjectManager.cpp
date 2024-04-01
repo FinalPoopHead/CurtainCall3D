@@ -27,8 +27,8 @@ namespace Rocket::Core
 	{
 		auto& _rscMgr = ResourceManager::Instance();
 
-		_fpsText.reset(new TextRenderer());
-		_fpsText->SetFont(_rscMgr.GetDefaultFont());
+		_debugText.reset(new TextRenderer());
+		_debugText->SetFont(_rscMgr.GetDefaultFont());
 
 		_axis.reset(new Axis());
 		_axis->Initialize(device);
@@ -48,7 +48,7 @@ namespace Rocket::Core
 
 	void ObjectManager::Finalize()
 	{
-		_fpsText.reset();
+		_debugText.reset();
 		_axis.reset();
 		_grid.reset();
 		_lineRenderer.reset();
