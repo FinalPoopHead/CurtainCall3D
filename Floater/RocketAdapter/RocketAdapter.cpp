@@ -37,7 +37,7 @@ flt::RocketAdapter::~RocketAdapter()
 
 bool flt::RocketAdapter::Initialize(HWND hwnd, HWND debugHWnd /*= NULL*/)
 {
-	RECT rect;
+	RECT rect{};
 	ASSERT(GetClientRect(hwnd, &rect) == TRUE, "Failed to get window rect");
 
 	_impl->Initialize(hwnd, rect.right - rect.left, rect.bottom - rect.top);

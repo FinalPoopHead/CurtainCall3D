@@ -92,32 +92,15 @@ int main(int argc, char* argv[])
 		using namespace flt;
 		using namespace flt::test;
 
-		struct Test1 : public ComponentBase<Test1>
+		Matrix4f mat
 		{
-
+			1.0f, 2.0f, 3.0f, 4.0f,
+			5.0f, 6.0f, 7.0f, 8.0f,
+			9.0f, 10.0f, 11.0f, 12.0f,
+			13.0f, 14.0f, 15.0f, 16.0f
 		};
 
-		struct Test2 : public ComponentBase<Test2>
-		{
-
-		};
-
-		Test1 test111;
-		Test2 test222;
-		Test1 test112;
-		Test1 test113;
-
-		test111.PrintIndex();
-		test112.PrintIndex();
-		test113.PrintIndex();
-		test222.PrintIndex();
-
-		struct Test3 : public ComponentBase<Test3>
-		{
-
-		} test3;
-
-		test3.PrintIndex();
+		Matrix4f mulMat = mat * mat;
 
 
 		//TesterRBTree tester;

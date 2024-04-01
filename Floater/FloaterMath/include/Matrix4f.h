@@ -102,7 +102,7 @@ namespace flt
 			temp -= rhs;
 			return temp;
 		}
-		inline Matrix4f& operator*=(const Matrix4f& rhs) noexcept
+		__forceinline Matrix4f& operator*=(const Matrix4f& rhs) noexcept
 		{
 			///SSE version, dp_ps를 사용하지 않음. 5950x 기준으로 아래 버젼이 1.5배정도 더 빠름.
 			/*Matrix4f temp = *this;
@@ -147,9 +147,13 @@ namespace flt
 
 			return *this;*/
 
+
+			//Mul(rhs.v[0].m, rhs.v[1].m, rhs.v[2].m, rhs.v[3].m);
+			//return *this;
+
 			///SSE4.1 dp_ps version
 			Matrix4f temp = *this;
-			Vector4f tmp[4] =
+			Vector4f transposeRhs[4] =
 			{
 				{rhs.e[0][0], rhs.e[1][0], rhs.e[2][0], rhs.e[3][0]},
 				{rhs.e[0][1], rhs.e[1][1], rhs.e[2][1], rhs.e[3][1]},
@@ -157,97 +161,145 @@ namespace flt
 				{rhs.e[0][3], rhs.e[1][3], rhs.e[2][3], rhs.e[3][3]}
 			};
 
-			e[0][0] = _mm_cvtss_f32(_mm_dp_ps(temp.v[0].m, tmp[0].m, 0xFF));
-			e[0][1] = _mm_cvtss_f32(_mm_dp_ps(temp.v[0].m, tmp[1].m, 0xFF));
-			e[0][2] = _mm_cvtss_f32(_mm_dp_ps(temp.v[0].m, tmp[2].m, 0xFF));
-			e[0][3] = _mm_cvtss_f32(_mm_dp_ps(temp.v[0].m, tmp[3].m, 0xFF));
+			e[0][0] = _mm_cvtss_f32(_mm_dp_ps(temp.v[0].m, transposeRhs[0].m, 0xFF));
+			e[0][1] = _mm_cvtss_f32(_mm_dp_ps(temp.v[0].m, transposeRhs[1].m, 0xFF));
+			e[0][2] = _mm_cvtss_f32(_mm_dp_ps(temp.v[0].m, transposeRhs[2].m, 0xFF));
+			e[0][3] = _mm_cvtss_f32(_mm_dp_ps(temp.v[0].m, transposeRhs[3].m, 0xFF));
 
-			e[1][0] = _mm_cvtss_f32(_mm_dp_ps(temp.v[1].m, tmp[0].m, 0xFF));
-			e[1][1] = _mm_cvtss_f32(_mm_dp_ps(temp.v[1].m, tmp[1].m, 0xFF));
-			e[1][2] = _mm_cvtss_f32(_mm_dp_ps(temp.v[1].m, tmp[2].m, 0xFF));
-			e[1][3] = _mm_cvtss_f32(_mm_dp_ps(temp.v[1].m, tmp[3].m, 0xFF));
+			e[1][0] = _mm_cvtss_f32(_mm_dp_ps(temp.v[1].m, transposeRhs[0].m, 0xFF));
+			e[1][1] = _mm_cvtss_f32(_mm_dp_ps(temp.v[1].m, transposeRhs[1].m, 0xFF));
+			e[1][2] = _mm_cvtss_f32(_mm_dp_ps(temp.v[1].m, transposeRhs[2].m, 0xFF));
+			e[1][3] = _mm_cvtss_f32(_mm_dp_ps(temp.v[1].m, transposeRhs[3].m, 0xFF));
 
-			e[2][0] = _mm_cvtss_f32(_mm_dp_ps(temp.v[2].m, tmp[0].m, 0xFF));
-			e[2][1] = _mm_cvtss_f32(_mm_dp_ps(temp.v[2].m, tmp[1].m, 0xFF));
-			e[2][2] = _mm_cvtss_f32(_mm_dp_ps(temp.v[2].m, tmp[2].m, 0xFF));
-			e[2][3] = _mm_cvtss_f32(_mm_dp_ps(temp.v[2].m, tmp[3].m, 0xFF));
+			e[2][0] = _mm_cvtss_f32(_mm_dp_ps(temp.v[2].m, transposeRhs[0].m, 0xFF));
+			e[2][1] = _mm_cvtss_f32(_mm_dp_ps(temp.v[2].m, transposeRhs[1].m, 0xFF));
+			e[2][2] = _mm_cvtss_f32(_mm_dp_ps(temp.v[2].m, transposeRhs[2].m, 0xFF));
+			e[2][3] = _mm_cvtss_f32(_mm_dp_ps(temp.v[2].m, transposeRhs[3].m, 0xFF));
 
-			e[3][0] = _mm_cvtss_f32(_mm_dp_ps(temp.v[3].m, tmp[0].m, 0xFF));
-			e[3][1] = _mm_cvtss_f32(_mm_dp_ps(temp.v[3].m, tmp[1].m, 0xFF));
-			e[3][2] = _mm_cvtss_f32(_mm_dp_ps(temp.v[3].m, tmp[2].m, 0xFF));
-			e[3][3] = _mm_cvtss_f32(_mm_dp_ps(temp.v[3].m, tmp[3].m, 0xFF));
+			e[3][0] = _mm_cvtss_f32(_mm_dp_ps(temp.v[3].m, transposeRhs[0].m, 0xFF));
+			e[3][1] = _mm_cvtss_f32(_mm_dp_ps(temp.v[3].m, transposeRhs[1].m, 0xFF));
+			e[3][2] = _mm_cvtss_f32(_mm_dp_ps(temp.v[3].m, transposeRhs[2].m, 0xFF));
+			e[3][3] = _mm_cvtss_f32(_mm_dp_ps(temp.v[3].m, transposeRhs[3].m, 0xFF));
 
 			return *this;
 
-			/// Not Work
-			/*Matrix4f temp;
-			// Use vW to hold the original row
-			__m128 vW = this->v[0].m;
-			__m128 vX = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(0, 0, 0, 0));
-			__m128 vY = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(1, 1, 1, 1));
-			__m128 vZ = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(2, 2, 2, 2));
-			vW = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(3, 3, 3, 3));
+			///DX 버젼과 비슷한 버젼
+			/*Matrix4f temp = *this;
 
-			// Perform the operation on the first row
-			vX = _mm_mul_ps(vX, rhs.v[0].m);
-			vY = _mm_mul_ps(vY, rhs.v[1].m);
-			vZ = _mm_mul_ps(vZ, rhs.v[2].m);
-			vW = _mm_mul_ps(vW, rhs.v[3].m);
-			// Perform a binary add to reduce cumulative errors
-			vX = _mm_add_ps(vX, vZ);
-			vY = _mm_add_ps(vY, vW);
-			vX = _mm_add_ps(vX, vY);
-			this->v[0] = vX;
+			__m128 xxxx = _mm_broadcast_ss(temp.e[0] + 0);
+			__m128 yyyy = _mm_broadcast_ss(temp.e[0] + 1);
+			__m128 zzzz = _mm_broadcast_ss(temp.e[0] + 2);
+			__m128 wwww = _mm_broadcast_ss(temp.e[0] + 3);
+			xxxx = _mm_mul_ps(xxxx, rhs.v[0].m);
+			yyyy = _mm_mul_ps(yyyy, rhs.v[1].m);
+			zzzz = _mm_mul_ps(zzzz, rhs.v[2].m);
+			wwww = _mm_mul_ps(wwww, rhs.v[3].m);
+			xxxx = _mm_add_ps(xxxx, zzzz);
+			yyyy = _mm_add_ps(yyyy, wwww);
+			xxxx = _mm_add_ps(xxxx, yyyy);
+			this->v[0] = xxxx;
 
-			vW = temp.v[1].m;
-			vX = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(0, 0, 0, 0));
-			vY = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(1, 1, 1, 1));
-			vZ = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(2, 2, 2, 2));
-			vW = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(3, 3, 3, 3));
-			vX = _mm_mul_ps(vX, rhs.v[0].m);
-			vY = _mm_mul_ps(vY, rhs.v[1].m);
-			vZ = _mm_mul_ps(vZ, rhs.v[2].m);
-			vW = _mm_mul_ps(vW, rhs.v[3].m);
-			vX = _mm_add_ps(vX, vZ);
-			vY = _mm_add_ps(vY, vW);
-			vX = _mm_add_ps(vX, vY);
-			this->v[1] = vX;
+			xxxx = _mm_broadcast_ss(temp.e[1] + 0);
+			yyyy = _mm_broadcast_ss(temp.e[1] + 1);
+			zzzz = _mm_broadcast_ss(temp.e[1] + 2);
+			wwww = _mm_broadcast_ss(temp.e[1] + 3);
+			xxxx = _mm_mul_ps(xxxx, rhs.v[0].m);
+			yyyy = _mm_mul_ps(yyyy, rhs.v[1].m);
+			zzzz = _mm_mul_ps(zzzz, rhs.v[2].m);
+			wwww = _mm_mul_ps(wwww, rhs.v[3].m);
+			xxxx = _mm_add_ps(xxxx, zzzz);
+			yyyy = _mm_add_ps(yyyy, wwww);
+			xxxx = _mm_add_ps(xxxx, yyyy);
+			this->v[1] = xxxx;
 
-			vW = temp.v[2].m;
-			vX = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(0, 0, 0, 0));
-			vY = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(1, 1, 1, 1));
-			vZ = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(2, 2, 2, 2));
-			vW = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(3, 3, 3, 3));
-			vX = _mm_mul_ps(vX, rhs.v[0].m);
-			vY = _mm_mul_ps(vY, rhs.v[1].m);
-			vZ = _mm_mul_ps(vZ, rhs.v[2].m);
-			vW = _mm_mul_ps(vW, rhs.v[3].m);
-			vX = _mm_add_ps(vX, vZ);
-			vY = _mm_add_ps(vY, vW);
-			vX = _mm_add_ps(vX, vY);
-			this->v[2] = vX;
+			xxxx = _mm_broadcast_ss(temp.e[2] + 0);
+			yyyy = _mm_broadcast_ss(temp.e[2] + 1);
+			zzzz = _mm_broadcast_ss(temp.e[2] + 2);
+			wwww = _mm_broadcast_ss(temp.e[2] + 3);
+			xxxx = _mm_mul_ps(xxxx, rhs.v[0].m);
+			yyyy = _mm_mul_ps(yyyy, rhs.v[1].m);
+			zzzz = _mm_mul_ps(zzzz, rhs.v[2].m);
+			wwww = _mm_mul_ps(wwww, rhs.v[3].m);
+			xxxx = _mm_add_ps(xxxx, zzzz);
+			yyyy = _mm_add_ps(yyyy, wwww);
+			xxxx = _mm_add_ps(xxxx, yyyy);
+			this->v[2] = xxxx;
 
-			vW = temp.v[3].m;
-			vX = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(0, 0, 0, 0));
-			vY = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(1, 1, 1, 1));
-			vZ = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(2, 2, 2, 2));
-			vW = _mm_shuffle_ps(vW, vW, _MM_SHUFFLE(3, 3, 3, 3));
-			vX = _mm_mul_ps(vX, rhs.v[0].m);
-			vY = _mm_mul_ps(vY, rhs.v[1].m);
-			vZ = _mm_mul_ps(vZ, rhs.v[2].m);
-			vW = _mm_mul_ps(vW, rhs.v[3].m);
-			vX = _mm_add_ps(vX, vZ);
-			vY = _mm_add_ps(vY, vW);
-			vX = _mm_add_ps(vX, vY);
-			this->v[3] = vX;
+			xxxx = _mm_broadcast_ss(temp.e[3] + 0);
+			yyyy = _mm_broadcast_ss(temp.e[3] + 1);
+			zzzz = _mm_broadcast_ss(temp.e[3] + 2);
+			wwww = _mm_broadcast_ss(temp.e[3] + 3);
+			xxxx = _mm_mul_ps(xxxx, rhs.v[0].m);
+			yyyy = _mm_mul_ps(yyyy, rhs.v[1].m);
+			zzzz = _mm_mul_ps(zzzz, rhs.v[2].m);
+			wwww = _mm_mul_ps(wwww, rhs.v[3].m);
+			xxxx = _mm_add_ps(xxxx, zzzz);
+			yyyy = _mm_add_ps(yyyy, wwww);
+			xxxx = _mm_add_ps(xxxx, yyyy);
+			this->v[3] = xxxx;
 
 			return *this;*/
 		}
 		Matrix4f operator*(const Matrix4f& rhs) const noexcept
 		{
-			Matrix4f temp = *this;
-			temp *= rhs;
-			return temp;
+			//Matrix4f temp = *this;
+			//temp *= rhs;
+			//return temp;
+
+			Matrix4f result;
+			__m128 xxxx = _mm_broadcast_ss(this->e[0] + 0);
+			__m128 yyyy = _mm_broadcast_ss(this->e[0] + 1);
+			__m128 zzzz = _mm_broadcast_ss(this->e[0] + 2);
+			__m128 wwww = _mm_broadcast_ss(this->e[0] + 3);
+			xxxx = _mm_mul_ps(xxxx, rhs.v[0].m);
+			yyyy = _mm_mul_ps(yyyy, rhs.v[1].m);
+			zzzz = _mm_mul_ps(zzzz, rhs.v[2].m);
+			wwww = _mm_mul_ps(wwww, rhs.v[3].m);
+			xxxx = _mm_add_ps(xxxx, zzzz);
+			yyyy = _mm_add_ps(yyyy, wwww);
+			xxxx = _mm_add_ps(xxxx, yyyy);
+			result.v[0] = xxxx;
+
+			xxxx = _mm_broadcast_ss(this->e[1] + 0);
+			yyyy = _mm_broadcast_ss(this->e[1] + 1);
+			zzzz = _mm_broadcast_ss(this->e[1] + 2);
+			wwww = _mm_broadcast_ss(this->e[1] + 3);
+			xxxx = _mm_mul_ps(xxxx, rhs.v[0].m);
+			yyyy = _mm_mul_ps(yyyy, rhs.v[1].m);
+			zzzz = _mm_mul_ps(zzzz, rhs.v[2].m);
+			wwww = _mm_mul_ps(wwww, rhs.v[3].m);
+			xxxx = _mm_add_ps(xxxx, zzzz);
+			yyyy = _mm_add_ps(yyyy, wwww);
+			xxxx = _mm_add_ps(xxxx, yyyy);
+			result.v[1] = xxxx;
+
+			xxxx = _mm_broadcast_ss(this->e[2] + 0);
+			yyyy = _mm_broadcast_ss(this->e[2] + 1);
+			zzzz = _mm_broadcast_ss(this->e[2] + 2);
+			wwww = _mm_broadcast_ss(this->e[2] + 3);
+			xxxx = _mm_mul_ps(xxxx, rhs.v[0].m);
+			yyyy = _mm_mul_ps(yyyy, rhs.v[1].m);
+			zzzz = _mm_mul_ps(zzzz, rhs.v[2].m);
+			wwww = _mm_mul_ps(wwww, rhs.v[3].m);
+			xxxx = _mm_add_ps(xxxx, zzzz);
+			yyyy = _mm_add_ps(yyyy, wwww);
+			xxxx = _mm_add_ps(xxxx, yyyy);
+			result.v[2] = xxxx;
+
+			xxxx = _mm_broadcast_ss(this->e[3] + 0);
+			yyyy = _mm_broadcast_ss(this->e[3] + 1);
+			zzzz = _mm_broadcast_ss(this->e[3] + 2);
+			wwww = _mm_broadcast_ss(this->e[3] + 3);
+			xxxx = _mm_mul_ps(xxxx, rhs.v[0].m);
+			yyyy = _mm_mul_ps(yyyy, rhs.v[1].m);
+			zzzz = _mm_mul_ps(zzzz, rhs.v[2].m);
+			wwww = _mm_mul_ps(wwww, rhs.v[3].m);
+			xxxx = _mm_add_ps(xxxx, zzzz);
+			yyyy = _mm_add_ps(yyyy, wwww);
+			xxxx = _mm_add_ps(xxxx, yyyy);
+			result.v[3] = xxxx;
+
+			return result;
 		}
 		Matrix4f& operator*=(float rhs) noexcept
 		{
@@ -426,11 +478,159 @@ namespace flt
 			return *this;
 		}
 
+		void Mul(__m128 rhsR0, __m128 rhsR1, __m128 rhsR2, __m128 rhsR3)
+		{
+			Matrix4f temp = *this;
+			__m128 vW = temp.v[0].m;
+			// Splat the component X,Y,Z then W
+			__m128 vX = _mm_shuffle_ps((vW), (vW), _MM_SHUFFLE(0, 0, 0, 0));
+			__m128 vY = _mm_shuffle_ps((vW), (vW), _MM_SHUFFLE(1, 1, 1, 1));
+			__m128 vZ = _mm_shuffle_ps((vW), (vW), _MM_SHUFFLE(2, 2, 2, 2));
+			vW = _mm_shuffle_ps((vW), (vW), _MM_SHUFFLE(3, 3, 3, 3));
+			// Perform the operation on the first row
+			vX = _mm_mul_ps(vX, rhsR0);
+			vY = _mm_mul_ps(vY, rhsR1);
+			vZ = _mm_mul_ps(vZ, rhsR2);
+			vW = _mm_mul_ps(vW, rhsR3);
+			// Perform a binary add to reduce cumulative errors
+			vX = _mm_add_ps(vX, vZ);
+			vY = _mm_add_ps(vY, vW);
+			vX = _mm_add_ps(vX, vY);
+			this->v[0] = vX;
+			// Repeat for the other 3 rows
+			vW = temp.v[1].m;
+			vX = _mm_shuffle_ps((vW), (vW), _MM_SHUFFLE(0, 0, 0, 0));
+			vY = _mm_shuffle_ps((vW), (vW), _MM_SHUFFLE(1, 1, 1, 1));
+			vZ = _mm_shuffle_ps((vW), (vW), _MM_SHUFFLE(2, 2, 2, 2));
+			vW = _mm_shuffle_ps((vW), (vW), _MM_SHUFFLE(3, 3, 3, 3));
+			vX = _mm_mul_ps(vX, rhsR0);
+			vY = _mm_mul_ps(vY, rhsR1);
+			vZ = _mm_mul_ps(vZ, rhsR2);
+			vW = _mm_mul_ps(vW, rhsR3);
+			vX = _mm_add_ps(vX, vZ);
+			vY = _mm_add_ps(vY, vW);
+			vX = _mm_add_ps(vX, vY);
+			this->v[1] = vX;
+			vW = temp.v[2].m;
+			vX = _mm_shuffle_ps((vW), (vW), _MM_SHUFFLE(0, 0, 0, 0));
+			vY = _mm_shuffle_ps((vW), (vW), _MM_SHUFFLE(1, 1, 1, 1));
+			vZ = _mm_shuffle_ps((vW), (vW), _MM_SHUFFLE(2, 2, 2, 2));
+			vW = _mm_shuffle_ps((vW), (vW), _MM_SHUFFLE(3, 3, 3, 3));
+			vX = _mm_mul_ps(vX, rhsR0);
+			vY = _mm_mul_ps(vY, rhsR1);
+			vZ = _mm_mul_ps(vZ, rhsR2);
+			vW = _mm_mul_ps(vW, rhsR3);
+			vX = _mm_add_ps(vX, vZ);
+			vY = _mm_add_ps(vY, vW);
+			vX = _mm_add_ps(vX, vY);
+			this->v[2] = vX;
+			vW = temp.v[3].m;
+			vX = _mm_shuffle_ps((vW), (vW), _MM_SHUFFLE(0, 0, 0, 0));
+			vY = _mm_shuffle_ps((vW), (vW), _MM_SHUFFLE(1, 1, 1, 1));
+			vZ = _mm_shuffle_ps((vW), (vW), _MM_SHUFFLE(2, 2, 2, 2));
+			vW = _mm_shuffle_ps((vW), (vW), _MM_SHUFFLE(3, 3, 3, 3));
+			vX = _mm_mul_ps(vX, rhsR0);
+			vY = _mm_mul_ps(vY, rhsR1);
+			vZ = _mm_mul_ps(vZ, rhsR2);
+			vW = _mm_mul_ps(vW, rhsR3);
+			vX = _mm_add_ps(vX, vZ);
+			vY = _mm_add_ps(vY, vW);
+			vX = _mm_add_ps(vX, vY);
+			this->v[3] = vX;
+		}
+
 		union
 		{
 			Vector4f v[4];
 			float e[4][4];
 		};
 	};
+
+	// 행렬 곱셈
+	__forceinline void Matrix4fMul(const Matrix4f& lhs, Matrix4f& out, __m128 rhsR0, __m128 rhsR1, __m128 rhsR2, __m128 rhsR3)
+	{
+		__m128 xxxx = _mm_broadcast_ss(lhs.e[0] + 0);
+		__m128 yyyy = _mm_broadcast_ss(lhs.e[0] + 1);
+		__m128 zzzz = _mm_broadcast_ss(lhs.e[0] + 2);
+		__m128 wwww = _mm_broadcast_ss(lhs.e[0] + 3);
+		xxxx = _mm_mul_ps(xxxx, rhsR0);
+		yyyy = _mm_mul_ps(yyyy, rhsR1);
+		zzzz = _mm_mul_ps(zzzz, rhsR2);
+		wwww = _mm_mul_ps(wwww, rhsR3);
+		xxxx = _mm_add_ps(xxxx, zzzz);
+		yyyy = _mm_add_ps(yyyy, wwww);
+		xxxx = _mm_add_ps(xxxx, yyyy);
+		out.v[0] = xxxx;
+
+		xxxx = _mm_broadcast_ss(lhs.e[1] + 0);
+		yyyy = _mm_broadcast_ss(lhs.e[1] + 1);
+		zzzz = _mm_broadcast_ss(lhs.e[1] + 2);
+		wwww = _mm_broadcast_ss(lhs.e[1] + 3);
+		xxxx = _mm_mul_ps(xxxx, rhsR0);
+		yyyy = _mm_mul_ps(yyyy, rhsR1);
+		zzzz = _mm_mul_ps(zzzz, rhsR2);
+		wwww = _mm_mul_ps(wwww, rhsR3);
+		xxxx = _mm_add_ps(xxxx, zzzz);
+		yyyy = _mm_add_ps(yyyy, wwww);
+		xxxx = _mm_add_ps(xxxx, yyyy);
+		out.v[1] = xxxx;
+
+		xxxx = _mm_broadcast_ss(lhs.e[2] + 0);
+		yyyy = _mm_broadcast_ss(lhs.e[2] + 1);
+		zzzz = _mm_broadcast_ss(lhs.e[2] + 2);
+		wwww = _mm_broadcast_ss(lhs.e[2] + 3);
+		xxxx = _mm_mul_ps(xxxx, rhsR0);
+		yyyy = _mm_mul_ps(yyyy, rhsR1);
+		zzzz = _mm_mul_ps(zzzz, rhsR2);
+		wwww = _mm_mul_ps(wwww, rhsR3);
+		xxxx = _mm_add_ps(xxxx, zzzz);
+		yyyy = _mm_add_ps(yyyy, wwww);
+		xxxx = _mm_add_ps(xxxx, yyyy);
+		out.v[2] = xxxx;
+
+		xxxx = _mm_broadcast_ss(lhs.e[3] + 0);
+		yyyy = _mm_broadcast_ss(lhs.e[3] + 1);
+		zzzz = _mm_broadcast_ss(lhs.e[3] + 2);
+		wwww = _mm_broadcast_ss(lhs.e[3] + 3);
+		xxxx = _mm_mul_ps(xxxx, rhsR0);
+		yyyy = _mm_mul_ps(yyyy, rhsR1);
+		zzzz = _mm_mul_ps(zzzz, rhsR2);
+		wwww = _mm_mul_ps(wwww, rhsR3);
+		xxxx = _mm_add_ps(xxxx, zzzz);
+		yyyy = _mm_add_ps(yyyy, wwww);
+		xxxx = _mm_add_ps(xxxx, yyyy);
+		out.v[3] = xxxx;
+	}
+
+	__forceinline void Matrix4fMuluseDot(const Matrix4f& lhs, const Matrix4f& rhs, Matrix4f& out)
+	{
+		Vector4f transposeRhs[4] =
+		{
+			{rhs.e[0][0], rhs.e[1][0], rhs.e[2][0], rhs.e[3][0]},
+			{rhs.e[0][1], rhs.e[1][1], rhs.e[2][1], rhs.e[3][1]},
+			{rhs.e[0][2], rhs.e[1][2], rhs.e[2][2], rhs.e[3][2]},
+			{rhs.e[0][3], rhs.e[1][3], rhs.e[2][3], rhs.e[3][3]}
+		};
+
+		out.e[0][0] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[0].m, transposeRhs[0].m, 0xFF));
+		out.e[0][1] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[0].m, transposeRhs[1].m, 0xFF));
+		out.e[0][2] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[0].m, transposeRhs[2].m, 0xFF));
+		out.e[0][3] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[0].m, transposeRhs[3].m, 0xFF));
+										  
+		out.e[1][0] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[1].m, transposeRhs[0].m, 0xFF));
+		out.e[1][1] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[1].m, transposeRhs[1].m, 0xFF));
+		out.e[1][2] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[1].m, transposeRhs[2].m, 0xFF));
+		out.e[1][3] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[1].m, transposeRhs[3].m, 0xFF));
+										 
+		out.e[2][0] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[2].m, transposeRhs[0].m, 0xFF));
+		out.e[2][1] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[2].m, transposeRhs[1].m, 0xFF));
+		out.e[2][2] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[2].m, transposeRhs[2].m, 0xFF));
+		out.e[2][3] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[2].m, transposeRhs[3].m, 0xFF));
+
+		out.e[3][0] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[3].m, transposeRhs[0].m, 0xFF));
+		out.e[3][1] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[3].m, transposeRhs[1].m, 0xFF));
+		out.e[3][2] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[3].m, transposeRhs[2].m, 0xFF));
+		out.e[3][3] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[3].m, transposeRhs[3].m, 0xFF));
+	}
 }
 
