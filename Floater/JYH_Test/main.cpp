@@ -6,7 +6,7 @@
 #include "../FloaterUtil/include/FloaterMacro.h"
 #include "../FloaterUtil/include/Timer.h"
 #include <iostream>
- 
+
 #include "../FloaterUtil/include/ConvString.h"
 
 #pragma region testInclude
@@ -131,6 +131,10 @@ int main(int argc, char* argv[])
 				std::cout << findData.cFileName << std::endl;
 			} while (FindNextFileA(handle, &findData));
 		}
+		else
+		{
+			std::cout << "error" << std::endl;
+		}
 
 		GetFullPathNameA(str.c_str(), 1024, buffer, NULL);
 
@@ -163,9 +167,12 @@ int main(int argc, char* argv[])
 	//auto adpaterTest = new IZeldaRendererAdapter();
 	//adpaterTest->Initialize(1280, 720, false, NULL, false, 0.0f, 0.0f);
 
+	std::cout << "Create flt::Platform" << std::endl;
 	flt::Platform platform{ true };
 	platform.Initialize(1280, 720, L"title", L".\\path");
 
+
+	//std::cout << "Create renderer" << std::endl;
 	//auto renderer = platform.CreateRenderer(flt::RendererType::ROCKET_DX11);
 	auto renderer = platform.CreateRenderer(flt::RendererType::DX11);
 
@@ -276,12 +283,15 @@ int main(int argc, char* argv[])
 			}
 		}
 
-		ASSERT(loopCount < 1000, "정지");
+		if (!(loopCount < 10000))
+		{
+			__debugbreak();
+		}
 		loopCount++;
 		//Sleep(1);
 	}
 
-	for(int i = 0; i < fbxObjectCount; ++i)
+	for (int i = 0; i < fbxObjectCount; ++i)
 	{
 		renderer->DeregisterObject(objectIDs[i]);
 		delete fbxObjects[i];

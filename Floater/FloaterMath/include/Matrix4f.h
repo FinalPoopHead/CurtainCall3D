@@ -3,6 +3,7 @@
 //#include <DirectXMath.h>
 #include <immintrin.h>
 #include "Vector4f.h"
+#include "../../FloaterUtil/include/FloaterMacro.h"
 
 
 namespace flt
@@ -104,6 +105,8 @@ namespace flt
 		}
 		__forceinline Matrix4f& operator*=(const Matrix4f& rhs) noexcept
 		{
+			ASSERT(false, "Matrix4f::operator*= is not implemented yet.");
+
 			///SSE version, dp_ps를 사용하지 않음. 5950x 기준으로 아래 버젼이 1.5배정도 더 빠름.
 			/*Matrix4f temp = *this;
 			Matrix4f transpose = rhs.Transpose();
@@ -602,6 +605,11 @@ namespace flt
 		out.v[3] = xxxx;
 	}
 
+	// _mm_dp_ps를 사용한 버젼은 Matrix4fMul보다 Release에서 4배정도 느리다.
+	// 동일 연산 비교 시
+	// Matrix4fMul : 1622ms
+	// Matrix4fMulDot : 6406ms
+	[[deprecated("use flt::Matrix4fMul function")]]
 	__forceinline void Matrix4fMuluseDot(const Matrix4f& lhs, const Matrix4f& rhs, Matrix4f& out)
 	{
 		Vector4f transposeRhs[4] =

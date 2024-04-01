@@ -697,7 +697,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 					continue;
 				}
 
-				switch (rdi.dwType)
+				/*switch (rdi.dwType)
 				{
 					//case RIM_TYPEMOUSE:
 					//	std::wcout << L"	Mouse" << std::endl;
@@ -725,7 +725,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 					default:
 						//std::wcout << L"	Unknown" << std::endl;
 						break;
-				}
+				}*/
 			}
 
 			// usUsagePage 1일 경우 usUsage 정보
