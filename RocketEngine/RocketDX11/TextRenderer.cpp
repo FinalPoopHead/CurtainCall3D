@@ -61,4 +61,9 @@ namespace Rocket::Core
 		_font = font;
 	}
 
+	void TextRenderer::Append(const std::string& str)
+	{
+		_text.append(str);
+	}
+
 }

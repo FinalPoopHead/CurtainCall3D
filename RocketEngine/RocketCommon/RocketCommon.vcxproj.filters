@@ -125,7 +125,7 @@
     <ClInclude Include="IMeshRenderer.h">
       <Filter>Interface\Component\Renderer\3D</Filter>
     </ClInclude>
-    <ClInclude Include="IRenderable.h">
+    <ClInclude Include="IGraphicsObject.h">
       <Filter>Interface\Component\Renderer\3D\BaseClass</Filter>
     </ClInclude>
     <ClInclude Include="ISketchable.h">

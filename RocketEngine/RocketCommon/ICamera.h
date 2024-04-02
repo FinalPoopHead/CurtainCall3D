@@ -1,13 +1,16 @@
-#pragma once
+﻿#pragma once
 #include "MathHeader.h"
+
+namespace Rocket::Core
+{
+	class RocketTransform;
+}
 
 namespace Rocket::Core
 {
 	class ICamera
 	{
 	public:
-		virtual void SetPositionAndRotation(const Vector3& pos, const Quaternion& rot) = 0;
-		virtual void SetWorldTM(const Matrix& matrix) = 0;
 		virtual void SetNearZ(float nearZ) = 0;
 		virtual void SetFarZ(float farZ) = 0;
 		virtual void SetAspect(float aspect) = 0;
@@ -15,5 +18,6 @@ namespace Rocket::Core
 		virtual void SetNearHeight(float height) = 0;
 		virtual void SetFarHeight(float height) = 0;
 		virtual void SetAsMainCamera() = 0;
+		virtual void BindTransform(RocketTransform* transform) = 0;
 	};
 }

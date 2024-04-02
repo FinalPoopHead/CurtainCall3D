@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <string>
-#include "IRenderable.h"
+#include "IGraphicsObject.h"
 
 namespace Rocket::Core
 {
@@ -9,7 +9,7 @@ namespace Rocket::Core
 
 namespace Rocket::Core
 {
-	class IDynamicModelRenderer : public IRenderable
+	class IDynamicModelRenderer : public IGraphicsObject
 	{
 	public:
 		virtual ~IDynamicModelRenderer() {}

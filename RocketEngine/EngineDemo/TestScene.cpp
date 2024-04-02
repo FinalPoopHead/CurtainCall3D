@@ -17,7 +17,7 @@ void TestScene::Initialize()
 	/// 카메라
 	auto camObj = scene->GetMainCamera()->gameObject;
 	camObj->AddComponent<DebugCameraMove>();	
-	scene->GetMainCamera()->GetCamera().SetAsMainCamera();
+	scene->GetMainCamera()->SetAsMainCamera();
 
 	/// 라이트
 	auto lightObj = scene->CreateObject("light");

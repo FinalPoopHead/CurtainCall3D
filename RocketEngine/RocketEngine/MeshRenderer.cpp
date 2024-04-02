@@ -28,6 +28,11 @@ namespace Rocket
 		_graphicsRenderer->LoadTexture(fileName);
 	}
 
+	void MeshRenderer::BindTransform()
+	{
+		_graphicsRenderer->BindTransform(gameObject->transform._rocketTransform);
+	}
+
 	void MeshRenderer::UpdateRenderData()
 	{
 		_graphicsRenderer->SetWorldTM(gameObject->transform.GetWorldTM());

@@ -39,8 +39,7 @@ namespace Rocket::Core
 	private:
 		void CreateDepthStencilStates();
 
-		void BeginRender();
-		void BeginRender(float r, float g, float b, float a);
+		void BeginRender(float r = 0.1f, float g = 0.1f, float b = 0.1f, float a = 0.1f);
 		void RenderHelperObject();
 		void RenderMesh();
 		void RenderText();

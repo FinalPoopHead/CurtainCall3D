@@ -16,6 +16,7 @@ namespace Rocket
 	class DynamicModelRenderer;
 	class MeshRenderer;
 	class Light;
+	class Camera;
 }
 
 namespace Rocket
@@ -29,6 +30,7 @@ namespace Rocket
 		friend DynamicModelRenderer;
 		friend MeshRenderer;
 		friend Light;
+		friend Camera;
 
 	public:
 		Transform();		// 생성할 때 내 Entity가 무엇인지 저장한다.

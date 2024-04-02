@@ -25,6 +25,8 @@ namespace Rocket
 		void LoadMesh(std::string fileName);
 		void SetTexture(std::string fileName);
 
+		virtual void BindTransform() override;
+
 	protected:
 		virtual void UpdateRenderData() override;
 

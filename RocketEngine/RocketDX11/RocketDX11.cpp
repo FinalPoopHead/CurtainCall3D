@@ -268,31 +268,6 @@ namespace Rocket::Core
 			&_lineInputLayout));
 	}
 
-	void RocketDX11::BeginRender()
-	{
-		float color[4];
-
-		// Setup the color to clear the buffer to.
-		color[0] = 0.1f;	// r
-		color[1] = 0.1f;	// g
-		color[2] = 0.1f;	// b
-		color[3] = 0.1f;	// a
-		// Clear the back buffer.
-		_deviceContext->ClearRenderTargetView(_renderTargetView.Get(), color);
-		// Clear the depth buffer.
-		_deviceContext->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		//d3dDeviceContext_->OMSetRenderTargets(1, renderTargetView_.GetAddressOf(), depthStencilView_.Get());
-		
-		/// RenderTargetView 와 DepthStencilBuffer를 출력 병합 단계(Output Merger Stage)에 바인딩
-		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
-
-		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
-		////Blend State Set.
-		_deviceContext->OMSetBlendState(_defaultBlendState.Get(), nullptr, 0xFF);
-
-		return;
-	}
-
 	void RocketDX11::BeginRender(float r, float g, float b, float a)
 	{
 		float color[4];
@@ -314,24 +289,49 @@ namespace Rocket::Core
 		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
 		////Blend State Set.
 		_deviceContext->OMSetBlendState(_defaultBlendState.Get(), nullptr, 0xFF);
-
-		return;
 	}
 
 	void RocketDX11::RenderMesh()
 	{
+		// Frustum Culling
 		Camera* mainCam = Camera::GetMainCamera();
 
-		// TODO : 전체 리스트에 있는 것들을 그리는 것이 아니라 현재 씬만 그려야 한다..
+		std::vector<IRenderable*> renderList;
+		renderList.reserve(256);
+
 		for (auto meshRenderer : _objectManager.GetStaticModelRenderers())
 		{
-			meshRenderer->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
+			if (mainCam->FrustumCulling(meshRenderer->GetBoundingBox()))
+			{
+				renderList.push_back(meshRenderer);
+			}
 		}
 
 		for (auto dynamicModelRenderer : _objectManager.GetDynamicModelRenderers())
 		{
-			dynamicModelRenderer->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
+			if (mainCam->FrustumCulling(dynamicModelRenderer->GetBoundingBox()))
+			{
+				renderList.push_back(dynamicModelRenderer);
+			}
 		}
+
+		// TODO : 전체 리스트에 있는 것들을 그리는 것이 아니라 현재 씬만 그려야 한다..
+// 		for (auto meshRenderer : _objectManager.GetStaticModelRenderers())
+// 		{
+// 			meshRenderer->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
+// 		}
+// 
+// 		for (auto dynamicModelRenderer : _objectManager.GetDynamicModelRenderers())
+// 		{
+// 			dynamicModelRenderer->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
+// 		}
+
+		for (auto& renderable : renderList)
+		{
+			renderable->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
+		}
+
+		_objectManager._debugText->Append("\nObjects Draw : " + std::to_string(renderList.size()));
 	}
 
 	void RocketDX11::RenderText()
@@ -381,13 +381,12 @@ namespace Rocket::Core
 	{
 		_deltaTime = deltaTime;
 
-		Camera::GetMainCamera()->UpdateViewMatrix();
-		Camera::GetMainCamera()->UpdateProjectionMatrix();
+		Camera::GetMainCamera()->Update();
 		UpdateAnimation(deltaTime);
 		
 		_objectManager._debugText->SetText(
 			"deltaTime : " + std::to_string(_deltaTime)
-			+ "\n" + "fps : " + std::to_string(fps)
+			+ "\nfps : " + std::to_string(fps)
 		);
 	}
 
@@ -548,9 +547,13 @@ namespace Rocket::Core
 
 	void RocketDX11::UpdateAnimation(float deltaTime)
 	{
-		for (auto& dynamicModel : _objectManager.GetDynamicModelRenderers())
+		Camera* mainCam = Camera::GetMainCamera();
+
+		// TODO : Frustum Culling을 여기서도 하고, RenderMesh에서도 하는데 한번만 하게끔 하자.
+		for (auto modelRenderer : _objectManager.GetDynamicModelRenderers())
 		{
-			dynamicModel->UpdateAnimation(deltaTime);
+			bool isCulled = !mainCam->FrustumCulling(modelRenderer->GetBoundingBox());
+			modelRenderer->UpdateAnimation(deltaTime, isCulled);
 		}
 	}
 

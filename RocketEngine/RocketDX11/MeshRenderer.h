@@ -4,8 +4,10 @@
 #include <DirectXMath.h>
 #include <wrl.h>
 #include <vector>
+#include <DirectXCollision.h>
 
 #include "..\\RocketCommon\\IMeshRenderer.h"
+#include "IRenderable.h"
 #include "../RocketCommon/GraphicsEnum.h"
 #include "ModelStruct.h"
 #include "StaticMesh.h"
@@ -22,7 +24,7 @@ namespace Rocket::Core
 {
 	/// Static Mesh만을 그리는 컴포넌트.
 	/// 애니메이션이 적용된 Mesh는 Model기준으로 그리는 DynamicModelRenderer를 사용.
-	class MeshRenderer : public Rocket::Core::IMeshRenderer
+	class MeshRenderer : public IMeshRenderer, public IRenderable
 	{
 	public:
 		MeshRenderer();
@@ -36,13 +38,14 @@ namespace Rocket::Core
 		virtual void BindTransform(RocketTransform* transform) override;
 
 	public:
-		void Render(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj);
+		virtual void Render(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj) override;
 
 	public:
 		void SetMaterial(Material* val) { _material = val; }
 		void SetVertexShader(VertexShader* shader);
 		void SetPixelShader(PixelShader* shader);
 		void SetRenderState(ID3D11RasterizerState* renderState);
+		DirectX::BoundingBox GetBoundingBox() const;
 
 	private:
 		void SetNodeBuffer(Node* node, NodeBufferType* nodeBuffer);
@@ -53,5 +56,6 @@ namespace Rocket::Core
 		Material* _material;
 		DirectX::XMMATRIX _worldTM;
 		bool _isActive;
+		DirectX::BoundingBox _boundingBox;		// frustumCulling 용
 	};
 }

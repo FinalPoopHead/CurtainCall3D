@@ -35,10 +35,10 @@
       <Filter>GraphicsProcess</Filter>
     </ClCompile>
     <ClCompile Include="MeshRenderer.cpp">
-      <Filter>Component\MeshRenderer</Filter>
+      <Filter>Component\Renderer\MeshRenderer</Filter>
     </ClCompile>
     <ClCompile Include="TextRenderer.cpp">
-      <Filter>Component\TextRenderer</Filter>
+      <Filter>Component\Renderer\TextRenderer</Filter>
     </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>Resource\Texture</Filter>
@@ -62,7 +62,7 @@
       <Filter>Resource\Mesh\SkinnedMesh</Filter>
     </ClCompile>
     <ClCompile Include="DynamicModelRenderer.cpp">
-      <Filter>Component\DynamicModelRenderer</Filter>
+      <Filter>Component\Renderer\DynamicModelRenderer</Filter>
     </ClCompile>
     <ClCompile Include="StaticMesh.cpp">
       <Filter>Resource\Mesh\StaticMeshes\StaticMesh</Filter>
@@ -124,10 +124,10 @@
       <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="MeshRenderer.h">
-      <Filter>Component\MeshRenderer</Filter>
+      <Filter>Component\Renderer\MeshRenderer</Filter>
     </ClInclude>
     <ClInclude Include="TextRenderer.h">
-      <Filter>Component\TextRenderer</Filter>
+      <Filter>Component\Renderer\TextRenderer</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>Resource\Texture</Filter>
@@ -160,7 +160,7 @@
       <Filter>Resource\Mesh\SkinnedMesh</Filter>
     </ClInclude>
     <ClInclude Include="DynamicModelRenderer.h">
-      <Filter>Component\DynamicModelRenderer</Filter>
+      <Filter>Component\Renderer\DynamicModelRenderer</Filter>
     </ClInclude>
     <ClInclude Include="StaticMesh.h">
       <Filter>Resource\Mesh\StaticMeshes\StaticMesh</Filter>
@@ -176,6 +176,9 @@
     </ClInclude>
     <ClInclude Include="ResourcePath.h">
       <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderable.h">
+      <Filter>Component\Renderer\Interface</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -281,23 +284,29 @@
     <Filter Include="Component">
       <UniqueIdentifier>{c6a26206-7bd0-412c-9938-aae0cc791990}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Component\DynamicModelRenderer">
-      <UniqueIdentifier>{51bf0425-9c14-4153-a750-4f08ac11fce2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Component\MeshRenderer">
-      <UniqueIdentifier>{b06c9dce-0c2e-4e80-9d78-36595b5a6d4d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Component\Camera">
       <UniqueIdentifier>{569834aa-0dc1-4d58-86a8-a5376e7b1fd6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Component\Light">
       <UniqueIdentifier>{1cb4a846-a9b5-414c-b3fa-5cfa50d7cdde}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Component\TextRenderer">
-      <UniqueIdentifier>{4e5df295-451d-4a52-87a7-90d2884ebebf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Object\HelperObject\BaseClass">
       <UniqueIdentifier>{6a1e7798-5f44-48f6-afb6-b1ec30452067}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Renderer">
+      <UniqueIdentifier>{54bec2fd-8994-4e3b-b761-9f63278426fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Renderer\TextRenderer">
+      <UniqueIdentifier>{4e5df295-451d-4a52-87a7-90d2884ebebf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Renderer\MeshRenderer">
+      <UniqueIdentifier>{b06c9dce-0c2e-4e80-9d78-36595b5a6d4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Renderer\DynamicModelRenderer">
+      <UniqueIdentifier>{51bf0425-9c14-4153-a750-4f08ac11fce2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Renderer\Interface">
+      <UniqueIdentifier>{20f6505e-d6c2-47bd-bc9a-ec2d7bc64134}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

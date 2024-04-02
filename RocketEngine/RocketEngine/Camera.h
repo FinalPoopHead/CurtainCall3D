@@ -21,15 +21,15 @@ namespace Rocket
 
 	protected:
 		virtual void Start() override;
-		virtual void UpdateRenderData() override;
 
-	public:
-		Core::ICamera& GetCamera();
-		
 	private:
 		Core::ICamera* _camera;
 
 	public:
+		virtual void BindTransform() override;
+
+		void SetAsMainCamera();
+
 		float GetNearZ() const;
 		float GetFarZ() const;
 		float GetAspect() const;			// 카메라 비율 screen.width/screen.height
@@ -67,6 +67,8 @@ namespace Rocket
 		void SetIsCameraShakeOnShoot(bool cameraShake);
 
 	private:
+		Ray _ray;					// 피킹을 위한 SimpleMath의 Ray 클래스
+
 		float _nearZ;				// frustum의 가까운 평면까지의 거리
 		float _farZ;				// frustum의 먼 평면까지의 거리
 		float _aspect;				// 가로 / 세로 비율

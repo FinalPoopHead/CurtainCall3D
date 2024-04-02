@@ -312,6 +312,7 @@ copy /Y "*.hlsl" "$(SolutionDir)Resources\Shaders";</Command>
     <ClInclude Include="CubeMap.h" />
     <ClInclude Include="CubeMesh.h" />
     <ClInclude Include="HelperObjectBase.h" />
+    <ClInclude Include="IRenderable.h" />
     <ClInclude Include="MathHeader.h" />
     <ClInclude Include="ModelStruct.h" />
     <ClInclude Include="ResourcePath.h" />

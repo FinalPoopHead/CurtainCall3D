@@ -11,13 +11,15 @@
 namespace Rocket::Core
 {
 	DynamicModelRenderer::DynamicModelRenderer()
-		: _model(nullptr),
-		_material(nullptr),
-		_isActive(true),
-		_worldTM(Matrix::Identity),
-		_animatedRootNode(nullptr),
-		_animationTime(0.0),
-		_animationTick(0.0)
+		: _model(nullptr)
+		, _material(nullptr)
+		, _isActive(true)
+		, _worldTM(Matrix::Identity)
+		, _animatedRootNode(nullptr)
+		, _animationTime(0.0)
+		, _animationTick(0.0)
+		, _rootTransform(nullptr)
+		, _boundingBox()
 	{
 
 	}
@@ -49,6 +51,24 @@ namespace Rocket::Core
 			return;
 		}
 		_animatedRootNode = CopyNodeData(_model->rootNode);
+		FindArmatureRootRecur(&_armatureRootNode, _animatedRootNode);
+
+		// BoundingBox 생성
+		std::vector<DirectX::XMFLOAT3> points;
+
+		for (auto& mesh : _model->meshes)
+		{
+			for (auto& vertex : mesh->GetVertices())
+			{
+				points.push_back(vertex.position);
+			}
+		}
+
+		DirectX::BoundingBox temp;
+		DirectX::BoundingBox::CreateFromPoints(temp, points.size(), points.data(), sizeof(DirectX::XMFLOAT3));
+
+		//_boundingBox = temp;
+		DirectX::BoundingOrientedBox::CreateFromBoundingBox(_boundingBox, temp);
 	}
 
 	void DynamicModelRenderer::LoadTexture(std::string fileName)
@@ -61,7 +81,7 @@ namespace Rocket::Core
 		BindTransformRecur(rootTransform, _animatedRootNode);
 	}
 
-	void DynamicModelRenderer::UpdateAnimation(float deltaTime)
+	void DynamicModelRenderer::UpdateAnimation(float deltaTime, bool isCulled /*= false*/)
 	{
 		if (_model->animations.empty())
 		{
@@ -101,6 +121,10 @@ namespace Rocket::Core
 			}
 		}
 
+		if (isCulled)
+		{
+			return;
+		}
 
 		for (auto& nodeAnim : anim->nodeAnimations)
 		{
@@ -465,4 +489,34 @@ namespace Rocket::Core
 		delete node;
 	}
 
+// 	DirectX::BoundingBox DynamicModelRenderer::GetBoundingBox() const
+// 	{
+// 		// WorldTM을 곱한 다음에 내보낸다.
+// 		DirectX::BoundingBox transformedBox;
+// 		_boundingBox.Transform(transformedBox, _armatureRootNode->transform->GetWorldTM());
+// 		transformedBox.Transform(transformedBox, 2.0f, { 0.0f,0.0f,0.0f,1.0f }, { 0.0f,0.0f,0.0f });
+// 		return transformedBox;
+// 	}
+
+	DirectX::BoundingOrientedBox DynamicModelRenderer::GetBoundingBox() const
+	{
+		// WorldTM을 곱한 다음에 내보낸다.
+		DirectX::BoundingOrientedBox transformedBox;
+		_boundingBox.Transform(transformedBox, _armatureRootNode->transform->GetWorldTM());
+		return transformedBox;
+	}
+
+	void DynamicModelRenderer::FindArmatureRootRecur(Node** out, Node* node) const
+	{
+		if (node->bindedBone)
+		{
+			*out = node;
+			return;
+		}
+
+		for (auto& child : node->children)
+		{
+			FindArmatureRootRecur(out, child);
+		}
+	}
 }

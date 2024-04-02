@@ -56,7 +56,6 @@ namespace Rocket::Core
 		DirectX::XMMATRIX offsetMatrix = DirectX::XMMatrixIdentity();
 	};
 
-	// TODO : 여기다가 Transform을 넣으면 되지 않을까?
 	// structure to hold node hierarchy
 	struct Node
 	{

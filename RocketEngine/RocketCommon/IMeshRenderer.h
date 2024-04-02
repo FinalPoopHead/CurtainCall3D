@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <string>
-#include "IRenderable.h"
+#include "IGraphicsObject.h"
 #include "GraphicsEnum.h"
 
 namespace Rocket::Core
@@ -12,7 +12,7 @@ namespace Rocket::Core
 {
 	/// Static Mesh만을 그리는 컴포넌트의 인터페이스.
 	/// 프레임워크에서는 이 인터페이스를 이용해서 그래픽스의 MeshRenderer를 다룬다.
-	class IMeshRenderer : public IRenderable
+	class IMeshRenderer : public IGraphicsObject
 	{
 	public:
 		virtual ~IMeshRenderer() {}
