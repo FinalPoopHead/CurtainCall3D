@@ -234,8 +234,37 @@ int main(int argc, char* argv[])
 			{
 				//isShowCurser = !isShowCurser;
 				//platform.ShowCursor(isShowCurser);
-				std::cout << "LL " << keyData.keyTime << " " << keyData.x << " " << keyData.y << std::endl;
+				//std::cout << "LL " << keyData.keyTime << " " << keyData.x << " " << keyData.y << std::endl;
 			}
+
+			keyData = platform.GetKey(flt::KeyCode::gpadA);
+			if (keyData)
+			{
+				std::cout << "gpadA " << keyData.keyTime << std::endl;
+			}
+			keyData = platform.GetKey(flt::KeyCode::gpadB);
+			if (keyData)
+			{
+				std::cout << "gpadB " << keyData.keyTime << std::endl;
+			}
+			keyData = platform.GetKey(flt::KeyCode::gpadX);
+			if (keyData)
+			{
+				std::cout << "gpadX " << keyData.keyTime << std::endl;
+			}
+			keyData = platform.GetKey(flt::KeyCode::gpadY);
+			if (keyData)
+			{
+				std::cout << "gpadY " << keyData.keyTime << std::endl;
+			}
+			keyData = platform.GetKey(flt::KeyCode::gpadLStickClick);
+			if (keyData)
+			{
+				std::cout << "gpadLStickClick " << keyData.keyTime << std::endl;
+			}
+
+
+
 			keyData = platform.GetKey(flt::KeyCode::mouseRButton);
 			float cameraSpeed = 0.2f;
 			if (keyData)

@@ -38,7 +38,7 @@ namespace flt
 
 		void HandleKeyboardRawData(const RAWKEYBOARD& data);
 		void HandleMouseRawData(const RAWMOUSE& data);
-		void HandleGamePadRawData(const RAWHID& data);
+		void HandleGamePadRawData(const RAWINPUT* raw);
 
 		void SetKeyState(KeyCode code, const KeyData& data, bool isActive, bool isInActive);
 		

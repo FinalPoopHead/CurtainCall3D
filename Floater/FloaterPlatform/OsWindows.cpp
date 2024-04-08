@@ -25,7 +25,9 @@
 #pragma comment(lib, "dxguid.lib")
 #endif
 
+// 게임패드 입력을 받기 위한 헤더.
 #include <hidsdi.h>
+//#include <hidpddi.h>
 #include <hidpi.h>
 
 #pragma comment(lib, "hid.lib")
@@ -519,15 +521,178 @@ void flt::OsWindows::HandleMouseRawData(const RAWMOUSE& data)
 	}
 }
 
-void flt::OsWindows::HandleGamePadRawData(const RAWHID& data)
+void flt::OsWindows::HandleGamePadRawData(const RAWINPUT* raw)
 {
-
-	for (int i = 0; i < data.dwCount; ++i)
+	unsigned int dataSize = 32;
+	RID_DEVICE_INFO deviceInfo{};
+	UINT retval = GetRawInputDeviceInfo(raw->header.hDevice, RIDI_DEVICEINFO, &deviceInfo, &dataSize);
+	if (retval == -1)
 	{
-		const BYTE* pData = data.bRawData + (i * data.dwSizeHid);
+		std::wstring error;
+		unsigned int errorCode;
+		this->GetError(&error, &errorCode);
+		ASSERT(false, "GetRawInputDeviceInfo 실패");
 	}
 
-	int i = 0;
+	// 현재 게임패드만 처리할 수 있기 때문에 게임패드가 아니라면 리턴.
+	if (deviceInfo.hid.usUsagePage != 1 || deviceInfo.hid.usUsage != 0x05)
+	{
+		return;
+	}
+
+	GetRawInputDeviceInfo(raw->header.hDevice, RIDI_PREPARSEDDATA, NULL, &dataSize);
+
+	std::unique_ptr<BYTE> pData(new(std::nothrow) BYTE[dataSize]);
+	ASSERT(pData.get(), "메모리 동적할당 실패");
+
+	if (GetRawInputDeviceInfo(raw->header.hDevice, RIDI_PREPARSEDDATA, pData.get(), &dataSize) == -1)
+	{
+		ASSERT(false, "RawInputDevice 정보 가져오기 실패");
+	}
+
+	// 게임패드가 맞기 때문에 게임패드라 생각하고 데이터 처리
+	HIDP_CAPS caps;
+	NTSTATUS ret = HidP_GetCaps((PHIDP_PREPARSED_DATA)pData.get(), &caps);
+	ASSERT(ret == HIDP_STATUS_SUCCESS, "HidP_GetCaps 실패");
+	std::unique_ptr<HIDP_BUTTON_CAPS[]> pButtonCaps(new HIDP_BUTTON_CAPS[caps.NumberInputButtonCaps]);
+
+	unsigned short capsLength = caps.NumberInputButtonCaps;
+	ret = HidP_GetButtonCaps(HidP_Input, pButtonCaps.get(), &capsLength, (PHIDP_PREPARSED_DATA)pData.get());
+	ASSERT(ret == HIDP_STATUS_SUCCESS, "HidP_GetButtonCaps 실패");
+
+	for (int i = 0; i < capsLength; ++i)
+	{
+		USHORT usageMin = pButtonCaps[i].Range.UsageMin;
+		USHORT usageMax = pButtonCaps[i].Range.UsageMax;
+		ULONG buttonNum = pButtonCaps[i].Range.UsageMax - usageMin + 1;
+		ASSERT(buttonNum <= 16, "버튼 개수가 16개를 넘어갑니다.");
+
+		USAGE usages[128];
+		ret = HidP_GetUsages(HidP_Input, pButtonCaps[i].UsagePage, 0, usages, &buttonNum, (PHIDP_PREPARSED_DATA)pData.get(),
+			(PCHAR)raw->data.hid.bRawData, raw->data.hid.dwSizeHid);
+
+		ASSERT(ret == HIDP_STATUS_SUCCESS, "HidP_GetUsages 실패");
+
+		bool isPressed[16] = { false, };
+		for (unsigned int j = 0; j < buttonNum; ++j)
+		{
+			int index = usages[j] - usageMin;
+			isPressed[index] = true;
+		}
+
+		for (int i = 0; i < 16; ++i)
+		{
+			KeyCode code;
+			switch (i)
+			{
+				case 0:
+				{
+					code = KeyCode::gpadA;
+				}
+				break;
+				case 1:
+				{
+					code = KeyCode::gpadB;
+				}
+				break;
+				case 2:
+				{
+					code = KeyCode::gpadX;
+				}
+				break;
+				case 3:
+				{
+					code = KeyCode::gpadY;
+				}
+				break;
+				case 4:
+				{
+					code = KeyCode::gpadLB;
+				}
+				break;
+				case 5:
+				{
+					code = KeyCode::gpadRB;
+				}
+				break;
+				case 8:
+				{
+					code = KeyCode::gpadLStickClick;
+				}
+				break;
+				case 9:
+				{
+					code = KeyCode::gpadRStickClick;
+				}
+				break;
+
+				default:
+					continue;
+			}
+
+			if (isPressed[i])
+			{
+				KeyData data = GetKey(code);
+				if (!data)
+				{
+					data.keyTime = _keyTimer.GetLabTimeMicroSeconds();
+					SetKeyState(code, data, true, false);
+				}
+			}
+			else
+			{
+				KeyData data{};
+				bool isUp = GetKey(code);
+				SetKeyState(code, data, false, isUp);
+			}
+		}
+
+		USHORT valueNum = caps.NumberInputValueCaps;
+		std::unique_ptr<HIDP_VALUE_CAPS[]> pValueCaps(new HIDP_VALUE_CAPS[valueNum]);
+		ret = HidP_GetValueCaps(HidP_Input, pValueCaps.get(), &valueNum, (PHIDP_PREPARSED_DATA)pData.get());
+		ASSERT(ret == HIDP_STATUS_SUCCESS, "HidP_GetValueCaps 실패");
+
+		for (int j = 0; j < valueNum; ++j)
+		{
+			ULONG value;
+			ret = HidP_GetUsageValue(HidP_Input, pValueCaps[j].UsagePage, 0, pValueCaps[j].Range.UsageMin, &value, (PHIDP_PREPARSED_DATA)pData.get(),
+				(PCHAR)raw->data.hid.bRawData, raw->data.hid.dwSizeHid);
+			ASSERT(ret == HIDP_STATUS_SUCCESS, "HidP_GetUsageValue 실패");
+
+			switch (ret)
+			{
+				case HIDP_STATUS_INCOMPATIBLE_REPORT_ID:
+				{
+					std::cout << "HIDP_INVALID_REPORT_LENGTH" << std::endl;
+				}
+				break;
+				case HIDP_STATUS_INVALID_PREPARSED_DATA:
+				{
+					std::cout << "HIDP_INVALID_PREPARSED_DATA" << std::endl;
+				}
+				break;
+				case HIDP_STATUS_USAGE_NOT_FOUND:
+				{
+					std::cout << "HIDP_STATUS_USAGE_NOT_FOUND" << std::endl;
+				}
+				break;
+			}
+
+			switch (pValueCaps[j].Range.UsageMin)
+			{
+				case 0x30:
+				{
+					//std::cout << "lAxisX : " << (LONG)value - 128 << std::endl;
+				}
+				break;
+				case 0x31:
+				{
+					//std::cout << "lAxisY : " << (LONG)value - 128 << std::endl;
+				}
+				break;
+			}
+		}
+	}
 }
 
 void flt::OsWindows::SetKeyState(KeyCode code, const KeyData& data, bool isActive, bool isInActive)
@@ -579,96 +744,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 			}
 			else if (raw->header.dwType == RIM_TYPEHID)
 			{
-				unsigned int dataSize = 0;
-				GetRawInputDeviceInfo(raw->header.hDevice, RIDI_PREPARSEDDATA, NULL, &dataSize);
-
-				std::unique_ptr<BYTE> pData(new(std::nothrow) BYTE[dataSize]);
-				ASSERT(pData.get(), "메모리 동적할당 실패");
-
-				if (GetRawInputDeviceInfo(raw->header.hDevice, RIDI_PREPARSEDDATA, pData.get(), &dataSize) == -1)
-				{
-					ASSERT(false, "RawInputDevice 정보 가져오기 실패");
-					break;
-				}
-
-				HIDP_CAPS caps;
-				NTSTATUS ret = HidP_GetCaps((PHIDP_PREPARSED_DATA)pData.get(), &caps);
-				ASSERT(ret == HIDP_STATUS_SUCCESS, "HidP_GetCaps 실패");
-				std::unique_ptr<HIDP_BUTTON_CAPS[]> pButtonCaps(new HIDP_BUTTON_CAPS[caps.NumberInputButtonCaps]);
-
-				unsigned short capsLength = caps.NumberInputButtonCaps;
-				ret = HidP_GetButtonCaps(HidP_Input, pButtonCaps.get(), &capsLength, (PHIDP_PREPARSED_DATA)pData.get());
-				ASSERT(ret == HIDP_STATUS_SUCCESS, "HidP_GetButtonCaps 실패");
-
-				for (int i = 0; i < capsLength; ++i)
-				{
-					USHORT usageMin = pButtonCaps[i].Range.UsageMin;
-					ULONG buttonNum = pButtonCaps[i].Range.UsageMax - usageMin + 1;
-
-					USAGE usages[128];
-					ret = HidP_GetUsages(HidP_Input, pButtonCaps[i].UsagePage, 0, usages, &buttonNum, (PHIDP_PREPARSED_DATA)pData.get(),
-						(PCHAR)raw->data.hid.bRawData, raw->data.hid.dwSizeHid);
-
-					ASSERT(ret == HIDP_STATUS_SUCCESS, "HidP_GetUsages 실패");
-
-					BOOL buttonState[128]{ false, };
-					for (int j = 0; j < buttonNum; ++j)
-					{
-						buttonState[usages[j] - usageMin] = true;
-
-						std::cout << "button pressed : " << (usages[j] - usageMin) << std::endl;
-					}
-
-					USHORT valueNum = caps.NumberInputValueCaps;
-					std::unique_ptr<HIDP_VALUE_CAPS[]> pValueCaps(new HIDP_VALUE_CAPS[valueNum]);
-					ret = HidP_GetValueCaps(HidP_Input, pValueCaps.get(), &valueNum, (PHIDP_PREPARSED_DATA)pData.get());
-					ASSERT(ret == HIDP_STATUS_SUCCESS, "HidP_GetValueCaps 실패");
-
-					for (int j = 0; j < valueNum; ++j)
-					{
-						ULONG value;
-						ret = HidP_GetUsageValue(HidP_Input, pValueCaps[j].UsagePage, 0, pValueCaps[j].Range.UsageMin, &value, (PHIDP_PREPARSED_DATA)pData.get(),
-							(PCHAR)raw->data.hid.bRawData, raw->data.hid.dwSizeHid);
-						ASSERT(ret == HIDP_STATUS_SUCCESS, "HidP_GetUsageValue 실패");
-
-						switch (ret)
-						{
-							case HIDP_STATUS_INCOMPATIBLE_REPORT_ID:
-							{
-								std::cout << "HIDP_INVALID_REPORT_LENGTH" << std::endl;
-							}
-							break;
-							case HIDP_STATUS_INVALID_PREPARSED_DATA:
-							{
-								std::cout << "HIDP_INVALID_PREPARSED_DATA" << std::endl;
-							}
-							break;
-							case HIDP_STATUS_USAGE_NOT_FOUND:
-							{
-								std::cout << "HIDP_STATUS_USAGE_NOT_FOUND" << std::endl;
-							}
-							break;
-						}
-
-						switch (pValueCaps[j].Range.UsageMin)
-						{
-							case 0x30:
-							{
-								std::cout << "lAxisX : " << (LONG)value - 128 << std::endl;
-							}
-							break;
-							case 0x31:
-							{
-								std::cout << "lAxisY : " << (LONG)value - 128 << std::endl;
-							}
-							break;
-						}
-					}
-				}
-
-
-
-				thisPtr->HandleGamePadRawData(raw->data.hid);
+				thisPtr->HandleGamePadRawData(raw);
 				//std::cout << "test " << x << std::endl;
 			}
 		}
