@@ -123,6 +123,8 @@
       </AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <AssemblerOutput>All</AssemblerOutput>
+      <Optimization>Disabled</Optimization>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -1,5 +1,6 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 
+
 #include "OsWindows.h"
 #include <iostream>
 #include <memory>
@@ -23,6 +24,12 @@
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxguid.lib")
 #endif
+
+#include <hidsdi.h>
+#include <hidpi.h>
+
+#pragma comment(lib, "hid.lib")
+//#pragma comment(lib, "hidparse.lib")
 
 
 const std::wstring flt::OsWindows::s_name = L"Windows";
@@ -512,6 +519,17 @@ void flt::OsWindows::HandleMouseRawData(const RAWMOUSE& data)
 	}
 }
 
+void flt::OsWindows::HandleGamePadRawData(const RAWHID& data)
+{
+
+	for (int i = 0; i < data.dwCount; ++i)
+	{
+		const BYTE* pData = data.bRawData + (i * data.dwSizeHid);
+	}
+
+	int i = 0;
+}
+
 void flt::OsWindows::SetKeyState(KeyCode code, const KeyData& data, bool isActive, bool isInActive)
 {
 	if (isActive)
@@ -539,20 +557,17 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 			UINT dwSize = 0;
 			GetRawInputData((HRAWINPUT)lParam, RID_INPUT, NULL, &dwSize, sizeof(RAWINPUTHEADER));
 
-			LPBYTE lpb = new BYTE[dwSize];
-			if (lpb == NULL)
-			{
-				ASSERT(false, "메모리 동적할당 실패");
-				break;
-			}
+			std::unique_ptr<BYTE> lpb(new(std::nothrow) BYTE[dwSize]);
+			ASSERT(lpb.get(), "메모리 동적할당 실패");
 
-			if (GetRawInputData((HRAWINPUT)lParam, RID_INPUT, lpb, &dwSize, sizeof(RAWINPUTHEADER)) != dwSize)
+			if (GetRawInputData((HRAWINPUT)lParam, RID_INPUT, lpb.get(), &dwSize, sizeof(RAWINPUTHEADER)) != dwSize)
 			{
 				ASSERT(false, "RawInputData 가져오기 실패");
 				break;
 			}
 
-			RAWINPUT* raw = (RAWINPUT*)lpb;
+			RAWINPUT* raw = (RAWINPUT*)lpb.get();
+
 
 			if (raw->header.dwType == RIM_TYPEKEYBOARD)
 			{
@@ -564,7 +579,96 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 			}
 			else if (raw->header.dwType == RIM_TYPEHID)
 			{
-				auto x = raw->data.hid.bRawData;
+				unsigned int dataSize = 0;
+				GetRawInputDeviceInfo(raw->header.hDevice, RIDI_PREPARSEDDATA, NULL, &dataSize);
+
+				std::unique_ptr<BYTE> pData(new(std::nothrow) BYTE[dataSize]);
+				ASSERT(pData.get(), "메모리 동적할당 실패");
+
+				if (GetRawInputDeviceInfo(raw->header.hDevice, RIDI_PREPARSEDDATA, pData.get(), &dataSize) == -1)
+				{
+					ASSERT(false, "RawInputDevice 정보 가져오기 실패");
+					break;
+				}
+
+				HIDP_CAPS caps;
+				NTSTATUS ret = HidP_GetCaps((PHIDP_PREPARSED_DATA)pData.get(), &caps);
+				ASSERT(ret == HIDP_STATUS_SUCCESS, "HidP_GetCaps 실패");
+				std::unique_ptr<HIDP_BUTTON_CAPS[]> pButtonCaps(new HIDP_BUTTON_CAPS[caps.NumberInputButtonCaps]);
+
+				unsigned short capsLength = caps.NumberInputButtonCaps;
+				ret = HidP_GetButtonCaps(HidP_Input, pButtonCaps.get(), &capsLength, (PHIDP_PREPARSED_DATA)pData.get());
+				ASSERT(ret == HIDP_STATUS_SUCCESS, "HidP_GetButtonCaps 실패");
+
+				for (int i = 0; i < capsLength; ++i)
+				{
+					USHORT usageMin = pButtonCaps[i].Range.UsageMin;
+					ULONG buttonNum = pButtonCaps[i].Range.UsageMax - usageMin + 1;
+
+					USAGE usages[128];
+					ret = HidP_GetUsages(HidP_Input, pButtonCaps[i].UsagePage, 0, usages, &buttonNum, (PHIDP_PREPARSED_DATA)pData.get(),
+						(PCHAR)raw->data.hid.bRawData, raw->data.hid.dwSizeHid);
+
+					ASSERT(ret == HIDP_STATUS_SUCCESS, "HidP_GetUsages 실패");
+
+					BOOL buttonState[128]{ false, };
+					for (int j = 0; j < buttonNum; ++j)
+					{
+						buttonState[usages[j] - usageMin] = true;
+
+						std::cout << "button pressed : " << (usages[j] - usageMin) << std::endl;
+					}
+
+					USHORT valueNum = caps.NumberInputValueCaps;
+					std::unique_ptr<HIDP_VALUE_CAPS[]> pValueCaps(new HIDP_VALUE_CAPS[valueNum]);
+					ret = HidP_GetValueCaps(HidP_Input, pValueCaps.get(), &valueNum, (PHIDP_PREPARSED_DATA)pData.get());
+					ASSERT(ret == HIDP_STATUS_SUCCESS, "HidP_GetValueCaps 실패");
+
+					for (int j = 0; j < valueNum; ++j)
+					{
+						ULONG value;
+						ret = HidP_GetUsageValue(HidP_Input, pValueCaps[j].UsagePage, 0, pValueCaps[j].Range.UsageMin, &value, (PHIDP_PREPARSED_DATA)pData.get(),
+							(PCHAR)raw->data.hid.bRawData, raw->data.hid.dwSizeHid);
+						ASSERT(ret == HIDP_STATUS_SUCCESS, "HidP_GetUsageValue 실패");
+
+						switch (ret)
+						{
+							case HIDP_STATUS_INCOMPATIBLE_REPORT_ID:
+							{
+								std::cout << "HIDP_INVALID_REPORT_LENGTH" << std::endl;
+							}
+							break;
+							case HIDP_STATUS_INVALID_PREPARSED_DATA:
+							{
+								std::cout << "HIDP_INVALID_PREPARSED_DATA" << std::endl;
+							}
+							break;
+							case HIDP_STATUS_USAGE_NOT_FOUND:
+							{
+								std::cout << "HIDP_STATUS_USAGE_NOT_FOUND" << std::endl;
+							}
+							break;
+						}
+
+						switch (pValueCaps[j].Range.UsageMin)
+						{
+							case 0x30:
+							{
+								std::cout << "lAxisX : " << (LONG)value - 128 << std::endl;
+							}
+							break;
+							case 0x31:
+							{
+								std::cout << "lAxisY : " << (LONG)value - 128 << std::endl;
+							}
+							break;
+						}
+					}
+				}
+
+
+
+				thisPtr->HandleGamePadRawData(raw->data.hid);
 				//std::cout << "test " << x << std::endl;
 			}
 		}
@@ -593,6 +697,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 		}
 		break;
 
+		// RegisterRawInputDevices 한 디바이스가 변경 되면 호출
 		case WM_INPUT_DEVICE_CHANGE:
 		{
 			UINT deviceCount = 0;
@@ -608,6 +713,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 			int result = GetRawInputDeviceList(pDeviceList.get(), &deviceCount, sizeof(RAWINPUTDEVICELIST));
 			ASSERT(result != -1, "RawInputDeviceList 정보 가져오기 실패");
 
+			std::cout << "Device Change : " << deviceCount << std::endl;
 			for (unsigned int i = 0; i < deviceCount; ++i)
 			{
 				UINT bufferSize = 0;
@@ -632,8 +738,58 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 					continue;
 				}
 
-				//std::wcout << L"TYPE : " << pDeviceList[i].dwType << L" | " << buffer << std::endl;
+				std::wcout << L"TYPE : " << pDeviceList[i].dwType << L" | " << buffer << std::endl;
 			}
+
+			std::cout << std::endl;
+		}
+		break;
+
+		// 키보드 등이 연결/해제 되면 호출
+		case WM_DEVICECHANGE:
+		{
+			UINT deviceCount = 0;
+
+			if (GetRawInputDeviceList(NULL, &deviceCount, sizeof(RAWINPUTDEVICELIST)) == -1)
+			{
+				ASSERT(false, "RawInputDeviceList 정보 가져오기 실패");
+			}
+
+			std::unique_ptr<RAWINPUTDEVICELIST[]> pDeviceList(new(std::nothrow) RAWINPUTDEVICELIST[deviceCount]);
+			ASSERT(pDeviceList != nullptr, "메모리 동적 할당 실패");
+
+			int result = GetRawInputDeviceList(pDeviceList.get(), &deviceCount, sizeof(RAWINPUTDEVICELIST));
+			ASSERT(result != -1, "RawInputDeviceList 정보 가져오기 실패");
+
+			std::cout << "Device Change : " << deviceCount << std::endl;
+			for (unsigned int i = 0; i < deviceCount; ++i)
+			{
+				UINT bufferSize = 0;
+				result = GetRawInputDeviceInfo(pDeviceList[i].hDevice, RIDI_DEVICENAME, NULL, &bufferSize);
+				if (result == -1)
+				{
+					ASSERT(false, "메모리 동적 할당 실패");
+					continue;
+				}
+
+				std::unique_ptr<wchar_t[]> buffer(new(std::nothrow) wchar_t[bufferSize]);
+				if (buffer == nullptr)
+				{
+					ASSERT(false, "메모리 동적 할당 실패");
+					continue;
+				}
+
+				result = GetRawInputDeviceInfo(pDeviceList[i].hDevice, RIDI_DEVICENAME, buffer.get(), &bufferSize);
+				if (result == -1)
+				{
+					ASSERT(false, "RawInputDevice 정보 가져오기 실패");
+					continue;
+				}
+
+				std::wcout << L"TYPE : " << pDeviceList[i].dwType << L" | " << buffer << std::endl;
+			}
+
+			std::cout << std::endl;
 		}
 		break;
 
@@ -697,35 +853,106 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 					continue;
 				}
 
-				/*switch (rdi.dwType)
+				switch (rdi.dwType)
 				{
-					//case RIM_TYPEMOUSE:
-					//	std::wcout << L"	Mouse" << std::endl;
-					//	std::wcout << L"	ID: " << rdi.mouse.dwId << std::endl;
-					//	std::wcout << L"	Number of Buttons: " << rdi.mouse.dwNumberOfButtons << std::endl;
-					//	std::wcout << L"	Sample Rate: " << rdi.mouse.dwSampleRate << std::endl;
-					//	break;
-					//case RIM_TYPEKEYBOARD:
-					//	std::wcout << L"	Keyboard" << std::endl;
-					//	std::wcout << L"	Type: " << rdi.keyboard.dwType << std::endl;
-					//	std::wcout << L"	Sub Type: " << rdi.keyboard.dwSubType << std::endl;
-					//	std::wcout << L"	Keyboard Mode: " << rdi.keyboard.dwKeyboardMode << std::endl;
-					//	std::wcout << L"	Number of Function Keys: " << rdi.keyboard.dwNumberOfFunctionKeys << std::endl;
-					//	std::wcout << L"	Number of Indicators: " << rdi.keyboard.dwNumberOfIndicators << std::endl;
-					//	std::wcout << L"	Number of Keys Total: " << rdi.keyboard.dwNumberOfKeysTotal << std::endl;
-					//	break;
-					//case RIM_TYPEHID:
-					//	std::wcout << L"	HID" << std::endl;
-					//	std::wcout << L"	Vendor ID: " << rdi.hid.dwVendorId << std::endl;
-					//	std::wcout << L"	Product ID: " << rdi.hid.dwProductId << std::endl;
-					//	std::wcout << L"	Version Number: " << rdi.hid.dwVersionNumber << std::endl;
-					//	std::wcout << L"	Usage for the top-level collection: " << rdi.hid.usUsage << std::endl;
-					//	std::wcout << L"	Usage Page for the top-level collection: " << rdi.hid.usUsagePage << std::endl;
-					//	break;
+					case RIM_TYPEMOUSE:
+					{
+						std::wcout << L"	Mouse" << std::endl;
+						std::wcout << L"	ID: " << rdi.mouse.dwId << std::endl;
+						std::wcout << L"	Number of Buttons: " << rdi.mouse.dwNumberOfButtons << std::endl;
+						std::wcout << L"	Sample Rate: " << rdi.mouse.dwSampleRate << std::endl;
+
+						RAWINPUTDEVICE rawInputDevice;
+
+						rawInputDevice.dwFlags = RIDEV_NOLEGACY;
+						// RIDEV_INPUTSINK; // 백 그라운드에서도 인풋 받기
+						rawInputDevice.usUsagePage = 1;
+						rawInputDevice.usUsage = 2;
+						rawInputDevice.hwndTarget = hwnd;
+
+						result = RegisterRawInputDevices(&rawInputDevice, 1, sizeof(rawInputDevice));
+
+						if (result == FALSE)
+						{
+							std::wstring errorMsg;
+							unsigned int errorCode;
+							auto r = thisPtr->GetError(&errorMsg, &errorCode);
+							ASSERT(result != FALSE, "RawInputDevice 등록 실패");
+						}
+					}
+
+					break;
+					case RIM_TYPEKEYBOARD:
+					{
+						std::wcout << L"	Keyboard" << std::endl;
+						std::wcout << L"	Type: " << rdi.keyboard.dwType << std::endl;
+						std::wcout << L"	Sub Type: " << rdi.keyboard.dwSubType << std::endl;
+						std::wcout << L"	Keyboard Mode: " << rdi.keyboard.dwKeyboardMode << std::endl;
+						std::wcout << L"	Number of Function Keys: " << rdi.keyboard.dwNumberOfFunctionKeys << std::endl;
+						std::wcout << L"	Number of Indicators: " << rdi.keyboard.dwNumberOfIndicators << std::endl;
+						std::wcout << L"	Number of Keys Total: " << rdi.keyboard.dwNumberOfKeysTotal << std::endl;
+
+						RAWINPUTDEVICE rawInputDevice;
+
+						rawInputDevice.dwFlags =
+							RIDEV_NOLEGACY;// |
+						//RIDEV_NOHOTKEYS; // 윈도우 등 핫키 무시하기
+						// RIDEV_INPUTSINK; // 백 그라운드에서도 인풋 받기
+						rawInputDevice.usUsagePage = 1;
+						rawInputDevice.usUsage = 6;
+						rawInputDevice.hwndTarget = hwnd;
+
+						result = RegisterRawInputDevices(&rawInputDevice, 1, sizeof(rawInputDevice));
+
+						if (result == FALSE)
+						{
+							std::wstring errorMsg;
+							unsigned int errorCode;
+							auto r = thisPtr->GetError(&errorMsg, &errorCode);
+							ASSERT(result != FALSE, "RawInputDevice 등록 실패");
+						}
+					}
+					break;
+					case RIM_TYPEHID:
+					{
+						std::wcout << L"	HID" << std::endl;
+						std::wcout << L"	Vendor ID: " << rdi.hid.dwVendorId << std::endl;
+						std::wcout << L"	Product ID: " << rdi.hid.dwProductId << std::endl;
+						std::wcout << L"	Version Number: " << rdi.hid.dwVersionNumber << std::endl;
+						std::wcout << L"	Usage for the top-level collection: " << rdi.hid.usUsage << std::endl;
+						std::wcout << L"	Usage Page for the top-level collection: " << rdi.hid.usUsagePage << std::endl;
+
+						if (rdi.hid.usUsagePage == 1 && rdi.hid.usUsage == 4)
+						{
+							std::cout << "test joyStick" << std::endl;
+						}
+
+						// 게임 패드이면
+						if (rdi.hid.usUsagePage == 1 && (rdi.hid.usUsage == 5 || rdi.hid.usUsage == 6))
+						{
+							RAWINPUTDEVICE rawInputDevice{};
+
+							rawInputDevice.dwFlags = 0;
+							rawInputDevice.usUsagePage = 1; // rdi.hid.usUsagePage;
+							rawInputDevice.usUsage = 5; // rdi.hid.usUsage;
+							rawInputDevice.hwndTarget = hwnd;
+
+							result = RegisterRawInputDevices(&rawInputDevice, 1, sizeof(rawInputDevice));
+
+							if (result == FALSE)
+							{
+								std::wstring errorMsg;
+								unsigned int errorCode;
+								auto r = thisPtr->GetError(&errorMsg, &errorCode);
+								ASSERT(result != FALSE, "RawInputDevice 등록 실패");
+							}
+						}
+					}
+					break;
 					default:
-						//std::wcout << L"	Unknown" << std::endl;
+						std::wcout << L"	Unknown" << std::endl;
 						break;
-				}*/
+				}
 			}
 
 			// usUsagePage 1일 경우 usUsage 정보
@@ -733,31 +960,31 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 			// 4-5 게임 컨트롤러
 			// 6-7 키보드, 키패드
 
-			RAWINPUTDEVICE rid[4];
+			//RAWINPUTDEVICE rid[4];
 
-			rid[0].dwFlags = RIDEV_NOLEGACY;// | RIDEV_INPUTSINK;
-			rid[0].usUsagePage = 1;
-			rid[0].usUsage = 6;
-			rid[0].hwndTarget = hwnd;
+			//rid[0].dwFlags = RIDEV_NOLEGACY;// | RIDEV_INPUTSINK;
+			//rid[0].usUsagePage = 1;
+			//rid[0].usUsage = 6;
+			//rid[0].hwndTarget = hwnd;
 
-			rid[1].dwFlags = 0;
-			rid[1].usUsagePage = 1;
-			rid[1].usUsage = 2;
-			rid[1].hwndTarget = hwnd;
+			//rid[1].dwFlags = 0;
+			//rid[1].usUsagePage = 1;
+			//rid[1].usUsage = 2;
+			//rid[1].hwndTarget = hwnd;
 
-			rid[2].dwFlags = NULL;
-			rid[2].usUsagePage = 1;
-			rid[2].usUsage = 5;
-			rid[2].hwndTarget = hwnd;
+			//rid[2].dwFlags = NULL;
+			//rid[2].usUsagePage = 1;
+			//rid[2].usUsage = 5;
+			//rid[2].hwndTarget = hwnd;
 
-			result = RegisterRawInputDevices(rid, 3, sizeof(rid[0]));
-			if (result == FALSE)
-			{
-				std::wstring errorMsg;
-				unsigned int errorCode;
-				auto r = thisPtr->GetError(&errorMsg, &errorCode);
-				ASSERT(false, "RawInputDevice 등록 실패");
-			}
+			//result = RegisterRawInputDevices(rid, 3, sizeof(rid[0]));
+			//if (result == FALSE)
+			//{
+			//	std::wstring errorMsg;
+			//	unsigned int errorCode;
+			//	auto r = thisPtr->GetError(&errorMsg, &errorCode);
+			//	ASSERT(false, "RawInputDevice 등록 실패");
+			//}
 		}
 		break;
 

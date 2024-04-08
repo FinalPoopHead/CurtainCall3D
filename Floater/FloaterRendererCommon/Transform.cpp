@@ -440,6 +440,7 @@ void flt::Transform::CalcWorldMatrixRecursive() const noexcept
 	{
 		Matrix4f localMatrix = GetLocalMatrix4f();
 		Matrix4f parentWorldMatrix = _pParent->GetWorldMatrix4f();
+		//const Matrix4f& parentWorldMatrix = _pParent->GetWorldMatrix4fRef();
 		Matrix4fMul(localMatrix, _worldMatrix, parentWorldMatrix.v[0].m, parentWorldMatrix.v[1].m, parentWorldMatrix.v[2].m, parentWorldMatrix.v[3].m);
 		//Matrix4fMuluseDot(localMatrix, parentWorldMatrix, _worldMatrix);
 
@@ -449,4 +450,16 @@ void flt::Transform::CalcWorldMatrixRecursive() const noexcept
 	{
 		_worldMatrix = GetLocalMatrix4f();
 	}
+}
+
+const flt::Matrix4f& flt::Transform::GetWorldMatrix4fRef() const noexcept
+{
+	if (_isDirty)
+	{
+		CalcWorldMatrixRecursive();
+
+		_isDirty = false;
+	}
+
+	return _worldMatrix;
 }

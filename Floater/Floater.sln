@@ -14,6 +14,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FloaterUtil", "FloaterUtil\FloaterUtil.vcxproj", "{CB145F87-3FE0-445E-BB70-582B466CBE74}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FloaterRendererCommon", "FloaterRendererCommon\FloaterRendererCommon.vcxproj", "{4C5CA68F-1387-44E2-84E2-6D07D893D21C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0BB76C52-C35F-4A26-88E7-04920C2B5DBE} = {0BB76C52-C35F-4A26-88E7-04920C2B5DBE}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RocketAdapter", "RocketAdapter\RocketAdapter.vcxproj", "{790F4F45-5E14-4D4B-B7B0-54313E923713}"
 EndProject

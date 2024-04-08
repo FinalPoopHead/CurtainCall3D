@@ -85,6 +85,7 @@ namespace flt
 	private:
 		void MakeDirtyRecursive() const noexcept;
 		void CalcWorldMatrixRecursive() const noexcept;
+		const Matrix4f& GetWorldMatrix4fRef() const noexcept;
 
 
 	private:

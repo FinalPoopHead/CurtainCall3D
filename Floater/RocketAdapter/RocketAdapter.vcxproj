@@ -119,7 +119,7 @@
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;$(ProjectDir)..\External\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\External\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)..\RocketEngine\Build\&amp;(Configuration);$(ProjectDir)..\External\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -144,7 +144,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;$(ProjectDir)..\External\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\External\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>$(SolutionDir)..\RocketEngine\Build\&amp;(Configuration);$(ProjectDir)..\External\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -156,6 +156,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\RocketEngine\RocketDX11\RocketDX11.vcxproj">
       <Project>{1d9e43e5-a3ec-4841-8dab-32bfff18bcc6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\FloaterMath\FloaterMath.vcxproj">
+      <Project>{0bb76c52-c35f-4a26-88e7-04920c2b5dbe}</Project>
     </ProjectReference>
     <ProjectReference Include="..\FloaterRendererCommon\FloaterRendererCommon.vcxproj">
       <Project>{4c5ca68f-1387-44e2-84e2-6d07d893d21c}</Project>

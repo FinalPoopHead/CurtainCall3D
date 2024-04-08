@@ -2,13 +2,14 @@
 
 //#include <DirectXMath.h>
 #include <immintrin.h>
+#include "Common.h"
 #include "Vector4f.h"
 #include "../../FloaterUtil/include/FloaterMacro.h"
 
 
 namespace flt
 {
-	struct __declspec(dllexport) Matrix4f final
+	struct FLOATER_MATH_API Matrix4f final
 	{
 		constexpr Matrix4f() noexcept : v{ {0.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f} } {}
 		constexpr Matrix4f(
@@ -103,7 +104,12 @@ namespace flt
 			temp -= rhs;
 			return temp;
 		}
-		__forceinline Matrix4f& operator*=(const Matrix4f& rhs) noexcept
+
+#ifdef _DEBUG
+		Matrix4f& operator*=(const Matrix4f& rhs) noexcept;
+		Matrix4f operator*(const Matrix4f& rhs) const noexcept;
+#else
+		Matrix4f& operator*=(const Matrix4f& rhs) noexcept
 		{
 			ASSERT(false, "Matrix4f::operator*= is not implemented yet.");
 
@@ -149,7 +155,6 @@ namespace flt
 			_mm_store_ps(this->e[3], R);
 
 			return *this;*/
-
 
 			//Mul(rhs.v[0].m, rhs.v[1].m, rhs.v[2].m, rhs.v[3].m);
 			//return *this;
@@ -245,10 +250,6 @@ namespace flt
 		}
 		Matrix4f operator*(const Matrix4f& rhs) const noexcept
 		{
-			//Matrix4f temp = *this;
-			//temp *= rhs;
-			//return temp;
-
 			Matrix4f result;
 			__m128 xxxx = _mm_broadcast_ss(this->e[0] + 0);
 			__m128 yyyy = _mm_broadcast_ss(this->e[0] + 1);
@@ -304,6 +305,8 @@ namespace flt
 
 			return result;
 		}
+#endif
+
 		Matrix4f& operator*=(float rhs) noexcept
 		{
 			v[0] *= rhs;
@@ -549,7 +552,13 @@ namespace flt
 		};
 	};
 
-	// 행렬 곱셈
+#ifdef _DEBUG
+	FLOATER_MATH_API void Matrix4fMul(const Matrix4f& lhs, Matrix4f& out, __m128 rhsR0, __m128 rhsR1, __m128 rhsR2, __m128 rhsR3);
+
+	[[deprecated("use flt::Matrix4fMul function")]]
+	FLOATER_MATH_API void Matrix4fMuluseDot(const Matrix4f& lhs, const Matrix4f& rhs, Matrix4f& out);
+
+#else
 	__forceinline void Matrix4fMul(const Matrix4f& lhs, Matrix4f& out, __m128 rhsR0, __m128 rhsR1, __m128 rhsR2, __m128 rhsR3)
 	{
 		__m128 xxxx = _mm_broadcast_ss(lhs.e[0] + 0);
@@ -624,12 +633,12 @@ namespace flt
 		out.e[0][1] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[0].m, transposeRhs[1].m, 0xFF));
 		out.e[0][2] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[0].m, transposeRhs[2].m, 0xFF));
 		out.e[0][3] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[0].m, transposeRhs[3].m, 0xFF));
-										  
+
 		out.e[1][0] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[1].m, transposeRhs[0].m, 0xFF));
 		out.e[1][1] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[1].m, transposeRhs[1].m, 0xFF));
 		out.e[1][2] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[1].m, transposeRhs[2].m, 0xFF));
 		out.e[1][3] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[1].m, transposeRhs[3].m, 0xFF));
-										 
+
 		out.e[2][0] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[2].m, transposeRhs[0].m, 0xFF));
 		out.e[2][1] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[2].m, transposeRhs[1].m, 0xFF));
 		out.e[2][2] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[2].m, transposeRhs[2].m, 0xFF));
@@ -640,5 +649,8 @@ namespace flt
 		out.e[3][2] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[3].m, transposeRhs[2].m, 0xFF));
 		out.e[3][3] = _mm_cvtss_f32(_mm_dp_ps(lhs.v[3].m, transposeRhs[3].m, 0xFF));
 	}
+#endif
+	// 행렬 곱셈
+	
 }
 
