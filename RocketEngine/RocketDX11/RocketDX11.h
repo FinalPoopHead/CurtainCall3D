@@ -20,7 +20,12 @@ namespace Rocket::Core
 {
 	class ObjectManager;
 	class ResourceManager;
-	
+	class DeferredBuffers;
+	class LightPass;
+}
+
+namespace Rocket::Core
+{	
 	class RocketDX11 final : public IDX11Renderer
 	{
 	public:
@@ -47,6 +52,7 @@ namespace Rocket::Core
 		void RenderTexture();
 		void RenderCubeMap();
 		void RenderDebug();
+		void GBufferPass();
 		void EndRender();
 
 		void UpdateAnimation(float deltaTime);
@@ -84,6 +90,11 @@ namespace Rocket::Core
 		DirectX::PrimitiveBatch<DirectX::VertexPositionColor>* _lineBatch;
 		std::unique_ptr<DirectX::BasicEffect> _basicEffect;
 		ComPtr<ID3D11InputLayout> _lineInputLayout;
+
+		/// deferred 관련
+	private:
+		std::unique_ptr<DeferredBuffers> _deferredBuffers;
+		std::unique_ptr<LightPass> _lightPass;
 
 	private:
 		ObjectManager& _objectManager;

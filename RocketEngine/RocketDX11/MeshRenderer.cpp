@@ -76,7 +76,6 @@ namespace Rocket::Core
 		deviceContext->VSSetShader(_material->GetVertexShader()->GetVertexShader(), nullptr, 0);
 		deviceContext->PSSetShader(_material->GetPixelShader()->GetPixelShader(), nullptr, 0);
 		
-		// TODO : sampler 경고때문에 잠시주석처리. Sampler에 대해 다시 알아보자.
 		deviceContext->PSSetSamplers(0, 1, _material->GetPixelShader()->GetAddressOfSampleState());
 
 		// 입력 배치 객체 셋팅
@@ -149,35 +148,39 @@ namespace Rocket::Core
 // 			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
 			///
 
+
+			// TODO : Deferred방식으로 바꾸면서 더 이상 필요 없음.
 			// 픽셀 쉐이더
-			bufferNumber = 0;
-
-			HR(deviceContext->Map(_material->GetPixelShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-		
-			LightBufferType* lightBufferDataPtr = (LightBufferType*)mappedResource.pData;
-
-			for (auto& directionalLight : ObjectManager::Instance().GetDirectionalLightList())
-			{
-				lightBufferDataPtr->ambientColor = directionalLight->GetAmbientColor();
-				lightBufferDataPtr->diffuseColor = directionalLight->GetDiffuseColor();
-				lightBufferDataPtr->specularPower = directionalLight->GetSpecularPower();
-				lightBufferDataPtr->specularColor = directionalLight->GetSpecularColor();				
-				lightBufferDataPtr->lightDirection = directionalLight->GetForward();
-			}
-
-			// TODO : 라이트가 없는경우. 임시입니다.
-			if (ObjectManager::Instance().GetDirectionalLightList().size() == 0)
-			{
-				lightBufferDataPtr->ambientColor = { 0.3f,0.3f,0.3f,0.3f };
-				lightBufferDataPtr->diffuseColor = { 1.0f,1.0f,1.0f,1.0f };
-				lightBufferDataPtr->specularPower = 4.0f;
-				lightBufferDataPtr->specularColor = { 1.0f,1.0f ,1.0f ,1.0f };
-				lightBufferDataPtr->lightDirection = { 0.0f,-1.0f,0.0f };
-			}
-
-			deviceContext->Unmap(_material->GetPixelShader()->GetConstantBuffer(bufferNumber), 0);
-
-			deviceContext->PSSetConstantBuffers(bufferNumber, 1, _material->GetPixelShader()->GetAddressOfConstantBuffer(bufferNumber));
+// 			{
+// 				bufferNumber = 0;
+// 
+// 				HR(deviceContext->Map(_material->GetPixelShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+// 
+// 				LightBufferType* lightBufferDataPtr = (LightBufferType*)mappedResource.pData;
+// 
+// 				for (auto& directionalLight : ObjectManager::Instance().GetDirectionalLightList())
+// 				{
+// 					lightBufferDataPtr->ambientColor = directionalLight->GetAmbientColor();
+// 					lightBufferDataPtr->diffuseColor = directionalLight->GetDiffuseColor();
+// 					lightBufferDataPtr->specularPower = directionalLight->GetSpecularPower();
+// 					lightBufferDataPtr->specularColor = directionalLight->GetSpecularColor();
+// 					lightBufferDataPtr->lightDirection = directionalLight->GetForward();
+// 				}
+// 
+// 				// TODO : 라이트가 없는경우. 임시입니다.
+// 				if (ObjectManager::Instance().GetDirectionalLightList().size() == 0)
+// 				{
+// 					lightBufferDataPtr->ambientColor = { 0.3f,0.3f,0.3f,0.3f };
+// 					lightBufferDataPtr->diffuseColor = { 1.0f,1.0f,1.0f,1.0f };
+// 					lightBufferDataPtr->specularPower = 4.0f;
+// 					lightBufferDataPtr->specularColor = { 1.0f,1.0f ,1.0f ,1.0f };
+// 					lightBufferDataPtr->lightDirection = { 0.0f,-1.0f,0.0f };
+// 				}
+// 
+// 				deviceContext->Unmap(_material->GetPixelShader()->GetConstantBuffer(bufferNumber), 0);
+// 
+// 				deviceContext->PSSetConstantBuffers(bufferNumber, 1, _material->GetPixelShader()->GetAddressOfConstantBuffer(bufferNumber));
+// 			}
 		}
 
 		// 렌더스테이트
@@ -205,6 +208,8 @@ namespace Rocket::Core
 
 		deviceContext->DrawIndexed(_mesh->GetIndexCount(), 0, 0);
 
+		ComPtr<ID3D11ShaderResourceView> nullSRV = nullptr;
+		deviceContext->PSSetShaderResources(0, 1, nullSRV.GetAddressOf());
 
 		/// Model 기반으로 그릴 때.
 		/*

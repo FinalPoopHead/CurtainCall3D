@@ -37,7 +37,9 @@ namespace Rocket::Core
 		enum class eRenderState
 		{
 			SOLID,
-			WIREFRAME
+			WIREFRAME,
+			SHADOWMAP,
+			CUBEMAP
 		};
 
 	public:

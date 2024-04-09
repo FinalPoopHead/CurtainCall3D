@@ -48,6 +48,7 @@ namespace Rocket::Core
 		_device = device;
 		_deviceContext = deviceContext;
 
+		// TODO : 이거 자동화 해서 해당 폴더에 있는 모든 hlsl 이름에 맞게 저장할 수 있도록 하는게 좋을 듯?
 		// Color Shader
 		{
 			std::unique_ptr<VertexShader> colorVS = std::make_unique<VertexShader>();
@@ -118,6 +119,66 @@ namespace Rocket::Core
 			std::unique_ptr<PixelShader> cubeMapPS = std::make_unique<PixelShader>();
 			cubeMapPS->Initialize(_device, HLSL_PATH + L"CubeMapPS.hlsl");
 			_pixelShaders["CubeMapPS"] = std::move(cubeMapPS);
+		}
+
+		// Deferred StaticMesh Shader
+		{
+			std::unique_ptr<VertexShader> deferredStaticMeshVS = std::make_unique<VertexShader>();
+			deferredStaticMeshVS->Initialize(_device, HLSL_PATH + L"DeferredStaticMeshVS.hlsl");
+			deferredStaticMeshVS->SetVertexType(eVertexType::VERTEX);
+			_vertexShaders["DeferredStaticMeshVS"] = std::move(deferredStaticMeshVS);
+
+			std::unique_ptr<PixelShader> deferredStaticMeshPS = std::make_unique<PixelShader>();
+			deferredStaticMeshPS->Initialize(_device, HLSL_PATH + L"DeferredStaticMeshPS.hlsl");
+			_pixelShaders["DeferredStaticMeshPS"] = std::move(deferredStaticMeshPS);
+		}
+
+		// Deferred SkinnedMesh Shader
+		{
+			std::unique_ptr<VertexShader> deferredSkinnedMeshVS = std::make_unique<VertexShader>();
+			deferredSkinnedMeshVS->Initialize(_device, HLSL_PATH + L"DeferredSkinnedMeshVS.hlsl");
+			deferredSkinnedMeshVS->SetVertexType(eVertexType::SKINNED_VERTEX);
+			_vertexShaders["DeferredSkinnedMeshVS"] = std::move(deferredSkinnedMeshVS);
+
+			std::unique_ptr<PixelShader> deferredSkinnedMeshPS = std::make_unique<PixelShader>();
+			deferredSkinnedMeshPS->Initialize(_device, HLSL_PATH + L"DeferredSkinnedMeshPS.hlsl");
+			_pixelShaders["DeferredSkinnedMeshPS"] = std::move(deferredSkinnedMeshPS);
+		}
+
+		// LightPass Shader
+		{
+			std::unique_ptr<VertexShader> lightPassVS = std::make_unique<VertexShader>();
+			lightPassVS->Initialize(_device, HLSL_PATH + L"LightPassVS.hlsl");
+			lightPassVS->SetVertexType(eVertexType::VERTEX);
+			_vertexShaders["LightPassVS"] = std::move(lightPassVS);
+
+			std::unique_ptr<PixelShader> lightPassPS = std::make_unique<PixelShader>();
+			lightPassPS->Initialize(_device, HLSL_PATH + L"LightPassPS.hlsl");
+			_pixelShaders["LightPassPS"] = std::move(lightPassPS);
+		}
+
+		// Deferred Color Shader
+		{
+			std::unique_ptr<VertexShader> DeferredColorVS = std::make_unique<VertexShader>();
+			DeferredColorVS->Initialize(_device, HLSL_PATH + L"DeferredColorVS.hlsl");
+			DeferredColorVS->SetVertexType(eVertexType::COLOR_VERTEX);
+			_vertexShaders["DeferredColorVS"] = std::move(DeferredColorVS);
+
+			std::unique_ptr<PixelShader> DeferredColorPS = std::make_unique<PixelShader>();
+			DeferredColorPS->Initialize(_device, HLSL_PATH + L"DeferredColorPS.hlsl");
+			_pixelShaders["DeferredColorPS"] = std::move(DeferredColorPS);
+		}
+
+		// Deferred CubeMap Shader
+		{
+			std::unique_ptr<VertexShader> DeferredCubeMapVS = std::make_unique<VertexShader>();
+			DeferredCubeMapVS->Initialize(_device, HLSL_PATH + L"DeferredCubeMapVS.hlsl");
+			DeferredCubeMapVS->SetVertexType(eVertexType::VERTEX);
+			_vertexShaders["DeferredCubeMapVS"] = std::move(DeferredCubeMapVS);
+
+			std::unique_ptr<PixelShader> DeferredCubeMapPS = std::make_unique<PixelShader>();
+			DeferredCubeMapPS->Initialize(_device, HLSL_PATH + L"DeferredCubeMapPS.hlsl");
+			_pixelShaders["DeferredCubeMapPS"] = std::move(DeferredCubeMapPS);
 		}
 
 		CreateRenderStates();
@@ -203,8 +264,8 @@ namespace Rocket::Core
 		solidDesc.DepthClipEnable = true;
 		ID3D11RasterizerState* solid;
 		HR(_device->CreateRasterizerState(&solidDesc, &solid));
-		_renderStates.emplace_back(solid);		// TODO : 왜 refCount가 증가하는거지? 이해가 안되네..
-		solid->Release();						// TODO : 이거 Release 해버리면 내가 vector 에 넣은것도 날라가는거 아닌가? 왜 refCount가 감소하고 Release 되지 않는거지..?
+		_renderStates.emplace_back(solid);
+		solid->Release();
 		solid->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"SOLID RASTER") - 1, L"SOLID RASTER");
 		
 
@@ -220,6 +281,27 @@ namespace Rocket::Core
 		wireframe->Release();
 		wireframe->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"WIREFRAME RASTER") - 1, L"WIREFRAME RASTER");
 
+		D3D11_RASTERIZER_DESC shadowMapDesc;
+		ZeroMemory(&shadowMapDesc, sizeof(D3D11_RASTERIZER_DESC));
+		shadowMapDesc.FillMode = D3D11_FILL_SOLID;
+		shadowMapDesc.CullMode = D3D11_CULL_FRONT;
+		shadowMapDesc.FrontCounterClockwise = false;
+		shadowMapDesc.DepthClipEnable = true;
+		ID3D11RasterizerState* shadowMapRS;
+		HR(_device->CreateRasterizerState(&shadowMapDesc, &shadowMapRS));
+		_renderStates.emplace_back(shadowMapRS);
+		shadowMapRS->Release();
+
+		D3D11_RASTERIZER_DESC cubeMapDesc;
+		ZeroMemory(&cubeMapDesc, sizeof(D3D11_RASTERIZER_DESC));
+		cubeMapDesc.FillMode = D3D11_FILL_SOLID;
+		cubeMapDesc.CullMode = D3D11_CULL_NONE;
+		cubeMapDesc.FrontCounterClockwise = false;
+		cubeMapDesc.DepthClipEnable = true;
+		ID3D11RasterizerState* cubemapRS;
+		HR(_device->CreateRasterizerState(&cubeMapDesc, &cubemapRS));
+		_renderStates.emplace_back(cubemapRS);
+		cubemapRS->Release();
 	}
 
 	ID3D11RasterizerState* ResourceManager::GetRenderState(eRenderState eState)

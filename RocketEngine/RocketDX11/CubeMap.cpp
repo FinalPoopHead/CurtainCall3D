@@ -44,10 +44,6 @@ namespace Rocket::Core
 		cubeMapDesc.DepthClipEnable = true;
 		HR(device->CreateRasterizerState(&cubeMapDesc, _cubeMapRenderState.GetAddressOf()));
 
-		// TODO : 이것도 얘가 리소스매니저한테 접근해서 받아오지말고 리소스매니저가 얘한테 부여하게끔 해야하나?
-		_vertexShader = ResourceManager::Instance().GetVertexShader("CubeMapVS");
-		_pixelShader = ResourceManager::Instance().GetPixelShader("CubeMapPS");
-
 		/// 샘플러 만들기
 		// 텍스처 샘플러 상태 구조체를 생성 및 설정한다.
 		D3D11_SAMPLER_DESC samplerDesc;
@@ -69,7 +65,7 @@ namespace Rocket::Core
 		HR(device->CreateSamplerState(&samplerDesc, &_samplerState));
 
 		_cubeMapRenderState->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"cubeMapRenderState") - 1, L"cubeMapRenderState");
-		_samplerState->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"samplerState") - 1, L"samplerState");
+		_samplerState->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"CubeMapsamplerState") - 1, L"CubeMapsamplerState");
 	}
 
 	void CubeMap::Render(ID3D11DeviceContext* deviceContext)
@@ -121,6 +117,9 @@ namespace Rocket::Core
 		deviceContext->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		deviceContext->DrawIndexed(_indexCount, 0, 0);
+
+		ComPtr<ID3D11ShaderResourceView> nullSRV = nullptr;
+		deviceContext->PSSetShaderResources(0, 1, nullSRV.GetAddressOf());
 	}
 
 	void CubeMap::LoadTexture(const std::string& fileName)
@@ -234,8 +233,14 @@ namespace Rocket::Core
 		_vertexCount = ARRAYSIZE(vertices);
 		_indexCount = ARRAYSIZE(indices);
 
-		_vertexBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"vertexBuffer") - 1, L"vertexBuffer");
-		_indexBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"indexBuffer") - 1, L"indexBuffer");
+		_vertexBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"CubeMapvertexBuffer") - 1, L"CubeMapvertexBuffer");
+		_indexBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"CubeMapindexBuffer") - 1, L"CubeMapindexBuffer");
+	}
+
+	void CubeMap::SetShader(VertexShader* vertexShader, PixelShader* pixelShader)
+	{
+		_vertexShader = vertexShader;
+		_pixelShader = pixelShader;
 	}
 
 }

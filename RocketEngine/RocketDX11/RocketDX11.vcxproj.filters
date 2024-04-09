@@ -76,6 +76,12 @@
     <ClCompile Include="HelperObjectBase.cpp">
       <Filter>Object\HelperObject\BaseClass</Filter>
     </ClCompile>
+    <ClCompile Include="DeferredBuffers.cpp">
+      <Filter>DeferredShading\DeferredBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="LightPass.cpp">
+      <Filter>DeferredShading\LightPass</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Axis.h">
@@ -180,6 +186,12 @@
     <ClInclude Include="IRenderable.h">
       <Filter>Component\Renderer\Interface</Filter>
     </ClInclude>
+    <ClInclude Include="DeferredBuffers.h">
+      <Filter>DeferredShading\DeferredBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="LightPass.h">
+      <Filter>DeferredShading\LightPass</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Object">
@@ -209,12 +221,6 @@
     <Filter Include="Resource\Shader\HLSL">
       <UniqueIdentifier>{215b4f0b-7d91-4a0d-9303-f3dc430726f8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource\Shader\HLSL\Color">
-      <UniqueIdentifier>{68fef6da-5093-4b42-b063-173aaf7c8f7d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource\Shader\HLSL\Texture">
-      <UniqueIdentifier>{80cc8937-d3c0-4387-9237-e9b25aa161e4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource\Shader\Interface">
       <UniqueIdentifier>{7f875c8d-bce6-4837-919f-35ac117e4e09}</UniqueIdentifier>
     </Filter>
@@ -236,9 +242,6 @@
     <Filter Include="GraphicsProcess">
       <UniqueIdentifier>{783d888a-f61d-4e9b-906b-301a0c7c4c9a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource\Shader\HLSL\Light">
-      <UniqueIdentifier>{cedef95d-8557-4c43-9eea-f305d33cb80a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ObjectManager">
       <UniqueIdentifier>{11071d87-dcf1-499b-b90c-53d5ec16db05}</UniqueIdentifier>
     </Filter>
@@ -248,14 +251,8 @@
     <Filter Include="Singleton">
       <UniqueIdentifier>{9ab8b4fc-e7cd-4859-9c52-eb203fd87a12}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource\Shader\HLSL\StaticMesh">
-      <UniqueIdentifier>{30f2938b-1c24-4d04-9178-291218ee142d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Material">
       <UniqueIdentifier>{bfe75a22-e57e-483a-bb7c-22c13248a61e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource\Shader\HLSL\SkinnedMesh">
-      <UniqueIdentifier>{a2656c4f-0de9-4c9a-be05-d5876d4313b1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource\Mesh">
       <UniqueIdentifier>{9cf0dba3-0cef-4a20-8674-a9ef2c746f99}</UniqueIdentifier>
@@ -277,9 +274,6 @@
     </Filter>
     <Filter Include="Object\CubeMap">
       <UniqueIdentifier>{b69fe248-0bba-4c99-9e53-0a598b73b05c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource\Shader\HLSL\CubeMap">
-      <UniqueIdentifier>{2f2126ff-2452-470f-8b0e-1ff1900dc15b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Component">
       <UniqueIdentifier>{c6a26206-7bd0-412c-9938-aae0cc791990}</UniqueIdentifier>
@@ -308,43 +302,121 @@
     <Filter Include="Component\Renderer\Interface">
       <UniqueIdentifier>{20f6505e-d6c2-47bd-bc9a-ec2d7bc64134}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource\Shader\HLSL\Deferred">
+      <UniqueIdentifier>{425d796c-5b0f-475a-916b-f400f2658159}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Shader\HLSL\Forward">
+      <UniqueIdentifier>{26b9a1d2-9f34-4692-956f-09c6a12e4ce3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Shader\HLSL\Forward\Light">
+      <UniqueIdentifier>{cedef95d-8557-4c43-9eea-f305d33cb80a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Shader\HLSL\Forward\CubeMap">
+      <UniqueIdentifier>{2f2126ff-2452-470f-8b0e-1ff1900dc15b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Shader\HLSL\Forward\Color">
+      <UniqueIdentifier>{68fef6da-5093-4b42-b063-173aaf7c8f7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Shader\HLSL\Forward\SkinnedMesh">
+      <UniqueIdentifier>{a2656c4f-0de9-4c9a-be05-d5876d4313b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Shader\HLSL\Forward\StaticMesh">
+      <UniqueIdentifier>{30f2938b-1c24-4d04-9178-291218ee142d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Shader\HLSL\Forward\Texture">
+      <UniqueIdentifier>{80cc8937-d3c0-4387-9237-e9b25aa161e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Shader\HLSL\Deferred\StaticMesh">
+      <UniqueIdentifier>{237cbf86-bbd8-4dc9-88d7-a94e0e36b79d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Shader\HLSL\Deferred\SkinnedMesh">
+      <UniqueIdentifier>{8f7f7f11-fceb-4b6b-9345-525c275d47f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DeferredShading">
+      <UniqueIdentifier>{f1cd75f3-057e-480e-a4c4-972aab00e42b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DeferredShading\DeferredBuffer">
+      <UniqueIdentifier>{015ea244-f5f7-4cb0-863d-cdb4f05ecf3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DeferredShading\LightPass">
+      <UniqueIdentifier>{2cd4b5a4-eee5-4a41-aab0-12dc45b014f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Shader\HLSL\Deferred\LightPass">
+      <UniqueIdentifier>{f4d84565-6ebc-42c0-8096-81e9de836678}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Shader\HLSL\Deferred\Color">
+      <UniqueIdentifier>{52a38d56-6bf5-4d02-b4d2-7e0c5105dcc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Shader\HLSL\Deferred\CubeMap">
+      <UniqueIdentifier>{ae108884-c1a6-4de3-ac1b-7ebf48e117fe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ColorPS.hlsl">
-      <Filter>Resource\Shader\HLSL\Color</Filter>
+      <Filter>Resource\Shader\HLSL\Forward\Color</Filter>
     </FxCompile>
     <FxCompile Include="ColorVS.hlsl">
-      <Filter>Resource\Shader\HLSL\Color</Filter>
+      <Filter>Resource\Shader\HLSL\Forward\Color</Filter>
     </FxCompile>
     <FxCompile Include="CubeMapVS.hlsl">
-      <Filter>Resource\Shader\HLSL\CubeMap</Filter>
+      <Filter>Resource\Shader\HLSL\Forward\CubeMap</Filter>
     </FxCompile>
     <FxCompile Include="LightPS.hlsl">
-      <Filter>Resource\Shader\HLSL\Light</Filter>
+      <Filter>Resource\Shader\HLSL\Forward\Light</Filter>
     </FxCompile>
     <FxCompile Include="LightVS.hlsl">
-      <Filter>Resource\Shader\HLSL\Light</Filter>
+      <Filter>Resource\Shader\HLSL\Forward\Light</Filter>
     </FxCompile>
     <FxCompile Include="CubeMapPS.hlsl">
-      <Filter>Resource\Shader\HLSL\CubeMap</Filter>
+      <Filter>Resource\Shader\HLSL\Forward\CubeMap</Filter>
     </FxCompile>
     <FxCompile Include="SkinnedMeshPS.hlsl">
-      <Filter>Resource\Shader\HLSL\SkinnedMesh</Filter>
+      <Filter>Resource\Shader\HLSL\Forward\SkinnedMesh</Filter>
     </FxCompile>
     <FxCompile Include="SkinnedMeshVS.hlsl">
-      <Filter>Resource\Shader\HLSL\SkinnedMesh</Filter>
+      <Filter>Resource\Shader\HLSL\Forward\SkinnedMesh</Filter>
     </FxCompile>
     <FxCompile Include="StaticMeshPS.hlsl">
-      <Filter>Resource\Shader\HLSL\StaticMesh</Filter>
+      <Filter>Resource\Shader\HLSL\Forward\StaticMesh</Filter>
     </FxCompile>
     <FxCompile Include="StaticMeshVS.hlsl">
-      <Filter>Resource\Shader\HLSL\StaticMesh</Filter>
+      <Filter>Resource\Shader\HLSL\Forward\StaticMesh</Filter>
     </FxCompile>
     <FxCompile Include="TextureVS.hlsl">
-      <Filter>Resource\Shader\HLSL\Texture</Filter>
+      <Filter>Resource\Shader\HLSL\Forward\Texture</Filter>
     </FxCompile>
     <FxCompile Include="TexturePS.hlsl">
-      <Filter>Resource\Shader\HLSL\Texture</Filter>
+      <Filter>Resource\Shader\HLSL\Forward\Texture</Filter>
+    </FxCompile>
+    <FxCompile Include="DeferredStaticMeshVS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\StaticMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="DeferredStaticMeshPS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\StaticMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="DeferredSkinnedMeshVS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\SkinnedMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="DeferredSkinnedMeshPS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\SkinnedMesh</Filter>
+    </FxCompile>
+    <FxCompile Include="LightPassVS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\LightPass</Filter>
+    </FxCompile>
+    <FxCompile Include="LightPassPS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\LightPass</Filter>
+    </FxCompile>
+    <FxCompile Include="DeferredColorVS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\Color</Filter>
+    </FxCompile>
+    <FxCompile Include="DeferredColorPS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\Color</Filter>
+    </FxCompile>
+    <FxCompile Include="DeferredCubeMapVS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\CubeMap</Filter>
+    </FxCompile>
+    <FxCompile Include="DeferredCubeMapPS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\CubeMap</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

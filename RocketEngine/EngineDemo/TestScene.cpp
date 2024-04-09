@@ -23,7 +23,7 @@ void TestScene::Initialize()
 	auto lightObj = scene->CreateObject("light");
 	auto lightComp = lightObj->AddComponent<Rocket::DirectionalLight>();
 	lightComp->SetSpecularPower(4.0f);
-	lightObj->transform.Rotate(0.0f, 180.0f, 0.0f);
+	lightObj->transform.Rotate(45.0f, 0.0f, 0.0f);
 
 	/// 스킨드 메쉬 테스트
 	auto skinnedTest1 = scene->CreateModelObject("Rob02.fbx");

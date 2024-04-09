@@ -21,6 +21,8 @@
 #include "SpriteRenderer.h"
 #include "LineRenderer.h"
 #include "GraphicsMacro.h"
+#include "DeferredBuffers.h"
+#include "LightPass.h"
 
 namespace Rocket::Core
 {
@@ -142,14 +144,13 @@ namespace Rocket::Core
 		swapChainDesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 		swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-		swapChainDesc.SampleDesc.Count = 4;      //multisampling setting	// 나는 4x를 사용하므로 4
-		swapChainDesc.SampleDesc.Quality = _m4xMsaaQuality - 1;	//vendor-specific flag	// 위에서 받아온 퀄리티 레벨을 넣어준다.	// -1 을 왜해줄까?
+		swapChainDesc.SampleDesc.Count = 1;      //multisampling setting	// 나는 4x를 사용하므로 4
+		swapChainDesc.SampleDesc.Quality = 0; // _m4xMsaaQuality - 1;	//vendor-specific flag	// 위에서 받아온 퀄리티 레벨을 넣어준다.	// -1 을 왜해줄까?
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapChainDesc.BufferCount = 1;		// 이걸 2로 하게되면 렌더타겟 뷰를 각각의 버퍼에 대해 가지고 있어야하나?
 		swapChainDesc.OutputWindow = _hWnd;
 		swapChainDesc.Windowed = TRUE; // Sets the initial state of full-screen mode.
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;	// 교환효과. DXGI_SWAP_EFFECT_DISCARD는 디스플레이 구동기가 가장 효율적인 제시 방법을 선택하게 함
-		//desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;	// MSDN 그대로 따라 친 것.
 		swapChainDesc.Flags = 0;
 
 		/// DXGIDevice로 DXGIAdapter를 만들고
@@ -186,10 +187,7 @@ namespace Rocket::Core
 		adapter.Reset();
 		factory.Reset();
 
-		hr = _swapChain->GetBuffer(
-			0,
-			__uuidof(ID3D11Texture2D),
-			(void**)&_backBuffer);
+		hr = _swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&_backBuffer);
 
 		hr = _device->CreateRenderTargetView(
 			_backBuffer.Get(),
@@ -210,8 +208,8 @@ namespace Rocket::Core
 		depthBufferDesc.MipLevels = 1;
 		depthBufferDesc.ArraySize = 1;
 		depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		depthBufferDesc.SampleDesc.Count = 4;
-		depthBufferDesc.SampleDesc.Quality = _m4xMsaaQuality - 1;
+		depthBufferDesc.SampleDesc.Count = 1;
+		depthBufferDesc.SampleDesc.Quality = 0; // _m4xMsaaQuality - 1;
 		depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 		depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 		depthBufferDesc.CPUAccessFlags = 0;
@@ -224,7 +222,7 @@ namespace Rocket::Core
 
 		// 깊이-스텐실 뷰의 description을 작성합니다.
 		depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+		depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 		depthStencilViewDesc.Texture2D.MipSlice = 0;
 
 		HR(_device->CreateDepthStencilView(_depthStencilBuffer.Get(), &depthStencilViewDesc, &_depthStencilView));
@@ -240,16 +238,22 @@ namespace Rocket::Core
 		_viewport.Height = (float)backBufferDesc.Height;
 		_viewport.Width = (float)backBufferDesc.Width;
 		_viewport.MinDepth = 0;
-		_viewport.MaxDepth = 1; 
+		_viewport.MaxDepth = 1;
 
-		_deviceContext->RSSetViewports(
-			1,
-			&_viewport
-		);
+		/// 기본 viewPort로 설정해준다.
+		_deviceContext->RSSetViewports(1, &_viewport);
+
+		/// deferredBuffers 초기화
+		_deferredBuffers = std::make_unique<DeferredBuffers>();
+		_deferredBuffers->Initialize(_device.Get(), depthBufferDesc.Width, depthBufferDesc.Height, 1000.0f, 0.1f);
 
 		/// DX 초기화 끝났으니 Manager들 초기화해준다.
 		_resourceManager.Initialize(_device.Get(), _deviceContext.Get());
 		_objectManager.Initialize(_device.Get());
+
+		/// LightPass 초기화 (ResourceManager에서 초기화한 셰이더가 필요하기때문에 이 순서)
+		_lightPass = std::make_unique<LightPass>();
+		_lightPass->Initialize(_device.Get(), _resourceManager.GetVertexShader("LightPassVS"), _resourceManager.GetPixelShader("LightPassPS"));
 
 		/// SpriteBatch, LineBatch, BasicEffect 초기화
 		_spriteBatch = new DirectX::SpriteBatch(_deviceContext.Get());
@@ -280,15 +284,18 @@ namespace Rocket::Core
 		// Clear the back buffer.
 		_deviceContext->ClearRenderTargetView(_renderTargetView.Get(), color);
 		// Clear the depth buffer.
-		_deviceContext->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		//d3dDeviceContext_->OMSetRenderTargets(1, renderTargetView_.GetAddressOf(), depthStencilView_.Get());
+		_deviceContext->ClearDepthStencilView(_deferredBuffers->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		/// RenderTargetView 와 DepthStencilBuffer를 출력 병합 단계(Output Merger Stage)에 바인딩
+		//_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
 		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
-
+		
 		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
-		////Blend State Set.
+		//Blend State Set.
 		_deviceContext->OMSetBlendState(_defaultBlendState.Get(), nullptr, 0xFF);
+
+		/// Deferred
+		_deferredBuffers->ClearRenderTargets(_deviceContext.Get(), 0.1f, 0.1f, 0.1f, 0.1f);
 	}
 
 	void RocketDX11::RenderMesh()
@@ -299,7 +306,7 @@ namespace Rocket::Core
 		std::vector<IRenderable*> renderList;
 		renderList.reserve(256);
 
-		for (auto meshRenderer : _objectManager.GetStaticModelRenderers())
+		for (auto meshRenderer : _objectManager.GetStaticMeshRenderers())
 		{
 			if (mainCam->FrustumCulling(meshRenderer->GetBoundingBox()))
 			{
@@ -397,14 +404,20 @@ namespace Rocket::Core
 
 	void RocketDX11::Render()
 	{
-		BeginRender(0.0f, 0.0f, 0.0f, 1.0f);
+		BeginRender(1.0f, 0.0f, 1.0f, 1.0f);
 
+		GBufferPass();
+
+		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), nullptr);
+		_lightPass->Render(_deviceContext.Get(), _deferredBuffers.get());
+
+		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _deferredBuffers->GetDepthStencilView());
 		RenderHelperObject();
-		RenderMesh();
-
 		RenderCubeMap();
 
-		RenderLine();
+		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), nullptr); 
+
+// 		RenderLine();
 		RenderText();
 		RenderTexture();
 
@@ -424,6 +437,9 @@ namespace Rocket::Core
 		delete _spriteBatch;
 		delete _lineBatch;		
 		_basicEffect.reset();
+		_deferredBuffers.reset();
+		_lightPass.reset();
+
 
 		// TODO : 여기서 Release를 먼저 해줬더니 아래에서 Reset 하면서 한번 더 지워서 RefCount가 -1이 되는 녀석이 하나 있다.. 뭐하는친구일까?
 // 
@@ -481,7 +497,6 @@ namespace Rocket::Core
 // 		{
 // 			_lineInputLayout->Release();
 // 		}
-
 
 		_device->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETdevice") - 1, L"ROCKETdevice");
 		_deviceContext->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETdeviceContext") - 1, L"ROCKETdeviceContext");
@@ -587,7 +602,7 @@ namespace Rocket::Core
 		defaultDepthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 		defaultDepthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-		HR(_device->CreateDepthStencilState(&defaultDepthStencilDesc, &_defaultDepthStencilState));
+		HR(_device->CreateDepthStencilState(&defaultDepthStencilDesc, _defaultDepthStencilState.GetAddressOf()));
 
 		/// Create CubeMapDepthStencilState
 		D3D11_DEPTH_STENCIL_DESC cubeMapDepthStencilDesc;
@@ -611,7 +626,7 @@ namespace Rocket::Core
 		cubeMapDepthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 		cubeMapDepthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-		HR(_device->CreateDepthStencilState(&cubeMapDepthStencilDesc, &_cubeMapDepthStencilState));
+		HR(_device->CreateDepthStencilState(&cubeMapDepthStencilDesc, _cubeMapDepthStencilState.GetAddressOf()));
 	}
 
 	void RocketDX11::RenderCubeMap()
@@ -623,9 +638,62 @@ namespace Rocket::Core
 
 	void RocketDX11::RenderDebug()
 	{
+		float height = _screenHeight / BUFFER_COUNT;
+		height *= BUFFER_COUNT - 1;
+		float width = _screenWidth / BUFFER_COUNT;
+
 		_spriteBatch->Begin();
+		for (int i = 0; i < BUFFER_COUNT; i++)
+		{
+			auto deferredTexture = _deferredBuffers->GetShaderResourceView(i);
+			_spriteBatch->Draw(
+				deferredTexture
+				, DirectX::XMFLOAT2(width * i, height)
+				, nullptr
+				, DirectX::Colors::White
+				, 0.0f							// 회전 각도
+				, DirectX::XMFLOAT2(0, 0)		// 이미지의 원점 : 0.0f,0.0f가 좌측상단
+				, (1.0f/(float)BUFFER_COUNT));						// 이미지 스케일
+		}
 		_objectManager._debugText->Render(_spriteBatch);
 		_spriteBatch->End();
 	}
 
+	void RocketDX11::GBufferPass()
+	{
+		// Frustum Culling
+		Camera* mainCam = Camera::GetMainCamera();
+
+		std::vector<IRenderable*> renderList;
+		renderList.reserve(256);
+
+		for (auto meshRenderer : _objectManager.GetStaticMeshRenderers())
+		{
+			if (mainCam->FrustumCulling(meshRenderer->GetBoundingBox()))
+			{
+				renderList.push_back(meshRenderer);
+			}
+		}
+
+		for (auto dynamicModelRenderer : _objectManager.GetDynamicModelRenderers())
+		{
+			if (mainCam->FrustumCulling(dynamicModelRenderer->GetBoundingBox()))
+			{
+				renderList.push_back(dynamicModelRenderer);
+			}
+		}
+
+		// Set RenderTarget
+		_deferredBuffers->SetRenderTargets(_deviceContext.Get());
+		// _deferredBuffers->SetRenderTargets(_deviceContext.Get(), _depthStencilView.Get());
+
+		// Draw On G-Buffers
+		for (auto& renderable : renderList)
+		{
+			renderable->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
+		}
+
+		// Debug Text
+		_objectManager._debugText->Append("\nObjects Draw : " + std::to_string(renderList.size()));
+	}
 }

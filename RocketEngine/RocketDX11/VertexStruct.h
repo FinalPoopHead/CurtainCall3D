@@ -48,6 +48,12 @@ namespace Rocket::Core
 		DirectX::XMFLOAT4 specularColor;
 	};
 
+	struct LightPassBufferType
+	{
+		DirectX::XMFLOAT3 lightDirection;
+		float padding;
+	};
+
 	struct CameraBufferType
 	{
 		DirectX::XMFLOAT3 cameraPosition;

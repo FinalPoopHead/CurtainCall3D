@@ -32,7 +32,7 @@ namespace Rocket::Core
 		void Finalize();
 
 	public:
-		std::vector<MeshRenderer*>& GetStaticModelRenderers();
+		std::vector<MeshRenderer*>& GetStaticMeshRenderers();
 		std::vector<DynamicModelRenderer*>& GetDynamicModelRenderers();
 		std::vector<TextRenderer*>& GetTextList();
 		std::vector<SpriteRenderer*>& GetImageList();

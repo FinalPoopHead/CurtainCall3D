@@ -14,7 +14,10 @@ namespace Rocket::Core
 	class Texture;
 	class VertexShader;
 	class PixelShader;
+}
 
+namespace Rocket::Core
+{
 	class CubeMap : public IResource
 	{
 	public:
@@ -25,6 +28,7 @@ namespace Rocket::Core
 		void Initialize(ID3D11Device* device);
 		void Render(ID3D11DeviceContext* deviceContext);
 		void LoadTexture(const std::string& fileName);
+		void SetShader(VertexShader* vertexShader, PixelShader* pixelShader);
 
 	private:
 		void BuildGeometryBuffers(ID3D11Device* device);
