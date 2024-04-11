@@ -10,7 +10,8 @@
 namespace flt
 {
 	class IRenderer;
-
+	struct GamePadState;
+	struct WinGamePad;
 
 	class OsWindows
 	{
@@ -27,7 +28,8 @@ namespace flt
 		void DestroyRenderer(IRenderer* renderer);
 
 		KeyData GetKey(KeyCode code);
-		KeyData GetGamePad(int playerNum);
+		bool GetGamePadState(int padIndex, GamePadState* outState);
+		bool SetGamePadVibration(int padIndex, float leftMotor, float rightMotor);
 		//virtual void OnClosed();
 		void ShowCursor(bool isShow);
 
@@ -61,5 +63,7 @@ namespace flt
 	private:
 		static unsigned char _keyCodeMap[256];
 		std::unordered_map<IRenderer*, RendererType> _rendererMap;
+
+		WinGamePad* _pGamePads[16];
 	};
 }

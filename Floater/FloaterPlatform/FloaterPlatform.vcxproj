@@ -156,16 +156,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\GamePad.h" />
     <ClInclude Include="include\EnumType.h" />
     <ClInclude Include="include\KeyCode.h" />
     <ClInclude Include="OsPlatform.h" />
     <ClInclude Include="include\Platform.h" />
     <ClInclude Include="OsWindows.h" />
+    <ClInclude Include="WinGamePadImpl.h" />
+    <ClInclude Include="XboxPad.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FloaterPlatform.cpp" />
     <ClCompile Include="Platform.cpp" />
     <ClCompile Include="OsWindows.cpp" />
+    <ClCompile Include="XboxPad.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FloaterRendererDX11\FloaterRendererDX11.vcxproj">

@@ -230,39 +230,73 @@ int main(int argc, char* argv[])
 		//renderable.transform.AddLocalPosition(0.0f, 0.0f, 0.01f);
 		{
 			auto keyData = platform.GetKey(flt::KeyCode::mouseLButton);
-			if (keyData)
-			{
-				//isShowCurser = !isShowCurser;
-				//platform.ShowCursor(isShowCurser);
-				//std::cout << "LL " << keyData.keyTime << " " << keyData.x << " " << keyData.y << std::endl;
-			}
+			//if (keyData)
+			//{
+			//	//isShowCurser = !isShowCurser;
+			//	//platform.ShowCursor(isShowCurser);
+			//	//std::cout << "LL " << keyData.keyTime << " " << keyData.x << " " << keyData.y << std::endl;
+			//}
 
-			keyData = platform.GetKey(flt::KeyCode::gpadA);
-			if (keyData)
-			{
-				std::cout << "gpadA " << keyData.keyTime << std::endl;
-			}
-			keyData = platform.GetKey(flt::KeyCode::gpadB);
-			if (keyData)
-			{
-				std::cout << "gpadB " << keyData.keyTime << std::endl;
-			}
-			keyData = platform.GetKey(flt::KeyCode::gpadX);
-			if (keyData)
-			{
-				std::cout << "gpadX " << keyData.keyTime << std::endl;
-			}
-			keyData = platform.GetKey(flt::KeyCode::gpadY);
-			if (keyData)
-			{
-				std::cout << "gpadY " << keyData.keyTime << std::endl;
-			}
-			keyData = platform.GetKey(flt::KeyCode::gpadLStickClick);
-			if (keyData)
-			{
-				std::cout << "gpadLStickClick " << keyData.keyTime << std::endl;
-			}
+			//keyData = platform.GetKey(flt::KeyCode::gpadA);
+			//if (keyData)
+			//{
+			//	std::cout << "gpadA " << keyData.keyTime << std::endl;
+			//}
+			//keyData = platform.GetKey(flt::KeyCode::gpadB);
+			//if (keyData)
+			//{
+			//	std::cout << "gpadB " << keyData.keyTime << std::endl;
+			//}
+			//keyData = platform.GetKey(flt::KeyCode::gpadX);
+			//if (keyData)
+			//{
+			//	std::cout << "gpadX " << keyData.keyTime << std::endl;
+			//}
+			//keyData = platform.GetKey(flt::KeyCode::gpadY);
+			//if (keyData)
+			//{
+			//	std::cout << "gpadY " << keyData.keyTime << std::endl;
+			//}
+			//keyData = platform.GetKey(flt::KeyCode::gpadLStickClick);
+			//if (keyData)
+			//{
+			//	std::cout << "gpadLStickClick " << keyData.keyTime << std::endl;
+			//}
 
+			flt::GamePadState state;
+			for (int i = 0; i < 16; ++i)
+			{
+				if (platform.GetGamePadState(i, &state))
+				{
+					printf("[%d] ", i);
+					printf("Buttons=%s%s%s%s %s %s",
+						(state.buttons & flt::GamePadState::A) ? "A" : " ",
+						(state.buttons & flt::GamePadState::B) ? "B" : " ",
+						(state.buttons & flt::GamePadState::X) ? "X" : " ",
+						(state.buttons & flt::GamePadState::Y) ? "Y" : " ",
+						(state.buttons & flt::GamePadState::BACK) ? "BACK" : "    ",
+						(state.buttons & flt::GamePadState::START) ? "START" : "     ");
+					printf("Dpad=%s%s%s%s ",
+						(state.buttons & flt::GamePadState::UP) ? "U" : " ",
+						(state.buttons & flt::GamePadState::DOWN) ? "D" : " ",
+						(state.buttons & flt::GamePadState::LEFT) ? "L" : " ",
+						(state.buttons & flt::GamePadState::RIGHT) ? "R" : " ");
+					printf("Shoulders=%s%s ",
+						(state.buttons & flt::GamePadState::LB) ? "L" : " ",
+						(state.buttons & flt::GamePadState::RB) ? "R" : " ");
+					printf("Thumb=%s%s ",
+						(state.buttons & flt::GamePadState::LSTICK) ? "L" : " ",
+						(state.buttons & flt::GamePadState::RSTICK) ? "R" : " ");
+					printf("lStick=(% 0.3f,% 0.3f) ", (state.lStickX), (state.lStickY));
+					printf("rStick=(% 0.3f,% 0.3f) ", (state.rStickX), (state.rStickY));
+					printf("Trigger=(% 0.3f,% 0.3f) ", (state.lTrigger), (state.rTrigger));
+					printf("\n");
+
+					//platform.SetGamePadVibration(i, state.lTrigger, state.rTrigger);
+					float vibPower = state.lStickX;
+					platform.SetGamePadVibration(i, -vibPower, vibPower);
+				}
+			}
 
 
 			keyData = platform.GetKey(flt::KeyCode::mouseRButton);
@@ -317,7 +351,7 @@ int main(int argc, char* argv[])
 			__debugbreak();
 		}
 		loopCount++;
-		//Sleep(1);
+		//Sleep(1000);
 	}
 
 	for (int i = 0; i < fbxObjectCount; ++i)
