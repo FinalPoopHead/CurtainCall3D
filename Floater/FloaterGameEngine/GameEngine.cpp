@@ -1,9 +1,25 @@
 ﻿#include "./include/GameEngine.h"
+#include "./include/Scene.h"
 #include "../FloaterPlatform/include/Platform.h"
 
 flt::IRenderer* flt::GameEngine::GetRenderer()
 {
-	return Instance()->_renderer;
+	return _renderer;
+}
+
+void flt::GameEngine::Init()
+{
+	_timer.Start();
+}
+
+void flt::GameEngine::Update()
+{
+	_timer.Update();
+	float deltaSeconde = _timer.GetDeltaSeconds();
+	_currentScene->Update(deltaSeconde);
+	_renderer->Render(deltaSeconde);
+	_currentScene->EndRender();
+	_currentScene->EndFrame();
 }
 
 flt::GameEngine::GameEngine() : _platform(nullptr), _renderer(nullptr)

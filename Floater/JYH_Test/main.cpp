@@ -79,6 +79,16 @@ void TestVectorPrint(const flt::Vector3f& up, const flt::Vector3f& front, const 
 	std::cout << "--------------------------------" << std::endl;
 }
 
+struct Component1 : public flt::ComponentBase<Component1>
+{
+	int a;
+};
+
+struct Component2 : public flt::ComponentBase<Component2>
+{
+	int b;
+};
+
 int main(int argc, char* argv[])
 {
 	setlocale(LC_ALL, ".UTF8");
@@ -102,6 +112,7 @@ int main(int argc, char* argv[])
 
 		Matrix4f mulMat = mat * mat;
 
+		
 
 		//TesterRBTree tester;
 		//tester.Test();
@@ -173,8 +184,8 @@ int main(int argc, char* argv[])
 
 
 	//std::cout << "Create renderer" << std::endl;
-	//auto renderer = platform.CreateRenderer(flt::RendererType::ROCKET_DX11);
-	auto renderer = platform.CreateRenderer(flt::RendererType::DX11);
+	auto renderer = platform.CreateRenderer(flt::RendererType::ROCKET_DX11);
+	//auto renderer = platform.CreateRenderer(flt::RendererType::DX11);
 
 	bool isShowCurser = true;
 
@@ -348,7 +359,7 @@ int main(int argc, char* argv[])
 
 		if (!(loopCount < 10000))
 		{
-			__debugbreak();
+			//__debugbreak();
 		}
 		loopCount++;
 		//Sleep(1000);

@@ -431,7 +431,7 @@ void flt::OsWindows::ShowCursor(bool isShow)
 
 std::wstring flt::OsWindows::GetExePath()
 {
-	return _exePath;
+	return _exePath;  
 }
 
 void flt::OsWindows::UpdateKeyState()

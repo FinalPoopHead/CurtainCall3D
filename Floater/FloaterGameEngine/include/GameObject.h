@@ -2,7 +2,7 @@
 #include "Component.h"
 #include "../../FloaterRendererCommon/include/Transform.h"
 #include "../../FloaterRendererCommon/include/TransformOwner.h"
-
+#include <vector>
 #include <string>
 
 namespace flt
@@ -11,19 +11,35 @@ namespace flt
 
 	class GameObject : public TransformOwner
 	{
+		friend class Scene;
+		friend class Renderer;
 	public:
 		GameObject();
 		~GameObject();
 
-		void AddComponent(Component* component);
+		bool AddComponent(Component* component);
 		void RemoveComponent(Component* component);
 
 		template <typename T>
 		Component* GetComponent();
 
 	private:
-		Scene* scene;
-		std::wstring name;
-
+		Scene* _scene;
+		std::wstring _name;
+		std::vector<Component*> _components;
+		bool _isEnable;
 	};
+
+	template <typename T>
+	Component* flt::GameObject::GetComponent()
+	{
+		int index = T::s_index;
+		if (index < 0 || _components.size() <= index)
+		{
+			return nullptr;
+		}
+
+		return _components[index];
+	}
+
 }

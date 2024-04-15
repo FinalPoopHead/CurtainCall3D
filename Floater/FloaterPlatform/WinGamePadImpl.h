@@ -8,6 +8,11 @@ namespace flt
 {
 	struct WinGamePad
 	{
+		WinGamePad() :
+			path(),
+			handle(NULL),
+			type(GamePadType::UNKNOWN),
+			state() {}
 		std::wstring path;
 		HANDLE handle;
 		GamePadType type;
