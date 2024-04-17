@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include <iostream>
+#include <type_traits>
 
 namespace flt
 {
@@ -51,10 +51,10 @@ namespace flt
 		ComponentBase() : Component() {}
 		ComponentBase(GameObject* gameObject) : Component(gameObject) {}
 
-		void PrintIndex()
-		{
-			std::cout << s_index << std::endl;
-		}
+		//void PrintIndex()
+		//{
+		//	std::cout << s_index << std::endl;
+		//}
 	protected:
 		static const inline int s_index = Component::GetComponentIndex();
 
@@ -64,5 +64,11 @@ namespace flt
 			return s_index;
 		}
 
+	};
+
+	template <typename T>
+	concept ComponentType = requires(T a)
+	{
+		std::is_base_of_v<Component, T>;
 	};
 }
