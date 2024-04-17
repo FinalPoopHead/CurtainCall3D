@@ -69,4 +69,9 @@ namespace flt
 		return _components[index];
 	}
 
+	template <typename T>
+	concept GameObjectType = requires(T a)
+	{
+		std::is_base_of_v<GameObject, T>;
+	};
 }

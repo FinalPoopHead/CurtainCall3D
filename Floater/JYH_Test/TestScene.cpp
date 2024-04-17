@@ -3,8 +3,10 @@
 
 void TestScene::Initialize()
 {
-	TestGameObejct* testObject = new TestGameObejct();
-	AddGameObject(testObject);
+	//TestGameObejct* testObject = new TestGameObejct();
+	//AddGameObject(testObject);
+
+	AddGameObject<TestGameObejct>();
 }
 
 void TestScene::Finalize()
