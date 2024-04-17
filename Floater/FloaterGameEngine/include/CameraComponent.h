@@ -1,26 +1,23 @@
 ﻿#pragma once
 #include "Component.h"
-#include "../FloaterRendererCommon/include/IRenderer.h"
-
+#include "../../FloaterRendererCommon/include/IRenderer.h"
 
 namespace flt
 {
-	class IRenderer;
+	struct RawNode;
 
-	class Renderer : public Component
+	class CameraComponent : public ComponentBase<CameraComponent>
 	{
 	public:
-		Renderer(GameObject& gameObject);
-		virtual ~Renderer();
+		CameraComponent(GameObject* gameObject);
 
 		void virtual OnEnable() override;
 		void virtual Update(float deltaSecond) override;
 		void virtual EndDraw() override;
-		void virtual OnDisable() override;
 		void virtual OnDestroy() override;
 
 	private:
-		GameObject& _gameObject;
+		RendererObject _rendererObject;
 		IRenderer& _renderer;
 		HOBJECT _hObject;
 		bool _isDraw;

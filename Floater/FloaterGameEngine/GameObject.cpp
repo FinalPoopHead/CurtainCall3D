@@ -1,6 +1,20 @@
 ﻿#include "./include/GameObject.h"
 #include "./include/Scene.h"
 
+flt::GameObject::GameObject() :
+	_scene(),
+	_name(),
+	_components(),
+	_isEnable(true)
+{
+
+}
+
+flt::GameObject::~GameObject()
+{
+
+}
+
 bool flt::GameObject::AddComponent(Component* component)
 {
 	int index = component->GetIndex();

@@ -11,15 +11,16 @@ namespace flt
 		friend class Scene;
 		friend class GameObject;
 	public:
-		Component() : _isEnable(false), _gameObject(nullptr) {}
+		Component() : Component(nullptr) {}
+		Component(GameObject* gameObject) : _isEnable(false), _gameObject(gameObject) {}
 		virtual ~Component() {}
 
-		void virtual Start() {}
-		void virtual OnEnable() {}
-		void virtual Update(float deltaSecond) {}
-		void virtual EndDraw() {}
-		void virtual OnDisable() {}
-		void virtual OnDestroy() {}
+		virtual void Start() {}
+		virtual void OnEnable() {}
+		virtual void Update(float deltaSecond) {}
+		virtual void EndDraw() {}
+		virtual void OnDisable() {}
+		virtual void OnDestroy() {}
 
 	public:
 		void Enable();
@@ -34,10 +35,12 @@ namespace flt
 			return s_indexCounter++;
 		}
 
+	protected:
+		GameObject* _gameObject;
+
 	private:
 		static int s_indexCounter;
 		bool _isEnable;
-		GameObject* _gameObject;
 	};
 
 	template<typename T>
@@ -45,6 +48,9 @@ namespace flt
 	{
 		friend class GameObject;
 	public:
+		ComponentBase() : Component() {}
+		ComponentBase(GameObject* gameObject) : Component(gameObject) {}
+
 		void PrintIndex()
 		{
 			std::cout << s_index << std::endl;

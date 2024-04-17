@@ -169,6 +169,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TestGameObejct.cpp" />
+    <ClCompile Include="TestScene.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TestGameObejct.h" />
+    <ClInclude Include="TestScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

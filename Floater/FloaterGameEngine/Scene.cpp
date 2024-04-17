@@ -2,7 +2,7 @@
 
 flt::Scene::Scene()
 {
-
+	_timer.Start();
 }
 
 flt::Scene::~Scene()
@@ -10,15 +10,39 @@ flt::Scene::~Scene()
 
 }
 
-void flt::Scene::Init()
+void flt::Scene::Initialize()
 {
-	_timer.Start();
+
 }
 
-flt::GameObject& flt::Scene::CreateGameObject()
+void flt::Scene::Finalize()
 {
-	_gameObjects.emplace_back();
+
+}
+
+flt::GameObject* flt::Scene::CreateGameObject()
+{
+	_gameObjects.emplace_back(new(std::nothrow) GameObject());
 	return _gameObjects.back();
+}
+
+void flt::Scene::AddGameObject(GameObject* gameObject)
+{
+	_gameObjects.emplace_back(gameObject);
+	if(gameObject->_isEnable)
+	{
+		_gameObjectsToEnable.emplace_back(gameObject, gameObject->_isEnable);
+
+		for(auto& component : gameObject->_components)
+		{
+			if(component == nullptr)
+			{
+				continue;
+			}
+
+			_componentsToEnable.emplace_back(component, true);
+		}
+	}
 }
 
 void flt::Scene::DestroyGameObject(GameObject& gameObject)
@@ -30,12 +54,12 @@ void flt::Scene::Update(float deltaSecond)
 {
 	for (auto& object : _gameObjects)
 	{
-		if (!object._isEnable)
+		if (!object->_isEnable)
 		{
 			continue;
 		}
 
-		for (auto& component : object._components)
+		for (auto& component : object->_components)
 		{
 			if (component == nullptr)
 			{
@@ -57,12 +81,12 @@ void flt::Scene::EndRender()
 {
 	for (auto& object : _gameObjects)
 	{
-		if (!object._isEnable)
+		if (!object->_isEnable)
 		{
 			continue;
 		}
 
-		for (auto& component : object._components)
+		for (auto& component : object->_components)
 		{
 			if (component == nullptr)
 			{
@@ -78,7 +102,7 @@ void flt::Scene::EndRender()
 	}
 }
 
-void flt::Scene::EndFrame()
+void flt::Scene::StartFrame()
 {
 	for (auto& [object, isEnable] : _gameObjectsToEnable)
 	{
@@ -87,6 +111,8 @@ void flt::Scene::EndFrame()
 			object->_isEnable = isEnable;
 		}
 	}
+
+	_gameObjectsToEnable.clear();
 
 	for (auto& [component, isEnable] : _componentsToEnable)
 	{
@@ -103,4 +129,6 @@ void flt::Scene::EndFrame()
 			}
 		}
 	}
+
+	_componentsToEnable.clear();
 }

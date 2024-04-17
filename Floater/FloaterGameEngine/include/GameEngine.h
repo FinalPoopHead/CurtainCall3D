@@ -10,7 +10,8 @@ namespace flt
 	class GameEngine
 	{
 		friend class Scene;
-		friend class Renderer;
+		friend class RendererComponent;
+		friend class CameraComponent;
 
 	private:
 		GameEngine();
@@ -21,8 +22,11 @@ namespace flt
 
 
 	public:
-		void Init();
+		void Initialize();
 		void Update();
+		void Finalize();
+
+		void SetScene(Scene* scene);
 
 	protected:
 		IRenderer* GetRenderer();

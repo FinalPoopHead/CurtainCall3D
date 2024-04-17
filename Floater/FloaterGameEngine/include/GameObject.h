@@ -12,7 +12,7 @@ namespace flt
 	class GameObject : public TransformOwner
 	{
 		friend class Scene;
-		friend class Renderer;
+		friend class RendererComponent;
 	public:
 		GameObject();
 		~GameObject();
