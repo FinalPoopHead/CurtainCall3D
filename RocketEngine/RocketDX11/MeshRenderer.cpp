@@ -37,6 +37,12 @@ namespace Rocket::Core
 		_isActive = isActive;
 	}
 
+
+	void MeshRenderer::SetMesh(eMeshType meshType)
+	{
+		_mesh = dynamic_cast<StaticMesh*>(ResourceManager::Instance().GetMesh(meshType));
+	}
+
 	void MeshRenderer::LoadMesh(std::string fileName)
 	{
 		// TODO : reinterpret_cast를 사용하지 않는 엑세렌또한 방법을 찾아보자.
@@ -60,9 +66,9 @@ namespace Rocket::Core
 		DirectX::BoundingBox::CreateFromPoints(_boundingBox, points.size(), points.data(), sizeof(DirectX::XMFLOAT3));
 	}
 
-	void MeshRenderer::LoadTexture(std::string fileName)
+	void MeshRenderer::LoadBaseColorTexture(std::string fileName)
 	{
-		_material->SetTexture(ResourceManager::Instance().GetTexture(fileName));
+		_material->SetBaseColorTexture(ResourceManager::Instance().GetTexture(fileName));
 	}
 
 	void MeshRenderer::Render(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj)
@@ -133,54 +139,46 @@ namespace Rocket::Core
 				deviceContext->VSSetConstantBuffers(bufferNumber, 1, mainCam->GetAddressOfCameraBuffer());
 			}
 
-			/// 노드버퍼를 세팅할 필요가 없어짐. 각각의 GameObject의 WorldTM을 이용하면 되므로..
-// 			bufferNumber = 2;
-// 
-// 			HR(deviceContext->Map(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-// 
-// 			NodeBufferType* nodeBufferDataPtr = (NodeBufferType*)mappedResource.pData;
-// 
-// 			SetNodeBuffer(_model->rootNode, nodeBufferDataPtr);
-// 			
-// 			deviceContext->Unmap(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0);
-// 
-// 
-// 			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
-			///
+			/// 픽셀 쉐이더
+			// PBR Data를 넘겨준다.
+			{
+				bufferNumber = 0;
 
+				HR(deviceContext->Map(_material->GetPixelShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
 
-			// TODO : Deferred방식으로 바꾸면서 더 이상 필요 없음.
-			// 픽셀 쉐이더
-// 			{
-// 				bufferNumber = 0;
-// 
-// 				HR(deviceContext->Map(_material->GetPixelShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-// 
-// 				LightBufferType* lightBufferDataPtr = (LightBufferType*)mappedResource.pData;
-// 
-// 				for (auto& directionalLight : ObjectManager::Instance().GetDirectionalLightList())
-// 				{
-// 					lightBufferDataPtr->ambientColor = directionalLight->GetAmbientColor();
-// 					lightBufferDataPtr->diffuseColor = directionalLight->GetDiffuseColor();
-// 					lightBufferDataPtr->specularPower = directionalLight->GetSpecularPower();
-// 					lightBufferDataPtr->specularColor = directionalLight->GetSpecularColor();
-// 					lightBufferDataPtr->lightDirection = directionalLight->GetForward();
-// 				}
-// 
-// 				// TODO : 라이트가 없는경우. 임시입니다.
-// 				if (ObjectManager::Instance().GetDirectionalLightList().size() == 0)
-// 				{
-// 					lightBufferDataPtr->ambientColor = { 0.3f,0.3f,0.3f,0.3f };
-// 					lightBufferDataPtr->diffuseColor = { 1.0f,1.0f,1.0f,1.0f };
-// 					lightBufferDataPtr->specularPower = 4.0f;
-// 					lightBufferDataPtr->specularColor = { 1.0f,1.0f ,1.0f ,1.0f };
-// 					lightBufferDataPtr->lightDirection = { 0.0f,-1.0f,0.0f };
-// 				}
-// 
-// 				deviceContext->Unmap(_material->GetPixelShader()->GetConstantBuffer(bufferNumber), 0);
-// 
-// 				deviceContext->PSSetConstantBuffers(bufferNumber, 1, _material->GetPixelShader()->GetAddressOfConstantBuffer(bufferNumber));
-// 			}
+				PBRBufferType* pbrBufferData = (PBRBufferType*)mappedResource.pData;
+
+				pbrBufferData->metallic = _material->GetMetallic();
+				pbrBufferData->roughness = _material->GetRoughness();
+				pbrBufferData->useNormalMap = false;
+				pbrBufferData->useMetallicMap = false;
+				pbrBufferData->useRoughnessMap = false;
+				pbrBufferData->useAOMap = false;
+
+				if(_material->GetNormalTexture())
+				{
+					pbrBufferData->useNormalMap = true;
+				}
+
+				if(_material->GetMetallicTexture())
+				{
+					pbrBufferData->useMetallicMap = true;
+				}
+
+				if(_material->GetRoughnessTexture())
+				{
+					pbrBufferData->useRoughnessMap = true;
+				}
+
+				if(_material->GetAOTexture())
+				{
+					pbrBufferData->useAOMap = true;
+				}
+
+				deviceContext->Unmap(_material->GetPixelShader()->GetConstantBuffer(bufferNumber), 0);
+
+				deviceContext->PSSetConstantBuffers(bufferNumber, 1, _material->GetPixelShader()->GetAddressOfConstantBuffer(bufferNumber));
+			}
 		}
 
 		// 렌더스테이트
@@ -204,12 +202,35 @@ namespace Rocket::Core
 		deviceContext->IASetVertexBuffers(0, 1, _mesh->GetAddressOfVertexBuffer(), &stride, &offset);
 		deviceContext->IASetIndexBuffer(_mesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
 
-		deviceContext->PSSetShaderResources(0, 1, _material->GetTexture()->GetAddressOfTextureView());
+		if (_material->GetBaseColorTexture())
+		{
+			deviceContext->PSSetShaderResources(0, 1, _material->GetBaseColorTexture()->GetAddressOfTextureView());
+		}
+		if (_material->GetNormalTexture())
+		{
+			deviceContext->PSSetShaderResources(1, 1, _material->GetNormalTexture()->GetAddressOfTextureView());
+		}
+		if (_material->GetMetallicTexture())
+		{
+			deviceContext->PSSetShaderResources(2, 1, _material->GetMetallicTexture()->GetAddressOfTextureView());
+		}
+		if (_material->GetRoughnessTexture())
+		{
+			deviceContext->PSSetShaderResources(3, 1, _material->GetRoughnessTexture()->GetAddressOfTextureView());
+		}
+		if (_material->GetAOTexture())
+		{
+			deviceContext->PSSetShaderResources(4, 1, _material->GetAOTexture()->GetAddressOfTextureView());
+		}
 
 		deviceContext->DrawIndexed(_mesh->GetIndexCount(), 0, 0);
 
 		ComPtr<ID3D11ShaderResourceView> nullSRV = nullptr;
 		deviceContext->PSSetShaderResources(0, 1, nullSRV.GetAddressOf());
+		deviceContext->PSSetShaderResources(1, 1, nullSRV.GetAddressOf());
+		deviceContext->PSSetShaderResources(2, 1, nullSRV.GetAddressOf());
+		deviceContext->PSSetShaderResources(3, 1, nullSRV.GetAddressOf());
+		deviceContext->PSSetShaderResources(4, 1, nullSRV.GetAddressOf());
 
 		/// Model 기반으로 그릴 때.
 		/*
@@ -289,4 +310,35 @@ namespace Rocket::Core
 		_boundingBox.Transform(transformedBox, _transform->GetWorldTM());
 		return transformedBox;
 	}
+
+	void MeshRenderer::SetMetallic(float metallic)
+	{
+		_material->SetMetallic(metallic);
+	}
+
+	void MeshRenderer::SetRoughness(float roughness)
+	{
+		_material->SetRoughness(roughness);
+	}
+
+	void MeshRenderer::LoadNormalTexture(std::string fileName)
+	{
+		_material->SetNormalTexture(ResourceManager::Instance().GetTexture(fileName));
+	}
+
+	void MeshRenderer::LoadMetallicTexture(std::string fileName)
+	{
+		_material->SetMetallicTexture(ResourceManager::Instance().GetTexture(fileName));
+	}
+
+	void MeshRenderer::LoadRoughnessTexture(std::string fileName)
+	{
+		_material->SetRoughnessTexture(ResourceManager::Instance().GetTexture(fileName));
+	}
+
+	void MeshRenderer::LoadAOTexture(std::string fileName)
+	{
+		_material->SetAmbientOcclusionTexture(ResourceManager::Instance().GetTexture(fileName));
+	}
+
 }

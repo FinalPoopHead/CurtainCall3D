@@ -1,6 +1,7 @@
 ﻿#include <cassert>
 #include <DDSTextureLoader.h>
 #include <WICTextureLoader.h>
+#include <DirectXTex.h>
 #include <io.h>
 
 #include "Texture.h"
@@ -59,6 +60,12 @@ namespace Rocket::Core
 		else if (extension == "jpg" || extension == "png")
 		{
 			HR(DirectX::CreateWICTextureFromFile(device, wFileName.c_str(), _texture.GetAddressOf(), _textureView.GetAddressOf()));
+		}
+		else if (extension == "tga")
+		{
+			DirectX::ScratchImage image;
+			HR(DirectX::LoadFromTGAFile(wFileName.c_str(), nullptr, image));
+			HR(CreateShaderResourceView(device, image.GetImages(), image.GetImageCount(), image.GetMetadata(), _textureView.GetAddressOf()));
 		}
 		else
 		{

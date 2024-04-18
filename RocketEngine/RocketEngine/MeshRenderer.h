@@ -21,9 +21,15 @@ namespace Rocket
 	{
 	public:
 		MeshRenderer();
-		//void SetMesh(eMeshType meshType);
+		void SetMesh(eMeshType meshType);
 		void LoadMesh(std::string fileName);
-		void SetTexture(std::string fileName);
+		void SetBaseColorTexture(std::string fileName);
+		void SetNormalTexture(std::string fileName);
+		void SetMetallicTexture(std::string fileName);
+		void SetRoughnessTexture(std::string fileName);
+		void SetAOTexture(std::string fileName);
+		void SetMetallic(float value);
+		void SetRoughness(float value);
 
 		virtual void BindTransform() override;
 

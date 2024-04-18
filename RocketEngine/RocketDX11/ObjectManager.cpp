@@ -42,12 +42,11 @@ namespace Rocket::Core
 		_grid->SetShader(_rscMgr.GetVertexShader("ColorVS"), _rscMgr.GetPixelShader("ColorPS")); // Forward
 		// _grid->SetShader(_rscMgr.GetVertexShader("DeferredColorVS"), _rscMgr.GetPixelShader("DeferredColorPS")); // Deferred
 
-		auto cubeMap = std::make_unique<CubeMap>();
-		cubeMap->Initialize(device);
-		cubeMap->SetShader(_rscMgr.GetVertexShader("CubeMapVS"), _rscMgr.GetPixelShader("CubeMapPS")); // Forward
+		_cubeMap = std::make_unique<CubeMap>();
+		_cubeMap->Initialize(device);
+		_cubeMap->SetShader(_rscMgr.GetVertexShader("CubeMapVS"), _rscMgr.GetPixelShader("CubeMapPS")); // Forward
 		// cubeMap->SetShader(_rscMgr.GetVertexShader("DeferredCubeMapVS"), _rscMgr.GetPixelShader("DeferredCubeMapPS")); // Deferred
-		cubeMap->LoadTexture("CloudCubeMap.dds");
-		_cubeMaps["CloudCubeMap"] = std::move(cubeMap);
+		_cubeMap->LoadTexture("Garden.dds");
 	}
 
 	void ObjectManager::Finalize()
@@ -87,10 +86,7 @@ namespace Rocket::Core
 			delete dl;
 		}
 
-		for (auto& iter : _cubeMaps)
-		{
-			iter.second.reset();
-		}
+		_cubeMap.reset();
 	}
 
 	Camera* ObjectManager::CreateCamera()
@@ -111,7 +107,7 @@ namespace Rocket::Core
 		// TODO : 기본 Material을 넣어주고 앞단에서 Material을 바꿔서 넣어줄 수 있도록 하자
 		//meshRenderer->SetMaterial(_resourceManager.GetDefaultMaterial());
 		Material* material = new Material();
-		material->SetTexture(_resourceManager.GetDefaultTexture());
+		material->SetBaseColorTexture(_resourceManager.GetDefaultTexture());
 
 		// TODO : 디퍼드 셰이더를 여기서 수동으로 바꿔주는게 조금 아쉽다.
 // 		material->SetVertexShader(_resourceManager.GetVertexShader("StaticMeshVS"));
@@ -182,7 +178,7 @@ namespace Rocket::Core
 		// TODO : 기본 Material을 넣어주고 앞단에서 Material을 바꿔서 넣어줄 수 있도록 하자
 		//skinnedMeshRenderer->SetMaterial(_resourceManager.GetDefaultMaterial());
 		Material* material = new Material();
-		material->SetTexture(_resourceManager.GetDefaultTexture());
+		material->SetBaseColorTexture(_resourceManager.GetDefaultTexture());
 		// TODO : 디퍼드 셰이더를 여기서 수동으로 바꿔주는게 조금 아쉽다.
 // 		material->SetVertexShader(_resourceManager.GetVertexShader("SkinnedMeshVS"));
 // 		material->SetPixelShader(_resourceManager.GetPixelShader("SkinnedMeshPS"));
@@ -209,18 +205,9 @@ namespace Rocket::Core
 		return _directionalLightList;
 	}
 
-	Rocket::Core::CubeMap* ObjectManager::GetCubeMap(const std::string& name)
+	Rocket::Core::CubeMap* ObjectManager::GetCubeMap()
 	{
-		if(_cubeMaps.find(name) == _cubeMaps.end())
-		{
-			return nullptr;
-		}
 
-		return _cubeMaps.at(name).get();
-	}
-
-	Rocket::Core::CubeMap* ObjectManager::GetDefaultCubeMap()
-	{
-		return _cubeMaps.begin()->second.get();
+		return _cubeMap.get();
 	}
 }

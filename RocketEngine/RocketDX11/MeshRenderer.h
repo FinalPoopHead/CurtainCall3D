@@ -33,9 +33,18 @@ namespace Rocket::Core
 	public:
 		virtual void SetWorldTM(const Matrix& worldTM) override;
 		virtual void SetActive(bool isActive) override;
+		virtual void SetMesh(eMeshType meshType) override;
 		virtual void LoadMesh(std::string fileName) override;
-		virtual void LoadTexture(std::string fileName) override;
+		virtual void LoadBaseColorTexture(std::string fileName) override;
+		virtual void LoadNormalTexture(std::string fileName) override;
+		virtual void LoadMetallicTexture(std::string fileName) override;
+		virtual void LoadRoughnessTexture(std::string fileName) override;
+		virtual void LoadAOTexture(std::string fileName) override;
 		virtual void BindTransform(RocketTransform* transform) override;
+
+		// 임시
+		virtual void SetMetallic(float metallic) override;
+		virtual void SetRoughness(float roughness) override;
 
 	public:
 		virtual void Render(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj) override;

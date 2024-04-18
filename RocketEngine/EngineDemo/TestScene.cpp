@@ -2,6 +2,7 @@
 #include "..\\RocketEngine\\RocketAPI.h"
 #include "DebugCameraMove.h"
 #include "PlayerController.h"
+#include "PBRController.h"
 
 TestScene::TestScene()
 	: scene()
@@ -23,7 +24,31 @@ void TestScene::Initialize()
 	auto lightObj = scene->CreateObject("light");
 	auto lightComp = lightObj->AddComponent<Rocket::DirectionalLight>();
 	lightComp->SetSpecularPower(4.0f);
-	lightObj->transform.Rotate(45.0f, 0.0f, 0.0f);
+	lightObj->transform.Rotate(45.0f, 45.0f, 0.0f);
+
+	/// PBR 테스트
+	// PBR 구
+	auto PBRSphere = scene->CreateObject("PBRTest");
+	PBRSphere->AddComponent<PBRController>();
+	PBRSphere->transform.SetPosition(0.0f, 1.0f, -10.0f);
+	auto SphereRenderer = PBRSphere->AddComponent<Rocket::MeshRenderer>();
+	SphereRenderer->SetMesh(Rocket::eMeshType::SPHERE);
+	SphereRenderer->SetBaseColorTexture("T_WEP_Basic_009_D.png");
+
+	// PBR 모델
+	auto PBRModel = scene->CreateModelObject("Cerberus_LP.fbx");
+	PBRModel->transform.SetPosition(2.0f, 1.0f, -10.0f);
+	PBRModel->transform.SetScale(0.05f, 0.05f, 0.05f);
+	PBRModel->transform.Rotate(0.0f, 180.0f, 0.0f);
+
+	auto PBRmr = PBRModel->GetComponentsFromAll<Rocket::MeshRenderer>();
+	for (auto& m : PBRmr)
+	{
+		m->SetBaseColorTexture("Cerberus_A.tga");
+		m->SetNormalTexture("Cerberus_N.tga");
+		m->SetMetallicTexture("Cerberus_M.tga");
+		m->SetRoughnessTexture("Cerberus_R.tga");
+	}
 
 	/// 스킨드 메쉬 테스트
 	auto skinnedTest1 = scene->CreateModelObject("Rob02.fbx");
@@ -32,7 +57,10 @@ void TestScene::Initialize()
 	auto dmr1 = skinnedTest1->GetComponentsFromAll<Rocket::DynamicModelRenderer>();
 	for (auto& m : dmr1)
 	{
-		m->SetTexture("Rob02Yellow_AlbedoTransparency.png");
+		m->SetBaseColorTexture("Rob02Yellow_AlbedoTransparency.png");
+		m->SetNormalTexture("Rob02_Normal.dds");
+		m->SetMetallicTexture("Rob02White_MetallicSmoothness.dds");
+		m->SetRoughnessTexture("Rob02White_Roughness.png");
 	}
 
 	auto skinnedTest2 = scene->CreateModelObject("Dying.fbx");
@@ -46,7 +74,7 @@ void TestScene::Initialize()
 	auto dmr3 = skinnedTest3->GetComponentsFromAll<Rocket::DynamicModelRenderer>();
 	for (auto& m : dmr3)
 	{
-		m->SetTexture("T_TP_CH_Camo_001_006_D.png");
+		m->SetBaseColorTexture("T_TP_CH_Camo_001_006_D.png");
 	}
 
 	/// 스태틱 메쉬 테스트
@@ -56,7 +84,7 @@ void TestScene::Initialize()
 	auto mr = staticTest->GetComponentsFromAll<Rocket::MeshRenderer>();
 	for (auto& m : mr)
 	{
-		m->SetTexture("T_TP_CH_Camo_006_003_D.png");
+		m->SetBaseColorTexture("T_TP_CH_Camo_006_003_D.png");
 	}
 
 	/// 노드구조대로 게임오브젝트 생성한 것 테스트
@@ -67,6 +95,11 @@ void TestScene::Initialize()
 
 	/// 스태틱 메쉬 계층구조 테스트
 	auto hierarchyTest = scene->CreateModelObject("SM_Box_Cargo.fbx");
+	auto hierarchyRenderer = hierarchyTest->GetComponentsFromAll<Rocket::MeshRenderer>();
+	for(auto& m : hierarchyRenderer)
+	{
+		m->SetBaseColorTexture("T_TP_CH_Props_D.png");
+	}
 
 	/// 텍스트 테스트
 	auto text = scene->CreateObject("text");

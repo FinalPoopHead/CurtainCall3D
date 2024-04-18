@@ -5,7 +5,7 @@
 
 using Microsoft::WRL::ComPtr;
 
-const int BUFFER_COUNT = 4;
+const int BUFFER_COUNT = 6;
 
 namespace Rocket::Core
 {

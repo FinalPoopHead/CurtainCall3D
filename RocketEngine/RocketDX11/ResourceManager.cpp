@@ -197,7 +197,7 @@ namespace Rocket::Core
 		_defaultMaterial->SetVertexShader(GetVertexShader("StaticMeshVS"));
 		_defaultMaterial->SetPixelShader(GetPixelShader("StaticMeshPS"));
 		_defaultMaterial->SetRenderState(GetRenderState(eRenderState::SOLID));
-		_defaultMaterial->SetTexture(_defaultTexture);
+		_defaultMaterial->SetBaseColorTexture(_defaultTexture);
 
 		_cubePrimitive = DirectX::DX11::GeometricPrimitive::CreateCube(deviceContext, 1.0f, false);
 		_spherePrimitive = DirectX::DX11::GeometricPrimitive::CreateSphere(deviceContext, 1.0f, 8, false, false);
@@ -461,6 +461,7 @@ namespace Rocket::Core
 			vertex.normal = rawVertex.normal;
 			vertex.UV = rawVertex.UV;
 			vertex.tangent = rawVertex.tangent;
+			vertex.bitangent = rawVertex.biTangent;
 			vertex.nodeIndex = rawVertex.nodeIndex;
 
 			vertices.push_back(vertex);
@@ -492,6 +493,7 @@ namespace Rocket::Core
 			vertex.UV = rawVertex.UV;
 			vertex.normal = rawVertex.normal;
 			vertex.tangent = rawVertex.tangent;
+			vertex.bitangent = rawVertex.biTangent;
 			vertex.nodeIndex = rawVertex.nodeIndex;
 			vertex.weights = rawVertex.weights;
 			vertex.boneIndices = rawVertex.boneIndices;

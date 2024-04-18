@@ -124,7 +124,17 @@ namespace Rocket::Core
 
 	void CubeMap::LoadTexture(const std::string& fileName)
 	{
-		_texture = ResourceManager::Instance().GetTexture(fileName);
+		//_texture = ResourceManager::Instance().GetTexture(fileName);
+
+		// IBL Baker를 통해 미리 구워둔 IBL 텍스쳐를 불러온다.
+		// TODO : 미리 굽지 않은경우 만들어내야할텐데..
+		// 아니면 IBL Baker 코드를 갖고와서 여기서 생성하도록 해도 될듯..?
+		std::string pureName = fileName.substr(0, fileName.find_last_of("."));
+		std::string extension = fileName.substr(fileName.find_last_of(".") + 1);
+		_texture = ResourceManager::Instance().GetTexture(pureName + "EnvHDR" + "." + extension);
+		_irradianceTexture = ResourceManager::Instance().GetTexture(pureName + "DiffuseHDR" + "." + extension);
+		_prefilteredTexture = ResourceManager::Instance().GetTexture(pureName + "SpecularHDR" + "." + extension);
+		_BRDF2DLUTTexture = ResourceManager::Instance().GetTexture(pureName + "Brdf" + "." + extension);
 	}
 
 	void CubeMap::BuildGeometryBuffers(ID3D11Device* device)
@@ -242,5 +252,57 @@ namespace Rocket::Core
 		_vertexShader = vertexShader;
 		_pixelShader = pixelShader;
 	}
+
+	ID3D11ShaderResourceView** CubeMap::GetIrradianceTextureSRV()
+	{
+		return _irradianceTexture->GetAddressOfTextureView();
+	}
+
+	ID3D11ShaderResourceView** CubeMap::GetPrefilteredTextureSRV()
+	{
+		return _prefilteredTexture->GetAddressOfTextureView();
+	}
+
+	ID3D11ShaderResourceView** CubeMap::GetBRDF2DLUTTextureSRV()
+	{
+		return _BRDF2DLUTTexture->GetAddressOfTextureView();
+	}
+
+// 	void CubeMap::CreateIBLTextures(ID3D11DeviceContext* deviceContext)
+// 	{
+// 		deviceContext->IASetInputLayout(_IBLCreatingVS->GetInputLayout());
+// 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+// 
+// 		// Shader deviceContext 이용해 연결.
+// 		deviceContext->VSSetShader(_vertexShader->GetVertexShader(), nullptr, 0);
+// 		deviceContext->PSSetShader(_pixelShader->GetPixelShader(), nullptr, 0);
+// 
+// 		// 픽셀 쉐이더 세팅
+// 		{
+// 			// pixelShader->SetShaderResourceView("Texture", m_material->GetAlbedoMap()); 아래로 대체.
+// 			deviceContext->PSSetShaderResources(0, 1, _texture->GetAddressOfTextureView());
+// 			deviceContext->PSSetSamplers(0, 1, _samplerState.GetAddressOf());
+// 		}
+// 
+// 		// 인덱스버퍼와 버텍스버퍼 셋팅
+// 		UINT stride = 0;
+// 		UINT offset = 0;
+// 
+// 		stride = sizeof(CubeMapVertex);
+// 
+// 		deviceContext->IASetVertexBuffers(0, 1, _vertexBuffer.GetAddressOf(), &stride, &offset);
+// 		deviceContext->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+// 
+// 		deviceContext->DrawIndexed(_indexCount, 0, 0);
+// 
+// 		ComPtr<ID3D11ShaderResourceView> nullSRV = nullptr;
+// 		deviceContext->PSSetShaderResources(0, 1, nullSRV.GetAddressOf());
+// 	}
+// 
+// 	void CubeMap::SetIBLCreatingShader(VertexShader* vertexShader, PixelShader* pixelShader)
+// 	{
+// 		_IBLCreatingVS = vertexShader;
+// 		_IBLCreatingPS = pixelShader;
+// 	}
 
 }

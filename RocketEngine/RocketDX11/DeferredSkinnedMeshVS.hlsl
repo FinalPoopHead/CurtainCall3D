@@ -28,6 +28,7 @@ struct VertexInputType
     float2 tex : TEXCOORD0;
     float3 normal : NORMAL;
     float3 tangent : TANGENT;
+    float3 bitangent : BINORMAL;
     uint nodeIndex : BLENDINDICES0;
     float4 weights : BLENDWEIGHT;
     uint4 boneIndex : BLENDINDICES1;
@@ -39,6 +40,8 @@ struct PixelInputType
     float4 worldPosition : POSITION;
     float2 tex : TEXCOORD0;
     float3 normal : NORMAL;
+    float3 tangent : TANGENT;
+    float3 bitangent : BINORMAL;
     float3 viewDiretion : TEXCOORD1;
 };
 

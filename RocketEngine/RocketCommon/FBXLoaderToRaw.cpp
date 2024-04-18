@@ -121,6 +121,10 @@ namespace Rocket::Core
 			vertex.tangent.y = mesh->mTangents[i].y;
 			vertex.tangent.z = mesh->mTangents[i].z;
 
+			vertex.biTangent.x = mesh->mBitangents[i].x;
+			vertex.biTangent.y = mesh->mBitangents[i].y;
+			vertex.biTangent.z = mesh->mBitangents[i].z;
+
 			// 우선 0으로 초기화
 			vertex.nodeIndex = 0;
 			vertex.boneIndices = DirectX::XMUINT4{ 0, 0, 0, 0 };

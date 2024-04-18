@@ -24,9 +24,9 @@ namespace Rocket::Core
 
 	void SphereMesh::BuildGeometryBuffers(ID3D11Device* device, float radius, UINT sliceCount, UINT stackCount)
 	{
-		_vertexType = eVertexType::LIGHT_VERTEX;
+		_vertexType = eVertexType::VERTEX;
 
-		std::vector<LightVertex> vertices;
+		std::vector<Vertex> vertices;
 		std::vector<UINT> indices;
 
 		float phiStep = DirectX::XM_PI / stackCount;
@@ -41,13 +41,13 @@ namespace Rocket::Core
 			{
 				float theta = j * thetaStep;
 
-				LightVertex vertex;
+				Vertex vertex;
 				vertex.position.x = radius * sinf(phi) * cosf(theta);
 				vertex.position.y = radius * cosf(phi);
 				vertex.position.z = radius * sinf(phi) * sinf(theta);
 
-				vertex.uv.x = theta / (2.0f * DirectX::XM_PI);
-				vertex.uv.y = phi / DirectX::XM_PI;
+				vertex.UV.x = theta / (2.0f * DirectX::XM_PI);
+				vertex.UV.y = phi / DirectX::XM_PI;
 
 				vertex.normal.x = sinf(phi) * cosf(theta);
 				vertex.normal.y = cosf(phi);
@@ -75,7 +75,7 @@ namespace Rocket::Core
 
 		D3D11_BUFFER_DESC vbd;
 		vbd.Usage = D3D11_USAGE_IMMUTABLE;
-		vbd.ByteWidth = sizeof(LightVertex) * (UINT)vertices.size();
+		vbd.ByteWidth = sizeof(Vertex) * (UINT)vertices.size();
 		vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		vbd.CPUAccessFlags = 0;
 		vbd.MiscFlags = 0;

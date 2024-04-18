@@ -347,6 +347,7 @@ if not exist "$(SolutionDir)Build\$(Configuration)\Resources" mkdir "$(SolutionD
   <ItemGroup>
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="DebugCameraMove.cpp" />
+    <ClCompile Include="PBRController.cpp" />
     <ClCompile Include="PlayerController.cpp" />
     <ClCompile Include="TestScene.cpp" />
     <ClCompile Include="WinMain.cpp" />
@@ -354,6 +355,7 @@ if not exist "$(SolutionDir)Build\$(Configuration)\Resources" mkdir "$(SolutionD
   <ItemGroup>
     <ClInclude Include="Client.h" />
     <ClInclude Include="DebugCameraMove.h" />
+    <ClInclude Include="PBRController.h" />
     <ClInclude Include="PlayerController.h" />
     <ClInclude Include="TestScene.h" />
   </ItemGroup>

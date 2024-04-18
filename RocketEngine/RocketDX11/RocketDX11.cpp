@@ -295,7 +295,7 @@ namespace Rocket::Core
 		_deviceContext->OMSetBlendState(_defaultBlendState.Get(), nullptr, 0xFF);
 
 		/// Deferred
-		_deferredBuffers->ClearRenderTargets(_deviceContext.Get(), 0.1f, 0.1f, 0.1f, 0.1f);
+		_deferredBuffers->ClearRenderTargets(_deviceContext.Get(), 0.0f, 0.0f, 0.0f, 0.3f);
 	}
 
 	void RocketDX11::RenderMesh()
@@ -632,7 +632,7 @@ namespace Rocket::Core
 	void RocketDX11::RenderCubeMap()
 	{
 		_deviceContext->OMSetDepthStencilState(_cubeMapDepthStencilState.Get(), 0);
-		_objectManager.GetDefaultCubeMap()->Render(_deviceContext.Get());
+		_objectManager.GetCubeMap()->Render(_deviceContext.Get());
 		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
 	}
 
@@ -656,6 +656,7 @@ namespace Rocket::Core
 				, (1.0f/(float)BUFFER_COUNT));						// 이미지 스케일
 		}
 		_objectManager._debugText->Render(_spriteBatch);
+
 		_spriteBatch->End();
 	}
 

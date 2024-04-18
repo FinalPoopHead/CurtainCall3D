@@ -350,6 +350,12 @@
     <Filter Include="Resource\Shader\HLSL\Deferred\CubeMap">
       <UniqueIdentifier>{ae108884-c1a6-4de3-ac1b-7ebf48e117fe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource\Shader\HLSL\Deferred\PBR">
+      <UniqueIdentifier>{8d1ac17c-af76-4718-80a5-bf891fee3843}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Shader\HLSL\Deferred\IBL">
+      <UniqueIdentifier>{7ca7f49e-ee9f-46b4-a507-51a314bf5113}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ColorPS.hlsl">
@@ -418,5 +424,13 @@
     <FxCompile Include="DeferredCubeMapPS.hlsl">
       <Filter>Resource\Shader\HLSL\Deferred\CubeMap</Filter>
     </FxCompile>
+    <FxCompile Include="CreateIBLMapPS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\IBL</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PBRFunction.hlsli">
+      <Filter>Resource\Shader\HLSL\Deferred\PBR</Filter>
+    </None>
   </ItemGroup>
 </Project>

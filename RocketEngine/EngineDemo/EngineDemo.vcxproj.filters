@@ -30,6 +30,9 @@
     <ClCompile Include="PlayerController.cpp">
       <Filter>ClientComponent</Filter>
     </ClCompile>
+    <ClCompile Include="PBRController.cpp">
+      <Filter>ClientComponent</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -42,6 +45,9 @@
       <Filter>ClientComponent</Filter>
     </ClInclude>
     <ClInclude Include="PlayerController.h">
+      <Filter>ClientComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="PBRController.h">
       <Filter>ClientComponent</Filter>
     </ClInclude>
   </ItemGroup>

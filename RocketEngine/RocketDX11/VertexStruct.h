@@ -81,6 +81,16 @@ namespace Rocket::Core
 		DirectX::XMMATRIX projection;
 	};
 
+	struct PBRBufferType
+	{
+		float metallic;
+		float roughness;
+		int useNormalMap;
+		int useMetallicMap;
+		int useRoughnessMap;
+		int useAOMap;
+	};
+
 	/// <summary>
 	/// assimp 용 vertex 구조체?
 	/// </summary>
@@ -90,6 +100,7 @@ namespace Rocket::Core
 		DirectX::XMFLOAT2 UV;		// UV Coordinate for texturing
 		DirectX::XMFLOAT3 normal;	// Normal for lighting
 		DirectX::XMFLOAT3 tangent;	// For normal mapping
+		DirectX::XMFLOAT3 bitangent;	// For normal mapping
 		UINT nodeIndex;				// 노드 인덱스
 
 		Vertex() 
@@ -115,6 +126,7 @@ namespace Rocket::Core
 		DirectX::XMFLOAT2 UV;
 		DirectX::XMFLOAT3 normal;
 		DirectX::XMFLOAT3 tangent;
+		DirectX::XMFLOAT3 bitangent;
 		UINT nodeIndex;
 		DirectX::XMFLOAT4 weights;			// 최대 4개의 본에 대한 가중치
 		DirectX::XMUINT4 boneIndices;		// 최대 4개의 본에 대한 인덱스
