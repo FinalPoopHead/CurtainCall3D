@@ -186,6 +186,11 @@ void flt::Transform::AddLocalPosition(float localX, float localY, float localZ)
 	_position.z += localZ;
 }
 
+void flt::Transform::AddLocalPosition(const Vector3f& position)
+{
+	AddLocalPosition(position.x, position.y, position.z);
+}
+
 void flt::Transform::AddLocalPosition(const Vector4f& localPos)
 {
 	MakeDirtyRecursive();

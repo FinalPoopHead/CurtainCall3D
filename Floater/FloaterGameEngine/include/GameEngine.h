@@ -28,8 +28,11 @@ namespace flt
 
 		void SetScene(Scene* scene);
 
-	protected:
 		IRenderer* GetRenderer();
+		Platform* GetPlatform();
+
+	protected:
+
 
 	private:
 		static GameEngine* _instance;

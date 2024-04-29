@@ -25,6 +25,7 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="include\GameObject.h" />
     <ClInclude Include="ID.h" />
+    <ClInclude Include="include\Input.h" />
     <ClInclude Include="include\Scene.h" />
     <ClInclude Include="include\RendererComponent.h" />
     <ClInclude Include="World.h" />
@@ -35,6 +36,7 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="RendererComponent.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="World.cpp" />

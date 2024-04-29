@@ -7,7 +7,7 @@ TestGameObejct::TestGameObejct()
 {
 	//flt::CameraComponent* camera = new flt::CameraComponent(this);
 	//AddComponent(camera);
-	AddComponent<flt::CameraComponent>();
+	//AddComponent<flt::CameraComponent>();
 
 	//flt::RendererComponent* renderer = new flt::RendererComponent(this);
 	//AddComponent(renderer);

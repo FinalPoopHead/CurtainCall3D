@@ -53,6 +53,7 @@ namespace flt
 
 		void AddLocalPosition(float x, float y, float z);
 		void AddLocalPosition(const Vector4f& position);
+		void AddLocalPosition(const Vector3f& position);
 		void AddWorldPosition(float x, float y, float z);
 		void AddWorldPosition(const Vector4f& position);
 		void AddLocalRotation(const Vector3f& axis, float radian);

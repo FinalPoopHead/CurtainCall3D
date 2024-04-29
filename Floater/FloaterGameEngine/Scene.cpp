@@ -59,6 +59,8 @@ void flt::Scene::Update(float deltaSecond)
 			continue;
 		}
 
+		object->Update(deltaSecond);
+
 		for (auto& component : object->_components)
 		{
 			if (component == nullptr)

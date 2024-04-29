@@ -96,6 +96,14 @@ int main(int argc, char* argv[])
 	setlocale(LC_ALL, ".UTF8");
 	std::cout << std::boolalpha;
 
+	float t1 = 10.0f;
+	float t2 = t1 + (flt::FLOAT_EPSILON * t1);
+
+	
+	//float t2 = t1 + 1.0e-08F;
+
+	std::cout << (t1 == t2) << std::endl;
+
 //	std::cout << "create rawScene" << std::endl;
 //	flt::RawScene rawScene;
 //
@@ -228,7 +236,7 @@ int main(int argc, char* argv[])
 //	renderable.transform.SetPosition(0.0f, 0.0f, 0.0f);
 
 	flt::GameEngine* pGameEngine = flt::GameEngine::Instance();
-	pGameEngine->Initialize();
+	//pGameEngine->Initialize();
 	TestScene testScene;
 	pGameEngine->SetScene(&testScene);
 
@@ -317,7 +325,6 @@ int main(int argc, char* argv[])
 		//			platform.SetGamePadVibration(i, -vibPower, vibPower);
 		//		}
 		//	}
-
 
 		//	keyData = platform.GetKey(flt::KeyCode::mouseRButton);
 		//	float cameraSpeed = 0.2f;

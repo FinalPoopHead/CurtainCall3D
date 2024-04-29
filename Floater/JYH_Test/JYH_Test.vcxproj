@@ -173,6 +173,8 @@
     <ClCompile Include="TestScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GlideComponent.h" />
+    <ClInclude Include="GlideObject.h" />
     <ClInclude Include="TestGameObejct.h" />
     <ClInclude Include="TestScene.h" />
   </ItemGroup>

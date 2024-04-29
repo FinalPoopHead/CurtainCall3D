@@ -7,6 +7,11 @@ flt::IRenderer* flt::GameEngine::GetRenderer()
 	return _renderer;
 }
 
+flt::Platform* flt::GameEngine::GetPlatform()
+{
+	return _platform;
+}
+
 void flt::GameEngine::Initialize()
 {
 	bool isDebug = false;
@@ -74,6 +79,7 @@ flt::GameEngine* flt::GameEngine::Instance()
 	if (_instance == nullptr)
 	{
 		_instance = new GameEngine();
+		_instance->Initialize();
 	}
 	return _instance;
 }
