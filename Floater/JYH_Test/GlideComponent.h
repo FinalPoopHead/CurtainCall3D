@@ -49,11 +49,16 @@ public:
 		//printf("pitch : %.3f\n", flt::DegToRad(transform.GetLocalRotation().GetEuler().x));
 
 
-		GlidingMovement(deltaSecond);
+
+	}
+
+	virtual void FixedUpdate() override
+	{
+		GlidingMovement();
 	}
 
 private:
-	void GlidingMovement(float deltaSecond)
+	void GlidingMovement()
 	{
 		float yaw = flt::DegToRad(transform.GetLocalRotation().GetEuler().y);
 		float pitch = flt::DegToRad(transform.GetLocalRotation().GetEuler().x);
@@ -98,10 +103,12 @@ private:
 		velocity.z *= 0.99f;
 
 		// 50 프레임인 fixedUpdate용에서 일반 Update용으로 사용하기 위해.
-		transform.AddLocalPosition(velocity * 20.0f * deltaSecond);
+		transform.AddLocalPosition(velocity);
 
 		flt::Vector4f position = transform.GetWorldPosition();
-		printf("positon : %.3f, %.3f %.3f | pitch : %.3f\n", position.x, position.y, position.z, pitch);
+
+		float speed = velocity.Norm();
+		printf("positon : %.3f, %.3f %.3f | pitch : %.3f | speed : %.3f\n", position.x, position.y, position.z, pitch, speed);
 	}
 
 private:

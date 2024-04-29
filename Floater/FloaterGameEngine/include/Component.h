@@ -18,6 +18,7 @@ namespace flt
 		virtual void Start() {}
 		virtual void OnEnable() {}
 		virtual void Update(float deltaSecond) {}
+		virtual void FixedUpdate() {}
 		virtual void EndDraw() {}
 		virtual void OnDisable() {}
 		virtual void OnDestroy() {}

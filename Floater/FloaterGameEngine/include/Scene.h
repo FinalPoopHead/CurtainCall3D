@@ -33,7 +33,8 @@ namespace flt
 		std::vector<GameObject*> _gameObjects;
 		std::list<std::pair<GameObject*, bool>> _gameObjectsToEnable;
 		std::list<std::pair<Component*, bool>> _componentsToEnable;
-		Timer _timer;
+
+		float _fixedUpdateElapsedSecond;
 	};
 
 	template<GameObjectType T>

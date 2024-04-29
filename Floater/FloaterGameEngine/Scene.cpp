@@ -1,8 +1,11 @@
 ﻿#include "./include/Scene.h"
 
-flt::Scene::Scene()
+flt::Scene::Scene() : 
+	_gameObjects(),
+	_gameObjectsToEnable(),
+	_componentsToEnable(),
+	_fixedUpdateElapsedSecond(0.0f)
 {
-	_timer.Start();
 }
 
 flt::Scene::~Scene()
@@ -52,6 +55,37 @@ void flt::Scene::DestroyGameObject(GameObject& gameObject)
 
 void flt::Scene::Update(float deltaSecond)
 {
+	_fixedUpdateElapsedSecond += deltaSecond;
+	
+	while(_fixedUpdateElapsedSecond > 0.02f)
+	{
+		for (auto& object : _gameObjects)
+		{
+			if (!object->_isEnable)
+			{
+				continue;
+			}
+
+			//object->FixedUpdate();
+
+			for (auto& component : object->_components)
+			{
+				if (component == nullptr)
+				{
+					continue;
+				}
+				if (!component->_isEnable)
+				{
+					continue;
+				}
+
+				component->FixedUpdate();
+			}
+		}
+
+		_fixedUpdateElapsedSecond -= 0.02f;
+	}
+
 	for (auto& object : _gameObjects)
 	{
 		if (!object->_isEnable)
