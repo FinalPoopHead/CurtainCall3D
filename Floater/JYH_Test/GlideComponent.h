@@ -72,32 +72,40 @@ private:
 		float lookY = -pitchsin;
 		float lookZ = yawcos * pitchcos;
 
-		float hvel = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
+		float hSpeed = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
 		float hlook = pitchcos;
 		float sqrpitchcos = pitchcos * pitchcos;
 
+		// 기본중력 적용과 방향에 따른 양력 적용
 		velocity.y += -0.08f + sqrpitchcos * 0.06f;
 
+		if (pitchcos < 0)
+		{
+			ASSERT(false, "pitchcos < 0");
+		}
+		//
 		if (velocity.y < 0 && hlook > 0)
 		{
-			float yacc = velocity.y * -0.1f * sqrpitchcos;
-			velocity.y += yacc;
-			velocity.x += lookX * yacc / hlook;
-			velocity.z += lookZ * yacc / hlook;
+			float accY = velocity.y * -0.1f * sqrpitchcos;
+			velocity.y += accY;
+			velocity.x += lookX * accY / hlook;
+			velocity.z += lookZ * accY / hlook;
 		}
+		// 위를 바라보고 있을 때
 		if (pitch < 0)
 		{
-			float yacc = hvel * -pitchsin * 0.04f;
-			velocity.y += yacc * 3.5f;
-			velocity.x -= lookX * yacc / hlook;
-			velocity.z -= lookZ * yacc / hlook;
+			float accY = hSpeed * lookY * 0.04f;
+			velocity.y += accY * 3.5f;
+			velocity.x -= lookX * accY / hlook;
+			velocity.z -= lookZ * accY / hlook;
 		}
 		if (hlook > 0)
 		{
-			velocity.x += (lookX / hlook * hvel - velocity.x) * 0.1f;
-			velocity.z += (lookZ / hlook * hvel - velocity.z) * 0.1f;
+			velocity.x += (lookX / hlook * hSpeed - velocity.x) * 0.1f;
+			velocity.z += (lookZ / hlook * hSpeed - velocity.z) * 0.1f;
 		}
 
+		// drag 적용
 		velocity.x *= 0.99f;
 		velocity.y *= 0.98f;
 		velocity.z *= 0.99f;
@@ -108,7 +116,11 @@ private:
 		flt::Vector4f position = transform.GetWorldPosition();
 
 		float speed = velocity.Norm();
-		printf("positon : %.3f, %.3f %.3f | pitch : %.3f | speed : %.3f\n", position.x, position.y, position.z, pitch, speed);
+		printf("positon : %.3f, %.3f %.3f | pitch : %.3f | sqrpitchcos : %.3f | pitchcos : %.3f\n", 
+			position.x, position.y, position.z, 
+			pitch, 
+			sqrpitchcos,
+			pitchcos);
 	}
 
 private:
@@ -120,7 +132,7 @@ private:
 	float MinDrag;
 	float RotationSpeed;
 	float TiltStrength = 90.0f;
-	const float LowPercent = 0.1;
+	const float LowPercent = 0.1f;
 	const float HighPercent = 1.0f;
 
 	float CurrentThrustSpeed;

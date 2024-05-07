@@ -18,7 +18,6 @@
 #pragma comment(lib, "../External/lib/x64/release/assimp-vc143-mt.lib")
 #endif
 
-
 void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene)
 {
 	ASSERT(outRawScene, "outRawScene is nullptr");

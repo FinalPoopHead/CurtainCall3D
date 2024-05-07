@@ -1,6 +1,7 @@
 ﻿#include "./include/GameEngine.h"
 #include "./include/Scene.h"
 #include "../FloaterPlatform/include/Platform.h"
+#include "PhysicsEngine.h"
 
 flt::IRenderer* flt::GameEngine::GetRenderer()
 {
@@ -21,6 +22,8 @@ void flt::GameEngine::Initialize()
 	_platform = new Platform(isDebug);
 	_platform->Initialize(1280, 720, L"name", L"");
 	_renderer = _platform->CreateRenderer(RendererType::ROCKET_DX11);
+	_physicsEngine = new PhysicsEngine();
+	_physicsEngine->Initialize();
 
 	_timer.Start();
 }
@@ -47,6 +50,10 @@ void flt::GameEngine::Finalize()
 
 	_renderer = nullptr;
 	_platform = nullptr;
+
+	_physicsEngine->Finalize();
+	delete _physicsEngine;
+	_physicsEngine = nullptr;
 }
 
 void flt::GameEngine::SetScene(Scene* scene)
@@ -63,6 +70,7 @@ void flt::GameEngine::SetScene(Scene* scene)
 flt::GameEngine::GameEngine() : 
 	_platform(nullptr), 
 	_renderer(nullptr),
+	_physicsEngine(nullptr),
 	_currentScene(nullptr),
 	_timer()
 {

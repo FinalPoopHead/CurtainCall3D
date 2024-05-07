@@ -12,28 +12,28 @@
 #include "../FloaterUtil/include/ConvString.h"
 
 #pragma region testInclude
-#include "../FloaterRendererCommon/include/IBuilder.h"
-#include "../FloaterRendererCommon/include/Resource.h"
-#include "../FloaterRendererCommon/include/ResourceMgr.h"
-#include "../FloaterUtil/TesterRBTree.h"
-
-#include "../FloaterUtil/TesterFixedSizeMemoryPool.h"
-#include "../FloaterUtil/include/Hash.h"
-
-#include "../FloaterRendererCommon/include/Camera.h"
-
-#include "../FloaterRendererCommon/include/ModelLoader.h"
-#include "../FloaterRendererCommon/CoordSystem.h"
-#include <unordered_map>
-#include <filesystem>
-
-#include "../FloaterMath/include/Common.h"
-#include "../FloaterMath/include/Vector2f.h"
-#include "../FloaterMath/include/Vector3f.h"
-
-#include <windows.h>
-
-#include "../FloaterGameEngine/include/Component.h"
+//#include "../FloaterRendererCommon/include/IBuilder.h"
+//#include "../FloaterRendererCommon/include/Resource.h"
+//#include "../FloaterRendererCommon/include/ResourceMgr.h"
+//#include "../FloaterUtil/TesterRBTree.h"
+//
+//#include "../FloaterUtil/TesterFixedSizeMemoryPool.h"
+//#include "../FloaterUtil/include/Hash.h"
+//
+//#include "../FloaterRendererCommon/include/Camera.h"
+//
+//#include "../FloaterRendererCommon/include/ModelLoader.h"
+//#include "../FloaterRendererCommon/CoordSystem.h"
+//#include <unordered_map>
+//#include <filesystem>
+//
+//#include "../FloaterMath/include/Common.h"
+//#include "../FloaterMath/include/Vector2f.h"
+//#include "../FloaterMath/include/Vector3f.h"
+//
+//#include <windows.h>
+//
+//#include "../FloaterGameEngine/include/Component.h"
 
 #pragma endregion
 
@@ -185,17 +185,23 @@ int main(int argc, char* argv[])
 //	}
 //#pragma endregion
 //
-//	//auto adpaterTest = new IZeldaRendererAdapter();
-//	//adpaterTest->Initialize(1280, 720, false, NULL, false, 0.0f, 0.0f);
-//
 //	std::cout << "Create flt::Platform" << std::endl;
-//	flt::Platform platform{ true };
-//	platform.Initialize(1280, 720, L"title", L".\\path");
-//
-//
-//	//std::cout << "Create renderer" << std::endl;
-//	auto renderer = platform.CreateRenderer(flt::RendererType::ROCKET_DX11);
-//	//auto renderer = platform.CreateRenderer(flt::RendererType::DX11);
+// 	flt::Platform platform{ true };
+// 	platform.Initialize(1280, 720, L"title", L".\\path");
+// 
+// 	//std::cout << "Create renderer" << std::endl;
+// 	auto renderer = platform.CreateRenderer(flt::RendererType::ROCKET_DX11);
+// 	auto renderer2 = platform.CreateRenderer(flt::RendererType::DX11);
+// 	
+// 	std::cout << typeid(renderer).name() << std::endl;
+// 	std::cout << typeid(renderer).raw_name() << std::endl;
+// 	std::cout << typeid(renderer).hash_code() << std::endl;
+// 	const type_info& renderType = typeid(renderer);
+// 
+// 	std::cout << typeid(renderer2).name() << std::endl;
+// 	std::cout << typeid(renderer2).raw_name() << std::endl;
+// 	std::cout << typeid(renderer2).hash_code() << std::endl;
+// 	const type_info& renderType2 = typeid(renderer);
 //
 //	bool isShowCurser = true;
 //

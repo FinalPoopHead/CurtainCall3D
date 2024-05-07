@@ -6,6 +6,7 @@ namespace flt
 	class Platform;
 	class IRenderer;
 	class Scene;
+	class PhysicsEngine;
 
 	class GameEngine
 	{
@@ -40,6 +41,7 @@ namespace flt
 	private:
 		Platform* _platform;
 		IRenderer* _renderer;
+		PhysicsEngine* _physicsEngine;
 
 		Scene* _currentScene;
 		Timer _timer;
