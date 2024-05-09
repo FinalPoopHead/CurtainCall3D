@@ -26,6 +26,9 @@ namespace flt
 
 		void Update(float deltaTime);
 
+		physx::PxPhysics* GetPhysics() { return _physics; }
+		physx::PxScene* GetScene() { return _scene; }
+
 	private:
 		physx::PxDefaultAllocator* _allocator;
 		physx::PxDefaultErrorCallback* _errorCallback;

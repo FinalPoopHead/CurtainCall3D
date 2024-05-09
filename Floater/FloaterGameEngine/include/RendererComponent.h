@@ -1,14 +1,16 @@
 ﻿#pragma once
 #include "Component.h"
-#include "../../FloaterRendererCommon/include/IRenderer.h"
+#include "../../FloaterUtil/include/FloaterType.h"
+
 
 
 namespace flt
 {
 	class IRenderer;
+	struct RendererObject;
 	struct RawNode;
 
-	class RendererComponent : public ComponentBase<RendererComponent>
+	class RendererComponent : public Component<RendererComponent>
 	{
 	public:
 		RendererComponent(GameObject* gameObject);
@@ -25,9 +27,9 @@ namespace flt
 
 
 	private:
-		RendererObject _rendererObject;
+		RendererObject* _rendererObject;
 		IRenderer& _renderer;
-		HOBJECT _hObject;
+		uint64 _hObject;
 		bool _isDraw;
 	};
 }

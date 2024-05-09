@@ -5,7 +5,7 @@
 
 
 flt::CameraComponent::CameraComponent(GameObject* gameObject) : 
-	ComponentBase<CameraComponent>(gameObject),
+	Component<CameraComponent>(gameObject),
 	_rendererObject(gameObject->transform, _isDraw),
 	_renderer(*GameEngine::Instance()->GetRenderer()),
 	_hObject(),

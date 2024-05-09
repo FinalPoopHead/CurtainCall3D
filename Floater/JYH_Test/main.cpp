@@ -81,12 +81,12 @@ void TestVectorPrint(const flt::Vector3f& up, const flt::Vector3f& front, const 
 	std::cout << "--------------------------------" << std::endl;
 }
 
-struct Component1 : public flt::ComponentBase<Component1>
+struct Component1 : public flt::Component<Component1>
 {
 	int a;
 };
 
-struct Component2 : public flt::ComponentBase<Component2>
+struct Component2 : public flt::Component<Component2>
 {
 	int b;
 };

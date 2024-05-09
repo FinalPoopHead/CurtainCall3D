@@ -11,11 +11,11 @@
 #include <algorithm>
 
 
-class GlideComponent : public flt::ComponentBase<GlideComponent>
+class GlideComponent : public flt::Component<GlideComponent>
 {
 public:
 	GlideComponent(flt::GameObject* gameObject) :
-		ComponentBase<GlideComponent>(gameObject),
+		Component<GlideComponent>(gameObject),
 		MaxThrustSpeed(100.0f),
 		MinThrustSpeed(10.0f),
 		ThrustFactor(10.0f),
@@ -54,7 +54,9 @@ public:
 
 	virtual void FixedUpdate() override
 	{
-		GlidingMovement();
+		flt::Vector4f position = transform.GetWorldPosition();
+		printf("positon : %.3f, %.3f %.3f\n", position.x, position.y, position.z);
+		//GlidingMovement();
 	}
 
 private:

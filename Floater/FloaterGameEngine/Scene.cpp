@@ -3,8 +3,7 @@
 flt::Scene::Scene() : 
 	_gameObjects(),
 	_gameObjectsToEnable(),
-	_componentsToEnable(),
-	_fixedUpdateElapsedSecond(0.0f)
+	_componentsToEnable()
 {
 }
 
@@ -23,13 +22,7 @@ void flt::Scene::Finalize()
 
 }
 
-flt::GameObject* flt::Scene::CreateGameObject()
-{
-	_gameObjects.emplace_back(new(std::nothrow) GameObject());
-	return _gameObjects.back();
-}
-
-void flt::Scene::AddGameObject(GameObject* gameObject)
+void flt::Scene::CreateGameObject(GameObject* gameObject)
 {
 	_gameObjects.emplace_back(gameObject);
 	if(gameObject->_isEnable)
@@ -53,39 +46,86 @@ void flt::Scene::DestroyGameObject(GameObject& gameObject)
 	ASSERT(false, "Not implemented yet");
 }
 
-void flt::Scene::Update(float deltaSecond)
+void flt::Scene::PrePhysicsUpdate()
 {
-	_fixedUpdateElapsedSecond += deltaSecond;
-	
-	while(_fixedUpdateElapsedSecond > 0.02f)
+	for (auto& object : _gameObjects)
 	{
-		for (auto& object : _gameObjects)
+		if (!object->_isEnable)
 		{
-			if (!object->_isEnable)
+			continue;
+		}
+
+		//object->FixedUpdate();
+
+		for (auto& component : object->_components)
+		{
+			if (component == nullptr)
+			{
+				continue;
+			}
+			if (!component->_isEnable)
 			{
 				continue;
 			}
 
-			//object->FixedUpdate();
+			component->PrePhysics();
+		}
+	}
+}
 
-			for (auto& component : object->_components)
-			{
-				if (component == nullptr)
-				{
-					continue;
-				}
-				if (!component->_isEnable)
-				{
-					continue;
-				}
-
-				component->FixedUpdate();
-			}
+void flt::Scene::PostPhysicsUpdate()
+{
+	for (auto& object : _gameObjects)
+	{
+		if (!object->_isEnable)
+		{
+			continue;
 		}
 
-		_fixedUpdateElapsedSecond -= 0.02f;
+		//object->FixedUpdate();
+
+		for (auto& component : object->_components)
+		{
+			if (component == nullptr)
+			{
+				continue;
+			}
+			if (!component->_isEnable)
+			{
+				continue;
+			}
+
+			component->PostPhysics();
+		}
 	}
 
+	for (auto& object : _gameObjects)
+	{
+		if (!object->_isEnable)
+		{
+			continue;
+		}
+
+		//object->FixedUpdate();
+
+		for (auto& component : object->_components)
+		{
+			if (component == nullptr)
+			{
+				continue;
+			}
+			if (!component->_isEnable)
+			{
+				continue;
+			}
+
+			component->FixedUpdate();
+		}
+	}
+}
+
+void flt::Scene::Update(float deltaSecond)
+{
 	for (auto& object : _gameObjects)
 	{
 		if (!object->_isEnable)

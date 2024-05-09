@@ -30,6 +30,7 @@ namespace flt
 		void SetScene(Scene* scene);
 
 		IRenderer* GetRenderer();
+		PhysicsEngine* GetPhysicsEngine();
 		Platform* GetPlatform();
 
 	protected:
@@ -45,5 +46,6 @@ namespace flt
 
 		Scene* _currentScene;
 		Timer _timer;
+		float _fixedUpdateElapsedSecond;
 	};
 }

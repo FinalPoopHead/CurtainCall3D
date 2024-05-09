@@ -16,29 +16,28 @@ namespace flt
 
 		virtual void Initialize();
 		virtual void Finalize();
-		GameObject* CreateGameObject();
 
-		[[deprecated("Use template AddGameObject instead")]] void AddGameObject(GameObject* gameObject);
+		[[deprecated("Use template CreateGameObject instead")]] void CreateGameObject(GameObject* gameObject);
 		void DestroyGameObject(GameObject& gameObject);
+		void PrePhysicsUpdate();
+		void PostPhysicsUpdate();
 		void Update(float deltaSecond);
 		void EndRender();
 		void StartFrame();
 
 		template<GameObjectType T>
-		T* AddGameObject();
+		T* CreateGameObject();
 
 		std::vector<GameObject*> GetGameObjects() const { return _gameObjects; }
 
 	private:
 		std::vector<GameObject*> _gameObjects;
 		std::list<std::pair<GameObject*, bool>> _gameObjectsToEnable;
-		std::list<std::pair<Component*, bool>> _componentsToEnable;
-
-		float _fixedUpdateElapsedSecond;
+		std::list<std::pair<ComponentBase*, bool>> _componentsToEnable;
 	};
 
 	template<GameObjectType T>
-	T* flt::Scene::AddGameObject()
+	T* Scene::CreateGameObject()
 	{
 		GameObject* gameObject = new T();
 

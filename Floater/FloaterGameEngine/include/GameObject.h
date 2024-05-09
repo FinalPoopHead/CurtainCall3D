@@ -24,26 +24,26 @@ namespace flt
 		virtual void OnDisable() {}
 		virtual void OnDestroy() {}
 		
-		[[deprecated("Use Template Function")]] bool AddComponent(Component* component);
-		void RemoveComponent(Component* component);
+		[[deprecated("Use Template Function")]] bool AddComponent(ComponentBase* component);
+		void RemoveComponent(ComponentBase* component);
 
 		template<ComponentType T>
 		T* AddComponent();
 
 		template <typename T>
-		Component* GetComponent();
+		ComponentBase* GetComponent();
 
 	private:
 		Scene* _scene;
 		std::wstring _name;
-		std::vector<Component*> _components;
+		std::vector<ComponentBase*> _components;
 		bool _isEnable;
 	};
 
 	template<ComponentType T>
 	T* flt::GameObject::AddComponent()
 	{
-		Component* component = new T(this);
+		ComponentBase* component = new T(this);
 		int index = component->GetIndex();
 
 		if (_components.size() <= index)
@@ -64,7 +64,7 @@ namespace flt
 	}
 
 	template <typename T>
-	Component* flt::GameObject::GetComponent()
+	ComponentBase* flt::GameObject::GetComponent()
 	{
 		int index = T::s_index;
 		if (index < 0 || _components.size() <= index)

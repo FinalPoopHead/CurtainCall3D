@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\BoxColliderComponent.h" />
+    <ClInclude Include="include\BuiltinComponent.h" />
     <ClInclude Include="include\CameraComponent.h" />
     <ClInclude Include="include\GameEngine.h" />
     <ClInclude Include="include\Component.h" />
@@ -32,6 +34,7 @@
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BoxColliderComponent.cpp" />
     <ClCompile Include="CameraComponent.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Entity.cpp" />

@@ -31,7 +31,7 @@ flt::PhysicsEngine::PhysicsEngine() :
 	_physics(nullptr),
 	_pvd(nullptr),
 	_dispatcher(nullptr),
-	_scene(nullptr),
+	_scene(nullptr)
 	//_material(nullptr),
 	//_actor(nullptr)
 {
@@ -50,7 +50,7 @@ void flt::PhysicsEngine::Initialize()
 	_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *_foundation, physx::PxTolerancesScale(), true, _pvd);
 
 	physx::PxSceneDesc sceneDesc(_physics->getTolerancesScale());
-	//sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
+	sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
 	_dispatcher = physx::PxDefaultCpuDispatcherCreate(2);
 	sceneDesc.cpuDispatcher = _dispatcher;
 	sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
@@ -97,4 +97,5 @@ void flt::PhysicsEngine::Finalize()
 void flt::PhysicsEngine::Update(float deltaTime)
 {
 	_scene->simulate(deltaTime);
+	_scene->fetchResults(true);
 }

@@ -75,6 +75,20 @@ void flt::Transform::SetPosition(float x, float y, float z)
 	_position.z = z;
 }
 
+void flt::Transform::SetWorldPosition(const Vector4f& position)
+{
+	MakeDirtyRecursive();
+
+	if (_pParent)
+	{
+		_position = position * _pParent->GetWorldMatrix4f().Inverse();
+	}
+	else
+	{
+		_position = position;
+	}
+}
+
 void flt::Transform::SetPosition(const Vector3f& position)
 {
 	SetPosition(position.x, position.y, position.z);
@@ -108,6 +122,21 @@ void flt::Transform::SetRotation(float degreeX, float degreeY, float degreeZ, Qu
 	MakeDirtyRecursive();
 
 	_rotation.SetEuler(degreeX, degreeY, degreeY, order);
+}
+
+void flt::Transform::SetWorldRotation(const Quaternion& q)
+{
+	MakeDirtyRecursive();
+
+	if (_pParent)
+	{
+		// 회전 Quaternion은 단위 Quaternion이기 때문에 Inverse == Conjugate
+		_rotation = q * _pParent->GetWorldRotation().Conjugate();
+	}
+	else
+	{
+		_rotation = q;
+	}
 }
 
 void flt::Transform::SetRotation(Vector3f degree, Quaternion::AxisOrder order /*= Quaternion::AxisOrder::YXZ*/)

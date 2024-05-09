@@ -1,4 +1,5 @@
 ﻿#include "./include/RendererComponent.h"
+#include "../FloaterRendererCommon/include/IRenderer.h"
 #include "./include/GameObject.h"
 #include "./include/Scene.h"
 #include "./include/GameEngine.h"
@@ -6,8 +7,8 @@
 
 
 flt::RendererComponent::RendererComponent(GameObject* gameObject) :
-	ComponentBase<RendererComponent>(gameObject),
-	_rendererObject(gameObject->transform, _isDraw),
+	Component<RendererComponent>(gameObject),
+	_rendererObject(new RendererObject{ gameObject->transform, _isDraw }),
 	_renderer(*GameEngine::Instance()->GetRenderer()), 
 	_hObject(), 
 	_isDraw(true)
@@ -16,14 +17,14 @@ flt::RendererComponent::RendererComponent(GameObject* gameObject) :
 
 flt::RendererComponent::~RendererComponent()
 {
-
+	delete _rendererObject;
 }
 
 void flt::RendererComponent::OnEnable()
 {
 	if (!_hObject)
 	{
-		_hObject = _renderer.RegisterObject(_rendererObject);
+		_hObject = _renderer.RegisterObject(*_rendererObject);
 	}
 }
 
@@ -47,5 +48,5 @@ void flt::RendererComponent::OnDestroy()
 
 void flt::RendererComponent::SetRawNode(RawNode* rawNode)
 {
-	_rendererObject.node = rawNode;
+	_rendererObject->node = rawNode;
 }

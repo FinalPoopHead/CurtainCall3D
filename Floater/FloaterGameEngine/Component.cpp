@@ -1,3 +1,3 @@
 ﻿#include "./include/Component.h"
 
-int flt::Component::s_indexCounter = 0;
+int flt::ComponentBase::s_indexCounter = 0;

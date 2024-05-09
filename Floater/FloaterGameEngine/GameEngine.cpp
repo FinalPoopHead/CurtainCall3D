@@ -8,6 +8,11 @@ flt::IRenderer* flt::GameEngine::GetRenderer()
 	return _renderer;
 }
 
+flt::PhysicsEngine* flt::GameEngine::GetPhysicsEngine()
+{
+	return _physicsEngine;
+}
+
 flt::Platform* flt::GameEngine::GetPlatform()
 {
 	return _platform;
@@ -22,6 +27,7 @@ void flt::GameEngine::Initialize()
 	_platform = new Platform(isDebug);
 	_platform->Initialize(1280, 720, L"name", L"");
 	_renderer = _platform->CreateRenderer(RendererType::ROCKET_DX11);
+	//_renderer = _platform->CreateRenderer(RendererType::DX11);
 	_physicsEngine = new PhysicsEngine();
 	_physicsEngine->Initialize();
 
@@ -31,15 +37,24 @@ void flt::GameEngine::Initialize()
 void flt::GameEngine::Update()
 {
 	_timer.Update();
+	float deltaSecond = (float)_timer.GetDeltaSeconds();
+	_platform->Update();
 
 	_currentScene->StartFrame();
 
-	_platform->Update();
+	_fixedUpdateElapsedSecond += deltaSecond;
+	while (_fixedUpdateElapsedSecond > 0.02f)
+	{
+		_currentScene->PrePhysicsUpdate();
+		_physicsEngine->Update(0.02f);
+		_currentScene->PostPhysicsUpdate();
+		_fixedUpdateElapsedSecond -= 0.02f;
+	}
 
-	float deltaSeconde = (float)_timer.GetDeltaSeconds();
-	_currentScene->Update(deltaSeconde);
 
-	_renderer->Render(deltaSeconde);
+	_currentScene->Update(deltaSecond);
+
+	_renderer->Render(deltaSecond);
 	_currentScene->EndRender();
 }
 
@@ -72,7 +87,8 @@ flt::GameEngine::GameEngine() :
 	_renderer(nullptr),
 	_physicsEngine(nullptr),
 	_currentScene(nullptr),
-	_timer()
+	_timer(),
+	_fixedUpdateElapsedSecond(0.0f)
 {
 
 }

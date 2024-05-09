@@ -70,5 +70,20 @@ namespace flt
 			float s1 = sinTheta / sinTheta0;
 			return q1 * s0 + q2 * s1;
 		}
+
+		Quaternion Conjugate() const noexcept
+		{
+			return Quaternion(-x, -y, -z, w);
+		}
+
+		Quaternion Inverse() const noexcept
+		{
+			float normPow = NormPow();
+			if (normPow < flt::FLOAT_EPSILON)
+			{
+				return Quaternion();
+			}
+			return Conjugate() / NormPow();
+		}
 	};
 }

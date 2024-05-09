@@ -6,18 +6,20 @@ namespace flt
 	class Scene;
 	class GameObject;
 
-	class Component
+	class ComponentBase
 	{
 		friend class Scene;
 		friend class GameObject;
 	public:
-		Component() : Component(nullptr) {}
-		Component(GameObject* gameObject) : _isEnable(false), _gameObject(gameObject) {}
-		virtual ~Component() {}
+		ComponentBase() : ComponentBase(nullptr) {}
+		ComponentBase(GameObject* gameObject) : _isEnable(false), _gameObject(gameObject) {}
+		virtual ~ComponentBase() {}
 
 		virtual void Start() {}
 		virtual void OnEnable() {}
 		virtual void Update(float deltaSecond) {}
+		virtual void PrePhysics() {}
+		virtual void PostPhysics() {}
 		virtual void FixedUpdate() {}
 		virtual void EndDraw() {}
 		virtual void OnDisable() {}
@@ -45,19 +47,19 @@ namespace flt
 	};
 
 	template<typename T>
-	class ComponentBase : public Component
+	class Component : public ComponentBase
 	{
 		friend class GameObject;
 	public:
-		ComponentBase() : Component() {}
-		ComponentBase(GameObject* gameObject) : Component(gameObject) {}
+		Component() : ComponentBase() {}
+		Component(GameObject* gameObject) : ComponentBase(gameObject) {}
 
 		//void PrintIndex()
 		//{
 		//	std::cout << s_index << std::endl;
 		//}
 	protected:
-		static const inline int s_index = Component::GetComponentIndex();
+		static const inline int s_index = ComponentBase::GetComponentIndex();
 
 	private:
 		virtual int GetIndex() final
@@ -70,6 +72,6 @@ namespace flt
 	template <typename T>
 	concept ComponentType = requires(T a)
 	{
-		std::is_base_of_v<Component, T>;
+		std::is_base_of_v<ComponentBase, T>;
 	};
 }

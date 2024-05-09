@@ -6,7 +6,7 @@ namespace flt
 {
 	struct RawNode;
 
-	class CameraComponent : public ComponentBase<CameraComponent>
+	class CameraComponent : public Component<CameraComponent>
 	{
 	public:
 		CameraComponent(GameObject* gameObject);

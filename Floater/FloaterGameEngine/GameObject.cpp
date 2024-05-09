@@ -15,7 +15,7 @@ flt::GameObject::~GameObject()
 
 }
 
-bool flt::GameObject::AddComponent(Component* component)
+bool flt::GameObject::AddComponent(ComponentBase* component)
 {
 	int index = component->GetIndex();
 	
@@ -34,7 +34,7 @@ bool flt::GameObject::AddComponent(Component* component)
 	return true;
 }
 
-void flt::GameObject::RemoveComponent(Component* component)
+void flt::GameObject::RemoveComponent(ComponentBase* component)
 {
 	int index = component->GetIndex();
 	if(_components.size() <= index)
