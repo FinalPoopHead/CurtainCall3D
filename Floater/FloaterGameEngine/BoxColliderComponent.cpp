@@ -66,6 +66,18 @@ void flt::BoxColliderComponent::PostPhysics()
 	UpdateTransform();
 }
 
+void flt::BoxColliderComponent::SetSize(const flt::Vector3f& size)
+{
+	_size = size;
+	physx::PxBoxGeometry geometry(_size.x, _size.y, _size.z);
+	_physXData->shape->setGeometry(geometry);
+}
+
+flt::Vector3f flt::BoxColliderComponent::GetSize() const
+{
+	return _size;
+}
+
 void flt::BoxColliderComponent::UpdatePhysTransform()
 {
 	Vector4f position = _transform->GetWorldPosition();

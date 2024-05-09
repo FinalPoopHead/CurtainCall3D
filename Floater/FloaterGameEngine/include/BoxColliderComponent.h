@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Component.h"
+#include "../../FloaterMath/include/Vector3f.h"
 
 namespace physx
 {
@@ -26,6 +27,10 @@ namespace flt
 		virtual void PrePhysics() override;
 		virtual void PostPhysics() override;
 
+	public:
+		void SetSize(const flt::Vector3f& size);
+		flt::Vector3f GetSize() const;
+
 	private:
 		void UpdatePhysTransform();
 		void UpdateTransform();
@@ -36,5 +41,7 @@ namespace flt
 		physx::PxPhysics& _physcx;
 		physx::PxScene& _scene;
 		PhysXData* _physXData;
+		
+		flt::Vector3f _size;
 	};
 }
