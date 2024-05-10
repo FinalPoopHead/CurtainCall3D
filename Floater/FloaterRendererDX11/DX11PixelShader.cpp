@@ -29,7 +29,7 @@ flt::DX11PixelShader* flt::DX11PixelShaderBuilder::build() const
 	}
 
 	UINT flags1 = 0;
-#if defined(_DEBUG) || defined(_DEBUG)
+#if defined(DEBUG) || defined(_DEBUG)
 	flags1 |= D3DCOMPILE_DEBUG;
 #endif
 

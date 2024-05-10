@@ -25,7 +25,8 @@ flt::BoxColliderComponent::BoxColliderComponent(GameObject* gameObject) :
 	_transform(&gameObject->transform),
 	_physcx(*GameEngine::Instance()->GetPhysicsEngine()->GetPhysics()),
 	_scene(*GameEngine::Instance()->GetPhysicsEngine()->GetScene()),
-	_physXData(new PhysXData())
+	_physXData(new PhysXData()),
+	_size(10.0f, 10.0f, 10.0f)
 {
 	Vector4f position = _transform->GetWorldPosition();
 	_physXData->transform.p = physx::PxVec3(position.x, position.y, position.z);
@@ -33,8 +34,7 @@ flt::BoxColliderComponent::BoxColliderComponent(GameObject* gameObject) :
 	_physXData->transform.q = physx::PxQuat(rotation.x, rotation.y, rotation.z, rotation.w);
 
 	_physXData->actor = _physcx.createRigidDynamic(_physXData->transform);
-	_physXData->shape = _physcx.createShape(physx::PxBoxGeometry(1.0f, 1.0f, 1.0f), *_physcx.createMaterial(0.5f, 0.5f, 0.6f));
-
+	_physXData->shape = _physcx.createShape(physx::PxBoxGeometry(_size.x, _size.y, _size.z), *_physcx.createMaterial(0.5f, 0.5f, 0.6f));
 	_physXData->actor->attachShape(*_physXData->shape);
 }
 
@@ -70,7 +70,9 @@ void flt::BoxColliderComponent::SetSize(const flt::Vector3f& size)
 {
 	_size = size;
 	physx::PxBoxGeometry geometry(_size.x, _size.y, _size.z);
+	_physXData->actor->detachShape(*_physXData->shape);
 	_physXData->shape->setGeometry(geometry);
+	_physXData->actor->attachShape(*_physXData->shape);
 }
 
 flt::Vector3f flt::BoxColliderComponent::GetSize() const

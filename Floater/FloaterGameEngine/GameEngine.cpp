@@ -42,13 +42,14 @@ void flt::GameEngine::Update()
 
 	_currentScene->StartFrame();
 
+	constexpr float fixedUpdateInterval = 0.02f;
 	_fixedUpdateElapsedSecond += deltaSecond;
-	while (_fixedUpdateElapsedSecond > 0.02f)
+	while (_fixedUpdateElapsedSecond > fixedUpdateInterval)
 	{
 		_currentScene->PrePhysicsUpdate();
-		_physicsEngine->Update(0.02f);
+		_physicsEngine->Update(fixedUpdateInterval);
 		_currentScene->PostPhysicsUpdate();
-		_fixedUpdateElapsedSecond -= 0.02f;
+		_fixedUpdateElapsedSecond -= fixedUpdateInterval;
 	}
 
 

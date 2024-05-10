@@ -31,7 +31,7 @@ namespace flt
 		T* AddComponent();
 
 		template <typename T>
-		ComponentBase* GetComponent();
+		T* GetComponent();
 
 	private:
 		Scene* _scene;
@@ -64,7 +64,7 @@ namespace flt
 	}
 
 	template <typename T>
-	ComponentBase* flt::GameObject::GetComponent()
+	T* flt::GameObject::GetComponent()
 	{
 		int index = T::s_index;
 		if (index < 0 || _components.size() <= index)
@@ -72,7 +72,7 @@ namespace flt
 			return nullptr;
 		}
 
-		return _components[index];
+		return static_cast<T*>(_components[index]);
 	}
 
 	template <typename T>

@@ -46,6 +46,8 @@ namespace flt
 
 		Scene* _currentScene;
 		Timer _timer;
+
+		Timer _fixedUpdateTimer;
 		float _fixedUpdateElapsedSecond;
 	};
 }
