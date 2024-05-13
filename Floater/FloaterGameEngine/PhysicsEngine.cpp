@@ -47,7 +47,6 @@ void flt::PhysicsEngine::Initialize()
 
 	_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *_foundation, physx::PxTolerancesScale(), true, _pvd);
 	
-
 	physx::PxSceneDesc sceneDesc(_physics->getTolerancesScale());
 	sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
 	_dispatcher = physx::PxDefaultCpuDispatcherCreate(2);
@@ -85,8 +84,9 @@ void flt::PhysicsEngine::Initialize()
 
 	// Ground plane
 	physx::PxMaterial* plainMaterial = _physics->createMaterial(0.5f, 0.5f, 0.6f);
-	physx::PxRigidStatic* planeActor = _physics->createRigidStatic(physx::PxTransform(physx::PxQuat(PX_PIDIV2, physx::PxVec3(0, 0, 1))));
-	physx::PxRigidActorExt::createExclusiveShape(*planeActor, physx::PxPlaneGeometry(), *plainMaterial);
+	//physx::PxRigidStatic* planeActor = _physics->createRigidStatic(physx::PxTransform(physx::PxQuat(PX_PIDIV2, physx::PxVec3(0, 0, 1))));
+	//physx::PxRigidActorExt::createExclusiveShape(*planeActor, physx::PxPlaneGeometry(), *plainMaterial);
+	physx::PxRigidStatic* planeActor = PxCreatePlane(*_physics, physx::PxPlane(0, 1, 0, 0), *plainMaterial);
 	_scene->addActor(*planeActor);
 	plainMaterial->release();
 
