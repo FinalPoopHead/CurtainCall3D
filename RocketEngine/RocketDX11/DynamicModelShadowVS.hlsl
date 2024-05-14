@@ -40,9 +40,10 @@ float4 main(VertexInputType input) : SV_POSITION
                                mul(mul(boneTransform[input.boneIndex.w], nodeTransform[input.boneIndex.w]), input.weights.w);
     
     float4 resultPosition = mul(float4(input.position, 1.0f), finalOffsetMatrix);
-    
     // weight 값의 총 합이 1이 아닌 경우 동차좌표인 1이 변조가 된다.
-    // 따라서 w가 변조된 경우 다시 1로 세팅해 주는 것.
+    // 따라서 w가 변조된 경우 다시 1로 세팅해 주는 것..?
+    resultPosition /= resultPosition.w;
+    
     
     output = mul(resultPosition, viewMatrix);
     output = mul(output, projectionMatrix);

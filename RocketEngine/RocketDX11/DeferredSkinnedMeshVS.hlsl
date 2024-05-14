@@ -50,6 +50,7 @@ PixelInputType main(VertexInputType input)
                                mul(mul(boneTransform[input.boneIndex.w], nodeTransform[input.boneIndex.w]), input.weights.w);
     
     float4 resultPosition = mul(float4(input.position, 1.0f), finalOffsetMatrix);
+    resultPosition /= resultPosition.w;
     
     
     matrix nodeTransformMatrix = nodeTransform[input.nodeIndex];
