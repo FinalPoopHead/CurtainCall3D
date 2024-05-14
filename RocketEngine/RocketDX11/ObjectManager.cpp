@@ -25,28 +25,29 @@ namespace Rocket::Core
 
 	void ObjectManager::Initialize(ID3D11Device* device)
 	{
-		auto& _rscMgr = ResourceManager::Instance();
-
 		_debugText.reset(new TextRenderer());
-		_debugText->SetFont(_rscMgr.GetDefaultFont());
+		_debugText->SetFont(_resourceManager.GetDefaultFont());
 
 		_axis.reset(new Axis());
 		_axis->Initialize(device);
-		_axis->SetRenderState(_rscMgr.GetRenderState(ResourceManager::eRenderState::WIREFRAME));
-		_axis->SetShader(_rscMgr.GetVertexShader("ColorVS"), _rscMgr.GetPixelShader("ColorPS")); // Forward
+		_axis->SetRenderState(_resourceManager.GetRenderState(ResourceManager::eRenderState::WIREFRAME));
+		_axis->SetShader(_resourceManager.GetVertexShader("ColorVS"), _resourceManager.GetPixelShader("ColorPS")); // Forward
 		// _axis->SetShader(_rscMgr.GetVertexShader("DeferredColorVS"), _rscMgr.GetPixelShader("DeferredColorPS")); // Deferred
 
 		_grid.reset(new Grid());
 		_grid->Initialize(device);
-		_grid->SetRenderState(_rscMgr.GetRenderState(ResourceManager::eRenderState::WIREFRAME));
-		_grid->SetShader(_rscMgr.GetVertexShader("ColorVS"), _rscMgr.GetPixelShader("ColorPS")); // Forward
-		// _grid->SetShader(_rscMgr.GetVertexShader("DeferredColorVS"), _rscMgr.GetPixelShader("DeferredColorPS")); // Deferred
+		_grid->SetRenderState(_resourceManager.GetRenderState(ResourceManager::eRenderState::WIREFRAME));
+		_grid->SetShader(_resourceManager.GetVertexShader("ColorVS"), _resourceManager.GetPixelShader("ColorPS")); // Forward
+		// _grid->SetShader(_resourceManager.GetVertexShader("DeferredColorVS"), _resourceManager.GetPixelShader("DeferredColorPS")); // Deferred
 
 		_cubeMap = std::make_unique<CubeMap>();
-		_cubeMap->Initialize(device);
-		_cubeMap->SetShader(_rscMgr.GetVertexShader("CubeMapVS"), _rscMgr.GetPixelShader("CubeMapPS")); // Forward
-		// cubeMap->SetShader(_rscMgr.GetVertexShader("DeferredCubeMapVS"), _rscMgr.GetPixelShader("DeferredCubeMapPS")); // Deferred
-		_cubeMap->LoadTexture("Garden.dds");
+		_cubeMap->Initialize(device, _resourceManager.GetDeviceContext());
+		_cubeMap->SetShader(_resourceManager.GetVertexShader("CubeMapVS"), _resourceManager.GetPixelShader("CubeMapPS")); // Forward
+		_cubeMap->SetIBLGenShader(_resourceManager.GetPixelShader("IrradianceMapPS"), _resourceManager.GetPixelShader("PrefilteredMapPS"), _resourceManager.GetPixelShader("BRDF2DLUTPS"));
+		// cubeMap->SetShader(_resourceManager.GetVertexShader("DeferredCubeMapVS"), _resourceManager.GetPixelShader("DeferredCubeMapPS")); // Deferred
+		//_cubeMap->LoadTexture("Garden.dds");
+		_cubeMap->LoadTexture("IBLBaker.dds");
+		//_cubeMap->LoadTexture("CobblestoneStreet.dds");
 	}
 
 	void ObjectManager::Finalize()

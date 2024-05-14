@@ -1,9 +1,9 @@
 ﻿#pragma once
-#include <SimpleMath.h>
 #include <d3d11.h>
 #include <wrl.h>
 #include <DirectXCollision.h>
 
+#include "MathHeader.h"
 #include "../RocketCommon/ICamera.h"
 
 using Microsoft::WRL::ComPtr;
@@ -47,14 +47,13 @@ namespace Rocket::Core
 		DirectX::XMMATRIX GetProjectionMatrix() const;		// 카메라의 투영행렬을 반환
 		DirectX::XMMATRIX GetViewProjectionMatrix() const;	// 위의 두 행렬을 적절히 곱해서 반환(view의 역행렬을 곱해주겠지?)
 
-		DirectX::XMVECTOR GetForward() const;
-		DirectX::XMVECTOR GetUp() const;
-		DirectX::XMVECTOR GetRight() const;
+		Vector3 GetForward() const;
+		Vector3 GetUp() const;
+		Vector3 GetRight() const;
+
+		float GetLengthZ() const { return _farZ - _nearZ; }
 
 	public:
-		void CreateCameraBuffer(ID3D11Device* device);
-		ID3D11Buffer* GetCameraBuffer() const;
-		ID3D11Buffer** GetAddressOfCameraBuffer();
 		bool FrustumCulling(const DirectX::BoundingBox& boundingBox);
 		bool FrustumCulling(const DirectX::BoundingOrientedBox& boundingOrientedBox);
 		bool FrustumCulling(const DirectX::BoundingSphere& boundingSphere);
@@ -76,7 +75,5 @@ namespace Rocket::Core
 
 		DirectX::XMFLOAT4X4 _viewMatrix;		// 카메라의 로컬좌표'계' 또는 카메라 worldTM의 역행렬
 		DirectX::XMFLOAT4X4 _projectionMatrix;	// 카메라의 투영 행렬
-
-		ComPtr<ID3D11Buffer> _cameraBuffer;
 	};
 }

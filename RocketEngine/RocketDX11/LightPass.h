@@ -31,5 +31,6 @@ namespace Rocket::Core
 		VertexShader* _vertexShader;
 		PixelShader* _pixelShader;
 		ComPtr<ID3D11SamplerState> _sampleState;
+		ComPtr<ID3D11SamplerState> _shadowMapSamplerState;
 	};
 }

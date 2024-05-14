@@ -251,6 +251,9 @@ namespace Rocket::Core
 
 	Matrix RocketTransform::GetLocalTM() const
 	{
+		// TODO : 나중에 최적화할때는 다 이걸로 바꾸면 되겠다
+		// return DirectX::XMMatrixAffineTransformation(_scale, Vector3::Zero, _rotation, _position);
+
 		Matrix result;
 		result *= GetLocalScaleMatrix();
 		result *= GetLocalRotationMatrix();

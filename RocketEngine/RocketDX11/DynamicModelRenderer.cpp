@@ -264,26 +264,26 @@ namespace Rocket::Core
 			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
 
 			// 카메라 버퍼 세팅
-			{
-				Camera* mainCam = Camera::GetMainCamera();
-				// 버텍스 쉐이더
-				D3D11_MAPPED_SUBRESOURCE mappedResource;
-				HR(deviceContext->Map(mainCam->GetCameraBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-
-				CameraBufferType* cameraBufferDataPtr = (CameraBufferType*)mappedResource.pData;
-
-				cameraBufferDataPtr->cameraPosition = mainCam->GetPosition();
-				cameraBufferDataPtr->padding = 0.0f;
-
-				deviceContext->Unmap(mainCam->GetCameraBuffer(), 0);
-
-				unsigned int bufferNumber = 1;
-
-				deviceContext->VSSetConstantBuffers(bufferNumber, 1, mainCam->GetAddressOfCameraBuffer());
-			}
+// 			{
+// 				Camera* mainCam = Camera::GetMainCamera();
+// 				// 버텍스 쉐이더
+// 				D3D11_MAPPED_SUBRESOURCE mappedResource;
+// 				HR(deviceContext->Map(mainCam->GetCameraBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+// 
+// 				CameraBufferType* cameraBufferDataPtr = (CameraBufferType*)mappedResource.pData;
+// 
+// 				cameraBufferDataPtr->cameraPosition = mainCam->GetPosition();
+// 				cameraBufferDataPtr->padding = 0.0f;
+// 
+// 				deviceContext->Unmap(mainCam->GetCameraBuffer(), 0);
+// 
+// 				unsigned int bufferNumber = 1;
+// 
+// 				deviceContext->VSSetConstantBuffers(bufferNumber, 1, mainCam->GetAddressOfCameraBuffer());
+// 			}
 
 			///
-			bufferNumber = 2;
+			bufferNumber = 1;
 			HR(deviceContext->Map(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
 
 			NodeBufferType* nodeBufferDataPtr = (NodeBufferType*)mappedResource.pData;
@@ -292,12 +292,10 @@ namespace Rocket::Core
 			SetNodeBuffer(_animatedRootNode, nodeBufferDataPtr);
 
 			deviceContext->Unmap(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0);
-
-
 			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
 
 
-			bufferNumber = 3;
+			bufferNumber = 2;
 			HR(deviceContext->Map(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
 
 			BoneBufferType* boneBufferDataPtr = (BoneBufferType*)mappedResource.pData;
@@ -308,8 +306,6 @@ namespace Rocket::Core
 			testCount = 0;
 
 			deviceContext->Unmap(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0);
-
-
 			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
 
 			/// 픽셀 쉐이더
@@ -375,23 +371,23 @@ namespace Rocket::Core
 
 			if (_material->GetBaseColorTexture())
 			{
-				deviceContext->PSSetShaderResources(0, 1, _material->GetBaseColorTexture()->GetAddressOfTextureView());
+				deviceContext->PSSetShaderResources(0, 1, _material->GetBaseColorTexture()->GetAddressOfSRV());
 			}
 			if (_material->GetNormalTexture())
 			{
-				deviceContext->PSSetShaderResources(1, 1, _material->GetNormalTexture()->GetAddressOfTextureView());
+				deviceContext->PSSetShaderResources(1, 1, _material->GetNormalTexture()->GetAddressOfSRV());
 			}
 			if (_material->GetMetallicTexture())
 			{
-				deviceContext->PSSetShaderResources(2, 1, _material->GetMetallicTexture()->GetAddressOfTextureView());
+				deviceContext->PSSetShaderResources(2, 1, _material->GetMetallicTexture()->GetAddressOfSRV());
 			}
 			if (_material->GetRoughnessTexture())
 			{
-				deviceContext->PSSetShaderResources(3, 1, _material->GetRoughnessTexture()->GetAddressOfTextureView());
+				deviceContext->PSSetShaderResources(3, 1, _material->GetRoughnessTexture()->GetAddressOfSRV());
 			}
 			if (_material->GetAOTexture())
 			{
-				deviceContext->PSSetShaderResources(4, 1, _material->GetAOTexture()->GetAddressOfTextureView());
+				deviceContext->PSSetShaderResources(4, 1, _material->GetAOTexture()->GetAddressOfSRV());
 			}
 
 			deviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
@@ -405,16 +401,20 @@ namespace Rocket::Core
 		deviceContext->PSSetShaderResources(4, 1, nullSRV.GetAddressOf());
 	}
 
-	void DynamicModelRenderer::SetVertexShader(VertexShader* shader)
+	Rocket::Core::VertexShader* DynamicModelRenderer::SetVertexShader(VertexShader* shader)
 	{
 		assert(_material);
+		auto temp = _material->GetVertexShader();
 		_material->SetVertexShader(shader);
+		return temp;
 	}
 
-	void DynamicModelRenderer::SetPixelShader(PixelShader* shader)
+	Rocket::Core::PixelShader* DynamicModelRenderer::SetPixelShader(PixelShader* shader)
 	{
 		assert(_material);
+		auto temp = _material->GetPixelShader();
 		_material->SetPixelShader(shader);
+		return temp;
 	}
 
 	void DynamicModelRenderer::SetRenderState(ID3D11RasterizerState* renderState)
@@ -582,6 +582,99 @@ namespace Rocket::Core
 	void DynamicModelRenderer::SetRoughness(float value)
 	{
 		_material->SetRoughness(value);
+	}
+
+	void DynamicModelRenderer::RenderShadowMap(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj, VertexShader* vs, PixelShader* ps)
+	{
+		if (!_isActive)
+		{
+			return;
+		}
+
+		// Grid가 쓰는 Shader deviceContext 이용해 연결.
+		deviceContext->VSSetShader(vs->GetVertexShader(), nullptr, 0);
+		//deviceContext->PSSetShader(ps->GetPixelShader(), nullptr, 0);
+		deviceContext->PSSetShader(NULL, NULL, 0);
+
+		// 상수 버퍼 세팅
+		{
+			// 버텍스 쉐이더
+			unsigned int bufferNumber = 0;
+			D3D11_MAPPED_SUBRESOURCE mappedResource;
+			HR(deviceContext->Map(vs->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+
+			MatrixBufferType* matrixBufferDataPtr = (MatrixBufferType*)mappedResource.pData;
+
+			// DX에서 HLSL 로 넘어갈때 자동으로 전치가 되서 넘어간다.
+			// HLSL 에서도 Row Major 하게 작성하고 싶으므로 미리 전치를 시켜놓는다.
+			// 총 전치가 2번되므로 HLSL에서도 Row Major한 Matrix로 사용한다.
+
+			DirectX::XMVECTOR det = DirectX::XMMatrixDeterminant(_worldTM);
+			DirectX::XMMATRIX worldInverse = DirectX::XMMatrixInverse(&det, _worldTM);
+
+			DirectX::XMMATRIX w = DirectX::XMMatrixTranspose(_worldTM);
+			DirectX::XMMATRIX wi = DirectX::XMMatrixTranspose(worldInverse);
+			DirectX::XMMATRIX v = DirectX::XMMatrixTranspose(view);
+			DirectX::XMMATRIX p = DirectX::XMMatrixTranspose(proj);
+
+			matrixBufferDataPtr->world = w;
+			matrixBufferDataPtr->worldInverse = wi;
+			matrixBufferDataPtr->view = v;
+			matrixBufferDataPtr->projection = p;
+
+			deviceContext->Unmap(vs->GetConstantBuffer(bufferNumber), 0);
+
+
+			deviceContext->VSSetConstantBuffers(bufferNumber, 1, vs->GetAddressOfConstantBuffer(bufferNumber));
+
+			///
+			bufferNumber = 1;
+			HR(deviceContext->Map(vs->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+
+			NodeBufferType* nodeBufferDataPtr = (NodeBufferType*)mappedResource.pData;
+
+			//SetNodeBuffer(_model->rootNode, nodeBufferDataPtr);
+			SetNodeBuffer(_animatedRootNode, nodeBufferDataPtr);
+
+			deviceContext->Unmap(vs->GetConstantBuffer(bufferNumber), 0);
+			deviceContext->VSSetConstantBuffers(bufferNumber, 1, vs->GetAddressOfConstantBuffer(bufferNumber));
+
+
+			bufferNumber = 2;
+			HR(deviceContext->Map(vs->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+
+			BoneBufferType* boneBufferDataPtr = (BoneBufferType*)mappedResource.pData;
+
+			// TODO : 이거 사실 둘 다 같은 본 데이터인건데 왜 매트릭스가 영행렬이 들어가있지..?
+			//SetBoneBuffer(_model->rootNode, boneBufferDataPtr);
+			SetBoneBuffer(_animatedRootNode, boneBufferDataPtr);
+
+			deviceContext->Unmap(vs->GetConstantBuffer(bufferNumber), 0);
+			deviceContext->VSSetConstantBuffers(bufferNumber, 1, vs->GetAddressOfConstantBuffer(bufferNumber));
+		}
+
+		// 렌더스테이트
+		deviceContext->RSSetState(ResourceManager::Instance().GetRenderState(ResourceManager::eRenderState::SHADOWMAP));
+
+
+		/// 그린다
+		// 인덱스버퍼와 버텍스버퍼 셋팅
+		UINT stride = 0;
+		UINT offset = 0;
+
+		stride = sizeof(VertexSkinned);
+
+		// 입력 배치 객체 셋팅
+		deviceContext->IASetInputLayout(vs->GetInputLayout());
+		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		for (auto& mesh : _model->meshes)
+		{
+			deviceContext->IASetVertexBuffers(0, 1, mesh->GetAddressOfVertexBuffer(), &stride, &offset);
+			deviceContext->IASetIndexBuffer(mesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+
+			deviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
+		}
 	}
 
 }

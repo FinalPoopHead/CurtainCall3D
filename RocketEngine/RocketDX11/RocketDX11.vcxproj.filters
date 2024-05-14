@@ -82,6 +82,9 @@
     <ClCompile Include="LightPass.cpp">
       <Filter>DeferredShading\LightPass</Filter>
     </ClCompile>
+    <ClCompile Include="ShadowPass.cpp">
+      <Filter>DeferredShading\ShadowPass</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Axis.h">
@@ -191,6 +194,9 @@
     </ClInclude>
     <ClInclude Include="LightPass.h">
       <Filter>DeferredShading\LightPass</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowPass.h">
+      <Filter>DeferredShading\ShadowPass</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -356,6 +362,12 @@
     <Filter Include="Resource\Shader\HLSL\Deferred\IBL">
       <UniqueIdentifier>{7ca7f49e-ee9f-46b4-a507-51a314bf5113}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DeferredShading\ShadowPass">
+      <UniqueIdentifier>{ab29fa6c-1635-45d2-a74c-00ceccfd7bd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Shader\HLSL\Deferred\ShadowPass">
+      <UniqueIdentifier>{571ad4e1-abd0-4946-9835-c66bdce95594}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ColorPS.hlsl">
@@ -424,8 +436,23 @@
     <FxCompile Include="DeferredCubeMapPS.hlsl">
       <Filter>Resource\Shader\HLSL\Deferred\CubeMap</Filter>
     </FxCompile>
-    <FxCompile Include="CreateIBLMapPS.hlsl">
+    <FxCompile Include="IrradianceMapPS.hlsl">
       <Filter>Resource\Shader\HLSL\Deferred\IBL</Filter>
+    </FxCompile>
+    <FxCompile Include="PrefilteredMapPS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\IBL</Filter>
+    </FxCompile>
+    <FxCompile Include="BRDF2DLUTPS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\IBL</Filter>
+    </FxCompile>
+    <FxCompile Include="StaticMeshShadowVS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\ShadowPass</Filter>
+    </FxCompile>
+    <FxCompile Include="ShadowMapPS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\ShadowPass</Filter>
+    </FxCompile>
+    <FxCompile Include="DynamicModelShadowVS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\ShadowPass</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

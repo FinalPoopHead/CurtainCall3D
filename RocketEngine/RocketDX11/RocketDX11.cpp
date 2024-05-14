@@ -10,6 +10,7 @@
 #include "VertexShader.h"
 #include "PixelShader.h"
 #include "CubeMap.h"
+#include "DirectionalLight.h"
 
 #include "GraphicsMacro.h"
 
@@ -23,6 +24,7 @@
 #include "GraphicsMacro.h"
 #include "DeferredBuffers.h"
 #include "LightPass.h"
+#include "ShadowPass.h"
 
 namespace Rocket::Core
 {
@@ -64,7 +66,7 @@ namespace Rocket::Core
 	RocketDX11::RocketDX11()
 		: _hWnd(), _screenWidth(), _screenHeight(), _vSyncEnabled(),
 		_device(), _deviceContext(),
-		_featureLevel(),_m4xMsaaQuality(),
+		_featureLevel(), _m4xMsaaQuality(),
 		_swapChain(), _backBuffer(),
 		_renderTargetView(), _depthStencilBuffer(), _depthStencilView(),
 		_viewport(),
@@ -85,7 +87,7 @@ namespace Rocket::Core
 
 	void RocketDX11::Initialize(void* hWnd, int screenWidth, int screenHeight)
 	{
- 		HRESULT hr = S_OK;
+		HRESULT hr = S_OK;
 
 		_hWnd = static_cast<HWND>(hWnd);
 		_screenWidth = screenWidth;
@@ -255,6 +257,11 @@ namespace Rocket::Core
 		_lightPass = std::make_unique<LightPass>();
 		_lightPass->Initialize(_device.Get(), _resourceManager.GetVertexShader("LightPassVS"), _resourceManager.GetPixelShader("LightPassPS"));
 
+		/// ShadowPass 초기화
+		_shadowPass = std::make_unique<ShadowPass>();
+		_shadowPass->Initialize(_resourceManager.GetVertexShader("StaticMeshShadowVS"), _resourceManager.GetVertexShader("DynamicModelShadowVS")
+			, _resourceManager.GetPixelShader("ShadowMapPS"));
+
 		/// SpriteBatch, LineBatch, BasicEffect 초기화
 		_spriteBatch = new DirectX::SpriteBatch(_deviceContext.Get());
 		_lineBatch = new DirectX::PrimitiveBatch<DirectX::VertexPositionColor>(_deviceContext.Get());
@@ -289,7 +296,7 @@ namespace Rocket::Core
 		/// RenderTargetView 와 DepthStencilBuffer를 출력 병합 단계(Output Merger Stage)에 바인딩
 		//_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
 		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
-		
+
 		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
 		//Blend State Set.
 		_deviceContext->OMSetBlendState(_defaultBlendState.Get(), nullptr, 0xFF);
@@ -376,6 +383,9 @@ namespace Rocket::Core
 			_swapChain->Present(0, 0);
 		}
 
+		_renderList.clear();
+		_renderList.reserve(512);
+
 		return;
 	}
 
@@ -389,8 +399,33 @@ namespace Rocket::Core
 		_deltaTime = deltaTime;
 
 		Camera::GetMainCamera()->Update();
-		UpdateAnimation(deltaTime);
+		for (auto& light : _objectManager.GetDirectionalLightList())
+		{
+			light->Update();
+		}
 		
+		// Culling 및 Update Animation
+		Camera* mainCam = Camera::GetMainCamera();
+
+		for (auto meshRenderer : _objectManager.GetStaticMeshRenderers())
+		{
+			if (mainCam->FrustumCulling(meshRenderer->GetBoundingBox()))
+			{
+				_renderList.push_back(meshRenderer);
+			}
+		}
+
+		for (auto dynamicModelRenderer : _objectManager.GetDynamicModelRenderers())
+		{
+			bool isCulled = !mainCam->FrustumCulling(dynamicModelRenderer->GetBoundingBox());
+			dynamicModelRenderer->UpdateAnimation(deltaTime, isCulled);
+
+			if (!isCulled)
+			{
+				_renderList.push_back(dynamicModelRenderer);
+			}
+		}
+
 		_objectManager._debugText->SetText(
 			"deltaTime : " + std::to_string(_deltaTime)
 			+ "\nfps : " + std::to_string(fps)
@@ -406,18 +441,27 @@ namespace Rocket::Core
 	{
 		BeginRender(1.0f, 0.0f, 1.0f, 1.0f);
 
+		// TODO : 섀도우 맵 만들고 LightPass에 넘겨줘야함.
+		_shadowPass->GenerateShadowMap(_deviceContext.Get(), _deferredBuffers.get());
+
+		_deviceContext->RSSetViewports(1, &_viewport);
+
 		GBufferPass();
 
 		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), nullptr);
 		_lightPass->Render(_deviceContext.Get(), _deferredBuffers.get());
 
 		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _deferredBuffers->GetDepthStencilView());
-		RenderHelperObject();
+		if (_isDebugMode)
+		{
+			RenderHelperObject();
+		}
+
 		RenderCubeMap();
 
-		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), nullptr); 
+		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), nullptr);
 
-// 		RenderLine();
+		// 		RenderLine();
 		RenderText();
 		RenderTexture();
 
@@ -435,11 +479,11 @@ namespace Rocket::Core
 		_resourceManager.Finalize();
 
 		delete _spriteBatch;
-		delete _lineBatch;		
+		delete _lineBatch;
 		_basicEffect.reset();
 		_deferredBuffers.reset();
 		_lightPass.reset();
-
+		_shadowPass.reset();
 
 		// TODO : 여기서 Release를 먼저 해줬더니 아래에서 Reset 하면서 한번 더 지워서 RefCount가 -1이 되는 녀석이 하나 있다.. 뭐하는친구일까?
 // 
@@ -553,22 +597,10 @@ namespace Rocket::Core
 			}
 		}
 		_lineBatch->End();
-		
+
 		if (_objectManager.GetLineRenderer())
 		{
 			_objectManager.GetLineRenderer()->Flush();
-		}
-	}
-
-	void RocketDX11::UpdateAnimation(float deltaTime)
-	{
-		Camera* mainCam = Camera::GetMainCamera();
-
-		// TODO : Frustum Culling을 여기서도 하고, RenderMesh에서도 하는데 한번만 하게끔 하자.
-		for (auto modelRenderer : _objectManager.GetDynamicModelRenderers())
-		{
-			bool isCulled = !mainCam->FrustumCulling(modelRenderer->GetBoundingBox());
-			modelRenderer->UpdateAnimation(deltaTime, isCulled);
 		}
 	}
 
@@ -638,22 +670,36 @@ namespace Rocket::Core
 
 	void RocketDX11::RenderDebug()
 	{
-		float height = _screenHeight / BUFFER_COUNT;
-		height *= BUFFER_COUNT - 1;
-		float width = _screenWidth / BUFFER_COUNT;
+		float y = _screenHeight / BUFFER_COUNT;
+		y *= BUFFER_COUNT - 1;
+		float x = _screenWidth / BUFFER_COUNT;
 
+		/// 디퍼드 텍스쳐,셰도우맵 그리기
+		/// 디버그 텍스트 그리기
 		_spriteBatch->Begin();
+
+		auto shadowMap = _deferredBuffers->GetShadowMapSRV();
+		_spriteBatch->Draw(
+			shadowMap
+			, DirectX::XMFLOAT2(_screenWidth - 512.0f, 0)
+			, nullptr
+			, DirectX::Colors::White
+			, 0.0f							// 회전 각도
+			, DirectX::XMFLOAT2(0, 0)		// 이미지의 원점 : 0.0f,0.0f가 좌측상단
+			, 1.0f/4.0f);
+
+
 		for (int i = 0; i < BUFFER_COUNT; i++)
 		{
 			auto deferredTexture = _deferredBuffers->GetShaderResourceView(i);
 			_spriteBatch->Draw(
 				deferredTexture
-				, DirectX::XMFLOAT2(width * i, height)
+				, DirectX::XMFLOAT2(x * i, y)
 				, nullptr
 				, DirectX::Colors::White
 				, 0.0f							// 회전 각도
 				, DirectX::XMFLOAT2(0, 0)		// 이미지의 원점 : 0.0f,0.0f가 좌측상단
-				, (1.0f/(float)BUFFER_COUNT));						// 이미지 스케일
+				, (1.0f / (float)BUFFER_COUNT));						// 이미지 스케일
 		}
 		_objectManager._debugText->Render(_spriteBatch);
 
@@ -665,36 +711,17 @@ namespace Rocket::Core
 		// Frustum Culling
 		Camera* mainCam = Camera::GetMainCamera();
 
-		std::vector<IRenderable*> renderList;
-		renderList.reserve(256);
-
-		for (auto meshRenderer : _objectManager.GetStaticMeshRenderers())
-		{
-			if (mainCam->FrustumCulling(meshRenderer->GetBoundingBox()))
-			{
-				renderList.push_back(meshRenderer);
-			}
-		}
-
-		for (auto dynamicModelRenderer : _objectManager.GetDynamicModelRenderers())
-		{
-			if (mainCam->FrustumCulling(dynamicModelRenderer->GetBoundingBox()))
-			{
-				renderList.push_back(dynamicModelRenderer);
-			}
-		}
-
 		// Set RenderTarget
 		_deferredBuffers->SetRenderTargets(_deviceContext.Get());
 		// _deferredBuffers->SetRenderTargets(_deviceContext.Get(), _depthStencilView.Get());
 
 		// Draw On G-Buffers
-		for (auto& renderable : renderList)
+		for (auto& renderable : _renderList)
 		{
 			renderable->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
 		}
 
 		// Debug Text
-		_objectManager._debugText->Append("\nObjects Draw : " + std::to_string(renderList.size()));
+		_objectManager._debugText->Append("\nObjects Draw : " + std::to_string(_renderList.size()));
 	}
 }

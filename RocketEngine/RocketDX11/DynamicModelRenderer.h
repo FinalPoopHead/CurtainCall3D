@@ -44,15 +44,16 @@ namespace Rocket::Core
 		virtual void SetRoughness(float value) override;
 
 	public:
-		virtual void Render(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj);
+		virtual void Render(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj) override;
+		void RenderShadowMap(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj, VertexShader* vs, PixelShader* ps);
 
 	public:
 		void UpdateAnimation(float deltaTime, bool isCulled = false);			// 깊은 복사 해온 Node 데이터에 애니메이션 데이터를 적용한다.
 
 	public:
 		void SetMaterial(Material* val) { _material = val; }
-		void SetVertexShader(VertexShader* shader);
-		void SetPixelShader(PixelShader* shader);
+		VertexShader* SetVertexShader(VertexShader* shader);
+		PixelShader* SetPixelShader(PixelShader* shader);
 		void SetRenderState(ID3D11RasterizerState* renderState);
 		//DirectX::BoundingBox GetBoundingBox() const;
 		DirectX::BoundingOrientedBox GetBoundingBox() const;

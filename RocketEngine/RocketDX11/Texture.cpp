@@ -30,7 +30,19 @@ namespace Rocket::Core
 {
 	Texture::Texture()
 		: _texture(nullptr),
-		_textureView(nullptr)
+		_textureSRV(nullptr)
+	{
+
+	}
+
+	Texture::Texture(ID3D11Resource* texture, ID3D11ShaderResourceView* textureView)
+		: _texture(texture), _textureSRV(textureView)
+	{
+
+	}
+
+	Texture::Texture(const Texture& other)
+		: _texture(other._texture), _textureSRV(other._textureSRV)
 	{
 
 	}
@@ -38,7 +50,7 @@ namespace Rocket::Core
 	Texture::~Texture()
 	{
 		_texture.Reset();
-		_textureView.Reset();
+		_textureSRV.Reset();
 	}
 
 	void Texture::LoadFromFile(ID3D11Device* device, std::string fileName)
@@ -55,17 +67,17 @@ namespace Rocket::Core
 		
 		if (extension == "dds")
 		{
-			HR(DirectX::CreateDDSTextureFromFile(device, wFileName.c_str(), _texture.GetAddressOf(), _textureView.GetAddressOf()));
+			HR(DirectX::CreateDDSTextureFromFile(device, wFileName.c_str(), _texture.GetAddressOf(), _textureSRV.GetAddressOf()));
 		}
 		else if (extension == "jpg" || extension == "png")
 		{
-			HR(DirectX::CreateWICTextureFromFile(device, wFileName.c_str(), _texture.GetAddressOf(), _textureView.GetAddressOf()));
+			HR(DirectX::CreateWICTextureFromFile(device, wFileName.c_str(), _texture.GetAddressOf(), _textureSRV.GetAddressOf()));
 		}
 		else if (extension == "tga")
 		{
 			DirectX::ScratchImage image;
 			HR(DirectX::LoadFromTGAFile(wFileName.c_str(), nullptr, image));
-			HR(CreateShaderResourceView(device, image.GetImages(), image.GetImageCount(), image.GetMetadata(), _textureView.GetAddressOf()));
+			HR(CreateShaderResourceView(device, image.GetImages(), image.GetImageCount(), image.GetMetadata(), _textureSRV.GetAddressOf()));
 		}
 		else
 		{
@@ -77,19 +89,40 @@ namespace Rocket::Core
 			_texture->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"TEXTUREtexture") - 1, L"TEXTUREtexture");
 		}
 
-		if (_textureView)
+		if (_textureSRV)
 		{
-			_textureView->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"TEXTUREtextureView") - 1, L"TEXTUREtextureView");
+			_textureSRV->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"TEXTUREtextureView") - 1, L"TEXTUREtextureView");
 		}
 	}
 
-	ID3D11ShaderResourceView* Texture::GetTextureView()
+	ID3D11ShaderResourceView* Texture::GetSRV()
 	{
-		return _textureView.Get();
+		return _textureSRV.Get();
 	}
 
-	ID3D11ShaderResourceView** Texture::GetAddressOfTextureView()
+	ID3D11ShaderResourceView** Texture::GetAddressOfSRV()
 	{
-		return _textureView.GetAddressOf();
+		return _textureSRV.GetAddressOf();
 	}
+
+	ID3D11Resource* Texture::GetResource()
+	{
+		return _texture.Get();
+	}
+
+	ID3D11Resource** Texture::GetAddressOfResource()
+	{
+		return _texture.GetAddressOf();
+	}
+
+	void Texture::SetResource(ID3D11Resource* resource)
+	{
+		_texture = resource;
+	}
+
+	void Texture::SetSRV(ID3D11ShaderResourceView* srv)
+	{
+		_textureSRV = srv;
+	}
+
 }

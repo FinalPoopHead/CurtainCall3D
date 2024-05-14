@@ -27,20 +27,10 @@ struct VertexInputType
     float4 weights : BLENDWEIGHT;
     uint4 boneIndex : BLENDINDICES1;
 };
-    
-struct PixelInputType
-{
-    float4 position : SV_POSITION;
-    float4 worldPosition : POSITION;
-    float2 tex : TEXCOORD0;
-    float3 normal : NORMAL;
-    float3 tangent : TANGENT;
-    float3 bitangent : BINORMAL;
-};
 
-PixelInputType main(VertexInputType input)
+float4 main(VertexInputType input) : SV_POSITION
 {
-    PixelInputType output = (PixelInputType) 0;
+    float4 output = (float4) 0;
     
     // Calculate the position of the vertex against the world, view, and projection matrices.
    
@@ -51,25 +41,11 @@ PixelInputType main(VertexInputType input)
     
     float4 resultPosition = mul(float4(input.position, 1.0f), finalOffsetMatrix);
     
+    // weight 값의 총 합이 1이 아닌 경우 동차좌표인 1이 변조가 된다.
+    // 따라서 w가 변조된 경우 다시 1로 세팅해 주는 것.
     
-    matrix nodeTransformMatrix = nodeTransform[input.nodeIndex];
-    
-    //output.position = mul(resultPosition, worldMatrix);
-    output.position = mul(resultPosition, viewMatrix);
-    output.position = mul(output.position, projectionMatrix);
-    
-    // Store the texture coordinates for the pixel shader.
-    output.tex = input.tex;
-    
-    // TODO : offsetMatrix와 node matrix도 곱한 matrix의 역전치를 곱해야될거같은데 일단 보류
-    output.normal = mul(float4(input.normal, 0.0f), finalOffsetMatrix).xyz;
-    output.normal = normalize(output.normal);
-    output.tangent = mul(float4(input.tangent, 0.0f), finalOffsetMatrix).xyz;
-    output.tangent = normalize(output.tangent);
-    output.bitangent = mul(float4(input.bitangent, 0.0f), finalOffsetMatrix).xyz;
-    output.bitangent = normalize(output.bitangent);
-    
-    output.worldPosition = resultPosition;
-    
+    output = mul(resultPosition, viewMatrix);
+    output = mul(output, projectionMatrix);
+
     return output;
 }

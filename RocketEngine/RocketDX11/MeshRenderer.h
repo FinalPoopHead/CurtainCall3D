@@ -48,11 +48,12 @@ namespace Rocket::Core
 
 	public:
 		virtual void Render(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj) override;
+		void RenderShadowMap(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj, VertexShader* vs, PixelShader* ps);
 
 	public:
 		void SetMaterial(Material* val) { _material = val; }
-		void SetVertexShader(VertexShader* shader);
-		void SetPixelShader(PixelShader* shader);
+		VertexShader* SetVertexShader(VertexShader* shader);
+		PixelShader* SetPixelShader(PixelShader* shader);
 		void SetRenderState(ID3D11RasterizerState* renderState);
 		DirectX::BoundingBox GetBoundingBox() const;
 

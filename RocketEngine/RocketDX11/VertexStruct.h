@@ -54,6 +54,11 @@ namespace Rocket::Core
 		float padding;
 	};
 
+	struct ShadowBufferType
+	{
+		DirectX::XMMATRIX lightViewProjection;
+	};
+
 	struct CameraBufferType
 	{
 		DirectX::XMFLOAT3 cameraPosition;
@@ -118,6 +123,8 @@ namespace Rocket::Core
 			: position(p), UV(uv), normal{ 0, 0, 0 }, tangent{ 0, 0, 0 }, nodeIndex() {}
 		Vertex(const DirectX::XMFLOAT3& p, const DirectX::XMFLOAT3& n, const DirectX::XMFLOAT2& uv)
 			: position(p), normal(n), UV(uv), tangent{ 0, 0, 0 }, nodeIndex() {}
+		Vertex(const DirectX::XMFLOAT3& p, const DirectX::XMFLOAT2& uv, const DirectX::XMFLOAT3& n, const DirectX::XMFLOAT3& t, const DirectX::XMFLOAT3& bt, const UINT& ni)
+			: position(p), UV(uv), normal(n), tangent(t), bitangent(bt), nodeIndex(ni) {}
 	};
 
 	struct VertexSkinned
