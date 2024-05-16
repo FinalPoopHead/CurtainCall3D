@@ -68,7 +68,8 @@ bool flt::RocketAdapter::Render(float deltaTime)
 		{
 			Vector3f pos = (Vector3f)obj->transform->GetWorldPosition();
 			Quaternion rot = obj->transform->GetWorldRotation();
-			obj->camera->SetPositionAndRotation({ pos.x, pos.y, pos.z }, { rot.x, rot.y, rot.z, rot.w });
+			obj->camera->BindTransform(&obj->rocketTransform);
+			//obj->camera->SetPositionAndRotation({ pos.x, pos.y, pos.z }, { rot.x, rot.y, rot.z, rot.w });
 		}
 	}
 
