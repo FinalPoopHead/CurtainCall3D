@@ -1,9 +1,9 @@
-#pragma once
-#include "IRenderable.h"
+﻿#pragma once
+#include "IGraphicsObject.h"
 
 namespace Rocket::Core
 {
-	class ISketchable : public IRenderable
+	class ISketchable : public IGraphicsObject
 	{
 	public:
 		virtual ~ISketchable() {};

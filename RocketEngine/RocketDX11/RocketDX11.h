@@ -20,7 +20,14 @@ namespace Rocket::Core
 {
 	class ObjectManager;
 	class ResourceManager;
-	
+	class DeferredBuffers;
+	class LightPass;
+	class ShadowPass;
+	class IRenderable;
+}
+
+namespace Rocket::Core
+{	
 	class RocketDX11 final : public IDX11Renderer
 	{
 	public:
@@ -39,8 +46,7 @@ namespace Rocket::Core
 	private:
 		void CreateDepthStencilStates();
 
-		void BeginRender();
-		void BeginRender(float r, float g, float b, float a);
+		void BeginRender(float r = 0.1f, float g = 0.1f, float b = 0.1f, float a = 0.1f);
 		void RenderHelperObject();
 		void RenderMesh();
 		void RenderText();
@@ -48,9 +54,8 @@ namespace Rocket::Core
 		void RenderTexture();
 		void RenderCubeMap();
 		void RenderDebug();
+		void GBufferPass();
 		void EndRender();
-
-		void UpdateAnimation(float deltaTime);
 
 		/// Initialize Member
 	private:
@@ -72,10 +77,10 @@ namespace Rocket::Core
 		ComPtr<IDXGISwapChain> _swapChain;
 		ComPtr<ID3D11Texture2D> _backBuffer;
 		ComPtr<ID3D11RenderTargetView> _renderTargetView;
-		ComPtr<ID3D11Texture2D> _depthStencilBuffer;
+		ComPtr<ID3D11Texture2D> _depthStencilBuffer;					// Deferred일때는 이것을 사용하지않고, DeferredBuffer의 뎁스스텐실 버퍼를 사용한다.
 		ComPtr<ID3D11DepthStencilState> _defaultDepthStencilState;
 		ComPtr<ID3D11DepthStencilState> _cubeMapDepthStencilState;
-		ComPtr<ID3D11DepthStencilView> _depthStencilView;
+		ComPtr<ID3D11DepthStencilView> _depthStencilView;				// Deferred일때는 이것을 사용하지않고, DeferredBuffer의 뎁스스텐실 버퍼를 사용한다.
 		ComPtr<ID3D11BlendState> _defaultBlendState;
 		
 		D3D11_VIEWPORT _viewport;
@@ -85,6 +90,16 @@ namespace Rocket::Core
 		DirectX::PrimitiveBatch<DirectX::VertexPositionColor>* _lineBatch;
 		std::unique_ptr<DirectX::BasicEffect> _basicEffect;
 		ComPtr<ID3D11InputLayout> _lineInputLayout;
+
+	private:
+		// 매 프레임 Frustum Culling 적용 후 살아남은 객체들
+		std::vector<IRenderable*> _renderList;
+
+		/// deferred 관련
+	private:
+		std::unique_ptr<DeferredBuffers> _deferredBuffers;
+		std::unique_ptr<LightPass> _lightPass;
+		std::unique_ptr<ShadowPass> _shadowPass;
 
 	private:
 		ObjectManager& _objectManager;

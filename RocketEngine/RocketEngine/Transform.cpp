@@ -60,7 +60,11 @@ namespace Rocket
 
 	void Transform::SetRotationEuler(float angleX, float angleY, float angleZ)
 	{
-		SetRotation(Quaternion::CreateFromYawPitchRoll(angleY, angleX, angleZ));
+		float radianX = DirectX::XMConvertToRadians(angleX);
+		float radianY = DirectX::XMConvertToRadians(angleY);
+		float radianZ = DirectX::XMConvertToRadians(angleZ);
+
+		SetRotation(Quaternion::CreateFromYawPitchRoll(radianY, radianX, radianZ));
 	}
 
 	void Transform::SetScale(const Vector3& scale)

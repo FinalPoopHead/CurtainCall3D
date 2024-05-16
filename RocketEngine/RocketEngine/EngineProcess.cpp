@@ -47,7 +47,7 @@ namespace Rocket
 		_resourceSystem(Rocket::Core::ResourceSystem::Instance()),
 		//_dataSystem(Rocket::Core::DataSystem::Instance()),
 		_hWnd(), _msg(), _screenWidth(WIDTH),_screenHeight(HEIGHT),
-		CLASSNAME(L"V-Gun"), WINDOWNAME(L"V-Gun"),
+		CLASSNAME(L"RocketEngine"), WINDOWNAME(L"RocketEngine"),
 		_isDebugMode(false)
 	{
 		RENDERSYSTEM = &_graphicsSystem;
@@ -261,6 +261,10 @@ namespace Rocket
 
 	BOOL EngineProcess::InitInstance(HINSTANCE hInstance, int nCmdShow)
 	{
+		RECT windowRect = { 0, 0, _screenWidth, _screenHeight };
+		AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
+		int adjustWidth = windowRect.right - windowRect.left;
+		int adjustHeight = windowRect.bottom - windowRect.top;
 // 
 // 		_hWnd = CreateWindow(CLASSNAME, WINDOWNAME, WS_OVERLAPPED,
 // 			CW_USEDEFAULT, CW_USEDEFAULT, _screenWidth, _screenHeight, nullptr, nullptr, hInstance, nullptr);
@@ -270,7 +274,7 @@ namespace Rocket
 // #endif
 
 		_hWnd = CreateWindow(CLASSNAME, WINDOWNAME, WS_OVERLAPPED | WS_OVERLAPPEDWINDOW,
-			CW_USEDEFAULT, CW_USEDEFAULT, _screenWidth, _screenHeight, nullptr, nullptr, hInstance, nullptr);
+			CW_USEDEFAULT, CW_USEDEFAULT, adjustWidth, adjustHeight, nullptr, nullptr, hInstance, nullptr);
 
 		if (!_hWnd)
 		{

@@ -1,10 +1,10 @@
 ﻿#pragma once
 #include <string>
-#include "IRenderable.h"
+#include "IGraphicsObject.h"
 
 namespace Rocket::Core
 {
-	class ISpriteRenderer : public IRenderable
+	class ISpriteRenderer : public IGraphicsObject
 	{
 	public:
 		virtual void SetImage(const std::string& fileName) = 0;

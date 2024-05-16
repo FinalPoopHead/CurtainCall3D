@@ -11,7 +11,7 @@
 
 namespace Rocket::Core
 {
-	class IRenderable;
+	class IGraphicsObject;
 	class ISketchable;
 	class RenderConstantData;
 

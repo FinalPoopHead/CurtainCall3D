@@ -20,6 +20,9 @@
 // 기능제공은 cpp에서 래핑.
 #include "eSoundGroup.h"
 
+/// 그래픽스 enum.
+#include "../RocketCommon/GraphicsEnum.h"
+
 /// 클래스 export.
 // 대체로 컴포넌트.
 #include "Component.h"

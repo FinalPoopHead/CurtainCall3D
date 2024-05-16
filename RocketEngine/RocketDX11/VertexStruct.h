@@ -48,6 +48,17 @@ namespace Rocket::Core
 		DirectX::XMFLOAT4 specularColor;
 	};
 
+	struct LightPassBufferType
+	{
+		DirectX::XMFLOAT3 lightDirection;
+		float padding;
+	};
+
+	struct ShadowBufferType
+	{
+		DirectX::XMMATRIX lightViewProjection;
+	};
+
 	struct CameraBufferType
 	{
 		DirectX::XMFLOAT3 cameraPosition;
@@ -75,6 +86,16 @@ namespace Rocket::Core
 		DirectX::XMMATRIX projection;
 	};
 
+	struct PBRBufferType
+	{
+		float metallic;
+		float roughness;
+		int useNormalMap;
+		int useMetallicMap;
+		int useRoughnessMap;
+		int useAOMap;
+	};
+
 	/// <summary>
 	/// assimp 용 vertex 구조체?
 	/// </summary>
@@ -84,6 +105,7 @@ namespace Rocket::Core
 		DirectX::XMFLOAT2 UV;		// UV Coordinate for texturing
 		DirectX::XMFLOAT3 normal;	// Normal for lighting
 		DirectX::XMFLOAT3 tangent;	// For normal mapping
+		DirectX::XMFLOAT3 bitangent;	// For normal mapping
 		UINT nodeIndex;				// 노드 인덱스
 
 		Vertex() 
@@ -101,6 +123,8 @@ namespace Rocket::Core
 			: position(p), UV(uv), normal{ 0, 0, 0 }, tangent{ 0, 0, 0 }, nodeIndex() {}
 		Vertex(const DirectX::XMFLOAT3& p, const DirectX::XMFLOAT3& n, const DirectX::XMFLOAT2& uv)
 			: position(p), normal(n), UV(uv), tangent{ 0, 0, 0 }, nodeIndex() {}
+		Vertex(const DirectX::XMFLOAT3& p, const DirectX::XMFLOAT2& uv, const DirectX::XMFLOAT3& n, const DirectX::XMFLOAT3& t, const DirectX::XMFLOAT3& bt, const UINT& ni)
+			: position(p), UV(uv), normal(n), tangent(t), bitangent(bt), nodeIndex(ni) {}
 	};
 
 	struct VertexSkinned
@@ -109,6 +133,7 @@ namespace Rocket::Core
 		DirectX::XMFLOAT2 UV;
 		DirectX::XMFLOAT3 normal;
 		DirectX::XMFLOAT3 tangent;
+		DirectX::XMFLOAT3 bitangent;
 		UINT nodeIndex;
 		DirectX::XMFLOAT4 weights;			// 최대 4개의 본에 대한 가중치
 		DirectX::XMUINT4 boneIndices;		// 최대 4개의 본에 대한 인덱스

@@ -59,6 +59,7 @@ namespace Rocket::Core
 		Vector2 UV = Vector2::Zero;
 		Vector3 normal = Vector3::Zero;
 		Vector3 tangent = Vector3::Zero;
+		Vector3 biTangent = Vector3::Zero;
 		UINT nodeIndex = 0;
 		Vector4 weights = Vector4::Zero;			// 최대 4개의 본에 대한 가중치
 		DirectX::XMUINT4 boneIndices = {};		// 최대 4개의 본에 대한 인덱스

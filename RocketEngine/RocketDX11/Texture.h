@@ -20,11 +20,15 @@ namespace Rocket::Core
 
 	public:
 		void LoadFromFile(ID3D11Device* device, std::string fileName);
-		ID3D11ShaderResourceView* GetTextureView();
-		ID3D11ShaderResourceView** GetAddressOfTextureView();
+		void SetResource(ID3D11Resource* resource);
+		void SetSRV(ID3D11ShaderResourceView* srv);
+		ID3D11Resource* GetResource();
+		ID3D11Resource** GetAddressOfResource();
+		ID3D11ShaderResourceView* GetSRV();
+		ID3D11ShaderResourceView** GetAddressOfSRV();
 
 	private:
 		ComPtr<ID3D11Resource> _texture;
-		ComPtr<ID3D11ShaderResourceView> _textureView;
+		ComPtr<ID3D11ShaderResourceView> _textureSRV;
 	};
 }

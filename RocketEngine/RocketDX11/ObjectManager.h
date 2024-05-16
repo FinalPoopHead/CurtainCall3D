@@ -32,14 +32,13 @@ namespace Rocket::Core
 		void Finalize();
 
 	public:
-		std::vector<MeshRenderer*>& GetStaticModelRenderers();
+		std::vector<MeshRenderer*>& GetStaticMeshRenderers();
 		std::vector<DynamicModelRenderer*>& GetDynamicModelRenderers();
 		std::vector<TextRenderer*>& GetTextList();
 		std::vector<SpriteRenderer*>& GetImageList();
 		LineRenderer* GetLineRenderer();
 		std::vector<DirectionalLight*>& GetDirectionalLightList();
-		CubeMap* GetCubeMap(const std::string& name);
-		CubeMap* GetDefaultCubeMap();
+		CubeMap* GetCubeMap();
 
 	public:
 		Camera* CreateCamera();
@@ -66,7 +65,7 @@ namespace Rocket::Core
 		std::vector<TextRenderer*> _textList;
 		std::vector<SpriteRenderer*> _spriteList;
 		std::vector<DirectionalLight*> _directionalLightList;
-		std::unordered_map<std::string, std::unique_ptr<CubeMap>> _cubeMaps;
+		std::unique_ptr<CubeMap> _cubeMap;
 
 	private:
 		ResourceManager& _resourceManager;

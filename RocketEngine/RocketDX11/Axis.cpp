@@ -63,10 +63,9 @@ namespace Rocket::Core
 		HR(device->CreateBuffer(&ibd, &iinitData, _indexBuffer.GetAddressOf()));
 
 		_indexCount = 6;
-#ifdef DEBUG
+#ifdef _DEBUG
 		_vertexBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"vertexBuffer") - 1, L"vertexBuffer");
 		_indexBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"indexBuffer") - 1, L"indexBuffer");
-#endif // DEBUG
-
+#endif // _DEBUG
 	}
 }

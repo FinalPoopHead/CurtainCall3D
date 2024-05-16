@@ -285,7 +285,7 @@
     <ClInclude Include="ILight.h" />
     <ClInclude Include="ILineRenderer.h" />
     <ClInclude Include="IMaterial.h" />
-    <ClInclude Include="IRenderable.h" />
+    <ClInclude Include="IGraphicsObject.h" />
     <ClInclude Include="IResourceManager.h" />
     <ClInclude Include="ISketchable.h" />
     <ClInclude Include="ISpriteRenderer.h" />

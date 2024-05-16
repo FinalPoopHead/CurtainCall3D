@@ -29,6 +29,7 @@ namespace Rocket::Core
 public:
 		void Render(DirectX::SpriteBatch* spriteBatch);
 		void SetFont(DirectX::SpriteFont* font);
+		void Append(const std::string& str);
 
 		// 리소스매니저에서 unique_ptr로 관리.
 		DirectX::SpriteFont* _font;

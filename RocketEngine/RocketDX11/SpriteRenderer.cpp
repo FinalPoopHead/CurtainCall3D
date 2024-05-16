@@ -25,7 +25,7 @@ namespace Rocket::Core
 
 		D3D11_TEXTURE2D_DESC textureDesc;
 		ComPtr<ID3D11Resource> resource;
-		_texture->GetTextureView()->GetResource(resource.GetAddressOf());
+		_texture->GetSRV()->GetResource(resource.GetAddressOf());
 		ComPtr<ID3D11Texture2D> texture2D = static_cast<ID3D11Texture2D*>(resource.Get());
 		texture2D->GetDesc(&textureDesc);
 
@@ -42,7 +42,7 @@ namespace Rocket::Core
 		_worldTM.Decompose(scale, quat, pos);
 
 		spriteBatch->Draw(
-			_texture->GetTextureView(),
+			_texture->GetSRV(),
 			DirectX::XMFLOAT2(pos.x, pos.y),
 			nullptr,
 			_color,

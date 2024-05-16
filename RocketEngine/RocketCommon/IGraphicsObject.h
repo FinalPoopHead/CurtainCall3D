@@ -1,12 +1,12 @@
-#pragma once
+﻿#pragma once
 #include "MathHeader.h"
 
 namespace Rocket::Core
 {
-	class IRenderable
+	class IGraphicsObject
 	{
 	public:
-		virtual ~IRenderable() {}
+		virtual ~IGraphicsObject() {}
 		virtual void SetWorldTM(const Matrix& worldTM) = 0;
 		virtual void SetActive(bool isActive) = 0;
 	};

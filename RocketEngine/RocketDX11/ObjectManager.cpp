@@ -1,6 +1,6 @@
 ﻿#include "ObjectManager.h"
 
-#include "..\\RocketCommon\\IRenderable.h"
+#include "..\\RocketCommon\\IGraphicsObject.h"
 
 #include "ResourceManager.h"
 #include "Camera.h"
@@ -25,25 +25,29 @@ namespace Rocket::Core
 
 	void ObjectManager::Initialize(ID3D11Device* device)
 	{
-		auto& _rscMgr = ResourceManager::Instance();
-
 		_debugText.reset(new TextRenderer());
-		_debugText->SetFont(_rscMgr.GetDefaultFont());
+		_debugText->SetFont(_resourceManager.GetDefaultFont());
 
 		_axis.reset(new Axis());
 		_axis->Initialize(device);
-		_axis->SetRenderState(_rscMgr.GetRenderState(ResourceManager::eRenderState::WIREFRAME));
-		_axis->SetShader(_rscMgr.GetVertexShader("ColorVS"), _rscMgr.GetPixelShader("ColorPS"));
+		_axis->SetRenderState(_resourceManager.GetRenderState(ResourceManager::eRenderState::WIREFRAME));
+		_axis->SetShader(_resourceManager.GetVertexShader("ColorVS"), _resourceManager.GetPixelShader("ColorPS")); // Forward
+		// _axis->SetShader(_rscMgr.GetVertexShader("DeferredColorVS"), _rscMgr.GetPixelShader("DeferredColorPS")); // Deferred
 
 		_grid.reset(new Grid());
 		_grid->Initialize(device);
-		_grid->SetRenderState(_rscMgr.GetRenderState(ResourceManager::eRenderState::WIREFRAME));
-		_grid->SetShader(_rscMgr.GetVertexShader("ColorVS"), _rscMgr.GetPixelShader("ColorPS"));
+		_grid->SetRenderState(_resourceManager.GetRenderState(ResourceManager::eRenderState::WIREFRAME));
+		_grid->SetShader(_resourceManager.GetVertexShader("ColorVS"), _resourceManager.GetPixelShader("ColorPS")); // Forward
+		// _grid->SetShader(_resourceManager.GetVertexShader("DeferredColorVS"), _resourceManager.GetPixelShader("DeferredColorPS")); // Deferred
 
-		auto cubeMap = std::make_unique<CubeMap>();
-		cubeMap->Initialize(device);
-		cubeMap->LoadTexture("CloudCubeMap.dds");
-		_cubeMaps["CloudCubeMap"] = std::move(cubeMap);
+		_cubeMap = std::make_unique<CubeMap>();
+		_cubeMap->Initialize(device, _resourceManager.GetDeviceContext());
+		_cubeMap->SetShader(_resourceManager.GetVertexShader("CubeMapVS"), _resourceManager.GetPixelShader("CubeMapPS")); // Forward
+		_cubeMap->SetIBLGenShader(_resourceManager.GetPixelShader("IrradianceMapPS"), _resourceManager.GetPixelShader("PrefilteredMapPS"), _resourceManager.GetPixelShader("BRDF2DLUTPS"));
+		// cubeMap->SetShader(_resourceManager.GetVertexShader("DeferredCubeMapVS"), _resourceManager.GetPixelShader("DeferredCubeMapPS")); // Deferred
+		//_cubeMap->LoadTexture("Garden.dds");
+		_cubeMap->LoadTexture("IBLBaker.dds");
+		//_cubeMap->LoadTexture("CobblestoneStreet.dds");
 	}
 
 	void ObjectManager::Finalize()
@@ -83,10 +87,7 @@ namespace Rocket::Core
 			delete dl;
 		}
 
-		for (auto& iter : _cubeMaps)
-		{
-			iter.second.reset();
-		}
+		_cubeMap.reset();
 	}
 
 	Camera* ObjectManager::CreateCamera()
@@ -104,13 +105,16 @@ namespace Rocket::Core
 		// TODO : 기본 Mesh를 넣어주기로 했는데 이거 일단 보류.
 		// meshRenderer->LoadModel(_resourceManager.GetCubeMesh());
 
-		//skinnedMeshRenderer->LoadMesh(_resourceManager.GetCubeMesh());
 		// TODO : 기본 Material을 넣어주고 앞단에서 Material을 바꿔서 넣어줄 수 있도록 하자
 		//meshRenderer->SetMaterial(_resourceManager.GetDefaultMaterial());
 		Material* material = new Material();
-		material->SetTexture(_resourceManager.GetDefaultTexture());
-		material->SetVertexShader(_resourceManager.GetVertexShader("StaticMeshVS"));
-		material->SetPixelShader(_resourceManager.GetPixelShader("StaticMeshPS"));
+		material->SetBaseColorTexture(_resourceManager.GetDefaultTexture());
+
+		// TODO : 디퍼드 셰이더를 여기서 수동으로 바꿔주는게 조금 아쉽다.
+// 		material->SetVertexShader(_resourceManager.GetVertexShader("StaticMeshVS"));
+// 		material->SetPixelShader(_resourceManager.GetPixelShader("StaticMeshPS"));
+		material->SetVertexShader(_resourceManager.GetVertexShader("DeferredStaticMeshVS"));
+		material->SetPixelShader(_resourceManager.GetPixelShader("DeferredStaticMeshPS"));
 		material->SetRenderState(_resourceManager.GetRenderState(ResourceManager::eRenderState::SOLID));
 		meshRenderer->SetMaterial(material);
 		
@@ -133,7 +137,7 @@ namespace Rocket::Core
 		return _spriteList;
 	}
 
-	std::vector<MeshRenderer*>& ObjectManager::GetStaticModelRenderers()
+	std::vector<MeshRenderer*>& ObjectManager::GetStaticMeshRenderers()
 	{
 		return _staticModelRendererList;
 	}
@@ -175,9 +179,12 @@ namespace Rocket::Core
 		// TODO : 기본 Material을 넣어주고 앞단에서 Material을 바꿔서 넣어줄 수 있도록 하자
 		//skinnedMeshRenderer->SetMaterial(_resourceManager.GetDefaultMaterial());
 		Material* material = new Material();
-		material->SetTexture(_resourceManager.GetDefaultTexture());
-		material->SetVertexShader(_resourceManager.GetVertexShader("SkinnedMeshVS"));
-		material->SetPixelShader(_resourceManager.GetPixelShader("SkinnedMeshPS"));
+		material->SetBaseColorTexture(_resourceManager.GetDefaultTexture());
+		// TODO : 디퍼드 셰이더를 여기서 수동으로 바꿔주는게 조금 아쉽다.
+// 		material->SetVertexShader(_resourceManager.GetVertexShader("SkinnedMeshVS"));
+// 		material->SetPixelShader(_resourceManager.GetPixelShader("SkinnedMeshPS"));
+		material->SetVertexShader(_resourceManager.GetVertexShader("DeferredSkinnedMeshVS"));
+		material->SetPixelShader(_resourceManager.GetPixelShader("DeferredSkinnedMeshPS"));
 		material->SetRenderState(_resourceManager.GetRenderState(ResourceManager::eRenderState::SOLID));
 		dynamicModelRenderer->SetMaterial(material);
 
@@ -199,18 +206,9 @@ namespace Rocket::Core
 		return _directionalLightList;
 	}
 
-	Rocket::Core::CubeMap* ObjectManager::GetCubeMap(const std::string& name)
+	Rocket::Core::CubeMap* ObjectManager::GetCubeMap()
 	{
-		if(_cubeMaps.find(name) == _cubeMaps.end())
-		{
-			return nullptr;
-		}
 
-		return _cubeMaps.at(name).get();
-	}
-
-	Rocket::Core::CubeMap* ObjectManager::GetDefaultCubeMap()
-	{
-		return _cubeMaps.begin()->second.get();
+		return _cubeMap.get();
 	}
 }
