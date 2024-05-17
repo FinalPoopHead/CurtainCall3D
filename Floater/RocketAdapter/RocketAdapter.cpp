@@ -66,9 +66,10 @@ bool flt::RocketAdapter::Render(float deltaTime)
 
 		if (obj->camera)
 		{
-			Vector3f pos = (Vector3f)obj->transform->GetWorldPosition();
-			Quaternion rot = obj->transform->GetWorldRotation();
-			obj->camera->SetPositionAndRotation({ pos.x, pos.y, pos.z }, { rot.x, rot.y, rot.z, rot.w });
+// 			Vector3f pos = (Vector3f)obj->transform->GetWorldPosition();
+// 			Quaternion rot = obj->transform->GetWorldRotation();
+// 			obj->camera->BindTransform(&obj->rocketTransform);
+			//obj->camera->SetPositionAndRotation({ pos.x, pos.y, pos.z }, { rot.x, rot.y, rot.z, rot.w });
 		}
 	}
 
@@ -92,6 +93,7 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 		// 카메라 등록 로직
 		rocketObject->camera = factory->CreateCamera();
 		rocketObject->camera->SetAsMainCamera();
+		rocketObject->camera->BindTransform(&rocketObject->rocketTransform);
 	}
 
 	if (renderable.node != nullptr)

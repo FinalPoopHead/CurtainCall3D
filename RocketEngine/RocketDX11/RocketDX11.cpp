@@ -457,11 +457,12 @@ namespace Rocket::Core
 			RenderHelperObject();
 		}
 
+		RenderHelperObject();
 		RenderCubeMap();
 
 		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), nullptr);
 
-		// 		RenderLine();
+		// RenderLine();
 		RenderText();
 		RenderTexture();
 
@@ -469,6 +470,7 @@ namespace Rocket::Core
 		{
 			RenderDebug();
 		}
+		RenderDebug();
 
 		EndRender();
 	}

@@ -102,8 +102,15 @@ namespace Rocket::Core
 
 			ShadowBufferType* shadowBufferDataPtr = (ShadowBufferType*)mappedResource.pData;
 
-			auto dirLight = ObjectManager::Instance().GetDirectionalLightList().front();
-			Matrix VP = dirLight->GetViewMatrix() * dirLight->GetProjectionMatrix();
+			Matrix VP = Matrix::Identity;
+
+			auto& dirLightList = ObjectManager::Instance().GetDirectionalLightList();
+			if (dirLightList.size() > 0)
+			{
+				auto& dirLight = dirLightList.front();
+				VP = dirLight->GetViewMatrix() * dirLight->GetProjectionMatrix();
+			}
+
 			VP = VP.Transpose();
 			shadowBufferDataPtr->lightViewProjection = VP;
 

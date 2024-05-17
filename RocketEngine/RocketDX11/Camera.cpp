@@ -17,6 +17,7 @@ namespace Rocket::Core
 	{
 		_nearWindowHeight = 2.0f * _nearZ * std::tanf(DirectX::XMConvertToRadians(_fovY / 2));
 		_farWindowHeight = 2.0f * _farZ * std::tanf(DirectX::XMConvertToRadians(_fovY / 2));
+		UpdateProjectionMatrix();
 	}
 
 	Camera::~Camera()
