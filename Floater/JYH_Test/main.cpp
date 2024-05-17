@@ -170,7 +170,8 @@ int main(int argc, char* argv[])
 	//adpaterTest->Initialize(1280, 720, false, NULL, false, 0.0f, 0.0f);
 
 	flt::Platform platform{ true };
-	platform.Initialize(1280, 720, L"title", L".\\path");
+	//platform.Initialize(1280, 720, L"title", L".\\path");
+	platform.Initialize(1920, 1080, L"title", L".\\path");
 
 	auto renderer = platform.CreateRenderer(flt::RendererType::ROCKET_DX11);
 	//auto renderer = platform.CreateRenderer(flt::RendererType::DX11);
