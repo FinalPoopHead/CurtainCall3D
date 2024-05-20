@@ -55,7 +55,7 @@ public:
 	virtual void FixedUpdate() override
 	{
 		flt::Vector4f position = transform.GetWorldPosition();
-		printf("positon : %.3f, %.3f %.3f\n", position.x, position.y, position.z);
+		//printf("positon : %.3f, %.3f %.3f\n", position.x, position.y, position.z);
 		//GlidingMovement();
 	}
 

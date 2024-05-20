@@ -26,7 +26,7 @@ namespace flt
 		void StartFrame();
 
 		template<GameObjectType T>
-		T* CreateGameObject();
+		T* CreateGameObject(bool isEnabled = true);
 
 		std::vector<GameObject*> GetGameObjects() const { return _gameObjects; }
 
@@ -37,26 +37,18 @@ namespace flt
 	};
 
 	template<GameObjectType T>
-	T* Scene::CreateGameObject()
+	T* Scene::CreateGameObject(bool isEnabled /*= true*/)
 	{
 		GameObject* gameObject = new T();
+		gameObject->_isEnable = false;
 
 		_gameObjects.emplace_back(gameObject);
-		if (gameObject->_isEnable)
+		if (isEnabled)
 		{
-			_gameObjectsToEnable.emplace_back(gameObject, gameObject->_isEnable);
-
-			for (auto& component : gameObject->_components)
-			{
-				if (component == nullptr)
-				{
-					continue;
-				}
-
-				_componentsToEnable.emplace_back(component, true);
-			}
+			_gameObjectsToEnable.emplace_back(gameObject, true);
 		}
 
 		return static_cast<T*>(gameObject);
 	}
+
 }

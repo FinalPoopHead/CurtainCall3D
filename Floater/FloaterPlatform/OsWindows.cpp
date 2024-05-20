@@ -1139,7 +1139,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 						RAWINPUTDEVICE rawInputDevice;
 
 						rawInputDevice.dwFlags = 0;
-						// RIDEV_NOLEGACY;	// 레거시 메시지 생성 금지
+						// RIDEV_NOLEGACY;	// 레거시 메시지 생성 금지, 마우스의 경우 윈도우 창에서 작업중 표시로 바뀌며 닫기 버튼등이 동작하지 않음.
 						// RIDEV_INPUTSINK; // 백 그라운드에서도 인풋 받기
 						rawInputDevice.usUsagePage = 1;
 						rawInputDevice.usUsage = 2;

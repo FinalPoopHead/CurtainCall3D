@@ -103,7 +103,7 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 
 		std::string pointer = std::to_string(reinterpret_cast<uint64_t>(rocketObject->rkModel));
 		rsmgr->LoadModel(pointer, rocketObject->rkModel);
-
+		
 		if (renderable.node->meshes.size() > 0)
 		{
 			rocketObject->renderer = factory->CreateDynamicModelRenderer();

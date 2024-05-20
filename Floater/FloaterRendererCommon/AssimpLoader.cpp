@@ -475,7 +475,7 @@ void flt::AssimpLoader::SetHierarchyRawNodeRecursive(aiNode* pNode, RawNode* pRa
 
 	pRawNode->name = ToWstring(pNode->mName.C_Str());
 	_RawNodeMap.insert({ pRawNode->name , pRawNode });
-	std::wcout << pRawNode->name << std::endl;
+	//std::wcout << pRawNode->name << std::endl;
 
 	aiVector3D position;
 	aiQuaternion rotation;

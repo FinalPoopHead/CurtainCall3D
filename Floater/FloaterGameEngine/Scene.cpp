@@ -182,9 +182,45 @@ void flt::Scene::StartFrame()
 {
 	for (auto& [object, isEnable] : _gameObjectsToEnable)
 	{
-		if (object->_isEnable != isEnable)
+		//이미 이 전 상태와 같다면 패스.
+		if (object->_isEnable == isEnable)
 		{
-			object->_isEnable = isEnable;
+			continue;
+		}
+
+		object->_isEnable = isEnable;
+
+		if (isEnable)
+		{
+			// 게임 오브젝트가 활성화 되면서 컴포넌츠들 활성화.
+			for (auto& component : object->_components)
+			{
+				if (component == nullptr)
+				{
+					continue;
+				}
+
+				if (component->_isEnable)
+				{
+					component->OnEnable();
+				}
+			}
+		}
+		else
+		{
+			// 게임 오브젝트가 활성화 되면서 컴포넌츠들 활성화.
+			for (auto& component : object->_components)
+			{
+				if (component == nullptr)
+				{
+					continue;
+				}
+
+				if (component->_isEnable)
+				{
+					component->OnDisable();
+				}
+			}
 		}
 	}
 

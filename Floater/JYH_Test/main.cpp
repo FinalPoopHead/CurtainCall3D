@@ -4,6 +4,7 @@
 #include "../FloaterGameEngine/include/GameEngine.h"
 #include "../FloaterPlatform/include/Platform.h"
 #include "TestScene.h"
+#include "UnityLoadScene.h"
 #include <iostream>
 
 int main(int argc, char* argv[])
@@ -15,8 +16,11 @@ int main(int argc, char* argv[])
 	////std::cout << std::hardware_destructive_interference_size << std::endl;
 	  
 	flt::GameEngine* pGameEngine = flt::GameEngine::Instance();
-	TestScene testScene;
-	pGameEngine->SetScene(&testScene);
+	
+	UnityLoadScene unityLoadScene(L"..\\x64\\data\\SoaringMap.json");
+
+	//TestScene testScene;
+	pGameEngine->SetScene(&unityLoadScene);
 
 	//int loopCount = 0;
 	while (pGameEngine->Update())
