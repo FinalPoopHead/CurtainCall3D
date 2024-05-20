@@ -1138,7 +1138,8 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 
 						RAWINPUTDEVICE rawInputDevice;
 
-						rawInputDevice.dwFlags = RIDEV_NOLEGACY;
+						rawInputDevice.dwFlags = 0;
+						// RIDEV_NOLEGACY;	// 레거시 메시지 생성 금지
 						// RIDEV_INPUTSINK; // 백 그라운드에서도 인풋 받기
 						rawInputDevice.usUsagePage = 1;
 						rawInputDevice.usUsage = 2;

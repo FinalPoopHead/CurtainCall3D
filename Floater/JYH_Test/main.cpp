@@ -19,9 +19,8 @@ int main(int argc, char* argv[])
 	pGameEngine->SetScene(&testScene);
 
 	//int loopCount = 0;
-	while (true)
+	while (pGameEngine->Update())
 	{
-		pGameEngine->Update();
 	}
 
 	pGameEngine->Finalize();
