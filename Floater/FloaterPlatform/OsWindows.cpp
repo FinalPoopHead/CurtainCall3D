@@ -4,6 +4,7 @@
 #include "OsWindows.h"
 #include "./include/GamePad.h"
 #include <iostream>
+#include <algorithm>
 #include <memory>
 #include "../FloaterUtil/include/FloaterMacro.h"
 #include "../FloaterRendererCommon/include/IRenderer.h"
