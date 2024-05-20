@@ -20,6 +20,6 @@ namespace Rocket::Core
 		virtual void Initialize(ID3D11Device* device) override;
 
 	private:
-		void BuildGeometryBuffers(ID3D11Device* device, float radius = 0.5f, UINT sliceCount = 20, UINT stackCount = 20);
+		void BuildGeometryBuffers(ID3D11Device* device, float radius = 0.5f, UINT sliceCount = 50, UINT stackCount = 50);
 	};
 }

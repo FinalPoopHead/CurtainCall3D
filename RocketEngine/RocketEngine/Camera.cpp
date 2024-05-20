@@ -9,16 +9,17 @@
 namespace Rocket
 {
 	Camera::Camera()
-		: _nearZ(0.01f),
-		_farZ(1000.0f),
-		_aspect(16.0f / 9.0f),
-		_fovY(70.0f),
-		_nearWindowHeight(),
-		_farWindowHeight(),
-		_isShakeCameraOnHit(false), _isShakeCameraOnShoot(false),
-		_shakeDurationOnHit(0.1f), _shakeDurationOnShoot(0.1f),
-		_distX(0.0f),_distY(0.0f), _distYOnShoot(0.0f),
-		_camera(Core::GraphicsSystem::Instance().GetFactory()->CreateCamera())
+		: _nearZ(0.01f)
+		, _farZ(1000.0f)
+		, _aspect(16.0f / 9.0f)
+		, _fovY(70.0f)
+		, _nearWindowHeight()
+		, _farWindowHeight()
+		, _isShakeCameraOnHit(false), _isShakeCameraOnShoot(false)
+		, _shakeDurationOnHit(0.1f), _shakeDurationOnShoot(0.1f)
+		, _distX(0.0f), _distY(0.0f), _distYOnShoot(0.0f)
+		, _camera(Core::GraphicsSystem::Instance().GetFactory()->CreateCamera())
+		, _ray()
 	{
 		_camera->SetNearZ(0.01f);
 		_camera->SetFarZ(1000.0f);
@@ -31,14 +32,14 @@ namespace Rocket
 
 	}
 
-	void Camera::UpdateRenderData()
+	void Camera::BindTransform()
 	{
-		_camera->SetPositionAndRotation(gameObject->transform.GetPosition(), gameObject->transform.GetRotation());
+		_camera->BindTransform(gameObject->transform._rocketTransform);
 	}
 
-	Rocket::Core::ICamera& Camera::GetCamera()
+	void Camera::SetAsMainCamera()
 	{
-		return *_camera;
+		_camera->SetAsMainCamera();
 	}
 
 	float Camera::GetNearZ() const
@@ -149,9 +150,21 @@ namespace Rocket
 		gameObject->transform.Translate(Vector3::Up * delta);
 	}
 
+	void Camera::Yaw(float angle)
+	{
+		// 아직 구현하지 않았음.
+		assert(false);
+	}
+
 	void Camera::Pitch(float angle)
 	{
 		gameObject->transform.Rotate(angle, 0.0f, 0.0f);
+	}
+
+	void Camera::Roll(float angle)
+	{
+		// 아직 구현하지 않았음.
+		assert(false);
 	}
 
 	void Camera::RotateY(float angle)

@@ -52,17 +52,9 @@ namespace Rocket::Core
 #endif
 
 		ID3D10Blob* pixelShaderBlob = nullptr;
-		HRESULT hResult = D3DCompileFromFile(path.c_str(), nullptr, nullptr, "main", "ps_5_0", flags1, 0, &pixelShaderBlob, nullptr);
-		if (hResult != S_OK)
-		{
-			assert(false);
-		}
+		HR(D3DCompileFromFile(path.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", "ps_5_0", flags1, 0, &pixelShaderBlob, nullptr));
 
-		hResult = device->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), nullptr, &_pixelShader);
-		if (hResult != S_OK)
-		{
-			assert(false);
-		}
+		HR(device->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), nullptr, &_pixelShader));
 
 		_pixelShader->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"pixelShader") - 1, L"pixelShader");
 

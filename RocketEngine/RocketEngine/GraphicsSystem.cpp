@@ -92,9 +92,6 @@ namespace Rocket::Core
 
 	void GraphicsSystem::UpdateRenderData()
 	{
-		auto mainCam = SceneSystem::Instance().GetCurrentScene()->GetMainCamera();
-		mainCam->UpdateRenderData();
-
 		for (auto& renderComp : _renderableList)
 		{
 			renderComp->UpdateRenderData();

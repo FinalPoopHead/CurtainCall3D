@@ -2,11 +2,11 @@
 #include <windows.h>
 #include <string>
 #include "MathHeader.h"
-#include "IRenderable.h"
+#include "IGraphicsObject.h"
 
 namespace Rocket::Core
 {
-	class ITextRenderer : public IRenderable
+	class ITextRenderer : public IGraphicsObject
 	{
 	public:
 		virtual std::string& GetText() = 0;

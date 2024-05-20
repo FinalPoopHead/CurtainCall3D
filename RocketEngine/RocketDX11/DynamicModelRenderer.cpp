@@ -11,13 +11,15 @@
 namespace Rocket::Core
 {
 	DynamicModelRenderer::DynamicModelRenderer()
-		: _model(nullptr),
-		_material(nullptr),
-		_isActive(true),
-		_worldTM(Matrix::Identity),
-		_animatedRootNode(nullptr),
-		_animationTime(0.0),
-		_animationTick(0.0)
+		: _model(nullptr)
+		, _material(nullptr)
+		, _isActive(true)
+		, _worldTM(Matrix::Identity)
+		, _animatedRootNode(nullptr)
+		, _animationTime(0.0)
+		, _animationTick(0.0)
+		, _rootTransform(nullptr)
+		, _boundingBox()
 	{
 
 	}
@@ -43,17 +45,35 @@ namespace Rocket::Core
 	void DynamicModelRenderer::LoadModel(const std::string& fileName)
 	{
 		_model = reinterpret_cast<DynamicModel*>(ResourceManager::Instance().GetModel(fileName));
-		if(_model == nullptr)
+		if (_model == nullptr)
 		{
 			MessageBox(NULL, TEXT("모델이 없습니다."), TEXT("모델 로드 실패"), MB_OK);
 			return;
 		}
 		_animatedRootNode = CopyNodeData(_model->rootNode);
+		FindArmatureRootRecur(&_armatureRootNode, _animatedRootNode);
+
+		// BoundingBox 생성
+		std::vector<DirectX::XMFLOAT3> points;
+
+		for (auto& mesh : _model->meshes)
+		{
+			for (auto& vertex : mesh->GetVertices())
+			{
+				points.push_back(vertex.position);
+			}
+		}
+
+		DirectX::BoundingBox temp;
+		DirectX::BoundingBox::CreateFromPoints(temp, points.size(), points.data(), sizeof(DirectX::XMFLOAT3));
+
+		//_boundingBox = temp;
+		DirectX::BoundingOrientedBox::CreateFromBoundingBox(_boundingBox, temp);
 	}
 
-	void DynamicModelRenderer::LoadTexture(std::string fileName)
+	void DynamicModelRenderer::LoadBaseColorTexture(std::string fileName)
 	{
-		_material->SetTexture(ResourceManager::Instance().GetTexture(fileName));
+		_material->SetBaseColorTexture(ResourceManager::Instance().GetTexture(fileName));
 	}
 
 	void DynamicModelRenderer::BindTransform(RocketTransform* rootTransform)
@@ -61,7 +81,7 @@ namespace Rocket::Core
 		BindTransformRecur(rootTransform, _animatedRootNode);
 	}
 
-	void DynamicModelRenderer::UpdateAnimation(float deltaTime)
+	void DynamicModelRenderer::UpdateAnimation(float deltaTime, bool isCulled /*= false*/)
 	{
 		if (_model->animations.empty())
 		{
@@ -87,7 +107,7 @@ namespace Rocket::Core
 			{
 				double secondPerTick = anim->duration / anim->ticksPerSecond;;
 				int count = 0;
-				while (secondPerTick * (count+1) < _animationTime)
+				while (secondPerTick * (count + 1) < _animationTime)
 				{
 					count++;
 				}
@@ -101,6 +121,10 @@ namespace Rocket::Core
 			}
 		}
 
+		if (isCulled)
+		{
+			return;
+		}
 
 		for (auto& nodeAnim : anim->nodeAnimations)
 		{
@@ -115,7 +139,7 @@ namespace Rocket::Core
 			// Position
 			{
 				int positionIndex = 0;
- 				for (int i = 0; i < nodeAnim->positionTimestamps.size(); i++)
+				for (int i = 0; i < nodeAnim->positionTimestamps.size(); i++)
 				{
 					if (_animationTick < nodeAnim->positionTimestamps[i])
 					{
@@ -123,7 +147,7 @@ namespace Rocket::Core
 						break;
 					}
 				}
-				
+
 				if (positionIndex == 0)
 				{
 					position = nodeAnim->positions[0];
@@ -185,7 +209,7 @@ namespace Rocket::Core
 
 			node->transform->SetLocalPosition(position);
 			node->transform->SetLocalRotation(rotation);
-			node->transform->SetLocalScale(scale);			
+			node->transform->SetLocalScale(scale);
 		}
 
 	}
@@ -240,26 +264,26 @@ namespace Rocket::Core
 			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
 
 			// 카메라 버퍼 세팅
-			{
-				Camera* mainCam = Camera::GetMainCamera();
-				// 버텍스 쉐이더
-				D3D11_MAPPED_SUBRESOURCE mappedResource;
-				HR(deviceContext->Map(mainCam->GetCameraBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-
-				CameraBufferType* cameraBufferDataPtr = (CameraBufferType*)mappedResource.pData;
-
-				cameraBufferDataPtr->cameraPosition = mainCam->GetPosition();
-				cameraBufferDataPtr->padding = 0.0f;
-
-				deviceContext->Unmap(mainCam->GetCameraBuffer(), 0);
-
-				unsigned int bufferNumber = 1;
-
-				deviceContext->VSSetConstantBuffers(bufferNumber, 1, mainCam->GetAddressOfCameraBuffer());
-			}
+// 			{
+// 				Camera* mainCam = Camera::GetMainCamera();
+// 				// 버텍스 쉐이더
+// 				D3D11_MAPPED_SUBRESOURCE mappedResource;
+// 				HR(deviceContext->Map(mainCam->GetCameraBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+// 
+// 				CameraBufferType* cameraBufferDataPtr = (CameraBufferType*)mappedResource.pData;
+// 
+// 				cameraBufferDataPtr->cameraPosition = mainCam->GetPosition();
+// 				cameraBufferDataPtr->padding = 0.0f;
+// 
+// 				deviceContext->Unmap(mainCam->GetCameraBuffer(), 0);
+// 
+// 				unsigned int bufferNumber = 1;
+// 
+// 				deviceContext->VSSetConstantBuffers(bufferNumber, 1, mainCam->GetAddressOfCameraBuffer());
+// 			}
 
 			///
-			bufferNumber = 2;
+			bufferNumber = 1;
 			HR(deviceContext->Map(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
 
 			NodeBufferType* nodeBufferDataPtr = (NodeBufferType*)mappedResource.pData;
@@ -268,12 +292,10 @@ namespace Rocket::Core
 			SetNodeBuffer(_animatedRootNode, nodeBufferDataPtr);
 
 			deviceContext->Unmap(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0);
-
-
 			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
 
 
-			bufferNumber = 3;
+			bufferNumber = 2;
 			HR(deviceContext->Map(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
 
 			BoneBufferType* boneBufferDataPtr = (BoneBufferType*)mappedResource.pData;
@@ -284,38 +306,44 @@ namespace Rocket::Core
 			testCount = 0;
 
 			deviceContext->Unmap(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0);
-
-
 			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
-			///
-			// 픽셀 쉐이더
+
+			/// 픽셀 쉐이더
+			// PBR Data를 넘겨준다.
 			bufferNumber = 0;
 
 			HR(deviceContext->Map(_material->GetPixelShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
 
-			LightBufferType* lightBufferDataPtr = (LightBufferType*)mappedResource.pData;
+			PBRBufferType* pbrBufferData = (PBRBufferType*)mappedResource.pData;
 
-			for (auto& directionalLight : ObjectManager::Instance().GetDirectionalLightList())
+			pbrBufferData->metallic = _material->GetMetallic();
+			pbrBufferData->roughness = _material->GetRoughness();
+			pbrBufferData->useNormalMap = false;
+			pbrBufferData->useMetallicMap = false;
+			pbrBufferData->useRoughnessMap = false;
+			pbrBufferData->useAOMap = false;
+
+			if (_material->GetNormalTexture())
 			{
-				lightBufferDataPtr->ambientColor = directionalLight->GetAmbientColor();
-				lightBufferDataPtr->diffuseColor = directionalLight->GetDiffuseColor();
-				lightBufferDataPtr->specularPower = directionalLight->GetSpecularPower();
-				lightBufferDataPtr->specularColor = directionalLight->GetSpecularColor();
-				lightBufferDataPtr->lightDirection = directionalLight->GetForward();
+				pbrBufferData->useNormalMap = true;
 			}
 
-			// TODO : 라이트가 없는경우. 임시입니다.
-			if (ObjectManager::Instance().GetDirectionalLightList().size() == 0)
+			if (_material->GetMetallicTexture())
 			{
-				lightBufferDataPtr->ambientColor = { 0.3f,0.3f,0.3f,0.3f };
-				lightBufferDataPtr->diffuseColor = { 1.0f,1.0f,1.0f,1.0f };
-				lightBufferDataPtr->specularPower = 4.0f;
-				lightBufferDataPtr->specularColor = { 1.0f,1.0f ,1.0f ,1.0f };
-				lightBufferDataPtr->lightDirection = { 0.0f,-1.0f,0.0f };
+				pbrBufferData->useMetallicMap = true;
+			}
+
+			if (_material->GetRoughnessTexture())
+			{
+				pbrBufferData->useRoughnessMap = true;
+			}
+
+			if (_material->GetAOTexture())
+			{
+				pbrBufferData->useAOMap = true;
 			}
 
 			deviceContext->Unmap(_material->GetPixelShader()->GetConstantBuffer(bufferNumber), 0);
-
 
 			deviceContext->PSSetConstantBuffers(bufferNumber, 1, _material->GetPixelShader()->GetAddressOfConstantBuffer(bufferNumber));
 		}
@@ -335,28 +363,58 @@ namespace Rocket::Core
 		// 		}
 
 		stride = sizeof(VertexSkinned);
-		
+
 		for (auto& mesh : _model->meshes)
 		{
 			deviceContext->IASetVertexBuffers(0, 1, mesh->GetAddressOfVertexBuffer(), &stride, &offset);
 			deviceContext->IASetIndexBuffer(mesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
 
-			deviceContext->PSSetShaderResources(0, 1, _material->GetTexture()->GetAddressOfTextureView());
+			if (_material->GetBaseColorTexture())
+			{
+				deviceContext->PSSetShaderResources(0, 1, _material->GetBaseColorTexture()->GetAddressOfSRV());
+			}
+			if (_material->GetNormalTexture())
+			{
+				deviceContext->PSSetShaderResources(1, 1, _material->GetNormalTexture()->GetAddressOfSRV());
+			}
+			if (_material->GetMetallicTexture())
+			{
+				deviceContext->PSSetShaderResources(2, 1, _material->GetMetallicTexture()->GetAddressOfSRV());
+			}
+			if (_material->GetRoughnessTexture())
+			{
+				deviceContext->PSSetShaderResources(3, 1, _material->GetRoughnessTexture()->GetAddressOfSRV());
+			}
+			if (_material->GetAOTexture())
+			{
+				deviceContext->PSSetShaderResources(4, 1, _material->GetAOTexture()->GetAddressOfSRV());
+			}
 
 			deviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
 		}
+
+		ComPtr<ID3D11ShaderResourceView> nullSRV = nullptr;
+		deviceContext->PSSetShaderResources(0, 1, nullSRV.GetAddressOf());
+		deviceContext->PSSetShaderResources(1, 1, nullSRV.GetAddressOf());
+		deviceContext->PSSetShaderResources(2, 1, nullSRV.GetAddressOf());
+		deviceContext->PSSetShaderResources(3, 1, nullSRV.GetAddressOf());
+		deviceContext->PSSetShaderResources(4, 1, nullSRV.GetAddressOf());
 	}
 
-	void DynamicModelRenderer::SetVertexShader(VertexShader* shader)
+	Rocket::Core::VertexShader* DynamicModelRenderer::SetVertexShader(VertexShader* shader)
 	{
 		assert(_material);
+		auto temp = _material->GetVertexShader();
 		_material->SetVertexShader(shader);
+		return temp;
 	}
 
-	void DynamicModelRenderer::SetPixelShader(PixelShader* shader)
+	Rocket::Core::PixelShader* DynamicModelRenderer::SetPixelShader(PixelShader* shader)
 	{
 		assert(_material);
+		auto temp = _material->GetPixelShader();
 		_material->SetPixelShader(shader);
+		return temp;
 	}
 
 	void DynamicModelRenderer::SetRenderState(ID3D11RasterizerState* renderState)
@@ -393,7 +451,7 @@ namespace Rocket::Core
 	}
 
 	void DynamicModelRenderer::SetBoneBuffer(Node* node, BoneBufferType* boneBuffer)
-	{	
+	{
 		Bone* bone = node->bindedBone;
 		if (bone)
 		{
@@ -463,6 +521,160 @@ namespace Rocket::Core
 		}
 
 		delete node;
+	}
+
+	// 	DirectX::BoundingBox DynamicModelRenderer::GetBoundingBox() const
+	// 	{
+	// 		// WorldTM을 곱한 다음에 내보낸다.
+	// 		DirectX::BoundingBox transformedBox;
+	// 		_boundingBox.Transform(transformedBox, _armatureRootNode->transform->GetWorldTM());
+	// 		transformedBox.Transform(transformedBox, 2.0f, { 0.0f,0.0f,0.0f,1.0f }, { 0.0f,0.0f,0.0f });
+	// 		return transformedBox;
+	// 	}
+
+	DirectX::BoundingOrientedBox DynamicModelRenderer::GetBoundingBox() const
+	{
+		// WorldTM을 곱한 다음에 내보낸다.
+		DirectX::BoundingOrientedBox transformedBox;
+		_boundingBox.Transform(transformedBox, _armatureRootNode->transform->GetWorldTM());
+		return transformedBox;
+	}
+
+	void DynamicModelRenderer::FindArmatureRootRecur(Node** out, Node* node) const
+	{
+		if (node->bindedBone)
+		{
+			*out = node;
+			return;
+		}
+
+		for (auto& child : node->children)
+		{
+			FindArmatureRootRecur(out, child);
+		}
+	}
+
+	void DynamicModelRenderer::LoadNormalTexture(std::string fileName)
+	{
+		_material->SetNormalTexture(ResourceManager::Instance().GetTexture(fileName));
+	}
+
+	void DynamicModelRenderer::LoadMetallicTexture(std::string fileName)
+	{
+		_material->SetMetallicTexture(ResourceManager::Instance().GetTexture(fileName));
+	}
+
+	void DynamicModelRenderer::LoadRoughnessTexture(std::string fileName)
+	{
+		_material->SetRoughnessTexture(ResourceManager::Instance().GetTexture(fileName));
+	}
+
+	void DynamicModelRenderer::LoadAOTexture(std::string fileName)
+	{
+		_material->SetAmbientOcclusionTexture(ResourceManager::Instance().GetTexture(fileName));
+	}
+
+	void DynamicModelRenderer::SetMetallic(float value)
+	{
+		_material->SetMetallic(value);
+	}
+
+	void DynamicModelRenderer::SetRoughness(float value)
+	{
+		_material->SetRoughness(value);
+	}
+
+	void DynamicModelRenderer::RenderShadowMap(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj, VertexShader* vs, PixelShader* ps)
+	{
+		if (!_isActive)
+		{
+			return;
+		}
+
+		// Grid가 쓰는 Shader deviceContext 이용해 연결.
+		deviceContext->VSSetShader(vs->GetVertexShader(), nullptr, 0);
+		//deviceContext->PSSetShader(ps->GetPixelShader(), nullptr, 0);
+		deviceContext->PSSetShader(NULL, NULL, 0);
+
+		// 상수 버퍼 세팅
+		{
+			// 버텍스 쉐이더
+			unsigned int bufferNumber = 0;
+			D3D11_MAPPED_SUBRESOURCE mappedResource;
+			HR(deviceContext->Map(vs->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+
+			MatrixBufferType* matrixBufferDataPtr = (MatrixBufferType*)mappedResource.pData;
+
+			// DX에서 HLSL 로 넘어갈때 자동으로 전치가 되서 넘어간다.
+			// HLSL 에서도 Row Major 하게 작성하고 싶으므로 미리 전치를 시켜놓는다.
+			// 총 전치가 2번되므로 HLSL에서도 Row Major한 Matrix로 사용한다.
+
+			DirectX::XMVECTOR det = DirectX::XMMatrixDeterminant(_worldTM);
+			DirectX::XMMATRIX worldInverse = DirectX::XMMatrixInverse(&det, _worldTM);
+
+			DirectX::XMMATRIX w = DirectX::XMMatrixTranspose(_worldTM);
+			DirectX::XMMATRIX wi = DirectX::XMMatrixTranspose(worldInverse);
+			DirectX::XMMATRIX v = DirectX::XMMatrixTranspose(view);
+			DirectX::XMMATRIX p = DirectX::XMMatrixTranspose(proj);
+
+			matrixBufferDataPtr->world = w;
+			matrixBufferDataPtr->worldInverse = wi;
+			matrixBufferDataPtr->view = v;
+			matrixBufferDataPtr->projection = p;
+
+			deviceContext->Unmap(vs->GetConstantBuffer(bufferNumber), 0);
+
+
+			deviceContext->VSSetConstantBuffers(bufferNumber, 1, vs->GetAddressOfConstantBuffer(bufferNumber));
+
+			///
+			bufferNumber = 1;
+			HR(deviceContext->Map(vs->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+
+			NodeBufferType* nodeBufferDataPtr = (NodeBufferType*)mappedResource.pData;
+
+			//SetNodeBuffer(_model->rootNode, nodeBufferDataPtr);
+			SetNodeBuffer(_animatedRootNode, nodeBufferDataPtr);
+
+			deviceContext->Unmap(vs->GetConstantBuffer(bufferNumber), 0);
+			deviceContext->VSSetConstantBuffers(bufferNumber, 1, vs->GetAddressOfConstantBuffer(bufferNumber));
+
+
+			bufferNumber = 2;
+			HR(deviceContext->Map(vs->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+
+			BoneBufferType* boneBufferDataPtr = (BoneBufferType*)mappedResource.pData;
+
+			// TODO : 이거 사실 둘 다 같은 본 데이터인건데 왜 매트릭스가 영행렬이 들어가있지..?
+			//SetBoneBuffer(_model->rootNode, boneBufferDataPtr);
+			SetBoneBuffer(_animatedRootNode, boneBufferDataPtr);
+
+			deviceContext->Unmap(vs->GetConstantBuffer(bufferNumber), 0);
+			deviceContext->VSSetConstantBuffers(bufferNumber, 1, vs->GetAddressOfConstantBuffer(bufferNumber));
+		}
+
+		// 렌더스테이트
+		deviceContext->RSSetState(ResourceManager::Instance().GetRenderState(ResourceManager::eRenderState::SHADOWMAP));
+
+
+		/// 그린다
+		// 인덱스버퍼와 버텍스버퍼 셋팅
+		UINT stride = 0;
+		UINT offset = 0;
+
+		stride = sizeof(VertexSkinned);
+
+		// 입력 배치 객체 셋팅
+		deviceContext->IASetInputLayout(vs->GetInputLayout());
+		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		for (auto& mesh : _model->meshes)
+		{
+			deviceContext->IASetVertexBuffers(0, 1, mesh->GetAddressOfVertexBuffer(), &stride, &offset);
+			deviceContext->IASetIndexBuffer(mesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+
+			deviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
+		}
 	}
 
 }

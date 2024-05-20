@@ -26,9 +26,39 @@ namespace Rocket
 		_graphicsComponent->BindTransform(rootTransform->_rocketTransform);
 	}
 
-	void DynamicModelRenderer::SetTexture(std::string fileName)
+	void DynamicModelRenderer::SetBaseColorTexture(std::string fileName)
 	{
-		_graphicsComponent->LoadTexture(fileName);
+		_graphicsComponent->LoadBaseColorTexture(fileName);
+	}
+
+	void DynamicModelRenderer::SetNormalTexture(std::string fileName)
+	{
+		_graphicsComponent->LoadNormalTexture(fileName);
+	}
+
+	void DynamicModelRenderer::SetMetallicTexture(std::string fileName)
+	{
+		_graphicsComponent->LoadMetallicTexture(fileName);
+	}
+
+	void DynamicModelRenderer::SetRoughnessTexture(std::string fileName)
+	{
+		_graphicsComponent->LoadRoughnessTexture(fileName);
+	}
+
+	void DynamicModelRenderer::SetAOTexture(std::string fileName)
+	{
+		_graphicsComponent->LoadAOTexture(fileName);
+	}
+
+	void DynamicModelRenderer::SetMetallic(float value)
+	{
+		_graphicsComponent->SetMetallic(value);
+	}
+
+	void DynamicModelRenderer::SetRoughness(float value)
+	{
+		_graphicsComponent->SetRoughness(value);
 	}
 
 	void DynamicModelRenderer::UpdateRenderData()

@@ -12,6 +12,8 @@ namespace Rocket::Core
 		virtual void CreateBuffers() override;
 		virtual void SetNode(Node* node) override;
 
+		std::vector<VertexSkinned>& GetVertices() { return _vertices; }
+
 	protected:
 		std::vector<VertexSkinned> _vertices;
 	};

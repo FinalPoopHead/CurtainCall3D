@@ -1,4 +1,5 @@
 ﻿#include <cassert>
+#include <filesystem>
 
 #include "ResourcePath.h"
 #include "ResourceManager.h"
@@ -48,76 +49,31 @@ namespace Rocket::Core
 		_device = device;
 		_deviceContext = deviceContext;
 
-		// Color Shader
+		std::filesystem::path hlslPath(HLSL_PATH);
+		std::filesystem::directory_iterator itr(hlslPath);
+		while (itr != std::filesystem::end(itr))
 		{
-			std::unique_ptr<VertexShader> colorVS = std::make_unique<VertexShader>();
-			colorVS->Initialize(_device, HLSL_PATH + L"ColorVS.hlsl");
-			colorVS->SetVertexType(eVertexType::COLOR_VERTEX);
-			_vertexShaders["ColorVS"] = std::move(colorVS);
+			const std::filesystem::directory_entry& entry = *itr;
+			std::string extension = entry.path().extension().string();
+			if (extension == ".hlsl")
+			{
+				std::string pureName = entry.path().filename().string();
+				pureName = pureName.substr(0, pureName.find_last_of("."));
 
-			std::unique_ptr<PixelShader> colorPS = std::make_unique<PixelShader>();
-			colorPS->Initialize(_device, HLSL_PATH + L"ColorPS.hlsl");
-			_pixelShaders["ColorPS"] = std::move(colorPS);
-		}
-
-		// Texture Shader
-		{
-			std::unique_ptr<VertexShader> textureVS = std::make_unique<VertexShader>();
-			textureVS->Initialize(_device, HLSL_PATH + L"TextureVS.hlsl");
-			textureVS->SetVertexType(eVertexType::TEXTURE_VERTEX);
-			_vertexShaders["TextureVS"] = std::move(textureVS);
-
-			std::unique_ptr<PixelShader> texturePS = std::make_unique<PixelShader>();
-			texturePS->Initialize(_device, HLSL_PATH + L"TexturePS.hlsl");
-			_pixelShaders["TexturePS"] = std::move(texturePS);
-		}
-
-		// Light Shader
-		{
-			std::unique_ptr<VertexShader> lightVS = std::make_unique<VertexShader>();
-			lightVS->Initialize(_device, HLSL_PATH + L"LightVS.hlsl");
-			lightVS->SetVertexType(eVertexType::LIGHT_VERTEX);
-			_vertexShaders["LightVS"] = std::move(lightVS);
-
-			std::unique_ptr<PixelShader> lightPS = std::make_unique<PixelShader>();
-			lightPS->Initialize(_device, HLSL_PATH + L"LightPS.hlsl");
-			_pixelShaders["LightPS"] = std::move(lightPS);
-		}
-
-		// StaticMesh Shader
-		{
-			std::unique_ptr<VertexShader> staticMeshVS = std::make_unique<VertexShader>();
-			staticMeshVS->Initialize(_device, HLSL_PATH + L"StaticMeshVS.hlsl");
-			staticMeshVS->SetVertexType(eVertexType::VERTEX);
-			_vertexShaders["StaticMeshVS"] = std::move(staticMeshVS);
-
-			std::unique_ptr<PixelShader> staticMeshPS = std::make_unique<PixelShader>();
-			staticMeshPS->Initialize(_device, HLSL_PATH + L"StaticMeshPS.hlsl");
-			_pixelShaders["StaticMeshPS"] = std::move(staticMeshPS);
-		}
-
-		// SkinnedMesh Shader
-		{
-			std::unique_ptr<VertexShader> skinnedMeshVS = std::make_unique<VertexShader>();
-			skinnedMeshVS->Initialize(_device, HLSL_PATH + L"SkinnedMeshVS.hlsl");
-			skinnedMeshVS->SetVertexType(eVertexType::SKINNED_VERTEX);
-			_vertexShaders["SkinnedMeshVS"] = std::move(skinnedMeshVS);
-
-			std::unique_ptr<PixelShader> skinnedMeshPS = std::make_unique<PixelShader>();
-			skinnedMeshPS->Initialize(_device, HLSL_PATH + L"SkinnedMeshPS.hlsl");
-			_pixelShaders["SkinnedMeshPS"] = std::move(skinnedMeshPS);
-		}
-
-		// CubeMap Shader
-		{
-			std::unique_ptr<VertexShader> cubeMapVS = std::make_unique<VertexShader>();
-			cubeMapVS->Initialize(_device, HLSL_PATH + L"CubeMapVS.hlsl");
-			cubeMapVS->SetVertexType(eVertexType::VERTEX);
-			_vertexShaders["CubeMapVS"] = std::move(cubeMapVS);
-
-			std::unique_ptr<PixelShader> cubeMapPS = std::make_unique<PixelShader>();
-			cubeMapPS->Initialize(_device, HLSL_PATH + L"CubeMapPS.hlsl");
-			_pixelShaders["CubeMapPS"] = std::move(cubeMapPS);
+				if (pureName.find("VS") != std::string::npos)
+				{
+					std::unique_ptr<VertexShader> vs = std::make_unique<VertexShader>();
+					vs->Initialize(_device, HLSL_PATH + entry.path().filename().wstring());
+					_vertexShaders[pureName] = std::move(vs);
+				}
+				else if (pureName.find("PS") != std::string::npos)
+				{
+					std::unique_ptr<PixelShader> ps = std::make_unique<PixelShader>();
+					ps->Initialize(_device, HLSL_PATH + entry.path().filename().wstring());
+					_pixelShaders[pureName] = std::move(ps);
+				}
+			}
+			itr++;
 		}
 
 		CreateRenderStates();
@@ -131,12 +87,12 @@ namespace Rocket::Core
 		_defaultTexture = GetTexture("darkbrickdxt1.dds");
 
 		_defaultFont = std::make_unique<DirectX::SpriteFont>(_device, (FONT_PATH + L"NotoSansKR.spritefont").c_str());
-		
+
 		_defaultMaterial = std::make_unique<Material>();
 		_defaultMaterial->SetVertexShader(GetVertexShader("StaticMeshVS"));
 		_defaultMaterial->SetPixelShader(GetPixelShader("StaticMeshPS"));
 		_defaultMaterial->SetRenderState(GetRenderState(eRenderState::SOLID));
-		_defaultMaterial->SetTexture(_defaultTexture);
+		_defaultMaterial->SetBaseColorTexture(_defaultTexture);
 
 		_cubePrimitive = DirectX::DX11::GeometricPrimitive::CreateCube(deviceContext, 1.0f, false);
 		_spherePrimitive = DirectX::DX11::GeometricPrimitive::CreateSphere(deviceContext, 1.0f, 8, false, false);
@@ -178,7 +134,7 @@ namespace Rocket::Core
 	}
 
 	DirectX::SpriteFont* ResourceManager::GetDefaultFont() const
-{
+	{
 		return _defaultFont.get();
 	}
 
@@ -203,10 +159,10 @@ namespace Rocket::Core
 		solidDesc.DepthClipEnable = true;
 		ID3D11RasterizerState* solid;
 		HR(_device->CreateRasterizerState(&solidDesc, &solid));
-		_renderStates.emplace_back(solid);		// TODO : 왜 refCount가 증가하는거지? 이해가 안되네..
-		solid->Release();						// TODO : 이거 Release 해버리면 내가 vector 에 넣은것도 날라가는거 아닌가? 왜 refCount가 감소하고 Release 되지 않는거지..?
+		_renderStates.emplace_back(solid);
+		solid->Release();
 		solid->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"SOLID RASTER") - 1, L"SOLID RASTER");
-		
+
 
 		D3D11_RASTERIZER_DESC wireframeDesc;
 		ZeroMemory(&wireframeDesc, sizeof(D3D11_RASTERIZER_DESC));
@@ -220,6 +176,28 @@ namespace Rocket::Core
 		wireframe->Release();
 		wireframe->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"WIREFRAME RASTER") - 1, L"WIREFRAME RASTER");
 
+		D3D11_RASTERIZER_DESC shadowMapDesc;
+		ZeroMemory(&shadowMapDesc, sizeof(D3D11_RASTERIZER_DESC));
+		shadowMapDesc.FillMode = D3D11_FILL_SOLID;
+		//shadowMapDesc.CullMode = D3D11_CULL_NONE;		// TODO : Plane의 경우를 어떻게 처리할것인가 (그림자를 만들거면 NONE, 아니라면 BACK)
+		shadowMapDesc.CullMode = D3D11_CULL_BACK;
+		shadowMapDesc.FrontCounterClockwise = false;
+		shadowMapDesc.DepthClipEnable = true;
+		ID3D11RasterizerState* shadowMapRS;
+		HR(_device->CreateRasterizerState(&shadowMapDesc, &shadowMapRS));
+		_renderStates.emplace_back(shadowMapRS);
+		shadowMapRS->Release();
+
+		D3D11_RASTERIZER_DESC cubeMapDesc;
+		ZeroMemory(&cubeMapDesc, sizeof(D3D11_RASTERIZER_DESC));
+		cubeMapDesc.FillMode = D3D11_FILL_SOLID;
+		cubeMapDesc.CullMode = D3D11_CULL_NONE;
+		cubeMapDesc.FrontCounterClockwise = false;
+		cubeMapDesc.DepthClipEnable = true;
+		ID3D11RasterizerState* cubemapRS;
+		HR(_device->CreateRasterizerState(&cubeMapDesc, &cubemapRS));
+		_renderStates.emplace_back(cubemapRS);
+		cubemapRS->Release();
 	}
 
 	ID3D11RasterizerState* ResourceManager::GetRenderState(eRenderState eState)
@@ -242,7 +220,7 @@ namespace Rocket::Core
 
 	Mesh* ResourceManager::GetMesh(const std::string& fileName)
 	{
-		if(_meshes.find(fileName) == _meshes.end())
+		if (_meshes.find(fileName) == _meshes.end())
 		{
 			return nullptr;
 		}
@@ -283,11 +261,11 @@ namespace Rocket::Core
 		std::unordered_map<std::string, int> meshNameCount;
 
 		// Mesh 정보 순회하면서 Mesh 만들기. Texture도 이때 로드해봄.
- 		for (auto& rawMesh : rawModel->meshes)
+		for (auto& rawMesh : rawModel->meshes)
 		{
 			std::unique_ptr<StaticMesh> staticMesh(ProcessStaticMesh(rawMesh));
 			resultModel->meshes.push_back(staticMesh.get());
-			_meshes.insert({ rawMesh->name + std::to_string(meshNameCount[rawMesh->name]), std::move(staticMesh)});	// TODO : 근데 다른 노드인데 이름이 같은 경우면 어떡하지? 세상에~
+			_meshes.insert({ rawMesh->name + std::to_string(meshNameCount[rawMesh->name]), std::move(staticMesh) });	// TODO : 근데 다른 노드인데 이름이 같은 경우면 어떡하지? 세상에~
 			meshNameCount[rawMesh->name]++;
 		}
 
@@ -379,6 +357,7 @@ namespace Rocket::Core
 			vertex.normal = rawVertex.normal;
 			vertex.UV = rawVertex.UV;
 			vertex.tangent = rawVertex.tangent;
+			vertex.bitangent = rawVertex.biTangent;
 			vertex.nodeIndex = rawVertex.nodeIndex;
 
 			vertices.push_back(vertex);
@@ -410,6 +389,7 @@ namespace Rocket::Core
 			vertex.UV = rawVertex.UV;
 			vertex.normal = rawVertex.normal;
 			vertex.tangent = rawVertex.tangent;
+			vertex.bitangent = rawVertex.biTangent;
 			vertex.nodeIndex = rawVertex.nodeIndex;
 			vertex.weights = rawVertex.weights;
 			vertex.boneIndices = rawVertex.boneIndices;

@@ -247,6 +247,7 @@ Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt:
 			rocketVertex.UV = { vertex.uvs[0].x, vertex.uvs[0].y };
 			rocketVertex.normal = { vertex.normal.x, vertex.normal.y, vertex.normal.z };
 			rocketVertex.tangent = { vertex.tangent.x, vertex.tangent.y, vertex.tangent.z };
+			rocketVertex.biTangent = { vertex.binormal.x, vertex.binormal.y, vertex.binormal.z };
 			rocketVertex.nodeIndex = -1;
 			for (int i = 0; i < vertex.boneWeights.size(); ++i)
 			{
