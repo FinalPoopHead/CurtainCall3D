@@ -13,13 +13,13 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Windows">
+      <UniqueIdentifier>{a93a42f8-0ad3-4001-8995-69bff5d0d63f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Platform.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OsWindows.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OsPlatform.h">
       <Filter>Header Files</Filter>
@@ -30,6 +30,18 @@
     <ClInclude Include="include\EnumType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\GamePad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OsWindows.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="XboxPad.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="WinGamePadImpl.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FloaterPlatform.cpp">
@@ -39,7 +51,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OsWindows.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="XboxPad.cpp">
+      <Filter>Windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

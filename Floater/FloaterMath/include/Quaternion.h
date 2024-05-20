@@ -22,6 +22,7 @@ namespace flt
 		constexpr Quaternion() noexcept : Vector4f(0.0f, 0.0f, 0.0f, 1.0f) {}
 		Quaternion(float x, float y, float z, float w) noexcept : Vector4f(Vector4f{ x, y, z, w }.Normalize()) {}
 		Quaternion(const Vector3f& euler, AxisOrder order = AxisOrder::YXZ);
+		Quaternion(float degreeX, float degreeY, float defreeZ, AxisOrder order = AxisOrder::YXZ) : Quaternion(Vector3f{ degreeX, degreeY, defreeZ }, order) {}
 		constexpr Quaternion(const Vector4f& v) noexcept : Vector4f(v) {}
 		Quaternion(const Vector3f& axis, float radian) noexcept : Vector4f(axis.Normalized()* sin(radian * 0.5f), cos(radian * 0.5f)) {}
 		Quaternion(const Vector4f& axis, float radian) noexcept : Quaternion((Vector3f)axis, radian) {}
@@ -58,12 +59,31 @@ namespace flt
 			}
 
 			float theta0 = acos(dot);
+			if (theta0 < flt::FLOAT_EPSILON)
+			{
+				return q1;
+			}
 			float theta = theta0 * t;
 			float sinTheta = sin(theta);
 			float sinTheta0 = sin(theta0);
 			float s0 = cos(theta) - dot * sinTheta / sinTheta0;
 			float s1 = sinTheta / sinTheta0;
 			return q1 * s0 + q2 * s1;
+		}
+
+		Quaternion Conjugate() const noexcept
+		{
+			return Quaternion(-x, -y, -z, w);
+		}
+
+		Quaternion Inverse() const noexcept
+		{
+			float normPow = NormPow();
+			if (normPow < flt::FLOAT_EPSILON)
+			{
+				return Quaternion();
+			}
+			return Conjugate() / NormPow();
 		}
 	};
 }

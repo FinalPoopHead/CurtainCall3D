@@ -55,9 +55,14 @@ flt::KeyData flt::Platform::GetKey(KeyCode code)
 	return _pOsImpl->GetKey(code);
 }
 
-flt::KeyData flt::Platform::GetGamePad(int playerNum)
+bool flt::Platform::GetGamePadState(int padIndex, GamePadState* outState)
 {
-	return _pOsImpl->GetGamePad(playerNum);
+	return _pOsImpl->GetGamePadState(padIndex, outState);
+}
+
+bool flt::Platform::SetGamePadVibration(int padIndex, float leftMotor, float rightMotor)
+{
+	return _pOsImpl->SetGamePadVibration(padIndex, leftMotor, rightMotor);
 }
 
 void flt::Platform::ShowCursor(bool isShow)

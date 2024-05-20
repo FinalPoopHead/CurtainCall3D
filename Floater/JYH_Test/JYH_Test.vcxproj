@@ -117,6 +117,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\RocketEngine\Build\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -140,33 +141,28 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\RocketEngine\Build\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="TestGameObejct.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="TestScene.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GlideComponent.h" />
+    <ClInclude Include="GlideObject.h" />
+    <ClInclude Include="TestGameObejct.h" />
+    <ClInclude Include="TestScene.h" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FloaterGameEngine\FloaterGameEngine.vcxproj">
       <Project>{ecbd9ca3-cc41-4494-a682-aa7b0c481fa8}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\FloaterMath\FloaterMath.vcxproj">
-      <Project>{0bb76c52-c35f-4a26-88e7-04920c2b5dbe}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\FloaterPlatform\FloaterPlatform.vcxproj">
-      <Project>{71b12dec-4df4-401f-a453-6216ef08c579}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\FloaterRendererCommon\FloaterRendererCommon.vcxproj">
-      <Project>{4c5ca68f-1387-44e2-84e2-6d07d893d21c}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\FloaterRendererDX11\FloaterRendererDX11.vcxproj">
-      <Project>{5501099a-fcca-4350-8307-8499ce179eac}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\FloaterUtil\FloaterUtil.vcxproj">
-      <Project>{cb145f87-3fe0-445e-bb70-582b466cbe74}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\RocketAdapter\RocketAdapter.vcxproj">
-      <Project>{790f4f45-5e14-4d4b-b7b0-54313e923713}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

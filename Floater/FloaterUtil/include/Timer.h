@@ -17,6 +17,7 @@ namespace flt
 		double GetLabTimeSeconds();
 		int64 GetLabTimeMicroSeconds();
 		double GetDeltaSeconds();
+
 	private:
 		std::chrono::time_point<std::chrono::steady_clock> _init;
 		std::chrono::time_point<std::chrono::steady_clock> _start;

@@ -16,8 +16,14 @@
     <Filter Include="ecs">
       <UniqueIdentifier>{f6ba29fe-6691-47fa-b620-ad5e900167ca}</UniqueIdentifier>
     </Filter>
-    <Filter Include="BuildIn">
+    <Filter Include="NewFilter1">
+      <UniqueIdentifier>{cc384472-1938-4ca3-8b49-7857dda9a83d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component">
       <UniqueIdentifier>{03e7fbef-dfe9-4c5a-b9a4-33dbe32c160f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\impl">
+      <UniqueIdentifier>{f07e4b8c-ab5a-4def-ab9c-28e6461792bd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -30,20 +36,35 @@
     <ClInclude Include="include\GameObject.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="include\Component.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Entity.h">
       <Filter>ecs</Filter>
     </ClInclude>
     <ClInclude Include="World.h">
       <Filter>ecs</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="include\GameEngine.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Input.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsEngine.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BuiltinComponent.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CameraComponent.h">
+      <Filter>Component\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BoxColliderComponent.h">
+      <Filter>Component\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RendererComponent.h">
+      <Filter>Component\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Component.h">
+      <Filter>Component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -53,20 +74,32 @@
     <ClCompile Include="GameObject.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Entity.cpp">
       <Filter>ecs</Filter>
     </ClCompile>
     <ClCompile Include="World.cpp">
       <Filter>ecs</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="GameEngine.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsEngine.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraComponent.cpp">
+      <Filter>Component\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="BoxColliderComponent.cpp">
+      <Filter>Component\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="RendererComponent.cpp">
+      <Filter>Component\impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

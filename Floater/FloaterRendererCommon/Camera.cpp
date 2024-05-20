@@ -48,4 +48,3 @@ flt::Matrix4f flt::Camera::GetProjectionMatrix() const noexcept
 		};
 	}
 }
-

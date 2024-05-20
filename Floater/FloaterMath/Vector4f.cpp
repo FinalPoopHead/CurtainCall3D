@@ -28,6 +28,18 @@ namespace flt
 		z = tmp.x * rhs.e[0][2] + tmp.y * rhs.e[1][2] + tmp.z * rhs.e[2][2] + tmp.w * rhs.e[3][2];
 		w = tmp.x * rhs.e[0][3] + tmp.y * rhs.e[1][3] + tmp.z * rhs.e[2][3] + tmp.w * rhs.e[3][3];
 
+		//__m128 x = _mm_set1_ps(tmp.x);
+		//__m128 y = _mm_set1_ps(tmp.y);
+		//__m128 z = _mm_set1_ps(tmp.z);
+		//__m128 w = _mm_set1_ps(tmp.w);
+
+		//__m128 p0 = _mm_mul_ps(x, rhs.v[0].m);
+		//__m128 p1 = _mm_mul_ps(y, rhs.v[1].m);
+		//__m128 p2 = _mm_mul_ps(z, rhs.v[2].m);
+		//__m128 p3 = _mm_mul_ps(w, rhs.v[3].m);
+
+		//this->m = _mm_add_ps(_mm_add_ps(p0, p1), _mm_add_ps(p2, p3));
+
 		return *this;
 	}
 }

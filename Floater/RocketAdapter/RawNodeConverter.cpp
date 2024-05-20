@@ -240,7 +240,7 @@ Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt:
 
 		// vertex 정보 입력
 		rocketMesh->vertices.reserve(mesh.vertices.size());
-		for (const auto& vertex : mesh.vertices)
+		for (const flt::RawVertex& vertex : mesh.vertices)
 		{
 			Rocket::Core::RawVertex rocketVertex;
 			rocketVertex.position = { vertex.pos.x, vertex.pos.y, vertex.pos.z };

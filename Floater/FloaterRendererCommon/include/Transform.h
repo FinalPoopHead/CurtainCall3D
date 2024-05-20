@@ -34,6 +34,7 @@ namespace flt
 		void SetPosition(double x, double y, double z);
 		void SetPosition(const Vector3f& position);
 		void SetPosition(const Vector4f& position);
+		void SetWorldPosition(const Vector4f& position);
 
 		Quaternion GetLocalRotation() const noexcept { return _rotation; }
 		Quaternion GetWorldRotation() const noexcept;
@@ -43,6 +44,7 @@ namespace flt
 		void SetRotation(const Vector3f& axis, float radian);
 		void SetRotation(const Quaternion& q);
 		void SetRotation(float x, float y, float z, float w);
+		void SetWorldRotation(const Quaternion& q);
 
 		Vector4f GetLocalScale() const noexcept { return _scale; }
 		Vector4f GetWorldScale() const noexcept;
@@ -53,6 +55,7 @@ namespace flt
 
 		void AddLocalPosition(float x, float y, float z);
 		void AddLocalPosition(const Vector4f& position);
+		void AddLocalPosition(const Vector3f& position);
 		void AddWorldPosition(float x, float y, float z);
 		void AddWorldPosition(const Vector4f& position);
 		void AddLocalRotation(const Vector3f& axis, float radian);
@@ -85,6 +88,7 @@ namespace flt
 	private:
 		void MakeDirtyRecursive() const noexcept;
 		void CalcWorldMatrixRecursive() const noexcept;
+		const Matrix4f& GetWorldMatrix4fRef() const noexcept;
 
 
 	private:

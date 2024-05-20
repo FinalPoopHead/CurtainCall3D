@@ -9,6 +9,7 @@
 
 #include <string>
 #include "KeyCode.h"
+#include "GamePad.h"
 #include "EnumType.h"
 #include "../FloaterRendererCommon/include/IRenderer.h"
 
@@ -35,7 +36,8 @@ namespace flt
 		void DestroyRenderer(IRenderer* renderer);
 
 		KeyData GetKey(KeyCode code);
-		KeyData GetGamePad(int playerNum);
+		bool GetGamePadState(int padIndex, GamePadState* outState);
+		bool SetGamePadVibration(int padIndex, float leftMotor, float rightMotor);
 
 		void ShowCursor(bool isShow);
 

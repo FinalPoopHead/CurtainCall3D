@@ -75,6 +75,20 @@ void flt::Transform::SetPosition(float x, float y, float z)
 	_position.z = z;
 }
 
+void flt::Transform::SetWorldPosition(const Vector4f& position)
+{
+	MakeDirtyRecursive();
+
+	if (_pParent)
+	{
+		_position = position * _pParent->GetWorldMatrix4f().Inverse();
+	}
+	else
+	{
+		_position = position;
+	}
+}
+
 void flt::Transform::SetPosition(const Vector3f& position)
 {
 	SetPosition(position.x, position.y, position.z);
@@ -108,6 +122,21 @@ void flt::Transform::SetRotation(float degreeX, float degreeY, float degreeZ, Qu
 	MakeDirtyRecursive();
 
 	_rotation.SetEuler(degreeX, degreeY, degreeY, order);
+}
+
+void flt::Transform::SetWorldRotation(const Quaternion& q)
+{
+	MakeDirtyRecursive();
+
+	if (_pParent)
+	{
+		// 회전 Quaternion은 단위 Quaternion이기 때문에 Inverse == Conjugate
+		_rotation = q * _pParent->GetWorldRotation().Conjugate();
+	}
+	else
+	{
+		_rotation = q;
+	}
 }
 
 void flt::Transform::SetRotation(Vector3f degree, Quaternion::AxisOrder order /*= Quaternion::AxisOrder::YXZ*/)
@@ -184,6 +213,11 @@ void flt::Transform::AddLocalPosition(float localX, float localY, float localZ)
 	_position.x += localX;
 	_position.y += localY;
 	_position.z += localZ;
+}
+
+void flt::Transform::AddLocalPosition(const Vector3f& position)
+{
+	AddLocalPosition(position.x, position.y, position.z);
 }
 
 void flt::Transform::AddLocalPosition(const Vector4f& localPos)
@@ -438,10 +472,28 @@ void flt::Transform::CalcWorldMatrixRecursive() const noexcept
 {
 	if (_pParent)
 	{
-		_worldMatrix = GetLocalMatrix4f() * _pParent->GetWorldMatrix4f();
+		Matrix4f localMatrix = GetLocalMatrix4f();
+		Matrix4f parentWorldMatrix = _pParent->GetWorldMatrix4f();
+		//const Matrix4f& parentWorldMatrix = _pParent->GetWorldMatrix4fRef();
+		Matrix4fMul(localMatrix, _worldMatrix, parentWorldMatrix.v[0].m, parentWorldMatrix.v[1].m, parentWorldMatrix.v[2].m, parentWorldMatrix.v[3].m);
+		//Matrix4fMuluseDot(localMatrix, parentWorldMatrix, _worldMatrix);
+
+		//_worldMatrix = GetLocalMatrix4f() * _pParent->GetWorldMatrix4f();
 	}
 	else
 	{
 		_worldMatrix = GetLocalMatrix4f();
 	}
+}
+
+const flt::Matrix4f& flt::Transform::GetWorldMatrix4fRef() const noexcept
+{
+	if (_isDirty)
+	{
+		CalcWorldMatrixRecursive();
+
+		_isDirty = false;
+	}
+
+	return _worldMatrix;
 }

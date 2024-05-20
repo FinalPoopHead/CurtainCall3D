@@ -1,42 +1,77 @@
 ﻿#pragma once
-#include <iostream>
+#include <type_traits>
 
 namespace flt
 {
+	class Scene;
 	class GameObject;
 
-	class Component
+	class ComponentBase
 	{
+		friend class Scene;
+		friend class GameObject;
 	public:
-		void virtual Start() {}
-		void virtual OnEnable() {}
-		void virtual Update() {}
-		void virtual OnDisable() {}
-		void virtual OnDestroy() {}
+		ComponentBase() : ComponentBase(nullptr) {}
+		ComponentBase(GameObject* gameObject) : _isEnable(false), _gameObject(gameObject) {}
+		virtual ~ComponentBase() {}
+
+		virtual void Start() {}
+		virtual void OnEnable() {}
+		virtual void Update(float deltaSecond) {}
+		virtual void PrePhysics() {}
+		virtual void PostPhysics() {}
+		virtual void FixedUpdate() {}
+		virtual void EndDraw() {}
+		virtual void OnDisable() {}
+		virtual void OnDestroy() {}
+
+	public:
+		void Enable();
+		void Disable();
+
+	private:
+		virtual int GetIndex() = 0;
 
 	protected:
-		static int GetComponentIndex() { return s_index++; }
+		static int GetComponentIndex()
+		{
+			return s_indexCounter++;
+		}
 
 	protected:
+		GameObject* _gameObject;
+
+	private:
+		static int s_indexCounter;
 		bool _isEnable;
-
-		static int s_index;
 	};
 
 	template<typename T>
-	class ComponentBase : public Component
+	class Component : public ComponentBase
 	{
+		friend class GameObject;
 	public:
-		void PrintIndex()
-		{
-			std::cout << s_index << std::endl;
-		}
+		Component() : ComponentBase() {}
+		Component(GameObject* gameObject) : ComponentBase(gameObject) {}
+
+		//void PrintIndex()
+		//{
+		//	std::cout << s_index << std::endl;
+		//}
 	protected:
-		static inline int s_index = Component::GetComponentIndex();
+		static const inline int s_index = ComponentBase::GetComponentIndex();
 
 	private:
+		virtual int GetIndex() final
+		{
+			return s_index;
+		}
 
 	};
+
+	template <typename T>
+	concept ComponentType = requires(T a)
+	{
+		std::is_base_of_v<ComponentBase, T>;
+	};
 }
-
-
