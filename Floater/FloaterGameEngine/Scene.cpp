@@ -1,5 +1,6 @@
 ﻿#include "./include/Scene.h"
 
+
 flt::Scene::Scene() :
 	_gameObjects(),
 	_gameObjectsToEnable(),
@@ -142,6 +143,8 @@ void flt::Scene::Update(float deltaSecond)
 {
 	for (auto& object : _gameObjects)
 	{
+		Vector4f position = object->transform.GetWorldPosition();
+
 		if (!object->_isEnable)
 		{
 			continue;

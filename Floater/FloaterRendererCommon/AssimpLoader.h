@@ -39,7 +39,7 @@ namespace flt
 		std::unordered_map<std::wstring, RawNode*> _RawNodeMap;
 		std::unordered_map<std::wstring, std::pair<RawSkeleton*, int>> _boneIndexMap;
 		std::vector<RawMaterial*> _materials;
-		std::vector<std::pair<RawMesh*, aiNode*>> _meshes;
+		std::vector<std::pair<RawMesh*, aiNode*>> _meshArmatures;
 		std::unordered_map<aiNode*, RawSkeleton> _skeletonMap;
 	};
 }

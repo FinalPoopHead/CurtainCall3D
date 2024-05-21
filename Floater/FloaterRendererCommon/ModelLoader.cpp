@@ -40,6 +40,7 @@ bool flt::ModelLoader::Load(std::wstring path, RawScene* outRawScene)
 
 	return true;
 
+	// 현재 사용하지 않음. 미 구현
 	if (extension == L"fbx")
 	{
 		_pFBXLoader->Load(path, outRawScene);

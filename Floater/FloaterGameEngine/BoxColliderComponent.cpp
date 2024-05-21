@@ -14,7 +14,7 @@ namespace flt
 	struct PhysXData
 	{
 		physx::PxTransform transform;
-		physx::PxRigidActor* actor;
+		physx::PxRigidDynamic* actor;
 		physx::PxShape* shape;
 	};
 }
@@ -27,15 +27,17 @@ flt::BoxColliderComponent::BoxColliderComponent(GameObject* gameObject) :
 	_scene(*GameEngine::Instance()->GetPhysicsEngine()->GetScene()),
 	_physXData(new PhysXData()),
 	_size(10.0f, 10.0f, 10.0f),
-	_offset(0.0f, 0.0f, 0.0f)
+	_offset(0.0f, 0.0f, 0.0f, 1.0f)
 {
 	Vector4f position = _transform->GetWorldPosition();
 	_physXData->transform.p = physx::PxVec3(position.x, position.y, position.z);
 	Quaternion rotation = _transform->GetWorldRotation();
 	_physXData->transform.q = physx::PxQuat(rotation.x, rotation.y, rotation.z, rotation.w);
 
-	//_physXData->actor = _physcx.createRigidDynamic(_physXData->transform);
-	_physXData->actor = _physcx.createRigidStatic(_physXData->transform);
+	_physXData->actor = _physcx.createRigidDynamic(_physXData->transform);
+	_physXData->actor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
+
+	//_physXData->actor = _physcx.createRigidStatic(_physXData->transform);
 	_physXData->shape = _physcx.createShape(physx::PxBoxGeometry(_size.x, _size.y, _size.z), *_physcx.createMaterial(0.5f, 0.5f, 0.6f));
 	_physXData->actor->attachShape(*_physXData->shape);
 }
@@ -80,26 +82,30 @@ flt::Vector3f flt::BoxColliderComponent::GetSize() const
 
 void flt::BoxColliderComponent::SetOffset(const flt::Vector3f& offset)
 {
-	_offset = offset;
+	_offset = {offset , 1.0f};
 }
 
 flt::Vector3f flt::BoxColliderComponent::GetOffset() const
 {
-	return _offset;
+	return (flt::Vector3f)_offset;
 }
 
 void flt::BoxColliderComponent::UpdatePhysTransform()
 {
 	Vector3f position = (Vector3f)_transform->GetWorldPosition();
-	position += _offset;
+	Vector4f worldOffset = _offset * _transform->GetWorldMatrix4f();
+	position += (Vector3f)worldOffset;
 	_physXData->transform.p = physx::PxVec3(position.x , position.y , position.z );
 	Quaternion rotation = _transform->GetWorldRotation();
 	_physXData->transform.q = physx::PxQuat(rotation.x, rotation.y, rotation.z, rotation.w);
 
-	_physXData->actor->setGlobalPose(_physXData->transform);
+	_physXData->actor->setKinematicTarget(_physXData->transform);
 
 	Vector3f scale = (Vector3f)_transform->GetWorldScale();
-	physx::PxBoxGeometry geometry(_size.x * scale.x, _size.y * scale.y, _size.z * scale.z);
+	scale.x *= _size.x;
+	scale.y *= _size.y;
+	scale.z *= _size.z;
+	physx::PxBoxGeometry geometry(scale.x, scale.y, scale.z);
 	_physXData->actor->detachShape(*_physXData->shape);
 	_physXData->shape->setGeometry(geometry);
 	_physXData->actor->attachShape(*_physXData->shape);
@@ -107,11 +113,14 @@ void flt::BoxColliderComponent::UpdatePhysTransform()
 
 void flt::BoxColliderComponent::UpdateTransform()
 {
-	_physXData->transform = _physXData->actor->getGlobalPose();
+	//_physXData->transform = _physXData->actor->getGlobalPose();
 
-	Vector4f position = Vector4f(_physXData->transform.p.x, _physXData->transform.p.y, _physXData->transform.p.z, 1.0f);
-	_transform->SetWorldPosition(position);
+	//Vector4f position = Vector4f(_physXData->transform.p.x, _physXData->transform.p.y, _physXData->transform.p.z, 1.0f);
+	//Vector4f worldOffset = _offset * _transform->GetWorldMatrix4f();
+	//position -= worldOffset;
+	//position.w = 1.0f;
+	//_transform->SetWorldPosition(position);
 
-	Quaternion rotation = Quaternion(_physXData->transform.q.x, _physXData->transform.q.y, _physXData->transform.q.z, _physXData->transform.q.w);
-	_transform->SetWorldRotation(rotation);
+	//Quaternion rotation = Quaternion(_physXData->transform.q.x, _physXData->transform.q.y, _physXData->transform.q.z, _physXData->transform.q.w);
+	//_transform->SetWorldRotation(rotation);
 }

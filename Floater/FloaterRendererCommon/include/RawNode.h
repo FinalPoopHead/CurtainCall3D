@@ -25,7 +25,7 @@ namespace flt
 		//std::vector<Resource<RawMesh>> meshes;
 		std::vector<RawMesh> meshes;
 		RawSkeleton* skeleton;
-		RawAnimationClip* animationClip;
+		RawAnimationClip* animationClip;					// 노드 자체의 애니메이션 데이터
 		Camera* camera;
 		Light* light;
 

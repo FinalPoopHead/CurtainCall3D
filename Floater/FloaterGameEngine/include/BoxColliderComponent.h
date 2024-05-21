@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Component.h"
 #include "../../FloaterMath/include/Vector3f.h"
+#include "../../FloaterMath/include/Vector4f.h"
 
 namespace physx
 {
@@ -46,6 +47,6 @@ namespace flt
 		PhysXData* _physXData;
 		
 		flt::Vector3f _size;
-		flt::Vector3f _offset;
+		flt::Vector4f _offset;
 	};
 }

@@ -54,5 +54,15 @@ void Controller::Update(float deltaSecond)
 		{
 			transform.AddWorldPosition(transform.Right() * speed * deltaSecond);
 		}
+
+		if (flt::GetKey(flt::KeyCode::e))
+		{
+			transform.AddWorldPosition(flt::Transform::WorldUp() * speed * deltaSecond);
+		}
+
+		if (flt::GetKey(flt::KeyCode::q))
+		{
+			transform.AddWorldPosition(-flt::Transform::WorldUp() * speed * deltaSecond);
+		}
 	}
 }
