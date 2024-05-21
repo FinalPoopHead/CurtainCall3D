@@ -92,7 +92,7 @@ void UnityLoadScene::LoadUnityJson()
 		for (auto& v : document.GetArray())
 		{
 			flt::GameObject* gameObject = CreateGameObject<flt::GameObject>();
-			gameObject->AddComponent<RotateComponent>();
+			//gameObject->AddComponent<RotateComponent>();
 
 			if (v.HasMember("ID"))
 			{

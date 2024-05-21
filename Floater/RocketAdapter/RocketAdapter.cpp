@@ -115,7 +115,8 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 		rocketObject->rkModel = ConvertModel(*renderable.node);
 		Rocket::Core::IResourceManager* rsmgr = Rocket::Core::GetResourceManager();
 
-		std::string pointer = std::to_string(reinterpret_cast<uint64_t>(rocketObject->rkModel));
+		//std::string pointer = std::to_string(reinterpret_cast<uint64_t>(rocketObject->rkModel));
+		std::string pointer = rocketObject->rkModel->name;
 		rsmgr->LoadModel(pointer, rocketObject->rkModel);
 		
 		if (renderable.node->meshes.size() > 0)
