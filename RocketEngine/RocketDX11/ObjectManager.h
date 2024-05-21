@@ -18,6 +18,7 @@ namespace Rocket::Core
 	class Camera;
 	class MeshRenderer;
 	class DynamicModelRenderer;
+	class StaticModelRenderer;
 	class SpriteRenderer;
 	class DirectionalLight;
 
@@ -32,8 +33,9 @@ namespace Rocket::Core
 		void Finalize();
 
 	public:
-		std::vector<MeshRenderer*>& GetStaticMeshRenderers();
+		std::vector<MeshRenderer*>& GetMeshRenderers();
 		std::vector<DynamicModelRenderer*>& GetDynamicModelRenderers();
+		std::vector<StaticModelRenderer*>& GetStaticModelRenderers();
 		std::vector<TextRenderer*>& GetTextList();
 		std::vector<SpriteRenderer*>& GetImageList();
 		LineRenderer* GetLineRenderer();
@@ -42,8 +44,9 @@ namespace Rocket::Core
 
 	public:
 		Camera* CreateCamera();
-		MeshRenderer* CreateStaticModelRenderer();
+		MeshRenderer* CreateMeshRenderer();
 		DynamicModelRenderer* CreateDynamicModelRenderer();
+		StaticModelRenderer* CreateStaticModelRenderer();
 		TextRenderer* CreateText();
 		SpriteRenderer* CreateImage();
 		LineRenderer* CreateLineRenderer();
@@ -60,8 +63,9 @@ namespace Rocket::Core
 		std::unique_ptr<LineRenderer> _lineRenderer;
 
 		std::vector<Camera*> _cameraList;
-		std::vector<MeshRenderer*> _staticModelRendererList;
+		std::vector<MeshRenderer*> _meshRendererList;
 		std::vector<DynamicModelRenderer*> _dynamicModelRendererList;
+		std::vector<StaticModelRenderer*> _staticModelRendererList;
 		std::vector<TextRenderer*> _textList;
 		std::vector<SpriteRenderer*> _spriteList;
 		std::vector<DirectionalLight*> _directionalLightList;

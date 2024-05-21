@@ -23,11 +23,13 @@ namespace Rocket::Core
 
 	public:
 		void Initialize(VertexShader* staticMeshVS, VertexShader* dynamicModelVS, PixelShader* shadowMapPS);
+		void SetStaticModelVS(VertexShader* staticModelVS);		//Floater 용이기 때문에 Init에 안넣었음.
 		void GenerateShadowMap(ID3D11DeviceContext* deviceContext, DeferredBuffers* g_buffer); 
 
 	private:
 		VertexShader* _staticMeshVS;
 		VertexShader* _dynamicModelVS;
+		VertexShader* _staticModelVS;
 		PixelShader* _shadowMapPS;
 	};
 

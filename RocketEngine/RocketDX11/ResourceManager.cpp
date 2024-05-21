@@ -103,7 +103,7 @@ namespace Rocket::Core
 	{
 		if (rawModel->animations.empty())
 		{
-			_models.insert({ fileName,std::make_unique<StaticModel>() });
+			_models.insert({ fileName, std::make_unique<StaticModel>() });
 			ProcessStaticModel(fileName, rawModel);
 		}
 		else

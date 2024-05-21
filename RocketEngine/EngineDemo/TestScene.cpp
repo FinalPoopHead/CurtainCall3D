@@ -61,6 +61,23 @@ void TestScene::Initialize()
 		planeRenderer->SetBaseColorTexture("T_WEP_Basic_008_D.png");
 	}
 
+	/// StaticModelRenderer 테스트 StaticModelRenderer 테스트 StaticModelRenderer 테스트 StaticModelRenderer 테스트 StaticModelRenderer 테스트 
+	{
+		auto test1 = scene->CreateObject("staticModelRendererTest1");
+		auto smr1 = test1->AddComponent<Rocket::StaticModelRenderer>();
+		smr1->LoadModel("SK_TP_CH_Default.fbx");
+		smr1->SetBaseColorTexture("T_TP_CH_Camo_006_003_D.png");
+		test1->transform.SetPosition(-15.0f, 0.0f, -10.0f);
+		test1->transform.SetScale(5.0f, 5.0f, 5.0f);
+
+		auto test2 = scene->CreateObject("staticModelRendererTest2");
+		auto smr2 = test2->AddComponent<Rocket::StaticModelRenderer>();
+		smr2->LoadModel("SM_Box_Cargo.fbx");
+		smr2->SetBaseColorTexture("T_TP_CH_Props_D.png");
+		test2->transform.SetPosition(-6.0f, 0.4f, 5.0f);
+		test2->transform.SetScale(2.0f, 2.0f, 2.0f);
+	}
+
 	/// PBR 테스트
 	// PBR 구
 	auto PBRSphere = scene->CreateObject("PBRTest");
@@ -159,20 +176,19 @@ void TestScene::Initialize()
 		}
 	}
 
-	/// 노드구조대로 게임오브젝트 생성한 것 테스트
-	auto boneHierarchyTest = scene->CreateModelObject("SK_TP_CH_Default.fbx");
-	//staticTest->transform.SetPosition(1.0f, 0.0f, 0.0f);
-
-	auto mr = boneHierarchyTest->GetComponentsFromAll<Rocket::MeshRenderer>();
-	for (auto& m : mr)
-	{
-		m->SetBaseColorTexture("T_TP_CH_Camo_006_003_D.png");
-	}
-
-	auto hand = scene->FindObjectByName("hand_r");
-	boneHierarchyTest->transform.SetParent(hand,false);
-	boneHierarchyTest->transform.SetScale(1.0f, 1.0f, 1.0f);
-
+// 	/// 노드구조대로 게임오브젝트 생성한 것 테스트
+// 	auto boneHierarchyTest = scene->CreateModelObject("SK_TP_CH_Default.fbx");
+// 	//staticTest->transform.SetPosition(1.0f, 0.0f, 0.0f);
+// 
+// 	auto mr = boneHierarchyTest->GetComponentsFromAll<Rocket::MeshRenderer>();
+// 	for (auto& m : mr)
+// 	{
+// 		m->SetBaseColorTexture("T_TP_CH_Camo_006_003_D.png");
+// 	}
+// 
+// 	auto hand = scene->FindObjectByName("hand_r");
+// 	boneHierarchyTest->transform.SetParent(hand,false);
+// 	boneHierarchyTest->transform.SetScale(1.0f, 1.0f, 1.0f);
 
 	/// 스태틱 메쉬 계층구조 테스트
 	auto hierarchyTest = scene->CreateModelObject("SM_Box_Cargo.fbx");
@@ -184,16 +200,16 @@ void TestScene::Initialize()
 		m->SetBaseColorTexture("T_TP_CH_Props_D.png");
 	}
 
-	/// 텍스트 테스트
-	auto text = scene->CreateObject("text");
-	text->AddComponent<Rocket::TextBox>();
-	text->GetComponent<Rocket::TextBox>()->SetText("Hello World\nBABO");
-	text->transform.Translate(1400.0f, 0.0f, 0.0f);
-
-	/// 스프라이트 테스트
-	auto sprite = scene->CreateObject("sprite");
-	sprite->AddComponent<Rocket::SpriteRenderer>();
-	sprite->transform.Translate(1400.0f, 700.0f, 0.0f);
+// 	/// 텍스트 테스트
+// 	auto text = scene->CreateObject("text");
+// 	text->AddComponent<Rocket::TextBox>();
+// 	text->GetComponent<Rocket::TextBox>()->SetText("Hello World\nBABO");
+// 	text->transform.Translate(1400.0f, 0.0f, 0.0f);
+// 
+// 	/// 스프라이트 테스트
+// 	auto sprite = scene->CreateObject("sprite");
+// 	sprite->AddComponent<Rocket::SpriteRenderer>();
+// 	sprite->transform.Translate(1400.0f, 700.0f, 0.0f);
 
 	/// 부하테스트
 	for (int i = 0; i < 5; i++)

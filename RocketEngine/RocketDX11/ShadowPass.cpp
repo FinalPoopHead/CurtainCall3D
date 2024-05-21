@@ -7,6 +7,7 @@
 #include "IRenderable.h"
 #include "MeshRenderer.h"
 #include "DynamicModelRenderer.h"
+#include "StaticModelRenderer.h"
 
 namespace Rocket::Core
 {
@@ -41,16 +42,29 @@ namespace Rocket::Core
 			std::vector<MeshRenderer*> staticMeshList;
 			staticMeshList.reserve(256);
 
+			std::vector<StaticModelRenderer*> staticModelList;
+			staticModelList.reserve(256);
+
 			std::vector<DynamicModelRenderer*> dynamicModelList;
 			dynamicModelList.reserve(256);
 
-			for (auto meshRenderer : objMgr.GetStaticMeshRenderers())
+			for (auto meshRenderer : objMgr.GetMeshRenderers())
 			{
 /*				staticMeshList.push_back(meshRenderer);*/
 
 				if (light->FrustumCulling(meshRenderer->GetBoundingBox()))
 				{
 					staticMeshList.push_back(meshRenderer);
+				}
+			}
+
+			for (auto staticModelRenderer : objMgr.GetStaticModelRenderers())
+			{
+				/*				staticMeshList.push_back(meshRenderer);*/
+
+				if (light->FrustumCulling(staticModelRenderer->GetBoundingBox()))
+				{
+					staticModelList.push_back(staticModelRenderer);
 				}
 			}
 
@@ -73,11 +87,21 @@ namespace Rocket::Core
 				meshRenderer->RenderShadowMap(deviceContext, light->GetViewMatrix(), light->GetProjectionMatrix(), _staticMeshVS, _shadowMapPS);
 			}
 
+			for (auto& modelRenderer : staticModelList)
+			{
+				modelRenderer->RenderShadowMap(deviceContext, light->GetViewMatrix(), light->GetProjectionMatrix(), _staticModelVS, _shadowMapPS);
+			}
+
 			for (auto& modelRenderer : dynamicModelList)
 			{
 				modelRenderer->RenderShadowMap(deviceContext, light->GetViewMatrix(), light->GetProjectionMatrix(), _dynamicModelVS, _shadowMapPS);
 			}
 		}
+	}
+
+	void ShadowPass::SetStaticModelVS(VertexShader* staticModelVS)
+	{
+		_staticModelVS = staticModelVS;
 	}
 
 }

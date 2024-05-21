@@ -26,6 +26,8 @@ struct PixelInputType
     float3 bitangent : BINORMAL;
 };
 
+// Model 기준으로 StaticMesh를 그릴때 사용할 Vertex Shader
+// NodeTransform 을 넘겨줘서 사용한다.
 PixelInputType main(VertexInputType input)
 {
     PixelInputType output = (PixelInputType) 0;

@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "MeshRenderer.h"
 #include "DynamicModelRenderer.h"
+#include "StaticModelRenderer.h"
 #include "SpriteRenderer.h"
 #include "LineRenderer.h"
 #include "Mesh.h"
@@ -17,7 +18,7 @@ namespace Rocket::Core
 	ObjectManager::ObjectManager()
 		: _resourceManager(ResourceManager::Instance()),
 		_lineRenderer(nullptr),
-		_staticModelRendererList(),
+		_meshRendererList(),
 		_cameraList(),
 		_textList()
 	{
@@ -62,7 +63,7 @@ namespace Rocket::Core
 			delete cam;
 		}
 
-		for (auto& mr : _staticModelRendererList)
+		for (auto& mr : _meshRendererList)
 		{
 			delete mr;
 		}
@@ -70,6 +71,11 @@ namespace Rocket::Core
 		for (auto& dmr : _dynamicModelRendererList)
 		{
 			delete dmr;
+		}
+
+		for (auto& smr : _staticModelRendererList)
+		{
+			delete smr;
 		}
 
 		for (auto& tr : _textList)
@@ -98,7 +104,7 @@ namespace Rocket::Core
 		return temp;
 	}
 
-	MeshRenderer* ObjectManager::CreateStaticModelRenderer()
+	MeshRenderer* ObjectManager::CreateMeshRenderer()
 	{
 		MeshRenderer* meshRenderer = new MeshRenderer();
 
@@ -118,7 +124,7 @@ namespace Rocket::Core
 		material->SetRenderState(_resourceManager.GetRenderState(ResourceManager::eRenderState::SOLID));
 		meshRenderer->SetMaterial(material);
 		
-		_staticModelRendererList.emplace_back(meshRenderer);
+		_meshRendererList.emplace_back(meshRenderer);
 
 		return meshRenderer;
 	}
@@ -137,9 +143,9 @@ namespace Rocket::Core
 		return _spriteList;
 	}
 
-	std::vector<MeshRenderer*>& ObjectManager::GetStaticMeshRenderers()
+	std::vector<MeshRenderer*>& ObjectManager::GetMeshRenderers()
 	{
-		return _staticModelRendererList;
+		return _meshRendererList;
 	}
 
 	Rocket::Core::TextRenderer* ObjectManager::CreateText()
@@ -193,6 +199,34 @@ namespace Rocket::Core
 		return dynamicModelRenderer;
 	}
 
+
+	StaticModelRenderer* ObjectManager::CreateStaticModelRenderer()
+	{
+		StaticModelRenderer* staticModelRenderer = new StaticModelRenderer();
+
+		// TODO : 기본 Mesh를 넣어주기로 했는데 이거 일단 보류.
+		// meshRenderer->LoadModel(_resourceManager.GetCubeMesh());
+
+		// TODO : 기본 Material을 넣어주고 앞단에서 Material을 바꿔서 넣어줄 수 있도록 하자
+		//meshRenderer->SetMaterial(_resourceManager.GetDefaultMaterial());
+		Material* material = new Material();
+		material->SetBaseColorTexture(_resourceManager.GetDefaultTexture());
+
+		// TODO : 디퍼드 셰이더를 여기서 수동으로 바꿔주는게 조금 아쉽다.
+// 		material->SetVertexShader(_resourceManager.GetVertexShader("StaticMeshVS"));
+// 		material->SetPixelShader(_resourceManager.GetPixelShader("StaticMeshPS"));
+		material->SetVertexShader(_resourceManager.GetVertexShader("DeferredStaticMeshVS"));
+		material->SetPixelShader(_resourceManager.GetPixelShader("DeferredStaticMeshPS"));
+		material->SetRenderState(_resourceManager.GetRenderState(ResourceManager::eRenderState::SOLID));
+		staticModelRenderer->SetMaterial(material);
+
+		_staticModelRendererList.emplace_back(staticModelRenderer);
+
+		return staticModelRenderer;
+	}
+
+
+
 	DirectionalLight* ObjectManager::CreateDirectionalLight()
 	{
 		DirectionalLight* directionalLight = new DirectionalLight();
@@ -211,4 +245,10 @@ namespace Rocket::Core
 
 		return _cubeMap.get();
 	}
+
+	std::vector<StaticModelRenderer*>& ObjectManager::GetStaticModelRenderers()
+	{
+		return _staticModelRendererList;
+	}
+
 }

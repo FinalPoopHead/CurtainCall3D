@@ -31,6 +31,13 @@ void UnityLoadScene::Initialize()
 		flt::ModelLoader loader;
 		flt::RawScene rawScene;
 		loader.Load(filePath, &rawScene);
+
+// 		flt::RawNode* fakeRoot = new flt::RawNode();
+// 		for (auto& node : rawScene.nodes)
+// 		{
+// 			fakeRoot->children.push_back(node);
+// 		}
+
 		flt::RawNode* node = rawScene.nodes[0];
 
 		renderer->SetRawNode(node);
@@ -38,10 +45,10 @@ void UnityLoadScene::Initialize()
 
 
 	//----------------------
-	LoadUnityJson();
+	//LoadUnityJson();
 
 	GlideObject* glideObject = CreateGameObject<GlideObject>();
-	glideObject->tr.SetPosition(0.0f, 100.0f, -100.0f);
+	glideObject->tr.SetPosition(0.0f, 0.0f, -10.0f);
 }
 
 void UnityLoadScene::Finalize()
