@@ -35,6 +35,11 @@ void Controller::Update(float deltaSecond)
 			speed *= 10.0f;
 		}
 
+		if (flt::GetKey(flt::KeyCode::lCtrl))
+		{
+			speed *= 0.1f;
+		}
+
 		if (flt::GetKey(flt::KeyCode::w))
 		{
 			transform.AddWorldPosition(transform.Forward() * speed * deltaSecond);

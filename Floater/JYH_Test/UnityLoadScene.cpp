@@ -75,7 +75,7 @@ void UnityLoadScene::LoadUnityJson()
 	std::string josnData = buffer.str();
 	inputFile.close();
 	document.Parse(josnData.c_str());
-	auto error = document.GetParseError();
+	ASSERT(document.HasParseError() == rapidjson::kParseErrorNone, "Parse error");
 
 	if (document.IsObject())
 	{
