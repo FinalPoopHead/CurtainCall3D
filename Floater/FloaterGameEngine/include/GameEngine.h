@@ -24,7 +24,7 @@ namespace flt
 
 	public:
 		void Initialize();
-		void Update();
+		bool Update();
 		void Finalize();
 
 		void SetScene(Scene* scene);

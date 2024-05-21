@@ -103,5 +103,10 @@ namespace flt
 		mutable bool _isDirty;
 
 		TransformOwner* _pOwner;
+
+	public:
+		static const Vector4f WorldForward();
+		static const Vector4f WorldRight();
+		static const Vector4f WorldUp();
 	};
 }

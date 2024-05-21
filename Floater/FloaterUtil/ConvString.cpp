@@ -31,6 +31,7 @@ std::wstring flt::ToWstring(const std::string& str, strEncoding encoding)
 	return ret;
 }
 
+
 std::string flt::ToString(const std::wstring& wstr, strEncoding encoding)
 {
 	std::string ret;
@@ -54,5 +55,54 @@ std::string flt::ToString(const std::wstring& wstr, strEncoding encoding)
 			break;
 	}
 
+	return ret;
+}
+
+std::wstring flt::ToWstring(int value)
+{
+	wchar_t buffer[256];
+	swprintf(buffer, 256, L"%d", value);
+	std::wstring ret = buffer;
+	return ret;
+}
+
+std::wstring flt::ToWstring(float value)
+{
+	wchar_t buffer[256];
+	swprintf(buffer, 256, L"%f", value);
+	std::wstring ret = buffer;
+	return ret;
+}
+
+std::wstring flt::ToWstring(double value)
+{
+	wchar_t buffer[256];
+	swprintf(buffer, 256, L"%lf", value);
+	std::wstring ret = buffer;
+	return ret;
+}
+
+std::string flt::ToString(int value)
+{
+	char buffer[256];
+	sprintf(buffer, "%d", value);
+	std::string ret = buffer;
+	return ret;
+}
+
+
+std::string flt::ToString(float value)
+{
+	char buffer[256];
+	sprintf(buffer, "%f", value);
+	std::string ret = buffer;
+	return ret;
+}
+
+std::string flt::ToString(double value)
+{
+	char buffer[256];
+	sprintf(buffer, "%lf", value);
+	std::string ret = buffer;
 	return ret;
 }

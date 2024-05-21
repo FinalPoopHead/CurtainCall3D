@@ -145,6 +145,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="GlideObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TestGameObejct.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -152,12 +154,15 @@
     <ClCompile Include="TestScene.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="UnityLoadScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Controller.h" />
     <ClInclude Include="GlideComponent.h" />
     <ClInclude Include="GlideObject.h" />
     <ClInclude Include="TestGameObejct.h" />
     <ClInclude Include="TestScene.h" />
+    <ClInclude Include="UnityLoadScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FloaterGameEngine\FloaterGameEngine.vcxproj">

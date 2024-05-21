@@ -28,20 +28,22 @@ namespace flt
 		void RemoveComponent(ComponentBase* component);
 
 		template<ComponentType T>
-		T* AddComponent();
+		T* AddComponent(bool isEnabled = true);
 
 		template <typename T>
 		T* GetComponent();
 
+	public:
+		std::wstring name;
+
 	private:
 		Scene* _scene;
-		std::wstring _name;
 		std::vector<ComponentBase*> _components;
 		bool _isEnable;
 	};
 
 	template<ComponentType T>
-	T* flt::GameObject::AddComponent()
+	T* flt::GameObject::AddComponent(bool isEnabled /*= true*/)
 	{
 		ComponentBase* component = new T(this);
 		int index = component->GetIndex();
@@ -59,6 +61,7 @@ namespace flt
 
 		_components[index] = component;
 		component->_gameObject = this;
+		component->_isEnable = isEnabled;
 
 		return static_cast<T*>(component);
 	}

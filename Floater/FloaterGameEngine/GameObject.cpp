@@ -3,7 +3,7 @@
 
 flt::GameObject::GameObject() :
 	_scene(),
-	_name(),
+	name(),
 	_components(),
 	_isEnable(true)
 {

@@ -1,6 +1,7 @@
 ﻿#include "./include/Scene.h"
 
-flt::Scene::Scene() : 
+
+flt::Scene::Scene() :
 	_gameObjects(),
 	_gameObjectsToEnable(),
 	_componentsToEnable()
@@ -25,13 +26,13 @@ void flt::Scene::Finalize()
 void flt::Scene::CreateGameObject(GameObject* gameObject)
 {
 	_gameObjects.emplace_back(gameObject);
-	if(gameObject->_isEnable)
+	if (gameObject->_isEnable)
 	{
 		_gameObjectsToEnable.emplace_back(gameObject, gameObject->_isEnable);
 
-		for(auto& component : gameObject->_components)
+		for (auto& component : gameObject->_components)
 		{
-			if(component == nullptr)
+			if (component == nullptr)
 			{
 				continue;
 			}
@@ -39,6 +40,20 @@ void flt::Scene::CreateGameObject(GameObject* gameObject)
 			_componentsToEnable.emplace_back(component, true);
 		}
 	}
+}
+
+std::vector<flt::GameObject*> flt::Scene::GetGameObjects(const std::wstring& name) const
+{
+	std::vector<GameObject*> result;
+	for (const auto& object : _gameObjects)
+	{
+		if (object->name == name)
+		{
+			result.emplace_back(object);
+		}
+	}
+
+	return result;
 }
 
 void flt::Scene::DestroyGameObject(GameObject& gameObject)
@@ -128,6 +143,8 @@ void flt::Scene::Update(float deltaSecond)
 {
 	for (auto& object : _gameObjects)
 	{
+		Vector4f position = object->transform.GetWorldPosition();
+
 		if (!object->_isEnable)
 		{
 			continue;
@@ -150,7 +167,7 @@ void flt::Scene::Update(float deltaSecond)
 		}
 	}
 
-	
+
 }
 
 void flt::Scene::EndRender()
@@ -182,9 +199,45 @@ void flt::Scene::StartFrame()
 {
 	for (auto& [object, isEnable] : _gameObjectsToEnable)
 	{
-		if (object->_isEnable != isEnable)
+		//이미 이 전 상태와 같다면 패스.
+		if (object->_isEnable == isEnable)
 		{
-			object->_isEnable = isEnable;
+			continue;
+		}
+
+		object->_isEnable = isEnable;
+
+		if (isEnable)
+		{
+			// 게임 오브젝트가 활성화 되면서 컴포넌츠들 활성화.
+			for (auto& component : object->_components)
+			{
+				if (component == nullptr)
+				{
+					continue;
+				}
+
+				if (component->_isEnable)
+				{
+					component->OnEnable();
+				}
+			}
+		}
+		else
+		{
+			// 게임 오브젝트가 활성화 되면서 컴포넌츠들 활성화.
+			for (auto& component : object->_components)
+			{
+				if (component == nullptr)
+				{
+					continue;
+				}
+
+				if (component->_isEnable)
+				{
+					component->OnDisable();
+				}
+			}
 		}
 	}
 

@@ -497,3 +497,18 @@ const flt::Matrix4f& flt::Transform::GetWorldMatrix4fRef() const noexcept
 
 	return _worldMatrix;
 }
+
+const flt::Vector4f flt::Transform::WorldForward()
+{
+	return Vector4f(0.0f, 0.0f, 1.0f, 0.0f);
+}
+
+const flt::Vector4f flt::Transform::WorldRight()
+{
+	return Vector4f(1.0f, 0.0f, 0.0f, 0.0f);
+}
+
+const flt::Vector4f flt::Transform::WorldUp()
+{
+	return Vector4f(0.0f, 1.0f, 0.0f, 0.0f);
+}

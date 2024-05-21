@@ -34,11 +34,11 @@ void flt::GameEngine::Initialize()
 	_timer.Start();
 }
 
-void flt::GameEngine::Update()
+bool flt::GameEngine::Update()
 {
 	_timer.Update();
 	float deltaSecond = (float)_timer.GetDeltaSeconds();
-	_platform->Update();
+	bool closeWindow = _platform->Update();
 
 	_currentScene->StartFrame();
 
@@ -57,6 +57,8 @@ void flt::GameEngine::Update()
 
 	_renderer->Render(deltaSecond);
 	_currentScene->EndRender();
+
+	return closeWindow;
 }
 
 void flt::GameEngine::Finalize()
