@@ -140,5 +140,8 @@
     <ClInclude Include="RocketTransform.h">
       <Filter>Transform</Filter>
     </ClInclude>
+    <ClInclude Include="IStaticModelRenderer.h">
+      <Filter>Interface\Component\Renderer\3D</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

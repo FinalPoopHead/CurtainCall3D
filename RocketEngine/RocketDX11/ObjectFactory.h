@@ -12,14 +12,13 @@ namespace Rocket::Core
 
 	public:
 		virtual ICamera* CreateCamera() override;
-		virtual IMeshRenderer* CreateStaticModelRenderer() override;
+		virtual IMeshRenderer* CreateMeshRenderer() override;
 		virtual ITextRenderer* CreateTextRenderer() override;
 		virtual ISpriteRenderer* CreateSpriteRenderer() override;
 		virtual ILineRenderer* CreateLineRenderer() override;
 		virtual IDirectionalLight* CreateDirectionalLight() override;
-
-		// IFactory을(를) 통해 상속됨
 		virtual IDynamicModelRenderer* CreateDynamicModelRenderer() override;
+		virtual IStaticModelRenderer* CreateStaticModelRenderer() override;
 		virtual CubePrimitive* CreateCubePrimitive() override;
 		virtual SpherePrimitive* CreateSpherePrimitive() override;
 		virtual CylinderPrimitive* CreateCylinderPrimitive() override;

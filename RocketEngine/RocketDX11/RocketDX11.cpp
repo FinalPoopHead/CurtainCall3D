@@ -19,6 +19,7 @@
 
 #include "MeshRenderer.h"
 #include "DynamicModelRenderer.h"
+#include "StaticModelRenderer.h"
 #include "SpriteRenderer.h"
 #include "LineRenderer.h"
 #include "GraphicsMacro.h"
@@ -261,6 +262,7 @@ namespace Rocket::Core
 		_shadowPass = std::make_unique<ShadowPass>();
 		_shadowPass->Initialize(_resourceManager.GetVertexShader("StaticMeshShadowVS"), _resourceManager.GetVertexShader("DynamicModelShadowVS")
 			, _resourceManager.GetPixelShader("ShadowMapPS"));
+		_shadowPass->SetStaticModelVS(_resourceManager.GetVertexShader("StaticModelShadowVS"));
 
 		/// SpriteBatch, LineBatch, BasicEffect 초기화
 		_spriteBatch = new DirectX::SpriteBatch(_deviceContext.Get());
@@ -313,7 +315,7 @@ namespace Rocket::Core
 		std::vector<IRenderable*> renderList;
 		renderList.reserve(256);
 
-		for (auto meshRenderer : _objectManager.GetStaticMeshRenderers())
+		for (auto meshRenderer : _objectManager.GetMeshRenderers())
 		{
 			if (mainCam->FrustumCulling(meshRenderer->GetBoundingBox()))
 			{
@@ -407,11 +409,19 @@ namespace Rocket::Core
 		// Culling 및 Update Animation
 		Camera* mainCam = Camera::GetMainCamera();
 
-		for (auto meshRenderer : _objectManager.GetStaticMeshRenderers())
+		for (auto meshRenderer : _objectManager.GetMeshRenderers())
 		{
 			if (mainCam->FrustumCulling(meshRenderer->GetBoundingBox()))
 			{
 				_renderList.push_back(meshRenderer);
+			}
+		}
+
+		for (auto staticModelRenderer : _objectManager.GetStaticModelRenderers())
+		{
+			if (mainCam->FrustumCulling(staticModelRenderer->GetBoundingBox()))
+			{
+				_renderList.push_back(staticModelRenderer);
 			}
 		}
 
@@ -457,12 +467,11 @@ namespace Rocket::Core
 			RenderHelperObject();
 		}
 
-		RenderHelperObject();
 		RenderCubeMap();
 
 		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), nullptr);
 
-		// RenderLine();
+		// 		RenderLine();
 		RenderText();
 		RenderTexture();
 
@@ -470,7 +479,6 @@ namespace Rocket::Core
 		{
 			RenderDebug();
 		}
-		RenderDebug();
 
 		EndRender();
 	}

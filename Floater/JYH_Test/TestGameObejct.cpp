@@ -14,7 +14,8 @@ TestGameObejct::TestGameObejct()
 	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>();
 
 	flt::ModelLoader loader;
-	std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Dying.fbx";
+	//std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Dying.fbx";
+	std::wstring filePath = L"..\\x64\\fbx\\Models\\SM_Box_Cargo.fbx";
 	flt::RawScene rawScene;
 	loader.Load(filePath, &rawScene);
 	auto& node = rawScene.nodes[0];

@@ -47,7 +47,7 @@ namespace Rocket::Core
 		_model = reinterpret_cast<DynamicModel*>(ResourceManager::Instance().GetModel(fileName));
 		if (_model == nullptr)
 		{
-			MessageBox(NULL, TEXT("모델이 없습니다."), TEXT("모델 로드 실패"), MB_OK);
+			MessageBox(NULL, TEXT("다이나믹 모델이 없습니다."), TEXT("다이나믹 모델 로드 실패"), MB_OK);
 			return;
 		}
 		_animatedRootNode = CopyNodeData(_model->rootNode);

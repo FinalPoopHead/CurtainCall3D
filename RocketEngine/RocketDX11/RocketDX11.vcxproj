@@ -320,6 +320,7 @@ copy /Y "*.hlsli" "$(SolutionDir)Resources\Shaders";</Command>
     <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="SphereMesh.cpp" />
     <ClCompile Include="StaticMesh.cpp" />
+    <ClCompile Include="StaticModelRenderer.cpp" />
     <ClCompile Include="TextRenderer.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="VertexShader.cpp" />
@@ -341,6 +342,7 @@ copy /Y "*.hlsli" "$(SolutionDir)Resources\Shaders";</Command>
     <ClInclude Include="SkinnedMesh.h" />
     <ClInclude Include="DynamicModelRenderer.h" />
     <ClInclude Include="SpriteRenderer.h" />
+    <ClInclude Include="StaticModelRenderer.h" />
     <ClInclude Include="VertexStruct.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Material.h" />
@@ -574,6 +576,16 @@ copy /Y "*.hlsli" "$(SolutionDir)Resources\Shaders";</Command>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)Resources\Shaders\%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='R_Debug|x64'">$(SolutionDir)Resources\Shaders\%(Filename).cso</ObjectFileOutput>
     </FxCompile>
+    <FxCompile Include="DeferredStaticModelVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Release|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="DynamicModelShadowVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Release|Win32'">Vertex</ShaderType>
@@ -743,6 +755,16 @@ copy /Y "*.hlsli" "$(SolutionDir)Resources\Shaders";</Command>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Release|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Debug|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="StaticModelShadowVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Release|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="TexturePS.hlsl">
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>

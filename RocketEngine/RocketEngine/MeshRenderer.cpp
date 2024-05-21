@@ -7,7 +7,7 @@
 namespace Rocket
 {
 	MeshRenderer::MeshRenderer()
-		: _graphicsRenderer(Core::GraphicsSystem::Instance().GetFactory()->CreateStaticModelRenderer())
+		: _graphicsRenderer(Core::GraphicsSystem::Instance().GetFactory()->CreateMeshRenderer())
 	{
 
 	}

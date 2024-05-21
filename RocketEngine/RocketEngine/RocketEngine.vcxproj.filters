@@ -187,6 +187,9 @@
     <Filter Include="Component\Renderer\Model\StaticMeshRenderer">
       <UniqueIdentifier>{ca4d48c7-1965-4fdf-bf7b-ded7efe3dc5b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Component\Renderer\Model\StaticModelRenderer">
+      <UniqueIdentifier>{3752d041-6f8f-4d4b-8733-8972ab95c336}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineProcess.h">
@@ -351,6 +354,9 @@
     <ClInclude Include="ResourceSystem.h">
       <Filter>System&amp;Manager\ResourceSystem</Filter>
     </ClInclude>
+    <ClInclude Include="StaticModelRenderer.h">
+      <Filter>Component\Renderer\Model\StaticModelRenderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EngineProcess.cpp">
@@ -493,6 +499,9 @@
     </ClCompile>
     <ClCompile Include="ResourceSystem.cpp">
       <Filter>System&amp;Manager\ResourceSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticModelRenderer.cpp">
+      <Filter>Component\Renderer\Model\StaticModelRenderer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

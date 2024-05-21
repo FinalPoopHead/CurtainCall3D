@@ -15,6 +15,7 @@ namespace Rocket
 	class GameObject;
 	class DynamicModelRenderer;
 	class MeshRenderer;
+	class StaticModelRenderer;
 	class Light;
 	class Camera;
 }
@@ -29,6 +30,7 @@ namespace Rocket
 	{
 		friend DynamicModelRenderer;
 		friend MeshRenderer;
+		friend StaticModelRenderer;
 		friend Light;
 		friend Camera;
 

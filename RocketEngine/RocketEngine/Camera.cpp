@@ -21,10 +21,10 @@ namespace Rocket
 		, _camera(Core::GraphicsSystem::Instance().GetFactory()->CreateCamera())
 		, _ray()
 	{
-		_camera->SetNearZ(0.01f);
-		_camera->SetFarZ(1000.0f);
-		_camera->SetAspect(16.0f / 9.0f);
-		_camera->SetFOVY(70.0f);
+		_camera->SetNearZ(_nearZ);
+		_camera->SetFarZ(_farZ);
+		_camera->SetAspect(_aspect);
+		_camera->SetFOVY(_fovY);
 	}
 
 	void Camera::Start()

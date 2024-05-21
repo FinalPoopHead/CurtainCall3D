@@ -12,11 +12,13 @@
 /// Renderable objects
 #include "./RocketCommon/IMeshRenderer.h"
 #include "./RocketCommon/IDynamicModelRenderer.h"
+#include "./RocketCommon/IStaticModelRenderer.h"
 #include "./RocketCommon/ITextRenderer.h"
 #include "./RocketCommon/ISpriteRenderer.h"
 #include "./RocketCommon/ILineRenderer.h"
 
 #include "./RocketCommon/IResourceManager.h"
+#include "./RocketCommon/RawModelStruct.h"
 
 #pragma warning(pop)
 
@@ -106,14 +108,24 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 
 		if (renderable.node->meshes.size() > 0)
 		{
-			rocketObject->renderer = factory->CreateDynamicModelRenderer();
-			rocketObject->renderer->LoadModel(pointer);
-			Rocket::Core::RocketTransform* rootBoneTransform = new Rocket::Core::RocketTransform();
-			rootBoneTransform->SetParent(&rocketObject->rocketTransform, false);
+			if (0 < rocketObject->rkModel->animations.size())
+			{
+				rocketObject->renderer = factory->CreateDynamicModelRenderer();
+				rocketObject->renderer->LoadModel(pointer);
+				Rocket::Core::RocketTransform* rootBoneTransform = new Rocket::Core::RocketTransform();
+				rootBoneTransform->SetParent(&rocketObject->rocketTransform, false);
 
-			RawSkeleton*& skeleton = renderable.node->skeleton;
-			GenerateTransformHierarchyRecursive(rootBoneTransform, &skeleton->bones[skeleton->rootBoneIndex].transform);
-			rocketObject->renderer->BindTransform(&rocketObject->rocketTransform);
+				RawSkeleton*& skeleton = renderable.node->skeleton;
+				GenerateTransformHierarchyRecursive(rootBoneTransform, &skeleton->bones[skeleton->rootBoneIndex].transform);
+				rocketObject->renderer->BindTransform(&rocketObject->rocketTransform);
+			}
+			else
+			{
+				rocketObject->staticMeshRenderer = factory->CreateStaticModelRenderer();
+				rocketObject->staticMeshRenderer->LoadModel(pointer);
+
+				rocketObject->renderer->BindTransform(&rocketObject->rocketTransform);
+			}
 		}
 	}
 

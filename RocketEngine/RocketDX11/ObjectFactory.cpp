@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "MeshRenderer.h"
 #include "DynamicModelRenderer.h"
+#include "StaticModelRenderer.h"
 #include "CubeMesh.h"
 #include "TextRenderer.h"
 #include "SpriteRenderer.h"
@@ -42,9 +43,9 @@ namespace Rocket::Core
 		return _objectManager.CreateCamera();
 	}
 
-	IMeshRenderer* ObjectFactory::CreateStaticModelRenderer()
+	IMeshRenderer* ObjectFactory::CreateMeshRenderer()
 	{
-		return _objectManager.CreateStaticModelRenderer();
+		return _objectManager.CreateMeshRenderer();
 	}
 
 	ITextRenderer* ObjectFactory::CreateTextRenderer()
@@ -85,6 +86,11 @@ namespace Rocket::Core
 	IDirectionalLight* ObjectFactory::CreateDirectionalLight()
 	{
 		return _objectManager.CreateDirectionalLight();
+	}
+
+	IStaticModelRenderer* ObjectFactory::CreateStaticModelRenderer()
+	{
+		return _objectManager.CreateStaticModelRenderer();
 	}
 
 }

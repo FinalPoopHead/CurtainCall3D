@@ -29,6 +29,7 @@
 #include "Camera.h"
 #include "MeshRenderer.h"
 #include "DynamicModelRenderer.h"
+#include "StaticModelRenderer.h"
 #include "Transform.h"
 #include "AnimationController.h"
 #include "Animator.h"

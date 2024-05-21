@@ -85,6 +85,9 @@
     <ClCompile Include="ShadowPass.cpp">
       <Filter>DeferredShading\ShadowPass</Filter>
     </ClCompile>
+    <ClCompile Include="StaticModelRenderer.cpp">
+      <Filter>Component\Renderer\StaticModelRenderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Axis.h">
@@ -197,6 +200,9 @@
     </ClInclude>
     <ClInclude Include="ShadowPass.h">
       <Filter>DeferredShading\ShadowPass</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticModelRenderer.h">
+      <Filter>Component\Renderer\StaticModelRenderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -368,6 +374,12 @@
     <Filter Include="Resource\Shader\HLSL\Deferred\ShadowPass">
       <UniqueIdentifier>{571ad4e1-abd0-4946-9835-c66bdce95594}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Component\Renderer\StaticModelRenderer">
+      <UniqueIdentifier>{e7f91170-e16c-4f82-b7d3-1e38a68c3b2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Shader\HLSL\Deferred\StaticModel">
+      <UniqueIdentifier>{afde9007-7363-4529-96f7-acb3a0bcfbf7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ColorPS.hlsl">
@@ -452,6 +464,12 @@
       <Filter>Resource\Shader\HLSL\Deferred\ShadowPass</Filter>
     </FxCompile>
     <FxCompile Include="DynamicModelShadowVS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\ShadowPass</Filter>
+    </FxCompile>
+    <FxCompile Include="DeferredStaticModelVS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\StaticModel</Filter>
+    </FxCompile>
+    <FxCompile Include="StaticModelShadowVS.hlsl">
       <Filter>Resource\Shader\HLSL\Deferred\ShadowPass</Filter>
     </FxCompile>
   </ItemGroup>

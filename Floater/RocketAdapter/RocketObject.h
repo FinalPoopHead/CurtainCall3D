@@ -8,6 +8,7 @@ namespace Rocket
 	{
 		class ICamera;
 		class IDynamicModelRenderer;
+		class IStaticModelRenderer;
 		struct RawModel;
 	}
 }
@@ -21,6 +22,7 @@ namespace flt
 			transform(nullptr),
 			camera(nullptr),
 			renderer(nullptr),
+			staticMeshRenderer(nullptr),
 			rkModel(nullptr),
 			isRegisted(false) {}
 
@@ -28,6 +30,7 @@ namespace flt
 		Transform* transform;
 		Rocket::Core::ICamera* camera;
 		Rocket::Core::IDynamicModelRenderer* renderer;
+		Rocket::Core::IStaticModelRenderer* staticMeshRenderer;
 		Rocket::Core::RawModel* rkModel;
 
 		bool isRegisted;
