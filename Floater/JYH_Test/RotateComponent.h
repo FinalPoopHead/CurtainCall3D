@@ -1,0 +1,23 @@
+﻿#pragma once
+#include "../FloaterGameEngine/include/Component.h"
+#include "../FloaterGameEngine/include/GameObject.h"
+#include "../FloaterRendererCommon/include/Transform.h"
+
+class RotateComponent : public flt::Component<RotateComponent>
+{
+public:
+	RotateComponent(flt::GameObject* gameObject) : 
+		flt::Component<RotateComponent>(gameObject),
+		speed(4.0f)
+	{
+	}
+
+	virtual void Update(float deltaSecond)
+	{
+		flt::Transform& transform = _gameObject->tr;
+
+		transform.AddLocalRotation({0.0f, 1.0f, 0.0f}, speed * deltaSecond);
+	}
+private:
+	float speed;
+};

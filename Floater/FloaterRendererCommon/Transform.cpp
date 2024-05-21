@@ -114,6 +114,7 @@ flt::Quaternion flt::Transform::GetWorldRotation() const noexcept
 		worldRot = _pParent->GetWorldRotation() * worldRot;
 	}
 
+	worldRot.Normalize();
 	return worldRot;
 }
 
@@ -137,6 +138,8 @@ void flt::Transform::SetWorldRotation(const Quaternion& q)
 	{
 		_rotation = q;
 	}
+
+	_rotation.Normalize();
 }
 
 void flt::Transform::SetRotation(Vector3f degree, Quaternion::AxisOrder order /*= Quaternion::AxisOrder::YXZ*/)
@@ -167,18 +170,6 @@ void flt::Transform::SetRotation(const Quaternion& q)
 	_rotation.Normalize();
 }
 
-flt::Vector4f flt::Transform::GetWorldScale() const noexcept
-{
-	Vector4f worldScl = _scale;
-	worldScl.w = 0.0f;
-
-	if (_pParent)
-	{
-		worldScl = worldScl * _pParent->GetWorldMatrix4f();
-	}
-
-	return worldScl;
-}
 
 void flt::Transform::SetScale(float x, float y, float z)
 {
@@ -215,9 +206,9 @@ void flt::Transform::AddLocalPosition(float localX, float localY, float localZ)
 	_position.z += localZ;
 }
 
-void flt::Transform::AddLocalPosition(const Vector3f& position)
+void flt::Transform::AddLocalPosition(const Vector3f& localPos)
 {
-	AddLocalPosition(position.x, position.y, position.z);
+	AddLocalPosition(localPos.x, localPos.y, localPos.z);
 }
 
 void flt::Transform::AddLocalPosition(const Vector4f& localPos)
@@ -239,17 +230,25 @@ void flt::Transform::AddWorldPosition(const Vector4f& worldPos)
 	AddLocalPosition(localPos);
 }
 
+void flt::Transform::AddLocalRotation(const Vector3f& localAxis, float radian)
+{
+	Vector4f worldAxis = Vector4f{localAxis, 0.0f} * GetWorldMatrix4f();
+	worldAxis.Normalize();
+
+	AddWorldRotation((Vector3f)worldAxis, radian);
+}
+
 void flt::Transform::AddWorldPosition(float worldX, float worldY, float worldZ)
 {
 	AddWorldPosition(Vector4f{ worldX, worldY, worldZ, 1.0f });
 }
 
-void flt::Transform::AddLocalRotation(const Vector3f& axis, float radian)
+void flt::Transform::AddRotation(const Vector3f& worldAxis, float radian)
 {
 	//Quaternion q0{ DirectX::XMQuaternionRotationAxis(Vector4f{ axis, 0.0f }, radian) };
-	Quaternion q(axis, radian);
+	Quaternion q(worldAxis, radian);
 	//q.SetEuler(degreeX, degreeY, degree);
-	AddLocalRotation(q);
+	AddRotation(q);
 }
 
 void flt::Transform::AddWorldRotation(const Vector3f& axis, float radian)
@@ -262,10 +261,10 @@ void flt::Transform::AddWorldRotation(const Vector3f& axis, float radian)
 	Vector4f worldAxis = { axis, 0.0f };
 	Vector4f localAxis = worldAxis * worldMatrix.Inverse();
 
-	AddLocalRotation({localAxis.x, localAxis.y, localAxis.z}, radian);
+	AddRotation({localAxis.x, localAxis.y, localAxis.z}, radian);
 }
 
-void flt::Transform::AddLocalRotation(const Quaternion& q)
+void flt::Transform::AddRotation(const Quaternion& q)
 {
 	MakeDirtyRecursive();
 

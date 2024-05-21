@@ -160,6 +160,7 @@
     <ClInclude Include="Controller.h" />
     <ClInclude Include="GlideComponent.h" />
     <ClInclude Include="GlideObject.h" />
+    <ClInclude Include="RotateComponent.h" />
     <ClInclude Include="TestGameObejct.h" />
     <ClInclude Include="TestScene.h" />
     <ClInclude Include="UnityLoadScene.h" />

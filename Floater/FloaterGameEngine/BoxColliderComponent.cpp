@@ -101,11 +101,7 @@ void flt::BoxColliderComponent::UpdatePhysTransform()
 
 	_physXData->actor->setKinematicTarget(_physXData->transform);
 
-	Vector3f scale = (Vector3f)_transform->GetWorldScale();
-	scale.x *= _size.x;
-	scale.y *= _size.y;
-	scale.z *= _size.z;
-	physx::PxBoxGeometry geometry(scale.x, scale.y, scale.z);
+	physx::PxBoxGeometry geometry(_size.x, _size.y, _size.z);
 	_physXData->actor->detachShape(*_physXData->shape);
 	_physXData->shape->setGeometry(geometry);
 	_physXData->actor->attachShape(*_physXData->shape);

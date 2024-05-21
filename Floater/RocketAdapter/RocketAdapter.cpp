@@ -57,14 +57,26 @@ bool flt::RocketAdapter::Render(float deltaTime)
 {
 	for (auto& obj : _objects)
 	{
-		Vector4f wPos = obj->transform->GetWorldPosition();
+		Transform temp;
+		temp.SetMatrix(obj->transform->GetWorldMatrix4f());
+
+		Vector4f wPos = temp.GetLocalPosition();
 		obj->rocketTransform.SetLocalPosition({ wPos.x, wPos.y, wPos.z });
 
-		Quaternion wRot = obj->transform->GetWorldRotation();
+		Quaternion wRot = temp.GetLocalRotation();
 		obj->rocketTransform.SetLocalRotation({ wRot.x, wRot.y, wRot.z, wRot.w });
 
-		Vector4f wScale = obj->transform->GetWorldScale();
+		Vector4f wScale = temp.GetLocalScale();
 		obj->rocketTransform.SetLocalScale({ wScale.x, wScale.y, wScale.z });
+
+		//Vector4f wPos = obj->transform->GetWorldPosition();
+		//obj->rocketTransform.SetLocalPosition({ wPos.x, wPos.y, wPos.z });
+
+		//Quaternion wRot = obj->transform->GetWorldRotation();
+		//obj->rocketTransform.SetLocalRotation({ wRot.x, wRot.y, wRot.z, wRot.w });
+
+		//Vector3f wScale = obj->transform->GetWorldScale();
+		//obj->rocketTransform.SetLocalScale({ wScale.x, wScale.y, wScale.z });
 
 		if (obj->camera)
 		{

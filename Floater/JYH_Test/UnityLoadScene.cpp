@@ -13,6 +13,9 @@
 #include "../FloaterGameEngine/include/BuiltinComponent.h"
 #include "../FloaterRendererCommon/include/ModelLoader.h"
 
+// 테스트 include
+#include "RotateComponent.h"
+
 
 UnityLoadScene::UnityLoadScene(const std::wstring& jsonPath) : _jsonPath(jsonPath)
 {
@@ -45,7 +48,7 @@ void UnityLoadScene::Initialize()
 
 
 	//----------------------
-	//LoadUnityJson();
+	LoadUnityJson();
 
 	GlideObject* glideObject = CreateGameObject<GlideObject>();
 	glideObject->tr.SetPosition(0.0f, 0.0f, -10.0f);
@@ -89,6 +92,7 @@ void UnityLoadScene::LoadUnityJson()
 		for (auto& v : document.GetArray())
 		{
 			flt::GameObject* gameObject = CreateGameObject<flt::GameObject>();
+			gameObject->AddComponent<RotateComponent>();
 
 			if (v.HasMember("ID"))
 			{
