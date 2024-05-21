@@ -32,6 +32,7 @@ PixelInputType main(VertexInputType input)
     
     // Calculate the position of the vertex against the world, view, and projection matrices.
     output.position = mul(float4(input.position, 1.0f), worldMatrix);
+    output.worldPosition = output.position;
     output.position = mul(output.position, viewMatrix);
     output.position = mul(output.position, projectionMatrix);
     
@@ -46,11 +47,6 @@ PixelInputType main(VertexInputType input)
     output.tangent = normalize(output.tangent);
     output.bitangent = mul(float4(input.bitangent, 0.0f), inverseTranspose).xyz;
     output.bitangent = normalize(output.bitangent);
-    
-    // float4 worldPosition = mul(float4(input.position, 1.0f), mul(nodeTransformMatrix, worldMatrix));
-    float4 worldPosition = mul(float4(input.position, 1.0f), worldMatrix);
-    
-    output.worldPosition = worldPosition;
     
     return output;
 }

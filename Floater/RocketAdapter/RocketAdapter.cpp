@@ -121,10 +121,10 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 			}
 			else
 			{
-				rocketObject->staticMeshRenderer = factory->CreateStaticModelRenderer();
-				rocketObject->staticMeshRenderer->LoadModel(pointer);
+				rocketObject->staticModelRenderer = factory->CreateStaticModelRenderer();
+				rocketObject->staticModelRenderer->LoadModel(pointer);
 
-				rocketObject->renderer->BindTransform(&rocketObject->rocketTransform);
+				rocketObject->staticModelRenderer->BindTransform(&rocketObject->rocketTransform);
 			}
 		}
 	}

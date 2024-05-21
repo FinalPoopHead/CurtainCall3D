@@ -52,17 +52,11 @@ namespace Rocket::Core
 		// BoundingBox 생성
 		std::vector<DirectX::XMFLOAT3> points;
 
-		std::vector<Node*> nodes;
-		nodes.push_back(nullptr);
-		MakeNodeVector(_model->rootNode, &nodes);
-
 		for (auto& mesh : _model->meshes)
 		{
 			for (auto& vertex : mesh->GetVertices())
 			{
-				Vector3 temp = vertex.position;
-				temp = DirectX::XMVector3Transform(temp, nodes[vertex.nodeIndex]->GetWorldMatrix());
-				points.push_back(temp);
+				points.push_back(vertex.position);
 			}
 		}
 
@@ -122,15 +116,15 @@ namespace Rocket::Core
 			deviceContext->Unmap(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0);
 			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
 
-			// NodeTransform 세팅
-			bufferNumber = 1;
-			HR(deviceContext->Map(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-			NodeBufferType* nodeTRBufferDataPtr = (NodeBufferType*)mappedResource.pData;
-
-			SetNodeBuffer(_model->rootNode, nodeTRBufferDataPtr);
-
-			deviceContext->Unmap(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0);
-			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
+// 			// NodeTransform 세팅
+// 			bufferNumber = 1;
+// 			HR(deviceContext->Map(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+// 			NodeBufferType* nodeTRBufferDataPtr = (NodeBufferType*)mappedResource.pData;
+// 
+// 			SetNodeBuffer(_model->rootNode, nodeTRBufferDataPtr);
+// 
+// 			deviceContext->Unmap(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0);
+// 			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
 
 			/// 픽셀 쉐이더
 			// PBR Data를 넘겨준다.
@@ -404,18 +398,4 @@ namespace Rocket::Core
 			deviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
 		}
 	}
-
-	void StaticModelRenderer::MakeNodeVector(Node* node, std::vector<Node*>* vec)
-	{
-		if (node->index > 0)
-		{
-			vec->push_back(node);
-		}
-
-		for (int i = 0; i < node->children.size(); i++)
-		{
-			MakeNodeVector(node->children[i], vec);
-		}
-	}
-
 }

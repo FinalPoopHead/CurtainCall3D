@@ -215,7 +215,7 @@ namespace Rocket::Core
 		// TODO : 디퍼드 셰이더를 여기서 수동으로 바꿔주는게 조금 아쉽다.
 // 		material->SetVertexShader(_resourceManager.GetVertexShader("StaticMeshVS"));
 // 		material->SetPixelShader(_resourceManager.GetPixelShader("StaticMeshPS"));
-		material->SetVertexShader(_resourceManager.GetVertexShader("DeferredStaticModelVS"));
+		material->SetVertexShader(_resourceManager.GetVertexShader("DeferredStaticMeshVS"));
 		material->SetPixelShader(_resourceManager.GetPixelShader("DeferredStaticMeshPS"));
 		material->SetRenderState(_resourceManager.GetRenderState(ResourceManager::eRenderState::SOLID));
 		staticModelRenderer->SetMaterial(material);

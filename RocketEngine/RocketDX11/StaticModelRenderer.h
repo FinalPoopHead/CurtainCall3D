@@ -58,8 +58,6 @@ namespace Rocket::Core
 
 	private:
 		void SetNodeBuffer(Node* node, NodeBufferType* nodeBuffer);
-		// Node 인덱스화 시켜서 Matrix쓰려고 만드는 재귀함수.. 임시
-		void MakeNodeVector(Node* node, std::vector<Node*>* vec);
 
 	private:
 		RocketTransform* _transform;

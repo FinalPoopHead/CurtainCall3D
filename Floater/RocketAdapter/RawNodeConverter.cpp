@@ -156,7 +156,7 @@ Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt:
 		RkMesh* rocketMesh = new(std::nothrow) Rocket::Core::RawMesh();
 		ASSERT(rocketMesh, "Failed to allocate memory for mesh");
 		rocketMesh->name = ToString(node.name);
-		rocketMesh->bindedNode = rocketNode;
+		rocketMesh->BindNode(rocketNode);
 
 		rocketMesh->material = new(std::nothrow) RkMaterial();
 		ASSERT(rocketMesh->material, "Failed to allocate memory for material");
