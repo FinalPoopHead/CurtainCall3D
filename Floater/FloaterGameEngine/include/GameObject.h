@@ -33,9 +33,11 @@ namespace flt
 		template <typename T>
 		T* GetComponent();
 
+	public:
+		std::wstring name;
+
 	private:
 		Scene* _scene;
-		std::wstring _name;
 		std::vector<ComponentBase*> _components;
 		bool _isEnable;
 	};

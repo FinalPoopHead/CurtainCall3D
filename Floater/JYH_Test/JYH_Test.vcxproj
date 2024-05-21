@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Controller.cpp" />
     <ClCompile Include="GlideObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TestGameObejct.cpp">
@@ -156,6 +157,7 @@
     <ClCompile Include="UnityLoadScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Controller.h" />
     <ClInclude Include="GlideComponent.h" />
     <ClInclude Include="GlideObject.h" />
     <ClInclude Include="TestGameObejct.h" />

@@ -2,7 +2,6 @@
 #include <string>
 
 
-
 namespace flt
 {
 	enum class strEncoding
@@ -24,4 +23,12 @@ namespace flt
 
 	std::wstring ToWstring(const std::string& str, strEncoding encoding = FLT_DEFAULT_ENCODING);
 	std::string ToString(const std::wstring& wstr, strEncoding encoding = FLT_DEFAULT_ENCODING);
+
+	std::wstring ToWstring(int value);
+	std::wstring ToWstring(float value);
+	std::wstring ToWstring(double value);
+
+	std::string ToString(int value);
+	std::string ToString(float value);
+	std::string ToString(double value);
 }

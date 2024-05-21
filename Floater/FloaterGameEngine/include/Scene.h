@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <list>
 #include <vector>
+#include <string>
 
 namespace flt
 {
@@ -29,6 +30,7 @@ namespace flt
 		T* CreateGameObject(bool isEnabled = true);
 
 		std::vector<GameObject*> GetGameObjects() const { return _gameObjects; }
+		std::vector<GameObject*> GetGameObjects(const std::wstring& name) const;
 
 	private:
 		std::vector<GameObject*> _gameObjects;

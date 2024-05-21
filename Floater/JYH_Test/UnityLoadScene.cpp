@@ -65,6 +65,11 @@ void UnityLoadScene::LoadUnityJson()
 		{
 			flt::GameObject* gameObject = CreateGameObject<flt::GameObject>();
 
+			if (v.HasMember("ID"))
+			{
+				int id = v["ID"].GetInt();
+				gameObject->name = flt::ToWstring(id);
+			}
 
 			if (v.HasMember("Name"))
 			{
@@ -106,22 +111,67 @@ void UnityLoadScene::LoadUnityJson()
 
 			if (v.HasMember("ColliderType"))
 			{
-				std::cout << v["ColliderType"].GetInt() << std::endl;
+				int colliderType = v["ColliderType"].GetInt();
+
+				if (colliderType == 1) // Box
+				{
+					flt::BoxColliderComponent* collider = gameObject->AddComponent<flt::BoxColliderComponent>();
+
+					if (v.HasMember("BoxColliderSize"))
+					{
+						auto& size = v["BoxColliderSize"];
+						collider->SetSize({size["x"].GetFloat(), size["y"].GetFloat(), size["z"].GetFloat()});
+					}
+
+					if (v.HasMember("colliderCenter"))
+					{
+						auto& center = v["BoxColliderCenter"];
+						collider->SetOffset({center["x"].GetFloat(), center["y"].GetFloat(), center["z"].GetFloat()});
+					}
+				}
+				else if (colliderType == 2) // Sphere
+				{
+					//gameObject->AddComponent<flt::SphereCollider>();
+				}
 			}
 
-			if (v.HasMember("BoxColliderSize"))
-			{
-				auto& size = v["BoxColliderSize"];
-				std::cout << size["x"].GetDouble() << std::endl;
-				std::cout << size["y"].GetDouble() << std::endl;
-				std::cout << size["z"].GetDouble() << std::endl;
-			}
+
 		}
 
+		// 계층구조 연결해주기
+		for (auto& v : document.GetArray())
+		{
+			if (!v.HasMember("Name"))
+			{
+				continue;
+			}
+
+			int id = v["ID"].GetInt();
+			std::wstring name = flt::ToWstring(id);
+
+			if (!v.HasMember("ParentID"))
+			{
+				continue;
+			}
+
+			int parentId = v["ParentID"].GetInt();
+			std::wstring parentName = flt::ToWstring(parentId);
+
+			if (parentId == 0)
+			{
+				continue;
+			}
+
+			auto parent = GetGameObjects(parentName);
+			ASSERT(parent.size() == 1, "Parent not found");
+			auto child = GetGameObjects(name);
+			ASSERT(child.size() == 1, "Child not found");
+
+			parent[0]->tr.AddChild(&child[0]->tr);
+		}
 	}
 	else
 	{
 		std::cout << "Invalid json file" << std::endl;
 	}
-
 }

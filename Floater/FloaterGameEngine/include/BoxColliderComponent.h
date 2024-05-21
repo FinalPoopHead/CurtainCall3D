@@ -31,6 +31,9 @@ namespace flt
 		void SetSize(const flt::Vector3f& size);
 		flt::Vector3f GetSize() const;
 
+		void SetOffset(const flt::Vector3f& offset);
+		flt::Vector3f GetOffset() const;
+
 	private:
 		void UpdatePhysTransform();
 		void UpdateTransform();
@@ -43,5 +46,6 @@ namespace flt
 		PhysXData* _physXData;
 		
 		flt::Vector3f _size;
+		flt::Vector3f _offset;
 	};
 }
