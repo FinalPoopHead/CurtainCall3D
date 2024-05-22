@@ -10,7 +10,7 @@ namespace Rocket::Core
 	Camera* Camera::_mainCamera;
 
 	Camera::Camera()
-		: _nearZ(0.01f), _farZ(1000.0f), _aspect(16.0f / 9.0f), _fovY(70.0f),
+		: _nearZ(0.01f), _farZ(1500.0f), _aspect(16.0f / 9.0f), _fovY(70.0f),
 		_nearWindowHeight(), _farWindowHeight(),
 		_viewMatrix(), _projectionMatrix()
 		, _boundingFrustum()
