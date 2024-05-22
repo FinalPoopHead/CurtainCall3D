@@ -549,6 +549,7 @@ void flt::OsWindows::HandleMouseRawData(const RAWMOUSE& data)
 	auto mouseFlags = data.usFlags;
 	if (mouseFlags & MOUSE_MOVE_ABSOLUTE)
 	{
+		// RemoteDesktop으로 마우스를 작동 시에 절대 좌표로 넘어옴.
 		ASSERT(false, "아직 제대로 구현 안함");
 		RECT rect;
 
@@ -569,6 +570,7 @@ void flt::OsWindows::HandleMouseRawData(const RAWMOUSE& data)
 
 		int absoluteX = MulDiv(rawX, rect.right, 65535) + rect.left;
 		int absoluteY = MulDiv(rawY, rect.bottom, 65535) + rect.top;
+
 
 		//std::cout << "absolute " << absoluteX << " " << absoluteY << std::endl;
 	}

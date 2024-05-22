@@ -28,7 +28,8 @@ public:
 		velocity(0.0f, 0.0f, 0.0f),
 		drag(0.0f),
 		transform(gameObject->tr),
-		cameraTransform(gameObject->tr)
+		cameraTransform(gameObject->tr),
+		initPos(0.0f, 200.0f, -400.0f, 1.0f)
 	{
 
 	}
@@ -48,6 +49,12 @@ public:
 		//printf("yaw : %.3f\n", flt::DegToRad(transform.GetLocalRotation().GetEuler().y));
 		//printf("pitch : %.3f\n", flt::DegToRad(transform.GetLocalRotation().GetEuler().x));
 
+		if (flt::GetKey(flt::KeyCode::spacebar))
+		{
+			_gameObject->tr.SetPosition(initPos);
+			velocity = flt::Vector3f(0.0f, 0.0f, 0.0f);
+			_gameObject->tr.SetRotation(10.0f, 0.0f, 0.0f);
+		}
 
 
 	}
@@ -56,12 +63,14 @@ public:
 	{
 		flt::Vector4f position = transform.GetWorldPosition();
 		//printf("positon : %.3f, %.3f %.3f\n", position.x, position.y, position.z);
-		//GlidingMovement();
+		GlidingMovement();
 	}
 
 private:
 	void GlidingMovement()
 	{
+		float p1 = 0.1f;
+
 		float yaw = flt::DegToRad(transform.GetLocalRotation().GetEuler().y);
 		float pitch = flt::DegToRad(transform.GetLocalRotation().GetEuler().x);
 
@@ -112,7 +121,11 @@ private:
 		velocity.y *= 0.98f;
 		velocity.z *= 0.99f;
 
-		// 50 프레임인 fixedUpdate용에서 일반 Update용으로 사용하기 위해.
+		////속도 느리게 테스트
+		//velocity.x *= 0.8f;
+		//velocity.y *= 0.8f;
+		//velocity.z *= 0.8f;
+
 		transform.AddLocalPosition(velocity);
 
 		flt::Vector4f position = transform.GetWorldPosition();
@@ -145,6 +158,8 @@ private:
 
 	flt::Transform& transform;
 	flt::Transform& cameraTransform;
+
+	flt::Vector4f initPos;
 
 	//Transform* CameraTransform; // Assuming Transform is defined elsewhere
 	//Rigidbody* Rb; // Assuming Rigidbody is defined elsewhere

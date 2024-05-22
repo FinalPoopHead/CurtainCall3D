@@ -24,34 +24,28 @@ UnityLoadScene::UnityLoadScene(const std::wstring& jsonPath) : _jsonPath(jsonPat
 void UnityLoadScene::Initialize()
 {
 	//----- 테스트 코드 -----
-	{
-		flt::GameObject* testObject = CreateGameObject<flt::GameObject>();
+	//{
+	//	flt::GameObject* testObject = CreateGameObject<flt::GameObject>();
 
-		std::wstring filePath = L"..\\x64\\fbx\\SM_Box_Cargo.fbx";
+	//	std::wstring filePath = L"..\\x64\\fbx\\SM_Box_Cargo.fbx";
 
-		flt::RendererComponent* renderer = testObject->AddComponent<flt::RendererComponent>();
+	//	flt::RendererComponent* renderer = testObject->AddComponent<flt::RendererComponent>();
 
-		flt::ModelLoader loader;
-		flt::RawScene rawScene;
-		loader.Load(filePath, &rawScene);
+	//	flt::ModelLoader loader;
+	//	flt::RawScene rawScene;
+	//	loader.Load(filePath, &rawScene);
 
-// 		flt::RawNode* fakeRoot = new flt::RawNode();
-// 		for (auto& node : rawScene.nodes)
-// 		{
-// 			fakeRoot->children.push_back(node);
-// 		}
+	//	flt::RawNode* node = rawScene.nodes[0];
 
-		flt::RawNode* node = rawScene.nodes[0];
-
-		renderer->SetRawNode(node);
-	}
-
-
+	//	renderer->SetRawNode(node);
+	//}
 	//----------------------
+
 	LoadUnityJson();
 
 	GlideObject* glideObject = CreateGameObject<GlideObject>();
-	glideObject->tr.SetPosition(0.0f, 0.0f, -10.0f);
+	//glideObject->tr.SetPosition(0.0f, 50.0f, -50.0f);
+	glideObject->tr.SetPosition(0.0f, 250.0f, -250.0f);
 }
 
 void UnityLoadScene::Finalize()
@@ -121,16 +115,17 @@ void UnityLoadScene::LoadUnityJson()
 			{
 				auto& pos = v["Position"];
 
-				//gameObject->tr.SetPosition(-pos["x"].GetFloat(), pos["y"].GetFloat(), pos["z"].GetFloat());
-				gameObject->tr.SetPosition(pos["x"].GetFloat(), pos["y"].GetFloat(), pos["z"].GetFloat());
+				gameObject->tr.SetPosition(-pos["x"].GetFloat(), pos["y"].GetFloat(), -pos["z"].GetFloat());
+				//gameObject->tr.SetPosition(pos["x"].GetFloat(), pos["y"].GetFloat(), pos["z"].GetFloat());
 			}
 
 			if (v.HasMember("Rotation"))
 			{
 				auto& rot = v["Rotation"];
 
-				//gameObject->tr.SetRotation(-rot["x"].GetFloat(), -rot["y"].GetFloat(), -rot["z"].GetFloat(), rot["w"].GetFloat());
 				gameObject->tr.SetRotation(rot["x"].GetFloat(), rot["y"].GetFloat(), rot["z"].GetFloat(), rot["w"].GetFloat());
+				//gameObject->tr.AddLocalRotation({ 0.0f, 1.0f, 0.0f }, flt::PI<float>);
+				//gameObject->tr.SetRotation(rot["x"].GetFloat(), rot["y"].GetFloat(), rot["z"].GetFloat(), rot["w"].GetFloat());
 			}
 
 			if (v.HasMember("Scale"))
@@ -154,10 +149,14 @@ void UnityLoadScene::LoadUnityJson()
 						collider->SetSize({size["x"].GetFloat(), size["y"].GetFloat(), size["z"].GetFloat()});
 					}
 
-					if (v.HasMember("colliderCenter"))
+					if (v.HasMember("ColliderCenter"))
 					{
-						auto& center = v["BoxColliderCenter"];
-						collider->SetOffset({center["x"].GetFloat(), center["y"].GetFloat(), center["z"].GetFloat()});
+						auto& center = v["ColliderCenter"];
+						float x = center["x"].GetFloat();
+						float y = center["y"].GetFloat();
+						float z = center["z"].GetFloat();
+
+						collider->SetOffset({-center["x"].GetFloat(), center["y"].GetFloat(), -center["z"].GetFloat()});
 					}
 				}
 				else if (colliderType == 2) // Sphere

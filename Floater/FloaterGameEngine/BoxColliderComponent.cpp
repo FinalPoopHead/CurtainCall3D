@@ -105,13 +105,9 @@ void flt::BoxColliderComponent::UpdatePhysTransform()
 	_physXData->actor->setKinematicTarget(_physXData->transform);
 
 	Vector4f scale = temp.GetLocalScale();
-	float sizeX = _size.x * scale.x;
-	float sizeY = _size.y * scale.y;
-	float sizeZ = _size.z * scale.z;
-
-	sizeX = sizeX < 0 ? sizeX = 0 : sizeX;
-	sizeY = sizeY < 0 ? sizeY = 0 : sizeY;
-	sizeZ = sizeZ < 0 ? sizeZ = 0 : sizeZ;
+	float sizeX = std::fabsf(_size.x * scale.x);
+	float sizeY = std::fabsf(_size.y * scale.y);
+	float sizeZ = std::fabsf(_size.z * scale.z);
 
 	physx::PxBoxGeometry geometry(sizeX, sizeY, sizeZ);
 	_physXData->actor->detachShape(*_physXData->shape);

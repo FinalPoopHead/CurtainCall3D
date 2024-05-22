@@ -44,6 +44,11 @@ bool flt::GameEngine::Update()
 
 	constexpr float fixedUpdateInterval = 0.02f;
 	_fixedUpdateElapsedSecond += deltaSecond;
+	// 너무 한번에 물리 루프를 돌지 않게 임시 루프
+	if (_fixedUpdateElapsedSecond > 0.05f)
+	{
+		_fixedUpdateElapsedSecond = 0.05f;
+	}
 	while (_fixedUpdateElapsedSecond > fixedUpdateInterval)
 	{
 		_currentScene->PrePhysicsUpdate();

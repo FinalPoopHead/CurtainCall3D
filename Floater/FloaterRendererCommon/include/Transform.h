@@ -17,7 +17,7 @@ namespace flt
 	public:
 		//Transform() : Transform(nullptr) {}
 		//Transform(TransformOwner* pOwner) : _position(), _scale(1.0f, 1.0f, 1.0f, 0.0f), _rotation(), _pParent(nullptr), _children(), _worldMatrix(), _isDirty(true), _pOwner(pOwner) {}
-		Transform() : _position(), _scale(1.0f, 1.0f, 1.0f, 0.0f), _rotation(), _pParent(nullptr), _children(), _worldMatrix(), _isDirty(true), _pOwner(nullptr) {}
+		Transform() : _position(0.0f, 0.0f, 0.0f, 1.0f), _scale(1.0f, 1.0f, 1.0f, 0.0f), _rotation(0.0f, 0.0f, 0.0f, 1.0f), _pParent(nullptr), _children(), _worldMatrix(), _isDirty(true), _pOwner(nullptr) {}
 		~Transform();
 
 		Transform(const Transform& other);

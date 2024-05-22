@@ -377,7 +377,7 @@ bool flt::RendererDX11::Finalize()
 bool flt::RendererDX11::Render(float deltaTime)
 {
 	bool ret = false;
-
+	//_renderMode = RenderMode::FORWARD;
 	switch (_renderMode)
 	{
 		case RenderMode::FORWARD:

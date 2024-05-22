@@ -9,8 +9,8 @@ GlideObject::GlideObject()
 	: flt::GameObject()
 {
 	AddComponent<flt::CameraComponent>();
-	AddComponent<Controller>();
-	//AddComponent<GlideComponent>();
+	//AddComponent<Controller>();
+	AddComponent<GlideComponent>();
 	//AddComponent<flt::BoxColliderComponent>();
 }
 

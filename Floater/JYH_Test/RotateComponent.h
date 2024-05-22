@@ -8,7 +8,7 @@ class RotateComponent : public flt::Component<RotateComponent>
 public:
 	RotateComponent(flt::GameObject* gameObject) : 
 		flt::Component<RotateComponent>(gameObject),
-		speed(4.0f)
+		speed(40.0f)
 	{
 	}
 
