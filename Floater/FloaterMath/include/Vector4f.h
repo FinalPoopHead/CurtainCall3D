@@ -23,6 +23,23 @@ namespace flt
 		constexpr Vector4f& operator=(const Vector4f&) noexcept = default;
 		~Vector4f() noexcept = default;
 
+		bool isSimiller(const Vector4f& rhs, float epsilon = FLOAT_EPSILON) const noexcept
+		{
+			float eps = epsilon * fmaxf(fabsf(x), fabsf(rhs.x));
+			bool ret = fabsf(x - rhs.x) <= eps;
+
+			eps = epsilon * fmaxf(fabsf(y), fabsf(rhs.y));
+			ret &= fabsf(y - rhs.y) <= eps;
+
+			eps = epsilon * fmaxf(fabsf(z), fabsf(rhs.z));
+			ret &= fabsf(z - rhs.z) <= eps;
+
+			eps = epsilon * fmaxf(fabsf(w), fabsf(rhs.w));
+			ret &= fabsf(w - rhs.w) <= eps;
+
+			return ret;
+		}
+
 		bool operator==(const Vector4f& rhs) const noexcept
 		{
 			float eps = FLOAT_EPSILON * fmaxf(fabsf(x), fabsf(rhs.x));

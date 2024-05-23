@@ -66,7 +66,6 @@ namespace flt
 		{
 			return s_index;
 		}
-
 	};
 
 	template <typename T>

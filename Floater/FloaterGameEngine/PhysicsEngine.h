@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "../FloaterUtil/include/FloaterType.h"
+#include "../FloaterMath/include/Vector3f.h"
 
 namespace physx
 {
@@ -15,8 +16,12 @@ namespace physx
 	class PxCustomGeometry;
 }
 
+class SimulationEventCallback;
+
 namespace flt
 {
+	class Collider;
+
 	class PhysicsEngine
 	{
 	public:
@@ -25,6 +30,8 @@ namespace flt
 		void Finalize();
 
 		void Update(float deltaTime);
+
+		Collider* Raycast(const Vector3f& origin, const Vector3f& direction, float distance);
 
 		physx::PxPhysics* GetPhysics() { return _physics; }
 		physx::PxScene* GetScene() { return _scene; }
@@ -37,6 +44,8 @@ namespace flt
 		physx::PxPvd* _pvd;
 		physx::PxDefaultCpuDispatcher* _dispatcher;
 		physx::PxScene* _scene;
+
+		SimulationEventCallback* _callback;
 		//physx::PxMaterial* _material;
 		//physx::PxRigidActor* _actor;
 	};

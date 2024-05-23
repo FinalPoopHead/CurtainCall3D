@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Component.h"
+#include "Collider.h"
 #include "../../FloaterMath/include/Vector3f.h"
 #include "../../FloaterMath/include/Vector4f.h"
 
@@ -15,7 +16,7 @@ namespace flt
 	struct PhysXData;
 	class Transform;
 
-	class BoxColliderComponent : public Component<BoxColliderComponent>
+	class BoxColliderComponent : public Component<BoxColliderComponent>, public Collider
 	{
 	public:
 		BoxColliderComponent(GameObject* gameObject);
@@ -35,6 +36,8 @@ namespace flt
 		void SetOffset(const flt::Vector3f& offset);
 		flt::Vector3f GetOffset() const;
 
+		void UseKinematic(bool use);
+
 	private:
 		void UpdatePhysTransform();
 		void UpdateTransform();
@@ -48,5 +51,7 @@ namespace flt
 		
 		flt::Vector3f _size;
 		flt::Vector4f _offset;
+
+		bool _isKinematic;
 	};
 }

@@ -66,6 +66,9 @@
     <ClInclude Include="include\Component.h">
       <Filter>Component</Filter>
     </ClInclude>
+    <ClInclude Include="include\Collider.h">
+      <Filter>Component\impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -99,6 +102,9 @@
       <Filter>Component</Filter>
     </ClCompile>
     <ClCompile Include="RendererComponent.cpp">
+      <Filter>Component\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Collider.cpp">
       <Filter>Component\impl</Filter>
     </ClCompile>
   </ItemGroup>
