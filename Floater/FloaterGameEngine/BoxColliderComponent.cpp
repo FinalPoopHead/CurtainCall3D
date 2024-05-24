@@ -33,7 +33,7 @@ flt::BoxColliderComponent::BoxColliderComponent(GameObject* gameObject) :
 {
 	Vector4f pos = _transform->GetWorldPosition();
 	_physXData->transform.p.x = pos.x;
-	_physXData->transform.p.y = pos.y;
+	_physXData->transform.p.y = pos.y + 100.0f;
 	_physXData->transform.p.z = pos.z;
 
 	Quaternion rot = _transform->GetWorldRotation();
@@ -44,6 +44,9 @@ flt::BoxColliderComponent::BoxColliderComponent(GameObject* gameObject) :
 
 	_physXData->actor = _physcx.createRigidDynamic(_physXData->transform);
 	_physXData->actor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, _isKinematic);
+	//_physXData->actor->setSleepThreshold(5e-3f);
+	_physXData->actor->setSleepThreshold(5e-5f);
+	//_physXData->actor->setWakeCounter(0.0f);
 
 	_physXData->actor->userData = static_cast<Collider*>(this);
 
@@ -111,6 +114,13 @@ flt::Vector3f flt::BoxColliderComponent::GetOffset() const
 
 void flt::BoxColliderComponent::UpdatePhysTransform()
 {
+	bool isKinematic = _physXData->actor->getRigidBodyFlags().isSet(physx::PxRigidBodyFlag::eKINEMATIC);
+
+	if (_physXData->actor->isSleeping())
+	{
+		int i = 0;
+	}
+
 	Transform temp;
 	temp.SetMatrix(_transform->GetWorldMatrix4f());
 	Vector4f position = temp.GetWorldPosition();
@@ -128,14 +138,10 @@ void flt::BoxColliderComponent::UpdatePhysTransform()
 	physxRot.z = _physXData->transform.q.z;
 	physxRot.w = _physXData->transform.q.w;
 
-	float eps = FLOAT_EPSILON * 100000.0f;
+	float eps = FLOAT_EPSILON * 10000.0f;
 	if (position.isSimiller(physxPos, eps) && rotation.isSimiller(physxRot, eps))
 	{
 		return;
-	}
-	else
-	{
-		int i = 0;
 	}
 
 
@@ -152,6 +158,13 @@ void flt::BoxColliderComponent::UpdatePhysTransform()
 	{
 		_physXData->actor->setGlobalPose(_physXData->transform);
 	}
+
+	//static bool testBool = true;
+	//if (testBool)
+	//{
+	//	_physXData->actor->setGlobalPose(_physXData->transform);
+	//	testBool = false;
+	//}
 
 
 	Vector4f scale = temp.GetLocalScale();

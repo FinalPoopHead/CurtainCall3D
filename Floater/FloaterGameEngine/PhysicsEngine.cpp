@@ -55,7 +55,9 @@ public:
 	virtual void onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) override
 	{
 		//ASSERT(false, "onContact");
-		std::cout << "onContact" << std::endl;
+
+		//physx::PxContactStreamIterator iter(pairs->contactPatches, pairs->contactPoints, pairs->patchCount, pairs->contactCount);
+
 		for (physx::PxU32 i = 0; i < nbPairs; i++)
 		{
 			const physx::PxContactPair& cp = pairs[i];
@@ -69,18 +71,23 @@ public:
 				flt::Collider* collider1 = static_cast<flt::Collider*>(actor1->userData);
 				//ASSERT(collider0, "Collider0 is nullptr");
 				//ASSERT(collider1, "Collider1 is nullptr");
-				//ASSERT(false, "onContact");
+				//ASSERT(false, "onContact"); 
+				std::cout << "First Contact" << std::endl;
 			}
 			else if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_PERSISTS)
 			{
+				int asdf = 0;
 				//ASSERT(false, "onContact");
 				// 접촉 유지중
+				std::cout << "Stay Contact" << std::endl;
 
 			}
 			else if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_LOST)
 			{
+				int asdf = 0;
 				//ASSERT(false, "onContact");
 				// 접촉 종료
+				std::cout << "End Contact" << std::endl;
 
 			}
 		}
@@ -110,7 +117,9 @@ static physx::PxFilterFlags contactReportFilterShader(physx::PxFilterObjectAttri
 	PX_UNUSED(filterData1);
 	PX_UNUSED(constantBlockSize);
 	PX_UNUSED(constantBlock);
-
+	
+	
+	
 	// all initial and persisting reports for everything, with per-point data
 	pairFlags = physx::PxPairFlag::eSOLVE_CONTACT | physx::PxPairFlag::eDETECT_DISCRETE_CONTACT
 		| physx::PxPairFlag::eNOTIFY_TOUCH_FOUND
@@ -118,6 +127,48 @@ static physx::PxFilterFlags contactReportFilterShader(physx::PxFilterObjectAttri
 		| physx::PxPairFlag::eNOTIFY_TOUCH_LOST
 		| physx::PxPairFlag::eNOTIFY_CONTACT_POINTS;
 	return physx::PxFilterFlag::eDEFAULT;
+	
+	//using namespace physx;
+	//bool maskTest = true;
+
+	//// Let triggers through
+	//if (PxFilterObjectIsTrigger(attributes0) || PxFilterObjectIsTrigger(attributes1))
+	//{
+	//	if (maskTest)
+	//	{
+	//		// Notify trigger if masks specify it
+	//		pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
+	//		pairFlags |= PxPairFlag::eNOTIFY_TOUCH_LOST;
+	//	}
+	//	pairFlags |= PxPairFlag::eDETECT_DISCRETE_CONTACT;
+	//	return PxFilterFlag::eDEFAULT;
+	//}
+
+
+	//// Send events for the kinematic actors but don't solve the contact
+	//if (PxFilterObjectIsKinematic(attributes0) && PxFilterObjectIsKinematic(attributes1))
+	//{
+	//	pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
+	//	pairFlags |= PxPairFlag::eNOTIFY_TOUCH_PERSISTS;
+	//	pairFlags |= PxPairFlag::eNOTIFY_TOUCH_LOST;
+	//	pairFlags |= PxPairFlag::eDETECT_DISCRETE_CONTACT;
+	//	return PxFilterFlag::eSUPPRESS;
+	//}
+
+	//if (maskTest)
+	//{
+	//	pairFlags |= PxPairFlag::eSOLVE_CONTACT;
+	//	pairFlags |= PxPairFlag::eDETECT_DISCRETE_CONTACT;
+	//	pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
+	//	pairFlags |= PxPairFlag::eNOTIFY_TOUCH_PERSISTS;
+	//	pairFlags |= PxPairFlag::ePOST_SOLVER_VELOCITY;
+	//	pairFlags |= PxPairFlag::eNOTIFY_CONTACT_POINTS;
+	//	return PxFilterFlag::eDEFAULT;
+	//}
+	//else
+	//{
+	//	return PxFilterFlag::eKILL;
+	//}
 }
 
 
@@ -164,6 +215,7 @@ void flt::PhysicsEngine::Initialize()
 	_scene->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
 	_scene->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, 1.0f);
 
+
 #ifdef _DEBUG
 	physx::PxPvdSceneClient* pvdClient = _scene->getScenePvdClient();
 	if (pvdClient)
@@ -175,9 +227,9 @@ void flt::PhysicsEngine::Initialize()
 #endif // _DEBUG
 
 	// Ground plane
-	physx::PxMaterial* plainMaterial = _physics->createMaterial(0.5f, 0.5f, 0.6f);
 	//physx::PxRigidStatic* planeActor = _physics->createRigidStatic(physx::PxTransform(physx::PxQuat(PX_PIDIV2, physx::PxVec3(0, 0, 1))));
 	//physx::PxRigidActorExt::createExclusiveShape(*planeActor, physx::PxPlaneGeometry(), *plainMaterial);
+	physx::PxMaterial* plainMaterial = _physics->createMaterial(0.5f, 0.5f, 0.6f);
 	physx::PxRigidStatic* planeActor = PxCreatePlane(*_physics, physx::PxPlane(0, 1, 0, 0), *plainMaterial);
 	_scene->addActor(*planeActor);
 	plainMaterial->release();

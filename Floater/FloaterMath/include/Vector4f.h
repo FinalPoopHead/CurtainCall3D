@@ -25,16 +25,16 @@ namespace flt
 
 		bool isSimiller(const Vector4f& rhs, float epsilon = FLOAT_EPSILON) const noexcept
 		{
-			float eps = epsilon * fmaxf(fabsf(x), fabsf(rhs.x));
+			float eps = std::fmaxf(epsilon * fmaxf(fabsf(x), fabsf(rhs.x)), epsilon);
 			bool ret = fabsf(x - rhs.x) <= eps;
 
-			eps = epsilon * fmaxf(fabsf(y), fabsf(rhs.y));
+			eps = std::fmaxf(epsilon * fmaxf(fabsf(y), fabsf(rhs.y)), epsilon);
 			ret &= fabsf(y - rhs.y) <= eps;
 
-			eps = epsilon * fmaxf(fabsf(z), fabsf(rhs.z));
+			eps = std::fmaxf(epsilon * fmaxf(fabsf(z), fabsf(rhs.z)), epsilon);
 			ret &= fabsf(z - rhs.z) <= eps;
 
-			eps = epsilon * fmaxf(fabsf(w), fabsf(rhs.w));
+			eps = std::fmaxf(epsilon * fmaxf(fabsf(w), fabsf(rhs.w)), epsilon);
 			ret &= fabsf(w - rhs.w) <= eps;
 
 			return ret;
@@ -42,16 +42,16 @@ namespace flt
 
 		bool operator==(const Vector4f& rhs) const noexcept
 		{
-			float eps = FLOAT_EPSILON * fmaxf(fabsf(x), fabsf(rhs.x));
+			float eps = std::fmaxf(FLOAT_EPSILON * fmaxf(fabsf(x), fabsf(rhs.x)), FLOAT_EPSILON);
 			bool ret = fabsf(x - rhs.x) <= eps;
 
-			eps = FLOAT_EPSILON * fmaxf(fabsf(y), fabsf(rhs.y));
+			eps = std::fmaxf(FLOAT_EPSILON * fmaxf(fabsf(y), fabsf(rhs.y)), FLOAT_EPSILON);
 			ret &= fabsf(y - rhs.y) <= eps;
 
-			eps = FLOAT_EPSILON * fmaxf(fabsf(z), fabsf(rhs.z));
+			eps = std::fmaxf(FLOAT_EPSILON * fmaxf(fabsf(z), fabsf(rhs.z)), FLOAT_EPSILON);
 			ret &= fabsf(z - rhs.z) <= eps;
 
-			eps = FLOAT_EPSILON * fmaxf(fabsf(w), fabsf(rhs.w));
+			eps = std::fmaxf(FLOAT_EPSILON * fmaxf(fabsf(w), fabsf(rhs.w)), FLOAT_EPSILON);
 			ret &= fabsf(w - rhs.w) <= eps;
 
 			return ret;
@@ -60,7 +60,7 @@ namespace flt
 		{
 			std::partial_ordering order = std::partial_ordering::unordered;
 
-			float epsilonX = std::fabsf(std::fmaxf(x, rhs.x)) * FLOAT_EPSILON;
+			float epsilonX = std::fmaxf(std::fabsf(std::fmaxf(x, rhs.x)) * FLOAT_EPSILON, FLOAT_EPSILON);
 			float sub = x - rhs.x;
 			if (sub < -epsilonX)
 			{
@@ -72,7 +72,7 @@ namespace flt
 			}
 			else
 			{
-				float epsilonY = std::fabsf(std::fmaxf(y, rhs.y)) * FLOAT_EPSILON;
+				float epsilonY = std::fmaxf(std::fabsf(std::fmaxf(y, rhs.y)) * FLOAT_EPSILON, FLOAT_EPSILON);
 				sub = y - rhs.y;
 				if (sub < -epsilonY)
 				{
@@ -84,7 +84,7 @@ namespace flt
 				}
 				else
 				{
-					float epsilonZ = std::fabsf(std::fmaxf(z, rhs.z)) * FLOAT_EPSILON;
+					float epsilonZ = std::fmaxf(std::fabsf(std::fmaxf(z, rhs.z)) * FLOAT_EPSILON, FLOAT_EPSILON);
 					sub = z - rhs.z;
 					if (sub < -epsilonZ)
 					{
@@ -96,7 +96,7 @@ namespace flt
 					}
 					else
 					{
-						float epsilonW = std::fabsf(std::fmaxf(w, rhs.w)) * FLOAT_EPSILON;
+						float epsilonW = std::fmaxf(std::fabsf(std::fmaxf(w, rhs.w)) * FLOAT_EPSILON, FLOAT_EPSILON);
 						sub = w - rhs.w;
 						if (sub < -epsilonW)
 						{
