@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CollisionPair.h" />
     <ClInclude Include="include\Collider.h" />
     <ClInclude Include="include\BoxColliderComponent.h" />
     <ClInclude Include="include\BuiltinComponent.h" />

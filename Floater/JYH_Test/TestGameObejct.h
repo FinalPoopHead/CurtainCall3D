@@ -6,5 +6,7 @@ class TestGameObejct : public flt::GameObject
 public:
 	TestGameObejct();
 	virtual ~TestGameObejct();
+
+	void Update(float deltaTime) override;
 };
 

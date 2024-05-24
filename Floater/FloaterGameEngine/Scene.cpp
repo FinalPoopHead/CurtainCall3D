@@ -56,6 +56,11 @@ std::vector<flt::GameObject*> flt::Scene::GetGameObjects(const std::wstring& nam
 	return result;
 }
 
+void flt::Scene::Collision(GameObject* gameObject)
+{
+
+}
+
 void flt::Scene::DestroyGameObject(GameObject& gameObject)
 {
 	ASSERT(false, "Not implemented yet");
@@ -90,14 +95,16 @@ void flt::Scene::PrePhysicsUpdate()
 
 void flt::Scene::PostPhysicsUpdate()
 {
+	// Collider Event
+
+
+	// postPhysics
 	for (auto& object : _gameObjects)
 	{
 		if (!object->_isEnable)
 		{
 			continue;
 		}
-
-		//object->FixedUpdate();
 
 		for (auto& component : object->_components)
 		{
@@ -114,14 +121,13 @@ void flt::Scene::PostPhysicsUpdate()
 		}
 	}
 
+	// FixedUpdate
 	for (auto& object : _gameObjects)
 	{
 		if (!object->_isEnable)
 		{
 			continue;
 		}
-
-		//object->FixedUpdate();
 
 		for (auto& component : object->_components)
 		{

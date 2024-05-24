@@ -1,6 +1,7 @@
 ﻿#include "TestGameObejct.h"
 #include "../FloaterRendererCommon/include/ModelLoader.h"
 #include "../FloaterGameEngine/include/BuiltinComponent.h"
+#include "../FloaterGameEngine/include/Input.h"
 
 
 TestGameObejct::TestGameObejct()
@@ -8,11 +9,12 @@ TestGameObejct::TestGameObejct()
 {
 	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>();
 	flt::BoxColliderComponent* boxCollider = AddComponent<flt::BoxColliderComponent>();
-	boxCollider->UseKinematic(false);
+	boxCollider->UseKinematic(true);
+	boxCollider->SetSize({ 100.0f, 100.0f, 100.0f });
 
 	flt::ModelLoader loader;
 	//std::wstring filePath = L"..\\x64\\fbx\\Ganondorf-3d-model-dl\\source\\Ganondorf (TotK) 3D Model\\Dying.fbx";
-	std::wstring filePath = L"..\\x64\\fbx\\Tile_Center.fbx";
+	std::wstring filePath = L"..\\x64\\fbx\\Tile_Edge.fbx";
 	flt::RawScene rawScene;
 	loader.Load(filePath, &rawScene);
 	auto& node = rawScene.nodes[0];
@@ -23,4 +25,10 @@ TestGameObejct::TestGameObejct()
 TestGameObejct::~TestGameObejct()
 {
 
+}
+
+void TestGameObejct::Update(float deltaTime)
+{
+	flt::GamePadState outState;
+	bool ret = GetGamePadState(0, &outState);
 }

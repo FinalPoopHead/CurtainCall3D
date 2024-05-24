@@ -9,3 +9,9 @@ flt::KeyData flt::GetKey(KeyCode code)
 {
 	return platform->GetKey(code);  
 }
+
+bool flt::GetGamePadState(int padIndex, GamePadState* outState)
+{
+	return platform->GetGamePadState(padIndex, outState);
+}
+

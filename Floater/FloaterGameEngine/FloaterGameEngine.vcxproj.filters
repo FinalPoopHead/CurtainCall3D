@@ -69,6 +69,9 @@
     <ClInclude Include="include\Collider.h">
       <Filter>Component\impl</Filter>
     </ClInclude>
+    <ClInclude Include="CollisionPair.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">

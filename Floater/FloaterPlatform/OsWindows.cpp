@@ -961,6 +961,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 			if (hdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
 			{
 				DEV_BROADCAST_DEVICEINTERFACE_W* dif = (DEV_BROADCAST_DEVICEINTERFACE_W*)hdr;
+				// 디바이스가 연결되었을 때
 				if (wParam == DBT_DEVICEARRIVAL)
 				{
 					for (int i = 0; i < 16; ++i)

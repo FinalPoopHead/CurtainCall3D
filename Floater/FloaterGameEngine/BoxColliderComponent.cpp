@@ -29,7 +29,7 @@ flt::BoxColliderComponent::BoxColliderComponent(GameObject* gameObject) :
 	_physXData(new PhysXData()),
 	_size(10.0f, 10.0f, 10.0f),
 	_offset(0.0f, 0.0f, 0.0f, 0.0f),
-	_isKinematic(true)
+	_isKinematic(false)
 {
 	Vector4f pos = _transform->GetWorldPosition();
 	_physXData->transform.p.x = pos.x;
@@ -45,12 +45,15 @@ flt::BoxColliderComponent::BoxColliderComponent(GameObject* gameObject) :
 	_physXData->actor = _physcx.createRigidDynamic(_physXData->transform);
 	_physXData->actor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, _isKinematic);
 	//_physXData->actor->setSleepThreshold(5e-3f);
-	_physXData->actor->setSleepThreshold(5e-5f);
-	//_physXData->actor->setWakeCounter(0.0f);
+	_physXData->actor->setSleepThreshold(5e-4f);
+	_physXData->actor->setWakeCounter(0.0f);
 
 	_physXData->actor->userData = static_cast<Collider*>(this);
 
 	_physXData->shape = _physcx.createShape(physx::PxBoxGeometry(_size.x, _size.y, _size.z), *_physcx.createMaterial(0.5f, 0.5f, 0.6f));
+	
+	auto contactOffset = _physXData->shape->getContactOffset();
+	
 	_physXData->actor->attachShape(*_physXData->shape);
 
 	physx::PxDominanceGroup group = 0;

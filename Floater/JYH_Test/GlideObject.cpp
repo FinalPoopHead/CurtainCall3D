@@ -12,7 +12,7 @@ GlideObject::GlideObject()
 	AddComponent<Controller>();
 	//AddComponent<GlideComponent>();
 	flt::BoxColliderComponent* boxCollider = AddComponent<flt::BoxColliderComponent>();
-	boxCollider->UseKinematic(false);
+	boxCollider->UseKinematic(true);
 }
 
 GlideObject::~GlideObject()

@@ -12,10 +12,13 @@ namespace flt
 			path(),
 			handle(NULL),
 			type(GamePadType::UNKNOWN),
-			state() {}
+			state(),
+			isConnected(false) {}
+
 		std::wstring path;
 		HANDLE handle;
 		GamePadType type;
 		GamePadState state;
+		bool isConnected;
 	};
 }

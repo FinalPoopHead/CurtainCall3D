@@ -1,16 +1,19 @@
 ﻿#pragma once
 #include "GameObject.h"
 #include "Component.h"
+#include "../CollisionPair.h"
 #include "../../FloaterUtil/include/Timer.h"
 #include <unordered_map>
 #include <list>
 #include <vector>
+#include <set>
 #include <string>
 
 namespace flt
 {
 	class Scene
 	{
+		friend class GameObject;
 	public:
 		Scene();
 		~Scene();
@@ -33,9 +36,16 @@ namespace flt
 		std::vector<GameObject*> GetGameObjects(const std::wstring& name) const;
 
 	private:
+		void Collision(GameObject* gameObject);
+
+	private:
 		std::vector<GameObject*> _gameObjects;
 		std::list<std::pair<GameObject*, bool>> _gameObjectsToEnable;
 		std::list<std::pair<ComponentBase*, bool>> _componentsToEnable;
+		
+		std::vector<CollisionPair> _collisionEnter;
+		std::set<CollisionPair> _collisionStay;
+		std::vector<CollisionPair> _collisionExit;
 	};
 
 	template<GameObjectType T>

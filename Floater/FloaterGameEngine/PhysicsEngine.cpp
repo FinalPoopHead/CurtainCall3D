@@ -88,7 +88,11 @@ public:
 				//ASSERT(false, "onContact");
 				// 접촉 종료
 				std::cout << "End Contact" << std::endl;
+			}
 
+			if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND && cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_LOST)
+			{
+				std::cout << "First Contact and End Contact" << std::endl;
 			}
 		}
 	}

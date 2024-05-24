@@ -9,10 +9,13 @@ void TestScene::Initialize()
 	//AddGameObject(testObject);
 
 	GlideObject* glideObject = CreateGameObject<GlideObject>();
-	glideObject->tr.SetPosition(0.0f, 20.0f, -50.0f);
+	glideObject->tr.SetPosition(0.0f, 20.0f, -400.0f);
 
-	//TestGameObejct* tObject = CreateGameObject<TestGameObejct>();
-	//tObject->tr.SetPosition(0.0f, 10.0f, 0.0f);
+	TestGameObejct* tObject = CreateGameObject<TestGameObejct>();
+	tObject->tr.SetPosition(0.0f, 201.0f, 0.0f);
+
+	TestGameObejct* tObject2 = CreateGameObject<TestGameObejct>();
+	tObject2->tr.SetPosition(0.0f, 0.0f, 0.0f);
 }
 
 void TestScene::Finalize()

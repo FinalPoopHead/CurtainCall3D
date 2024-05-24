@@ -5,6 +5,7 @@ namespace flt
 {
 	class Scene;
 	class GameObject;
+	class Collider;
 
 	class ComponentBase
 	{
@@ -17,13 +18,20 @@ namespace flt
 
 		virtual void Start() {}
 		virtual void OnEnable() {}
-		virtual void Update(float deltaSecond) {}
+
 		virtual void PrePhysics() {}
+		virtual void OnCollisionEnter(Collider* other) {}
+		virtual void OnCollisionStay(Collider* other) {}
+		virtual void OnCollisionExit(Collider* other) {}
 		virtual void PostPhysics() {}
 		virtual void FixedUpdate() {}
+
+		virtual void Update(float deltaSecond) {}
 		virtual void EndDraw() {}
 		virtual void OnDisable() {}
 		virtual void OnDestroy() {}
+
+
 
 	public:
 		void Enable();
