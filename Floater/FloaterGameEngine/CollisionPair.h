@@ -28,10 +28,19 @@ namespace flt
 			return obj1 < other.obj1;
 		}
 
+	public:
+		struct HashFunction
+		{
+			size_t operator()(const CollisionPair& pair) const;
+		};
+
+	public:
+
 		flt::GameObject* obj1;
 		flt::Collider* collider1;
 		flt::GameObject* obj2;
 		flt::Collider* collider2;
+		bool flag = 0;
 	};
 }
 

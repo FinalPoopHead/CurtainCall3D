@@ -30,7 +30,10 @@
 class SimulationEventCallback : public physx::PxSimulationEventCallback
 {
 public:
-	SimulationEventCallback() : physx::PxSimulationEventCallback(), _gameEngine(flt::GameEngine::Instance())
+	SimulationEventCallback(std::vector<flt::CollisionPair>& collisionPair) : 
+		physx::PxSimulationEventCallback(), 
+		_gameEngine(flt::GameEngine::Instance()),
+		_collisionPairs(collisionPair)
 	{
 	}
 
@@ -63,24 +66,32 @@ public:
 			const physx::PxContactPair& cp = pairs[i];
 			if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND)
 			{
+				//physx::PxShape* shape0;
+				//physx::PxShape* shape1;
 				physx::PxActor* actor0 = pairHeader.actors[0];
 				physx::PxActor* actor1 = pairHeader.actors[1];
-				physx::PxShape* shape0;
-				physx::PxShape* shape1;
 				flt::Collider* collider0 = static_cast<flt::Collider*>(actor0->userData);
 				flt::Collider* collider1 = static_cast<flt::Collider*>(actor1->userData);
-				//ASSERT(collider0, "Collider0 is nullptr");
-				//ASSERT(collider1, "Collider1 is nullptr");
-				//ASSERT(false, "onContact"); 
+				flt::GameObject* gameObject0 = collider0->_gameObject;
+				flt::GameObject* gameObject1 = collider1->_gameObject;
+				
+				_collisionPairs.emplace_back(gameObject0, collider0, gameObject1, collider1);
+
 				std::cout << "First Contact" << std::endl;
 			}
 			else if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_PERSISTS)
 			{
-				int asdf = 0;
-				//ASSERT(false, "onContact");
 				// 접촉 유지중
-				std::cout << "Stay Contact" << std::endl;
+				physx::PxActor* actor0 = pairHeader.actors[0];
+				physx::PxActor* actor1 = pairHeader.actors[1];
+				flt::Collider* collider0 = static_cast<flt::Collider*>(actor0->userData);
+				flt::Collider* collider1 = static_cast<flt::Collider*>(actor1->userData);
+				flt::GameObject* gameObject0 = collider0->_gameObject;
+				flt::GameObject* gameObject1 = collider1->_gameObject;
 
+				_collisionPairs.emplace_back(gameObject0, collider0, gameObject1, collider1);
+
+				std::cout << "Stay Contact" << std::endl;
 			}
 			else if (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_LOST)
 			{
@@ -109,6 +120,7 @@ public:
 
 private:
 	flt::GameEngine* _gameEngine;
+	std::vector<flt::CollisionPair>& _collisionPairs;
 };
 
 static physx::PxFilterFlags contactReportFilterShader(physx::PxFilterObjectAttributes attributes0, physx::PxFilterData filterData0,
@@ -205,7 +217,7 @@ void flt::PhysicsEngine::Initialize()
 
 	_physics = PxCreatePhysics(PX_PHYSICS_VERSION, *_foundation, physx::PxTolerancesScale(), true, _pvd);
 
-	_callback = new SimulationEventCallback();
+	_callback = new SimulationEventCallback(_collisionPairs);
 
 	physx::PxSceneDesc sceneDesc(_physics->getTolerancesScale());
 	sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
@@ -265,10 +277,16 @@ void flt::PhysicsEngine::Finalize()
 
 }
 
-void flt::PhysicsEngine::Update(float deltaTime)
+void flt::PhysicsEngine::Update(float deltaTime, std::vector<CollisionPair>& collsionPairs)
 {
 	_scene->simulate(deltaTime);
 	_scene->fetchResults(true);
+
+	for(const auto& collisionPair : _collisionPairs)
+	{
+		collsionPairs.push_back(collisionPair);
+	}
+	_collisionPairs.clear();
 }
 
 flt::Collider* flt::PhysicsEngine::Raycast(const Vector3f& origin, const Vector3f& direction, float distance)

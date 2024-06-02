@@ -53,7 +53,7 @@ bool flt::GameEngine::Update()
 	while (_fixedUpdateElapsedSecond > fixedUpdateInterval)
 	{
 		_currentScene->PrePhysicsUpdate();
-		_physicsEngine->Update(fixedUpdateInterval);
+		_physicsEngine->Update(fixedUpdateInterval, _currentScene->_collisionPairs);
 		_currentScene->PostPhysicsUpdate();
 		_fixedUpdateElapsedSecond -= fixedUpdateInterval;
 	}

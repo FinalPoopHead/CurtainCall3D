@@ -9,7 +9,6 @@ namespace flt
 	public:
 		Collider(GameObject* gameObject);
 
-	private:
 		GameObject* _gameObject;
 	};
 }

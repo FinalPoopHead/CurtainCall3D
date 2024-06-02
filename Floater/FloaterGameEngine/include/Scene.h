@@ -3,7 +3,7 @@
 #include "Component.h"
 #include "../CollisionPair.h"
 #include "../../FloaterUtil/include/Timer.h"
-#include <unordered_map>
+#include <unordered_set>
 #include <list>
 #include <vector>
 #include <set>
@@ -14,6 +14,8 @@ namespace flt
 	class Scene
 	{
 		friend class GameObject;
+		friend class GameEngine;
+
 	public:
 		Scene();
 		~Scene();
@@ -43,9 +45,9 @@ namespace flt
 		std::list<std::pair<GameObject*, bool>> _gameObjectsToEnable;
 		std::list<std::pair<ComponentBase*, bool>> _componentsToEnable;
 		
-		std::vector<CollisionPair> _collisionEnter;
-		std::set<CollisionPair> _collisionStay;
-		std::vector<CollisionPair> _collisionExit;
+		std::vector<CollisionPair> _collisionPairs;
+		std::unordered_set<CollisionPair> _collisionSet;
+		bool _collisionFlag = false;
 	};
 
 	template<GameObjectType T>
