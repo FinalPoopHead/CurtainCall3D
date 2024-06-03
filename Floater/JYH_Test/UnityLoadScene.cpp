@@ -10,7 +10,7 @@
 #include <iostream>
 
 #include "GlideObject.h"
-#include "../FloaterGameEngine/include/internal/BuiltinComponent.h"
+//#include "../FloaterGameEngine/include/internal/BuiltinComponent.h"
 #include "../FloaterRendererCommon/include/ModelLoader.h"
 
 // 테스트 include

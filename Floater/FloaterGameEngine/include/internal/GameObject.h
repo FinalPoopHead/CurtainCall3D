@@ -18,7 +18,7 @@ namespace flt
 		GameObject();
 		~GameObject();
 
-		virtual void Start() {}
+		virtual void OnCreate() {}
 		virtual void OnEnable() {}
 		virtual void PreUpdate(float deltaSecond) {}
 		virtual void Update(float deltaSecond) {}
@@ -27,6 +27,10 @@ namespace flt
 		virtual void OnDisable() {}
 		virtual void OnDestroy() {}
 		
+	public:
+		void Enable();
+		void Disable();
+		void Destroy();
 
 	public:
 		[[deprecated("Use Template Function")]] bool AddComponent(ComponentBase* component);

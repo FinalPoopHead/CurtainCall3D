@@ -3,26 +3,16 @@
 
 Board::Board(int width, int height)
 	: flt::GameObject()
-	, _width(width)
-	, _height(height)
+	, _width(0)
+	, _height(0)
 	, _tileState()
 {
-	_tileState.resize(_width);
-	for (int i = 0; i < _width; ++i)
-	{
-		_tileState[i].resize(_height);
-	}
+	Resize(width, height);
+}
 
-	_tiles.resize(_width);
-	for (int i = 0; i < _width; ++i)
-	{
-		_tiles[i].reserve(_height);
-
-		for (int j = 0; j < _height; ++j)
-		{
-			_tiles[i].push_back(flt::CreateGameObject<Tile>(true));
-		}
-	}
+Board::~Board()
+{
+	Resize(0, 0);
 }
 
 void Board::PreUpdate(float deltaTime)
@@ -75,6 +65,69 @@ TileStateFlag Board::QueryTileState(float x, float y)
 void Board::ConvertToTileIndex(float x, float y, int& outX, int& outY)
 {
 
+}
+
+void Board::Resize(int newWidth, int newHeight)
+{
+	_tileState.resize(newWidth);
+	for (int i = 0; i < newWidth; ++i)
+	{
+		_tileState[i].resize(newHeight);
+	}
+
+	// 타일 높이가 변화시 먼저 처리
+	if (newHeight < _height)
+	{
+		for (auto& tileHeight : _tiles)
+		{
+			for (int j = newHeight; j < _height; ++j)
+			{
+				tileHeight[j]->Destroy();
+				//tileHeight[j] = nullptr;
+			}
+
+			tileHeight.resize(newHeight);
+		}
+	}
+	else if (newHeight > _height)
+	{
+		for (auto& tileHeight : _tiles)
+		{
+			tileHeight.resize(newHeight);
+			for (int j = _height; j < newHeight; ++j)
+			{
+				tileHeight[j] = flt::CreateGameObject<Tile>(true);
+				//tileHeight[j] = (Tile*)1;
+			}
+		}
+	}
+
+	// 타일 너비가 작아지는경우 타일을 삭제
+	if (newWidth < _width)
+	{
+		for (int i = newWidth; i < _width; ++i)
+		{
+			for (auto& tile : _tiles[i])
+			{
+				tile->Destroy();
+			}
+		}
+	}
+	_tiles.resize(newWidth);
+
+	// 타일이 늘어나는 경우 타일을 추가
+	for (int i = _width; i < newWidth; ++i)
+	{
+		_tiles[i].resize(newHeight);
+
+		for (int j = 0; j < newHeight; ++j)
+		{
+			_tiles[i][j] = flt::CreateGameObject<Tile>(true);
+		}
+	}
+
+	_width = newWidth;
+	_height = newHeight;
 }
 
 void Board::UpdateBoard()

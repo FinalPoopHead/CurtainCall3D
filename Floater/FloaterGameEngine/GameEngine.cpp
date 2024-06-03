@@ -67,11 +67,19 @@ bool flt::GameEngine::Update()
 	_renderer->Render(deltaSecond);
 	_currentScene->EndRender();
 
+	_currentScene->EndFrame();
+
 	return closeWindow;
 }
 
 void flt::GameEngine::Finalize()
 {
+	if (_currentScene != nullptr)
+	{
+		_currentScene->Finalize();
+	}
+	_currentScene = nullptr;
+
 	_platform->DestroyRenderer(_renderer);
 	delete _platform;
 

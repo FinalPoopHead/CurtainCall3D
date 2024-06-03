@@ -10,7 +10,22 @@ flt::Scene::Scene() :
 
 flt::Scene::~Scene()
 {
+	for (auto& object : _gameObjects)
+	{
+		for (auto& component : object->_components)
+		{
+			if (component == nullptr)
+			{
+				continue;
+			}
 
+			component->OnDestroy();
+			delete component;
+		}
+		object->OnDestroy();
+		delete object;
+	}
+	_gameObjects.clear();
 }
 
 void flt::Scene::Initialize()
@@ -54,6 +69,47 @@ std::vector<flt::GameObject*> flt::Scene::GetGameObjects(const std::wstring& nam
 	}
 
 	return result;
+}
+
+void flt::Scene::AddEnableGameObject(GameObject* gameObject, bool isEnable)
+{
+	{
+		bool isExist = false;
+		for (auto& object : _gameObjects)
+		{
+			if (object == gameObject)
+			{
+				isExist = true;
+				break;
+			}
+		}
+		ASSERT(isExist, "Not exist game object");
+	}
+
+	if (isEnable)
+	{
+		_gameObjectsToEnable.emplace_back(gameObject);
+	}
+	else
+	{
+		_gameObjectsToDisable.emplace_back(gameObject);
+	}
+}
+
+void flt::Scene::AddDestroyGameObject(GameObject* gameObject)
+{
+	bool isExist = false;
+	for (auto& object : _gameObjects)
+	{
+		if (object == gameObject)
+		{
+			isExist = true;
+			break;
+		}
+	}
+	ASSERT(isExist, "Not exist game object");
+
+	_gameObjectsToDestroy.push_back(gameObject);
 }
 
 void flt::Scene::CallCollisionEvent()
@@ -162,16 +218,6 @@ void flt::Scene::CallCollisionEvent()
 	//_collisionPairs.clear();
 }
 
-void flt::Scene::Collision(GameObject* gameObject)
-{
-
-}
-
-void flt::Scene::DestroyGameObject(GameObject& gameObject)
-{
-	ASSERT(false, "Not implemented yet");
-}
-
 void flt::Scene::PrePhysicsUpdate()
 {
 	for (auto& object : _gameObjects)
@@ -203,7 +249,7 @@ void flt::Scene::PostPhysicsUpdate()
 {
 	// Collider Event
 	CallCollisionEvent();
-	
+
 	// postPhysics
 	for (auto& object : _gameObjects)
 	{
@@ -353,67 +399,159 @@ void flt::Scene::EndRender()
 
 void flt::Scene::StartFrame()
 {
-	for (auto& [object, isEnable] : _gameObjectsToEnable)
+	for (auto& object : _gameObjectsToCreate)
 	{
-		//이미 이 전 상태와 같다면 패스.
-		if (object->_isEnable == isEnable)
+		_gameObjects.emplace_back(object);
+		if (object->_isEnable)
+		{
+			object->_isEnable = false;
+			_gameObjectsToEnable.emplace_back(object);
+			for (auto& component : object->_components)
+			{
+				if (component == nullptr)
+				{
+					continue;
+				}
+
+				if (!component->_isEnable)
+				{
+					continue;
+				}
+				// true일 경우 아래에서 이미 호출한줄 알고 비활성상태로 바꿔줌.
+				//component->_isEnable = false;
+				//_componentsToEnable.emplace_back(component);
+				component->OnCreate();
+			}
+		}
+
+		object->OnCreate();
+	}
+	_gameObjectsToCreate.clear();
+
+	for (auto& object : _gameObjectsToEnable)
+	{
+		if (object->_isEnable == true)
 		{
 			continue;
 		}
 
-		object->_isEnable = isEnable;
+		object->_isEnable = true;
 
-		if (isEnable)
+		for (auto& component : object->_components)
 		{
-			// 게임 오브젝트가 활성화 되면서 컴포넌츠들 활성화.
-			for (auto& component : object->_components)
+			if (component == nullptr)
 			{
-				if (component == nullptr)
-				{
-					continue;
-				}
-
-				if (component->_isEnable)
-				{
-					component->OnEnable();
-				}
+				continue;
 			}
-		}
-		else
-		{
-			// 게임 오브젝트가 활성화 되면서 컴포넌츠들 활성화.
-			for (auto& component : object->_components)
-			{
-				if (component == nullptr)
-				{
-					continue;
-				}
 
-				if (component->_isEnable)
-				{
-					component->OnDisable();
-				}
-			}
-		}
-	}
-
-	_gameObjectsToEnable.clear();
-
-	for (auto& [component, isEnable] : _componentsToEnable)
-	{
-		if (component->_isEnable != isEnable)
-		{
-			component->_isEnable = isEnable;
-			if (isEnable)
+			if (component->_isEnable)
 			{
 				component->OnEnable();
 			}
-			else
+		}
+		object->OnEnable();
+	}
+	_gameObjectsToEnable.clear();
+
+	for (auto& component : _componentsToEnable)
+	{
+		if (component->_isEnable == true)
+		{
+			continue;
+		}
+
+		component->_isEnable = true;
+		component->OnEnable();
+	}
+	_componentsToEnable.clear();
+
+}
+
+void flt::Scene::EndFrame()
+{
+	for (auto& object : _gameObjectsToDisable)
+	{
+		//이미 이 전 상태와 같다면 패스.
+		if (object->_isEnable == false)
+		{
+			continue;
+		}
+
+		object->_isEnable = false;
+
+		for (auto& component : object->_components)
+		{
+			if (component == nullptr)
+			{
+				continue;
+			}
+
+			if (component->_isEnable)
 			{
 				component->OnDisable();
 			}
 		}
+		object->OnDisable();
+	}
+	_gameObjectsToDisable.clear();
+
+	//추가로 삭제할 오브젝트들도 Disable 처리
+	for (auto& object : _gameObjectsToDestroy)
+	{
+		//이미 이 전 상태와 같다면 패스.
+		if (object->_isEnable == false)
+		{
+			continue;
+		}
+
+		object->_isEnable = false;
+
+		for (auto& component : object->_components)
+		{
+			if (component == nullptr)
+			{
+				continue;
+			}
+
+			if (component->_isEnable)
+			{
+				component->OnDisable();
+			}
+		}
+		object->OnDisable();
 	}
 
-	_componentsToEnable.clear();
+
+	for (auto& component : _componentsToDisable)
+	{
+		if (component->_isEnable == false)
+		{
+			continue;
+		}
+
+		component->_isEnable = false;
+		component->OnDisable();
+	}
+
+	// Destroy 처리
+
+	for (auto& object : _gameObjectsToDestroy)
+	{
+		for (auto& component : object->_components)
+		{
+			if (component == nullptr)
+			{
+				continue;
+			}
+
+			// Disable인 컴포넌트들도 Destroy해야하는가..?
+			component->OnDestroy();
+			delete component;
+		}
+		object->OnDestroy();
+
+		_gameObjects.erase(std::remove(_gameObjects.begin(), _gameObjects.end(), object), _gameObjects.end());
+		delete object;
+	}
+	_gameObjectsToDestroy.clear();
 }

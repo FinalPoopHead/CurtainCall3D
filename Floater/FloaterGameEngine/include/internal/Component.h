@@ -16,7 +16,7 @@ namespace flt
 		ComponentBase(GameObject* gameObject) : _isEnable(false), _gameObject(gameObject) {}
 		virtual ~ComponentBase() {}
 
-		virtual void Start() {}
+		virtual void OnCreate() {}
 		virtual void OnEnable() {}
 
 		virtual void PrePhysics() {}

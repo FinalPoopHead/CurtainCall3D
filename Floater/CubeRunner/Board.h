@@ -16,10 +16,12 @@ class Board : public flt::GameObject
 {
 public:
 	Board(int width, int height);
-	virtual ~Board() {};
+	virtual ~Board();
 
 	void PreUpdate(float deltaTime) override;
 
+public:
+	void Resize(int width, int height);
 	bool SetTileState(float x, float y, TileStateFlag state);
 	bool AddTileState(float x, float y, TileStateFlag state);
 	TileStateFlag QueryTileState(float x, float y);
@@ -35,5 +37,9 @@ private:
 
 	std::vector<std::vector<TileStateFlag>> _tileState;
 	std::vector<std::vector<Tile*>> _tiles;
+
+	//std::vector<std::pair<int, int>> _playerPos;
+	//std::vector<std::pair<int, int>> _cubePos;
+	//std::vector<std::pair<int, int>> _minePos;
 };
 
