@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "Component.h"
-#include "../../FloaterRendererCommon/include/IRenderer.h"
+#include "../../../FloaterRendererCommon/include/IRenderer.h"
 
 namespace flt
 {

@@ -6,6 +6,9 @@
 #include "include/KeyCode.h"
 #include "include/EnumType.h"
 #include "../FloaterUtil/include/Timer.h"
+#include "./WinGamePadImpl.h"
+#include "../FloaterUtil/include/FloaterType.h"
+
 
 namespace flt
 {
@@ -43,6 +46,8 @@ namespace flt
 		void HandleGamePadRawData(const RAWINPUT* raw);
 
 		void SetKeyState(KeyCode code, const KeyData& data, bool isActive, bool isInActive);
+
+		WinGamePad* FindEmptyGamePad(uint64 hash);
 		
 		static LRESULT WINAPI WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		bool GetError(std::wstring* outErrorMsg, unsigned int* outErrorCode);
@@ -64,6 +69,6 @@ namespace flt
 		static unsigned char _keyCodeMap[256];
 		std::unordered_map<IRenderer*, RendererType> _rendererMap;
 
-		WinGamePad* _pGamePads[16];
+		WinGamePad _pGamePads[16];
 	};
 }

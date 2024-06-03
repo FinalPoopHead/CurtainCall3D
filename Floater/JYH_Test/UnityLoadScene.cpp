@@ -10,7 +10,7 @@
 #include <iostream>
 
 #include "GlideObject.h"
-#include "../FloaterGameEngine/include/BuiltinComponent.h"
+#include "../FloaterGameEngine/include/internal/BuiltinComponent.h"
 #include "../FloaterRendererCommon/include/ModelLoader.h"
 
 // 테스트 include
@@ -43,7 +43,7 @@ void UnityLoadScene::Initialize()
 
 	LoadUnityJson();
 
-	GlideObject* glideObject = CreateGameObject<GlideObject>();
+	GlideObject* glideObject = flt::CreateGameObject<GlideObject>(true);
 	//glideObject->tr.SetPosition(0.0f, 50.0f, -50.0f);
 	glideObject->tr.SetPosition(0.0f, 250.0f, -250.0f);
 }
@@ -85,7 +85,7 @@ void UnityLoadScene::LoadUnityJson()
 	{
 		for (auto& v : document.GetArray())
 		{
-			flt::GameObject* gameObject = CreateGameObject<flt::GameObject>();
+			flt::GameObject* gameObject = flt::CreateGameObject<flt::GameObject>(true);
 			//gameObject->AddComponent<RotateComponent>();
 
 			if (v.HasMember("ID"))

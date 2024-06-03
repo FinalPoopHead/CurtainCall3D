@@ -8,12 +8,14 @@ void TestScene::Initialize()
 	//TestGameObejct* testObject = new TestGameObejct();
 	//AddGameObject(testObject);
 
-	GlideObject* glideObject = CreateGameObject<GlideObject>();
-	glideObject->tr.SetPosition(0.0f, 100.0f, -100.0f);
+	GlideObject* glideObject = flt::CreateGameObject<GlideObject>(true);
+	glideObject->tr.SetPosition(0.0f, 20.0f, -400.0f);
 
-	// 테스트용 젤다 애니메이션
-	CreateGameObject<TestGameObejct>();
+	TestGameObejct* tObject = flt::CreateGameObject<TestGameObejct>(true);
+	tObject->tr.SetPosition(0.0f, 201.0f, 0.0f);
 
+	TestGameObejct* tObject2 = flt::CreateGameObject<TestGameObejct>(true);
+	tObject2->tr.SetPosition(0.0f, 0.0f, 0.0f);
 }
 
 void TestScene::Finalize()

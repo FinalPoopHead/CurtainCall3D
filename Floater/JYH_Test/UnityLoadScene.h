@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "../FloaterGameEngine/include/Scene.h"
+#include "../FloaterGameEngine/include/EngineMinimal.h"
 #include <string>
 
 class UnityLoadScene : public flt::Scene

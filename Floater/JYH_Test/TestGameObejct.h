@@ -1,12 +1,12 @@
 ﻿#pragma once
-#include "../FloaterGameEngine/include/GameObject.h"
-#include "../FloaterGameEngine/include/RendererComponent.h"
-#include "../FloaterGameEngine/include/CameraComponent.h"
+#include "../FloaterGameEngine/include/internal/GameObject.h"
 
 class TestGameObejct : public flt::GameObject
 {
 public:
 	TestGameObejct();
 	virtual ~TestGameObejct();
+
+	void Update(float deltaTime) override;
 };
 

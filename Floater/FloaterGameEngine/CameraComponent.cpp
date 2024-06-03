@@ -1,6 +1,6 @@
-﻿#include "./include/CameraComponent.h"
-#include "./include/GameObject.h"
-#include "./include/GameEngine.h"
+﻿#include "./include/internal/CameraComponent.h"
+#include "./include/internal/GameObject.h"
+#include "./include/internal/GameEngine.h"
 #include "../FloaterRendererCommon/include/Camera.h"
 
 

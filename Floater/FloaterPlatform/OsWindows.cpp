@@ -10,6 +10,7 @@
 #include "../FloaterRendererCommon/include/IRenderer.h"
 #include "../FloaterRendererDX11/include/CreateRenderer.h"
 #include "../FloaterUtil/include/ConvString.h"
+#include "../FloaterUtil/include/Hash.h"
 
 // TODO : include 폴더로 이동 해야함.
 #include "../RocketAdapter/include/CreateRenderer.h"
@@ -287,12 +288,12 @@ bool flt::OsWindows::Update()
 
 	for (int i = 0; i < 16; ++i)
 	{
-		if (_pGamePads[i] == nullptr)
+		if (_pGamePads[i].isConnected == false)
 		{
 			continue;
 		}
 
-		flt::Xbox::Get(_pGamePads[i]);
+		flt::Xbox::Get(&_pGamePads[i]);
 	}
 
 	return true;
@@ -377,12 +378,12 @@ bool flt::OsWindows::GetGamePadState(int padIndex, GamePadState* outState)
 		return false;
 	}
 
-	if (_pGamePads[padIndex] == nullptr)
+	if (_pGamePads[padIndex].isConnected == false)
 	{
 		return false;
 	}
 
-	*outState = _pGamePads[padIndex]->state;
+	*outState = _pGamePads[padIndex].state;
 	return true;
 }
 
@@ -393,7 +394,7 @@ bool flt::OsWindows::SetGamePadVibration(int padIndex, float leftMotor, float ri
 		return false;
 	}
 
-	if (_pGamePads[padIndex] == nullptr)
+	if (_pGamePads[padIndex].isConnected == false)
 	{
 		return false;
 	}
@@ -401,7 +402,7 @@ bool flt::OsWindows::SetGamePadVibration(int padIndex, float leftMotor, float ri
 	leftMotor = std::clamp(leftMotor, 0.0f, 1.0f);
 	rightMotor = std::clamp(rightMotor, 0.0f, 1.0f);
 
-	Xbox::Set(_pGamePads[padIndex], (BYTE)(leftMotor * 255), (BYTE)(rightMotor * 255));
+	Xbox::Set(&_pGamePads[padIndex], (BYTE)(leftMotor * 255), (BYTE)(rightMotor * 255));
 	return true;
 }
 
@@ -839,6 +840,47 @@ void flt::OsWindows::SetKeyState(KeyCode code, const KeyData& data, bool isActiv
 	}
 }
 
+flt::WinGamePad* flt::OsWindows::FindEmptyGamePad(uint64 hash)
+{
+	//먼저 전에 연결한 적이 있는 패드면 해당 슬롯에 연결
+	for (int i = 0; i < 16; ++i)
+	{
+		if (_pGamePads[i].isConnected == true)
+		{
+			continue;
+		}
+
+		if (_pGamePads[i].hash == hash)
+		{
+			return &_pGamePads[i];
+		}
+	}
+
+	// 먼저 한번도 연결된적이 없는 슬롯을 찾아보자.
+	for (int i = 0; i < 16; ++i)
+	{
+		if (_pGamePads[i].isConnected == true || _pGamePads[i].hash != 0)
+		{
+			continue;
+		}
+
+		return &_pGamePads[i];
+	}
+
+	// 가장 빠른 슬롯을 할당한다.
+	for (int i = 0; i < 16; ++i)
+	{
+		if (_pGamePads[i].isConnected == true)
+		{
+			continue;
+		}
+
+		return &_pGamePads[i];
+	}
+
+	return nullptr;
+}
+
 LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static OsWindows* thisPtr = nullptr;
@@ -961,39 +1003,42 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 			if (hdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
 			{
 				DEV_BROADCAST_DEVICEINTERFACE_W* dif = (DEV_BROADCAST_DEVICEINTERFACE_W*)hdr;
+				// 디바이스가 연결되었을 때
 				if (wParam == DBT_DEVICEARRIVAL)
 				{
-					for (int i = 0; i < 16; ++i)
+					wchar_t* data = dif->dbcc_name;
+					int size = wcslen(data) * sizeof(wchar_t);
+					uint64 hash = flt::hash::xxh64::hash((char*)data, size, 0);
+					ASSERT(hash == 0, "해시값이 0이면 처음 연결되는것으로 세팅되어있음.");
+
+					WinGamePad* emptyGamePad = thisPtr->FindEmptyGamePad(hash);
+					
+
+					if (emptyGamePad == nullptr)
 					{
-						if (thisPtr->_pGamePads[i] != nullptr)
-						{
-							continue;
-						}
-
-						thisPtr->_pGamePads[i] = new WinGamePad();
-						thisPtr->_pGamePads[i]->path = dif->dbcc_name;
-						flt::Xbox::Connect(thisPtr->_pGamePads[i]);
-						break;
+						ASSERT(false, "게임패드 슬롯이 부족합니다.");
 					}
-
+					else
+					{
+						emptyGamePad->path = dif->dbcc_name;
+						flt::Xbox::Connect(emptyGamePad);
+					}
 				}
 				else if (wParam == DBT_DEVICEREMOVECOMPLETE)
 				{
 					for (int i = 0; i < 16; ++i)
 					{
-						if (!thisPtr->_pGamePads[i])
+						if (thisPtr->_pGamePads[i].isConnected == false)
 						{
 							continue;
 						}
 
-						if (_wcsicmp(thisPtr->_pGamePads[i]->path.c_str(), dif->dbcc_name) != 0)
+						if (_wcsicmp(thisPtr->_pGamePads[i].path.c_str(), dif->dbcc_name) != 0)
 						{
 							continue;
 						}
 
-						flt::Xbox::Disconnect(thisPtr->_pGamePads[i]);
-						delete thisPtr->_pGamePads[i];
-						thisPtr->_pGamePads[i] = nullptr;
+						flt::Xbox::Disconnect(&thisPtr->_pGamePads[i]);
 						break;
 					}
 				}

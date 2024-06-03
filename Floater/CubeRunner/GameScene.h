@@ -1,7 +1,10 @@
 ﻿#pragma once
+//#include "../FloaterGameEngine/include/Scene.h"
+//#include "../FloaterGameEngine/include/GameEngine.h"
 #include "../FloaterGameEngine/include/EngineMinimal.h"
 
-class TestScene : public flt::Scene
+
+class GameScene : public flt::Scene
 {
 public:
 	virtual void Initialize() override;
@@ -9,4 +12,3 @@ public:
 
 private:
 };
-
