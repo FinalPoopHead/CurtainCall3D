@@ -44,9 +44,5 @@ private:
 
 	std::vector<std::vector<TileStateFlag>> _tileState;
 	std::vector<std::vector<Tile*>> _tiles;
-
-	//std::vector<std::pair<int, int>> _playerPos;
-	//std::vector<std::pair<int, int>> _cubePos;
-	//std::vector<std::pair<int, int>> _minePos;
 };
 
