@@ -39,6 +39,16 @@ namespace Rocket::Core
 
 		virtual void BindTransform(RocketTransform* rootTransform) override;
 
+		// 애니메이션
+		virtual void StopAnimation() override;
+		virtual void ForceStopAnimation() override;
+		virtual void PlayAnimation(const std::string& animName, bool isLoop = true) override;
+		virtual void PlayAnimation(UINT index, bool isLoop = true) override;
+		virtual std::string GetAnimName(UINT index) override;
+		virtual int GetAnimIndex(const std::string& animName) override;
+		virtual std::string GetCurrentAnimName() override;
+		virtual UINT GetAnimCount() override;
+
 		// TODO : 임시
 		virtual void SetMetallic(float value) override;
 		virtual void SetRoughness(float value) override;
@@ -83,7 +93,7 @@ namespace Rocket::Core
 	/// 나중에는 따로 빼서 관리하는게 낫겠다.
 	/// </summary>
 	private:
-		std::string _nowAnimationName;
+		Animation* _nowAnim;			// 현재 애니메이션
 		Node* _animatedRootNode;		// 애니메이션을 적용한 루트 노드 (원본에서 깊은 복사해옴)
 		Node* _armatureRootNode;		// 애니메이션을 적용한 루트 노드 중에서 Armature의 루트 노드
 		RocketTransform* _rootTransform;	// 앞단에서의 GameObject의 transform의 최상위 부모
@@ -91,6 +101,8 @@ namespace Rocket::Core
 		double _animationTime;
 		double _animationTick;
 		bool _isLoop = true;		// TODO : 지금은 임시로 Looping하도록 해뒀음. 나중에는 외부에서 설정할 수 있게 바꿔야함.
+		bool _isPlaying = false;			// 애니메이션을 재생중인지 여부, false 라면 마지막으로 재생한 애니메이션의 마지막 프레임으로 고정됨.
+		bool _isStopRequest = false;			// 애니메이션을 중지하라는 요청이 들어왔는지 여부
 
 	private:
 		UINT testCount = 0;
