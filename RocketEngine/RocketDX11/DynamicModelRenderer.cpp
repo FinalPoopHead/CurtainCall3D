@@ -125,6 +125,8 @@ namespace Rocket::Core
 			{
 				_animationTime = _nowAnim->duration / _nowAnim->ticksPerSecond;
 				_animationTick = _animationTime * _nowAnim->ticksPerSecond;
+				_animationTick--;
+				_isPlaying = false;
 			}
 		}
 
