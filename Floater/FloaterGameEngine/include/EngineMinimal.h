@@ -20,11 +20,6 @@ namespace flt
 	namespace __impl
 	{
 		extern GameEngineWrapper g_engine;
-		//inline GameEngineWrapper* GetEngine()
-		//{
-		//	static GameEngineWrapper engine;
-		//	return &engine;
-		//}
 	}
 
 	template<GameObjectDerived T, typename... TArgs>
@@ -39,8 +34,6 @@ namespace flt
 	{
 		T* scene = new T(std::forward<TArgs>(args)...);
 		__impl::g_engine.AddScene(scene);
-		//engine->SetScene(scene);
-		//scene->Initialize();
 		return scene;
 	}
 
