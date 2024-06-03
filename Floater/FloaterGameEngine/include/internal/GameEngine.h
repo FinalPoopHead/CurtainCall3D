@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "../../FloaterUtil/include/Timer.h"
+#include "../../../FloaterUtil/include/Timer.h"
 
 namespace flt
 {
@@ -7,6 +7,7 @@ namespace flt
 	class IRenderer;
 	class Scene;
 	class PhysicsEngine;
+
 
 	class GameEngine
 	{
@@ -28,6 +29,7 @@ namespace flt
 		void Finalize();
 
 		void SetScene(Scene* scene);
+		Scene* GetCurrentScene();
 
 		IRenderer* GetRenderer();
 		PhysicsEngine* GetPhysicsEngine();

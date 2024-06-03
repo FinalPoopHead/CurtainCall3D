@@ -1,5 +1,5 @@
 ﻿#include "./include/Input.h"
-#include "./include/GameEngine.h"
+#include "./include/internal/GameEngine.h"
 #include "../FloaterPlatform/include/Platform.h"
 
 

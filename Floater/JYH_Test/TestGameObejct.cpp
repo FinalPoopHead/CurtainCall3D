@@ -1,6 +1,6 @@
 ﻿#include "TestGameObejct.h"
 #include "../FloaterRendererCommon/include/ModelLoader.h"
-#include "../FloaterGameEngine/include/BuiltinComponent.h"
+#include "../FloaterGameEngine/include/EngineMinimal.h"
 #include "../FloaterGameEngine/include/Input.h"
 
 

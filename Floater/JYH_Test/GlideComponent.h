@@ -1,12 +1,9 @@
 ﻿#pragma once
-#include "../FloaterGameEngine/include/Component.h"
-#include "../FloaterGameEngine/include/CameraComponent.h"
-#include "../FloaterGameEngine/include/GameObject.h"
+#include "../FloaterGameEngine/include/EngineMinimal.h"
 #include "../FloaterGameEngine/include/Input.h"
-#include "../FloaterRendererCommon/include/Transform.h"
-#include "../FloaterMath/include/Vector3f.h"
-#include "../FloaterMath/include/Quaternion.h"
-#include "../FloaterMath/include/Common.h"
+//#include "../FloaterMath/include/Vector3f.h"
+//#include "../FloaterMath/include/Quaternion.h"
+//#include "../FloaterMath/include/Common.h"
 #include <cmath>
 #include <algorithm>
 

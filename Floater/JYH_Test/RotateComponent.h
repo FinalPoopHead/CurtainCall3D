@@ -1,7 +1,5 @@
 ﻿#pragma once
-#include "../FloaterGameEngine/include/Component.h"
-#include "../FloaterGameEngine/include/GameObject.h"
-#include "../FloaterRendererCommon/include/Transform.h"
+#include "../FloaterGameEngine/include/EngineMinimal.h"
 
 class RotateComponent : public flt::Component<RotateComponent>
 {

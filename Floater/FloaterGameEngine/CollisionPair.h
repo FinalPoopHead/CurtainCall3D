@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "./include/Gameobject.h"
-#include "./include/Collider.h"
+#include "./include/internal/Gameobject.h"
+#include "./include/internal/Collider.h"
 
 
 namespace flt

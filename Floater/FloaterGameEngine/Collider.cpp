@@ -1,5 +1,5 @@
-﻿#include "./include/Collider.h"
-#include "./include/GameObject.h"
+﻿#include "./include/internal/Collider.h"
+#include "./include/internal/GameObject.h"
 
 
 flt::Collider::Collider(GameObject* gameObject) : 

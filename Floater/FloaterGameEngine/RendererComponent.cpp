@@ -1,8 +1,8 @@
-﻿#include "./include/RendererComponent.h"
+﻿#include "./include/internal/RendererComponent.h"
 #include "../FloaterRendererCommon/include/IRenderer.h"
-#include "./include/GameObject.h"
-#include "./include/Scene.h"
-#include "./include/GameEngine.h"
+#include "./include/internal/GameObject.h"
+#include "./include/internal/Scene.h"
+#include "./include/internal/GameEngine.h"
 #include "../FloaterRendererCommon/include/RawNode.h"
 
 

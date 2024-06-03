@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "../FloaterGameEngine/include/Component.h"
-#include "../FloaterGameEngine/include/GameObject.h"
+#include "../FloaterGameEngine/include/internal/Component.h"
+#include "../FloaterGameEngine/include/internal/GameObject.h"
 
 namespace flt
 {

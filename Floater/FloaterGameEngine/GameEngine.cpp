@@ -1,7 +1,8 @@
-﻿#include "./include/GameEngine.h"
-#include "./include/Scene.h"
+﻿#include "./include/internal/GameEngine.h"
+#include "./include/internal/Scene.h"
 #include "../FloaterPlatform/include/Platform.h"
 #include "PhysicsEngine.h"
+
 
 flt::IRenderer* flt::GameEngine::GetRenderer()
 {
@@ -36,6 +37,8 @@ void flt::GameEngine::Initialize()
 
 bool flt::GameEngine::Update()
 {
+	ASSERT(_currentScene, "Scene is not set");
+
 	_timer.Update();
 	float deltaSecond = (float)_timer.GetDeltaSeconds();
 	bool closeWindow = _platform->Update();
@@ -89,6 +92,11 @@ void flt::GameEngine::SetScene(Scene* scene)
 
 	_currentScene = scene;
 	_currentScene->Initialize();
+}
+
+flt::Scene* flt::GameEngine::GetCurrentScene()
+{
+	return _currentScene;
 }
 
 flt::GameEngine::GameEngine() : 

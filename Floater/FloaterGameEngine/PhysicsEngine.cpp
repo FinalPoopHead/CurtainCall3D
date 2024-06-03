@@ -1,6 +1,6 @@
 ﻿#include "PhysicsEngine.h"
-#include "./include/Collider.h"
-#include "./include/GameEngine.h"
+#include "./include/internal/Collider.h"
+#include "./include/internal/GameEngine.h"
 #include "../FloaterUtil/include/FloaterMacro.h"
 
 #pragma warning(push)

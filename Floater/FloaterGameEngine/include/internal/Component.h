@@ -26,7 +26,9 @@ namespace flt
 		virtual void PostPhysics() {}
 		virtual void FixedUpdate() {}
 
+		virtual void PreUpdate(float deltaSecond) {}
 		virtual void Update(float deltaSecond) {}
+		virtual void PostUpdate(float deltaSecond) {}
 		virtual void EndDraw() {}
 		virtual void OnDisable() {}
 		virtual void OnDestroy() {}

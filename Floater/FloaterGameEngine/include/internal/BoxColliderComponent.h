@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include "Component.h"
 #include "Collider.h"
-#include "../../FloaterMath/include/Vector3f.h"
-#include "../../FloaterMath/include/Vector4f.h"
+#include "../../../FloaterMath/include/Vector3f.h"
+#include "../../../FloaterMath/include/Vector4f.h"
 
 namespace physx
 {

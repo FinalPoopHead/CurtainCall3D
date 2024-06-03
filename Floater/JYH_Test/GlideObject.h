@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "../FloaterGameEngine/include/GameObject.h"
+#include "../FloaterGameEngine/include/EngineMinimal.h"
 
 
 class GlideObject : public flt::GameObject 

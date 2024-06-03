@@ -1,8 +1,7 @@
 ﻿#define FLT_WINDOWS
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "../FloaterGameEngine/include/GameEngine.h"
-#include "../FloaterPlatform/include/Platform.h"
+#include "../FloaterGameEngine/include\EngineMinimal.h"
 #include "TestScene.h"
 #include "UnityLoadScene.h"
 #include <iostream>

@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "../FloaterGameEngine/include/GameObject.h"
+#include "../FloaterGameEngine/include/internal/GameObject.h"
 
 class TestGameObejct : public flt::GameObject
 {

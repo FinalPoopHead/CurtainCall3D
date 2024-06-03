@@ -1,7 +1,7 @@
-﻿#include "./include/BoxColliderComponent.h"
-#include "./include/GameEngine.h"
+﻿#include "./include/internal/BoxColliderComponent.h"
+#include "./include/internal/GameEngine.h"
 #include "PhysicsEngine.h"
-#include "./include/GameObject.h"
+#include "./include/internal/GameObject.h"
 #include "../FloaterRendererCommon/include/Transform.h"
 #pragma warning(push)
 #pragma warning(disable:26495 6297 33010)
