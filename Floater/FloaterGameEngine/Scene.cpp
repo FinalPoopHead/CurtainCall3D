@@ -10,6 +10,21 @@ flt::Scene::Scene() :
 
 flt::Scene::~Scene()
 {
+	//// 일단 Destroy는 사용하지 않도록
+	//for (auto& object : _gameObjects)
+	//{
+	//	for (auto& component : object->_components)
+	//	{
+	//		if (component == nullptr)
+	//		{
+	//			continue;
+	//		}
+
+	//		component->OnDestroy();
+	//	}
+	//	object->OnDestroy();
+	//}
+
 	for (auto& object : _gameObjects)
 	{
 		for (auto& component : object->_components)
@@ -18,11 +33,8 @@ flt::Scene::~Scene()
 			{
 				continue;
 			}
-
-			component->OnDestroy();
 			delete component;
 		}
-		object->OnDestroy();
 		delete object;
 	}
 	_gameObjects.clear();
@@ -294,6 +306,7 @@ void flt::Scene::PostPhysicsUpdate()
 
 			component->FixedUpdate();
 		}
+		object->FixedUpdate();
 	}
 }
 

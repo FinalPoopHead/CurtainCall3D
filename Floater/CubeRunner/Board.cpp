@@ -1,16 +1,33 @@
 ﻿#include "Board.h"
 #include "Tile.h"
 
-Board::Board(int width, int height)
-	: flt::GameObject()
-	, _width(0)
-	, _height(0)
-	, _tileState()
+Board::Board(int width, int height, float offset) :
+	flt::GameObject(),
+	_width(width),
+	_height(height),
+	_offset(offset),
+	_tileState()
 {
-	Resize(width, height);
+
 }
 
 Board::~Board()
+{
+
+}
+
+void Board::OnCreate()
+{
+	int width = _width;
+	int height = _height;
+
+	_width = 0;
+	_height = 0;
+
+	Resize(width, height);
+}
+
+void Board::OnDestroy()
 {
 	Resize(0, 0);
 }
@@ -62,9 +79,24 @@ TileStateFlag Board::QueryTileState(float x, float y)
 	return _tileState[tileX][tileY];
 }
 
-void Board::ConvertToTileIndex(float x, float y, int& outX, int& outY)
+void Board::ConvertToTileIndex(float x, float z, int& outX, int& outZ)
 {
+	flt::Vector4f pos = this->tr.GetWorldPosition();
+	x -= pos.x;
+	z -= pos.z;
 
+	outX = (int)(x / _offset);
+	outZ = (int)(z / _offset);
+}
+
+void Board::ConvertToTilePosition(int x, int z, float& outX, float& outZ)
+{
+	outX = (float)x * _offset;
+	outZ = (float)z * _offset;
+
+	flt::Vector4f pos = this->tr.GetWorldPosition();
+	outX += pos.x;
+	outZ += pos.z;
 }
 
 void Board::Resize(int newWidth, int newHeight)
@@ -78,26 +110,26 @@ void Board::Resize(int newWidth, int newHeight)
 	// 타일 높이가 변화시 먼저 처리
 	if (newHeight < _height)
 	{
-		for (auto& tileHeight : _tiles)
+		for (int i = 0; i < _width; ++i)
 		{
 			for (int j = newHeight; j < _height; ++j)
 			{
-				tileHeight[j]->Destroy();
-				//tileHeight[j] = nullptr;
+				_tiles[i][j]->Destroy();
 			}
 
-			tileHeight.resize(newHeight);
+			_tiles[i].resize(newHeight);
 		}
 	}
 	else if (newHeight > _height)
 	{
-		for (auto& tileHeight : _tiles)
+		for (int i = 0; i < _width; ++i)
 		{
-			tileHeight.resize(newHeight);
+			_tiles[i].resize(newHeight);
 			for (int j = _height; j < newHeight; ++j)
 			{
-				tileHeight[j] = flt::CreateGameObject<Tile>(true);
-				//tileHeight[j] = (Tile*)1;
+				_tiles[i][j] = flt::CreateGameObject<Tile>(true);
+				_tiles[i][j]->tr.SetParent(&this->tr);
+				_tiles[i][j]->tr.SetPosition({ i * _offset, 0.0f, j * _offset });
 			}
 		}
 	}
@@ -123,6 +155,8 @@ void Board::Resize(int newWidth, int newHeight)
 		for (int j = 0; j < newHeight; ++j)
 		{
 			_tiles[i][j] = flt::CreateGameObject<Tile>(true);
+			_tiles[i][j]->tr.SetParent(&this->tr);
+			_tiles[i][j]->tr.SetPosition({ i * _offset, 0.0f, j * _offset });
 		}
 	}
 
