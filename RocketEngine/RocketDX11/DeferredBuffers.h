@@ -19,6 +19,7 @@ namespace Rocket::Core
 
 	public:
 		void Initialize(ID3D11Device* device, int textureWidth, int textureHeight, float screenDepth, float screenNear);
+		void SetViewportXY(float x, float y);
 		void SetRenderTargets(ID3D11DeviceContext* deviceContext);
 		void SetRenderTargets(ID3D11DeviceContext* deviceContext, ID3D11DepthStencilView* depthStencilView);
 		void SetShadowMapRenderTarget(ID3D11DeviceContext* deviceContext);
@@ -41,6 +42,8 @@ namespace Rocket::Core
 
 		ComPtr<ID3D11Texture2D> _depthStencilBuffer;
 		ComPtr<ID3D11DepthStencilView> _depthStencilView;
+
+		D3D11_VIEWPORT _viewport;
 
 		ComPtr<ID3D11ShaderResourceView> _shadowMapShaderResourceView;
 		ComPtr<ID3D11Texture2D> _shadowDepthBuffer;

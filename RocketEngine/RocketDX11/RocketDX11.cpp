@@ -249,6 +249,14 @@ namespace Rocket::Core
 		/// deferredBuffers 초기화
 		_deferredBuffers = std::make_unique<DeferredBuffers>();
 		_deferredBuffers->Initialize(_device.Get(), depthBufferDesc.Width, depthBufferDesc.Height, 1000.0f, 0.1f);
+		// player 1 버퍼
+		_deferredBufferArr[0] = std::make_unique<DeferredBuffers>();
+		_deferredBufferArr[0]->Initialize(_device.Get(), depthBufferDesc.Width / 2, depthBufferDesc.Height, 1000.0f, 0.1f);
+		_deferredBufferArr[0]->SetViewportXY(0, 0);
+		// player 2 버퍼
+		_deferredBufferArr[1] = std::make_unique<DeferredBuffers>();
+		_deferredBufferArr[1]->Initialize(_device.Get(), depthBufferDesc.Width / 2, depthBufferDesc.Height, 1000.0f, 0.1f);
+		_deferredBufferArr[1]->SetViewportXY(depthBufferDesc.Width / 2, 0);
 
 		/// DX 초기화 끝났으니 Manager들 초기화해준다.
 		_resourceManager.Initialize(_device.Get(), _deviceContext.Get());
@@ -303,8 +311,12 @@ namespace Rocket::Core
 		//Blend State Set.
 		_deviceContext->OMSetBlendState(_defaultBlendState.Get(), nullptr, 0xFF);
 
+		_deviceContext->RSSetViewports(1, &_viewport);
+
 		/// Deferred
 		_deferredBuffers->ClearRenderTargets(_deviceContext.Get(), 0.0f, 0.0f, 0.0f, 0.3f);
+		_deferredBufferArr[0]->ClearRenderTargets(_deviceContext.Get(), 1.0f, 0.0f, 0.0f, 1.0f);
+		_deferredBufferArr[1]->ClearRenderTargets(_deviceContext.Get(), 0.0f, 1.0f, 0.0f, 1.0f);
 	}
 
 	void RocketDX11::RenderMesh()
@@ -400,40 +412,19 @@ namespace Rocket::Core
 	{
 		_deltaTime = deltaTime;
 
-		Camera::GetMainCamera()->Update();
-		for (auto& light : _objectManager.GetDirectionalLightList())
+		Camera** mainCams = Camera::GetMainCamArr();
+		for (int i = 0; i < 2; i++)
 		{
-			light->Update();
-		}
-		
-		// Culling 및 Update Animation
-		Camera* mainCam = Camera::GetMainCamera();
-
-		for (auto meshRenderer : _objectManager.GetMeshRenderers())
-		{
-			if (mainCam->FrustumCulling(meshRenderer->GetBoundingBox()))
+			if (mainCams[i] != nullptr)
 			{
-				_renderList.push_back(meshRenderer);
+				mainCams[i]->Update();
 			}
 		}
 
-		for (auto staticModelRenderer : _objectManager.GetStaticModelRenderers())
-		{
-			if (mainCam->FrustumCulling(staticModelRenderer->GetBoundingBox()))
-			{
-				_renderList.push_back(staticModelRenderer);
-			}
-		}
-
+		// Update Animation
 		for (auto dynamicModelRenderer : _objectManager.GetDynamicModelRenderers())
 		{
-			bool isCulled = !mainCam->FrustumCulling(dynamicModelRenderer->GetBoundingBox());
-			dynamicModelRenderer->UpdateAnimation(deltaTime, isCulled);
-
-			if (!isCulled)
-			{
-				_renderList.push_back(dynamicModelRenderer);
-			}
+			dynamicModelRenderer->UpdateAnimation(deltaTime);
 		}
 
 		_objectManager._debugText->SetText(
@@ -451,33 +442,24 @@ namespace Rocket::Core
 	{
 		BeginRender(1.0f, 0.0f, 1.0f, 1.0f);
 
-		// TODO : 섀도우 맵 만들고 LightPass에 넘겨줘야함.
-		_shadowPass->GenerateShadowMap(_deviceContext.Get(), _deferredBuffers.get());
-
-		_deviceContext->RSSetViewports(1, &_viewport);
-
-		GBufferPass();
-
-		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), nullptr);
-		_lightPass->Render(_deviceContext.Get(), _deferredBuffers.get());
-
-		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _deferredBuffers->GetDepthStencilView());
-		if (_isDebugMode)
+		// 카메라가 하나 일 때
+		if (Camera::GetMainCamera(1) == nullptr)
 		{
-			RenderHelperObject();
+			auto mainCam = Camera::GetMainCamera(0);
+
+			RenderPerCamera(mainCam);
 		}
-
-		RenderCubeMap();
-
-		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), nullptr);
-
-		// 		RenderLine();
-		RenderText();
-		RenderTexture();
-
-		if (_isDebugMode)
+		else	// 카메라가 두 개일 때
 		{
-			RenderDebug();
+			for (int i = 0; i < 2; i++)
+			{
+				auto mainCam = Camera::GetMainCamera(i);
+
+				RenderPerCamera(mainCam);
+
+				_renderList.clear();
+				_renderList.reserve(512);
+			}
 		}
 
 		EndRender();
@@ -577,10 +559,8 @@ namespace Rocket::Core
 		_lineInputLayout.Reset();
 	}
 
-	void RocketDX11::RenderHelperObject()
+	void RocketDX11::RenderHelperObject(Camera* cam)
 	{
-		auto cam = Camera::GetMainCamera();
-
 		_objectManager._grid->Update(DirectX::XMMatrixIdentity(), cam->GetViewMatrix(), cam->GetProjectionMatrix());
 		_objectManager._grid->Render(_deviceContext.Get());
 		_objectManager._axis->Update(DirectX::XMMatrixIdentity(), cam->GetViewMatrix(), cam->GetProjectionMatrix());
@@ -671,10 +651,10 @@ namespace Rocket::Core
 		HR(_device->CreateDepthStencilState(&cubeMapDepthStencilDesc, _cubeMapDepthStencilState.GetAddressOf()));
 	}
 
-	void RocketDX11::RenderCubeMap()
-	{
+	void RocketDX11::RenderCubeMap(Camera* cam)
+{
 		_deviceContext->OMSetDepthStencilState(_cubeMapDepthStencilState.Get(), 0);
-		_objectManager.GetCubeMap()->Render(_deviceContext.Get());
+		_objectManager.GetCubeMap()->Render(_deviceContext.Get(), cam);
 		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
 	}
 
@@ -696,7 +676,7 @@ namespace Rocket::Core
 			, DirectX::Colors::White
 			, 0.0f							// 회전 각도
 			, DirectX::XMFLOAT2(0, 0)		// 이미지의 원점 : 0.0f,0.0f가 좌측상단
-			, 1.0f/4.0f);
+			, 1.0f / 4.0f);
 
 
 		for (int i = 0; i < BUFFER_COUNT; i++)
@@ -716,11 +696,8 @@ namespace Rocket::Core
 		_spriteBatch->End();
 	}
 
-	void RocketDX11::GBufferPass()
+	void RocketDX11::GBufferPass(Camera* cam)
 	{
-		// Frustum Culling
-		Camera* mainCam = Camera::GetMainCamera();
-
 		// Set RenderTarget
 		_deferredBuffers->SetRenderTargets(_deviceContext.Get());
 		// _deferredBuffers->SetRenderTargets(_deviceContext.Get(), _depthStencilView.Get());
@@ -728,10 +705,76 @@ namespace Rocket::Core
 		// Draw On G-Buffers
 		for (auto& renderable : _renderList)
 		{
-			renderable->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
+			renderable->Render(_deviceContext.Get(), cam->GetViewMatrix(), cam->GetProjectionMatrix());
 		}
 
 		// Debug Text
 		_objectManager._debugText->Append("\nObjects Draw : " + std::to_string(_renderList.size()));
 	}
+
+	void RocketDX11::FrustumCulling(Camera* cam)
+	{
+		for (auto meshRenderer : _objectManager.GetMeshRenderers())
+		{
+			if (cam->FrustumCulling(meshRenderer->GetBoundingBox()))
+			{
+				_renderList.push_back(meshRenderer);
+			}
+		}
+
+		for (auto staticModelRenderer : _objectManager.GetStaticModelRenderers())
+		{
+			if (cam->FrustumCulling(staticModelRenderer->GetBoundingBox()))
+			{
+				_renderList.push_back(staticModelRenderer);
+			}
+		}
+
+		for (auto dynamicModelRenderer : _objectManager.GetDynamicModelRenderers())
+		{
+			if (cam->FrustumCulling(dynamicModelRenderer->GetBoundingBox()))
+			{
+				_renderList.push_back(dynamicModelRenderer);
+			}
+		}
+	}
+
+	void RocketDX11::RenderPerCamera(Camera* cam)
+	{
+		for (auto& light : _objectManager.GetDirectionalLightList())
+		{
+			light->Update(cam);
+		}
+
+		FrustumCulling(cam);
+
+		_shadowPass->GenerateShadowMap(_deviceContext.Get(), _deferredBuffers.get());
+
+		_deviceContext->RSSetViewports(1, &_viewport);
+
+		GBufferPass(cam);
+
+		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), nullptr);
+		_lightPass->Render(_deviceContext.Get(), _deferredBuffers.get(), cam);
+
+		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _deferredBuffers->GetDepthStencilView());
+		if (_isDebugMode)
+		{
+			RenderHelperObject(cam);
+		}
+
+		RenderCubeMap(cam);
+
+		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), nullptr);
+
+		// 		RenderLine();
+		RenderText();
+		RenderTexture();
+
+		if (_isDebugMode)
+		{
+			RenderDebug();
+		}
+	}
+
 }

@@ -112,6 +112,12 @@ namespace Rocket::Core
 
 		HR(device->CreateDepthStencilView(_depthStencilBuffer.Get(), &depthStencilViewDesc, _depthStencilView.GetAddressOf()));
 
+		ZeroMemory(&_viewport, sizeof(D3D11_VIEWPORT));
+		_viewport.Width = _textureWidth;
+		_viewport.Height = _textureHeight;
+		_viewport.MinDepth = 0;
+		_viewport.MaxDepth = 1;
+
 
 		/// Shadow Map 관련
 		float shadowMapWidth = 2048.0f;
@@ -168,6 +174,7 @@ namespace Rocket::Core
 	{
 		// 렌더링 대상 뷰 배열 및 깊이 스텐실 버퍼를 출력 렌더 파이프라인에 바인딩 합니다.
 		deviceContext->OMSetRenderTargets(BUFFER_COUNT, _renderTargetViewArray->GetAddressOf(), _depthStencilView.Get());
+		deviceContext->RSSetViewports(1, &_viewport);
 	}
 
 	void DeferredBuffers::SetRenderTargets(ID3D11DeviceContext* deviceContext, ID3D11DepthStencilView* depthStencilView)
@@ -209,6 +216,12 @@ namespace Rocket::Core
 	{
 		deviceContext->OMSetRenderTargets(0, nullptr, _shadowDepthStencilView.Get());
 		deviceContext->RSSetViewports(1, &_shadowMapViewport);
+	}
+
+	void DeferredBuffers::SetViewportXY(float x, float y)
+	{
+		_viewport.TopLeftX = x;
+		_viewport.TopLeftY = y;
 	}
 
 }

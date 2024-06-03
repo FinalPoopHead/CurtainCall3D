@@ -10,6 +10,7 @@ namespace Rocket::Core
 	class VertexShader;
 	class PixelShader;
 	class DeferredBuffers;
+	class Camera;
 }
 
 namespace Rocket::Core
@@ -22,7 +23,7 @@ namespace Rocket::Core
 
 	public:
 		void Initialize(ID3D11Device* device, VertexShader* vertexShader, PixelShader* pixelShader);
-		void Render(ID3D11DeviceContext* deviceContext, DeferredBuffers* g_buffer);
+		void Render(ID3D11DeviceContext* deviceContext, DeferredBuffers* g_buffer, Camera* cam);
 
 	private:
 		void CreateSamplerState(ID3D11Device* device);
