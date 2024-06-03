@@ -88,36 +88,45 @@ namespace Rocket::Core
 			return;
 		}
 
-		// TODO : 외부에서 애니메이션 세팅하고 재생할 수 있게 바꿔야함. 지금은 임시로 첫번째 애니메이션만 실행함.
-		Animation* anim = _model->animations.begin()->second;
-		//anim = _model->animations.at("Ani_Monster2_BattleIdle");
-		_nowAnimationName = anim->name;
+		if (!_isPlaying)
+		{
+			return;
+		}
 
-		//if (_animationTime == anim->duration)
-		//{
-		//	return;
-		//}
+		if (_nowAnim == nullptr)
+		{
+			return;
+		}
 
 		_animationTime += deltaTime;
-		_animationTick = _animationTime * anim->ticksPerSecond;
+		_animationTick = _animationTime * _nowAnim->ticksPerSecond;
 
-		if (_animationTick > anim->duration)
+		if (_animationTick > _nowAnim->duration)
 		{
+			if (_isStopRequest)
+			{
+				_isPlaying = false;
+				_isStopRequest = false;
+				_isLoop = false;
+			}
+
 			if (_isLoop)
 			{
-				double secondPerTick = anim->duration / anim->ticksPerSecond;;
+				double secondPerTick = _nowAnim->duration / _nowAnim->ticksPerSecond;;
 				int count = 0;
 				while (secondPerTick * (count + 1) < _animationTime)
 				{
 					count++;
 				}
 				_animationTime -= count * secondPerTick;
-				_animationTick = _animationTime * anim->ticksPerSecond;
+				_animationTick = _animationTime * _nowAnim->ticksPerSecond;
 			}
 			else
 			{
-				_animationTime = anim->duration / anim->ticksPerSecond;
-				_animationTick = _animationTime * anim->ticksPerSecond;
+				_animationTime = _nowAnim->duration / _nowAnim->ticksPerSecond;
+				_animationTick = _animationTime * _nowAnim->ticksPerSecond;
+				_animationTick--;
+				_isPlaying = false;
 			}
 		}
 
@@ -126,7 +135,7 @@ namespace Rocket::Core
 			return;
 		}
 
-		for (auto& nodeAnim : anim->nodeAnimations)
+		for (auto& nodeAnim : _nowAnim->nodeAnimations)
 		{
 			Vector3 position;
 			Vector4 rotation;
@@ -675,6 +684,92 @@ namespace Rocket::Core
 
 			deviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
 		}
+	}
+
+	void DynamicModelRenderer::StopAnimation()
+	{
+		_isStopRequest = true;
+	}
+
+	void DynamicModelRenderer::ForceStopAnimation()
+	{
+		_isPlaying = false;
+	}
+
+	void DynamicModelRenderer::PlayAnimation(const std::string& animName, bool isLoop /*= true*/)
+	{
+		if (_model->animations.find(animName) == _model->animations.end())
+		{
+			return;
+		}
+
+		_isPlaying = true;
+		_isLoop = isLoop;
+		_nowAnim = _model->animations.at(animName);
+	}
+
+	void DynamicModelRenderer::PlayAnimation(UINT index, bool isLoop /*= true*/)
+	{
+		if (index >= _model->animations.size())
+		{
+			return;
+		}
+
+		_isPlaying = true;
+		_isLoop = isLoop;
+
+		auto iter = _model->animations.begin();
+		for (int i = 0; i < index; i++)
+		{
+			iter++;
+		}
+		_nowAnim = iter->second;
+	}
+
+	std::string DynamicModelRenderer::GetAnimName(UINT index)
+	{
+		if (index >= _model->animations.size())
+		{
+			return "";
+		}
+
+		auto iter = _model->animations.begin();
+		for (int i = 0; i < index; i++)
+		{
+			iter++;
+		}
+		return iter->second->name;
+	}
+
+	int DynamicModelRenderer::GetAnimIndex(const std::string& animName)
+	{
+		if (_model->animations.find(animName) == _model->animations.end())
+		{
+			return -1;
+		}
+
+		int index = 0;
+
+		auto targetIter = _model->animations.find(animName);
+		auto iter = _model->animations.begin();
+
+		while (iter != targetIter)
+		{
+			index++;
+			iter++;
+		}
+
+		return index;
+	}
+
+	std::string DynamicModelRenderer::GetCurrentAnimName()
+	{
+		return _nowAnim->name;
+	}
+
+	UINT DynamicModelRenderer::GetAnimCount()
+	{
+		return _model->animations.size();
 	}
 
 }

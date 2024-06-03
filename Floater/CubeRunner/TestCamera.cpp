@@ -1,17 +1,17 @@
-﻿#include "Controller.h"
+﻿#include "TestCamera.h"
+#include "../FloaterGameEngine/include/internal/BuiltinComponent.h"
 #include "../FloaterGameEngine/include/Input.h"
 #include <algorithm>
 
 
-Controller::Controller(flt::GameObject* gameObject) :
-	Component<Controller>(gameObject),
-	transform(gameObject->tr),
+TestCamera::TestCamera() :
+	flt::GameObject(), 
 	_speed(10.0f)
 {
-
+	AddComponent<flt::CameraComponent>();
 }
 
-void Controller::Update(float deltaSecond)
+void TestCamera::Update(float deltaSecond)
 {
 	flt::KeyData rButtonDown = flt::GetKey(flt::KeyCode::mouseRButton);
 	if (rButtonDown)

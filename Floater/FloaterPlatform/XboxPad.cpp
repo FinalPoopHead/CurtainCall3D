@@ -1,13 +1,14 @@
 ﻿#include "XboxPad.h"
 #include <string>
 #include "../FloaterUtil/include/FloaterMacro.h"
+#include "../FloaterUtil/include/Hash.h"
 #include <winioctl.h>
 
 #include <setupapi.h>
 #pragma comment(lib, "setupapi.lib")
 
 
-bool flt::Xbox::Initialize(WinGamePad** outGamePadArr)
+bool flt::Xbox::Initialize(WinGamePad* outGamePadArr)
 {
 	HDEVINFO dev = SetupDiGetClassDevsW(&guid, NULL, NULL, DIGCF_DEVICEINTERFACE | DIGCF_PRESENT);
 	if (dev != INVALID_HANDLE_VALUE)
@@ -18,6 +19,7 @@ bool flt::Xbox::Initialize(WinGamePad** outGamePadArr)
 		DWORD index = 0;
 		while (SetupDiEnumDeviceInterfaces(dev, NULL, &guid, index, &idata))
 		{
+			ASSERT(index < 16, "GamePad is full");
 			DWORD size;
 			SetupDiGetDeviceInterfaceDetailW(dev, &idata, NULL, 0, &size, NULL);
 
@@ -31,9 +33,9 @@ bool flt::Xbox::Initialize(WinGamePad** outGamePadArr)
 
 				if (SetupDiGetDeviceInterfaceDetailW(dev, &idata, detail, size, &size, &data))
 				{
-					outGamePadArr[index] = new WinGamePad();
-					outGamePadArr[index]->path = detail->DevicePath;
-					Connect(outGamePadArr[index]);
+					//outGamePadArr[index] = new WinGamePad();
+					outGamePadArr[index].path = detail->DevicePath;
+					Connect(&outGamePadArr[index]);
 				}
 				LocalFree(detail);
 			}
@@ -61,6 +63,8 @@ bool flt::Xbox::Connect(WinGamePad* outGamePad)
 		return false;
 	}
 
+	outGamePad->isConnected = true;
+
 	return true;
 }
 
@@ -70,6 +74,7 @@ bool flt::Xbox::Disconnect(WinGamePad* outGamePad)
 
 	BOOL ret = CloseHandle(outGamePad->handle);
 	outGamePad->handle = NULL;
+	outGamePad->isConnected = false;
 	return ret;
 }
 

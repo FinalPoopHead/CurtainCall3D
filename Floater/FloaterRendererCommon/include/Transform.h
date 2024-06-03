@@ -17,7 +17,7 @@ namespace flt
 	public:
 		//Transform() : Transform(nullptr) {}
 		//Transform(TransformOwner* pOwner) : _position(), _scale(1.0f, 1.0f, 1.0f, 0.0f), _rotation(), _pParent(nullptr), _children(), _worldMatrix(), _isDirty(true), _pOwner(pOwner) {}
-		Transform() : _position(), _scale(1.0f, 1.0f, 1.0f, 0.0f), _rotation(), _pParent(nullptr), _children(), _worldMatrix(), _isDirty(true), _pOwner(nullptr) {}
+		Transform() : _position(0.0f, 0.0f, 0.0f, 1.0f), _scale(1.0f, 1.0f, 1.0f, 0.0f), _rotation(0.0f, 0.0f, 0.0f, 1.0f), _pParent(nullptr), _children(), _worldMatrix(), _isDirty(true), _pOwner(nullptr) {}
 		~Transform();
 
 		Transform(const Transform& other);
@@ -47,19 +47,19 @@ namespace flt
 		void SetWorldRotation(const Quaternion& q);
 
 		Vector4f GetLocalScale() const noexcept { return _scale; }
-		Vector4f GetWorldScale() const noexcept;
 		void SetScale(float x, float y, float z);
 		void SetScale(double x, double y, double z);
 		void SetScale(const Vector3f& scale);
 		void SetScale(const Vector4f& scale);
 
 		void AddLocalPosition(float x, float y, float z);
-		void AddLocalPosition(const Vector4f& position);
-		void AddLocalPosition(const Vector3f& position);
+		void AddLocalPosition(const Vector4f& localPos);
+		void AddLocalPosition(const Vector3f& localPos);
 		void AddWorldPosition(float x, float y, float z);
-		void AddWorldPosition(const Vector4f& position);
-		void AddLocalRotation(const Vector3f& axis, float radian);
-		void AddLocalRotation(const Quaternion& q);
+		void AddWorldPosition(const Vector4f& worldPos);
+		void AddLocalRotation(const Vector3f& localAxis, float radian);
+		void AddRotation(const Vector3f& worldAxis, float radian);
+		void AddRotation(const Quaternion& q);
 		void AddWorldRotation(const Vector3f& axis, float radian);
 
 		void AddScale(float x, float y, float z);

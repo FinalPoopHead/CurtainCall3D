@@ -19,23 +19,27 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\BoxColliderComponent.h" />
-    <ClInclude Include="include\BuiltinComponent.h" />
-    <ClInclude Include="include\CameraComponent.h" />
-    <ClInclude Include="include\GameEngine.h" />
-    <ClInclude Include="include\Component.h" />
+    <ClInclude Include="CollisionPair.h" />
+    <ClInclude Include="include\internal\Collider.h" />
+    <ClInclude Include="include\internal\BoxColliderComponent.h" />
+    <ClInclude Include="include\internal\BuiltinComponent.h" />
+    <ClInclude Include="include\internal\CameraComponent.h" />
+    <ClInclude Include="include\EngineMinimal.h" />
+    <ClInclude Include="include\internal\GameEngine.h" />
+    <ClInclude Include="include\internal\Component.h" />
     <ClInclude Include="Entity.h" />
-    <ClInclude Include="include\GameObject.h" />
+    <ClInclude Include="include\internal\GameObject.h" />
     <ClInclude Include="ID.h" />
     <ClInclude Include="include\Input.h" />
-    <ClInclude Include="include\Scene.h" />
-    <ClInclude Include="include\RendererComponent.h" />
+    <ClInclude Include="include\internal\Scene.h" />
+    <ClInclude Include="include\internal\RendererComponent.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BoxColliderComponent.cpp" />
     <ClCompile Include="CameraComponent.cpp" />
+    <ClCompile Include="Collider.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="GameEngine.cpp" />

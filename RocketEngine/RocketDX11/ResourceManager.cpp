@@ -101,6 +101,11 @@ namespace Rocket::Core
 
 	void ResourceManager::LoadModel(const std::string& fileName, const RawModel* rawModel)
 	{
+		if (_models.find(fileName) != _models.end())
+		{
+			return;
+		}
+
 		if (rawModel->animations.empty())
 		{
 			_models.insert({ fileName, std::make_unique<StaticModel>() });

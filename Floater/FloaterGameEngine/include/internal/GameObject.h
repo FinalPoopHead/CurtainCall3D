@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include "Component.h"
-#include "../../FloaterRendererCommon/include/Transform.h"
-#include "../../FloaterRendererCommon/include/TransformOwner.h"
+#include "../../../FloaterRendererCommon/include/Transform.h"
+#include "../../../FloaterRendererCommon/include/TransformOwner.h"
+#include <type_traits>
 #include <vector>
 #include <string>
 
@@ -19,11 +20,15 @@ namespace flt
 
 		virtual void Start() {}
 		virtual void OnEnable() {}
+		virtual void PreUpdate(float deltaSecond) {}
 		virtual void Update(float deltaSecond) {}
+		virtual void PostUpdate(float deltaSecond) {}
 		virtual void EndDraw() {}
 		virtual void OnDisable() {}
 		virtual void OnDestroy() {}
 		
+
+	public:
 		[[deprecated("Use Template Function")]] bool AddComponent(ComponentBase* component);
 		void RemoveComponent(ComponentBase* component);
 
@@ -41,6 +46,7 @@ namespace flt
 		std::vector<ComponentBase*> _components;
 		bool _isEnable;
 	};
+
 
 	template<ComponentType T>
 	T* flt::GameObject::AddComponent(bool isEnabled /*= true*/)

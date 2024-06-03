@@ -1,5 +1,5 @@
-﻿#include "./include/GameObject.h"
-#include "./include/Scene.h"
+﻿#include "./include/internal/GameObject.h"
+#include "./include/internal/Scene.h"
 
 flt::GameObject::GameObject() :
 	_scene(),
