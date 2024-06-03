@@ -80,6 +80,11 @@ void flt::GameEngine::Finalize()
 	}
 	_currentScene = nullptr;
 
+	for (auto& scene : _scenes)
+	{
+		delete scene;
+	}
+
 	_platform->DestroyRenderer(_renderer);
 	delete _platform;
 
@@ -91,8 +96,10 @@ void flt::GameEngine::Finalize()
 	_physicsEngine = nullptr;
 }
 
-void flt::GameEngine::SetScene(Scene* scene)
+flt::Scene* flt::GameEngine::SetScene(Scene* scene)
 {
+	Scene* ret = _currentScene;
+
 	if(_currentScene != nullptr)
 	{
 		_currentScene->Finalize();
@@ -100,6 +107,13 @@ void flt::GameEngine::SetScene(Scene* scene)
 
 	_currentScene = scene;
 	_currentScene->Initialize();
+
+	return ret;
+}
+
+void flt::GameEngine::AddScene(Scene* scene)
+{
+	_scenes.insert(scene);
 }
 
 flt::Scene* flt::GameEngine::GetCurrentScene()

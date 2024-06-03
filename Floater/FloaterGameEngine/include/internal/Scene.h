@@ -11,7 +11,7 @@
 
 namespace flt
 {
-	template<GameObjectType T, typename... TArgs>
+	template<GameObjectDerived T, typename... TArgs>
 	T* CreateGameObject(bool isEnabled, TArgs&&... args);
 
 	class Scene
@@ -19,7 +19,7 @@ namespace flt
 		friend class GameObject;
 		friend class GameEngine;
 
-		template<GameObjectType T, typename... TArgs>
+		template<GameObjectDerived T, typename... TArgs>
 		friend T* flt::CreateGameObject(bool isEnabled, TArgs&&... args);
 
 	public:
@@ -46,27 +46,27 @@ namespace flt
 		void AddDestroyGameObject(GameObject* gameObject);
 
 	private:
-		template<GameObjectType T, typename... TArgs>
+		template<GameObjectDerived T, typename... TArgs>
 		T* InstantiateGameObject(bool isEnabled, TArgs&&... args);
 
 		void CallCollisionEvent();
 
 	private:
 		std::vector<GameObject*> _gameObjects;
-		std::list<GameObject*> _gameObjectsToCreate;
-		std::list<GameObject*> _gameObjectsToEnable;
-		std::list<GameObject*> _gameObjectsToDisable;
-		std::list<GameObject*> _gameObjectsToDestroy;
+		std::vector<GameObject*> _gameObjectsToCreate;
+		std::vector<GameObject*> _gameObjectsToEnable;
+		std::vector<GameObject*> _gameObjectsToDisable;
+		std::vector<GameObject*> _gameObjectsToDestroy;
 
-		std::list<ComponentBase*> _componentsToEnable;
-		std::list<ComponentBase*> _componentsToDisable;
+		std::vector<ComponentBase*> _componentsToEnable;
+		std::vector<ComponentBase*> _componentsToDisable;
 
 		std::vector<CollisionPair> _collisionPairs;
 		//std::unordered_set<CollisionPair> _collisionSet;
 		bool _collisionFlag = false;
 	};
 
-	template<GameObjectType T, typename... TArgs>
+	template<GameObjectDerived T, typename... TArgs>
 	T* Scene::InstantiateGameObject(bool isEnabled, TArgs&&... args)
 	{
 		GameObject* gameObject = new T(std::forward<TArgs>(args)...);
@@ -82,4 +82,10 @@ namespace flt
 
 		return static_cast<T*>(gameObject);
 	}
+
+	template <typename T>
+	concept SceneDerived = requires(T a)
+	{
+		std::is_base_of_v<flt::Scene, T>;
+	};
 }

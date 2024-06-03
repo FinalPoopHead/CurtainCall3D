@@ -96,8 +96,8 @@ namespace flt
 	}
 
 	template <typename T>
-	concept GameObjectType = requires(T a)
+	concept GameObjectDerived = requires(T a)
 	{
-		std::is_base_of_v<GameObject, T>;
+		std::is_base_of_v<flt::GameObject, T>;
 	};
 }
