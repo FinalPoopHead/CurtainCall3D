@@ -33,7 +33,7 @@ public:
 
 private:
 	//void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
-	//void ConvertToTilePosition(int x, int z, float& outX, float& outZ);
+	void ConvertToTileLocalPosition(int x, int z, float& outX, float& outZ);
 
 	void UpdateBoard();
 

@@ -83,6 +83,13 @@ void TestCamera::Update(float deltaSecond)
 
 		_board->ConvertToTileIndex(pos.x, pos.z, tileX, tileZ);
 
-		std::cout << "index : " << tileX << ", " << tileZ << std::endl;
+		float worldX = 0.0f;
+		float worldZ = 0.0f;
+
+		_board->ConvertToTilePosition(tileX, tileZ, worldX, worldZ);
+
+		std::cout << "index : " << tileX << ", " << tileZ;
+		std::cout << " | center : " << worldX << ", " << worldZ;
+		std::cout << " | world : " << pos.x << ", " << pos.z << std::endl;
 	}
 }

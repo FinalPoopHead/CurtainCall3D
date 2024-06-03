@@ -85,14 +85,19 @@ void Board::ConvertToTileIndex(float x, float z, int& outX, int& outZ)
 	x -= pos.x;
 	z -= pos.z;
 
-	outX = (int)(x / _offset);
-	outZ = (int)(z / _offset);
+	x = x / _offset;
+	z = z / _offset;
+
+	x < 0.0f ? x -= 0.5f : x += 0.5f;
+	z < 0.0f ? z -= 0.5f : z += 0.5f;
+
+	outX = (int)x;
+	outZ = (int)z;
 }
 
 void Board::ConvertToTilePosition(int x, int z, float& outX, float& outZ)
 {
-	outX = (float)x * _offset;
-	outZ = (float)z * _offset;
+	ConvertToTileLocalPosition(x, z, outX, outZ);
 
 	flt::Vector4f pos = this->tr.GetWorldPosition();
 	outX += pos.x;
@@ -129,7 +134,11 @@ void Board::Resize(int newWidth, int newHeight)
 			{
 				_tiles[i][j] = flt::CreateGameObject<Tile>(true);
 				_tiles[i][j]->tr.SetParent(&this->tr);
-				_tiles[i][j]->tr.SetPosition({ i * _offset, 0.0f, j * _offset });
+
+				float x = 0.0f;
+				float z = 0.0f;
+				ConvertToTileLocalPosition(i, j, x, z);
+				_tiles[i][j]->tr.SetPosition({ x, 0.0f, z });
 			}
 		}
 	}
@@ -156,12 +165,25 @@ void Board::Resize(int newWidth, int newHeight)
 		{
 			_tiles[i][j] = flt::CreateGameObject<Tile>(true);
 			_tiles[i][j]->tr.SetParent(&this->tr);
-			_tiles[i][j]->tr.SetPosition({ i * _offset, 0.0f, j * _offset });
+
+			float x = 0.0f;
+			float z = 0.0f;
+			ConvertToTileLocalPosition(i, j, x, z);
+			_tiles[i][j]->tr.SetPosition({ x, 0.0f, z });
 		}
 	}
 
 	_width = newWidth;
 	_height = newHeight;
+}
+
+void Board::ConvertToTileLocalPosition(int x, int z, float& outX, float& outZ)
+{
+	outX = (float)x;
+	outZ = (float)z;
+
+	outX *= _offset;
+	outZ *= _offset;
 }
 
 void Board::UpdateBoard()
