@@ -296,6 +296,7 @@ copy /Y "*.hlsli" "$(SolutionDir)Resources\Shaders";</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Axis.cpp" />
+    <ClCompile Include="BlitPass.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="CubeMesh.cpp" />
@@ -328,6 +329,7 @@ copy /Y "*.hlsli" "$(SolutionDir)Resources\Shaders";</Command>
   <ItemGroup>
     <ClInclude Include="AssimpMathConverter.h" />
     <ClInclude Include="Axis.h" />
+    <ClInclude Include="BlitPass.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeMap.h" />
     <ClInclude Include="CubeMesh.h" />
@@ -366,6 +368,26 @@ copy /Y "*.hlsli" "$(SolutionDir)Resources\Shaders";</Command>
     <ClInclude Include="VertexShader.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="BlitPassPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="BlitPassVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Release|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="BRDF2DLUTPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='R_Release|Win32'">Pixel</ShaderType>

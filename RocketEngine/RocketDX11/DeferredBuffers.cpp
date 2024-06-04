@@ -174,7 +174,6 @@ namespace Rocket::Core
 	{
 		// 렌더링 대상 뷰 배열 및 깊이 스텐실 버퍼를 출력 렌더 파이프라인에 바인딩 합니다.
 		deviceContext->OMSetRenderTargets(BUFFER_COUNT, _renderTargetViewArray->GetAddressOf(), _depthStencilView.Get());
-		deviceContext->RSSetViewports(1, &_viewport);
 	}
 
 	void DeferredBuffers::SetRenderTargets(ID3D11DeviceContext* deviceContext, ID3D11DepthStencilView* depthStencilView)
@@ -218,10 +217,9 @@ namespace Rocket::Core
 		deviceContext->RSSetViewports(1, &_shadowMapViewport);
 	}
 
-	void DeferredBuffers::SetViewportXY(float x, float y)
+	void DeferredBuffers::SetViewport(ID3D11DeviceContext* deviceContext)
 	{
-		_viewport.TopLeftX = x;
-		_viewport.TopLeftY = y;
+		deviceContext->RSSetViewports(1, &_viewport);
 	}
 
 }
