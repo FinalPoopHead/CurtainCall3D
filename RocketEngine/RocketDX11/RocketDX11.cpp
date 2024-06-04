@@ -807,6 +807,8 @@ namespace Rocket::Core
 		{
 			RenderDebug();
 		}
+
+		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
 	}
 
 	void RocketDX11::InitSplitScreen()
