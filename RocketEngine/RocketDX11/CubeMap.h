@@ -15,6 +15,7 @@ namespace Rocket::Core
 	class Texture;
 	class VertexShader;
 	class PixelShader;
+	class Camera;
 }
 
 namespace Rocket::Core
@@ -27,7 +28,7 @@ namespace Rocket::Core
 
 	public:
 		void Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext);
-		void Render(ID3D11DeviceContext* deviceContext);
+		void Render(ID3D11DeviceContext* deviceContext, Camera* cam);
 		void LoadTexture(const std::string& fileName);
 		void SetShader(VertexShader* vertexShader, PixelShader* pixelShader);
 		void SetIBLGenShader(PixelShader* irradianceMapPS, PixelShader* prefilteredMapPS, PixelShader* BRDF2DLUTPS);

@@ -6,6 +6,7 @@
 namespace Rocket::Core
 {
 	class RocketTransform;
+	class Camera;
 }
 
 namespace Rocket::Core
@@ -29,7 +30,7 @@ namespace Rocket::Core
 
 		// For Shadow Map
 	public:
-		void Update();
+		void Update(Camera* cam);
 		bool FrustumCulling(const DirectX::BoundingBox& boundingBox);
 		bool FrustumCulling(const DirectX::BoundingOrientedBox& boundingOrientedBox);
 		bool FrustumCulling(const DirectX::BoundingSphere& boundingSphere);

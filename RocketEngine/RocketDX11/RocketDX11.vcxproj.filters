@@ -88,6 +88,9 @@
     <ClCompile Include="StaticModelRenderer.cpp">
       <Filter>Component\Renderer\StaticModelRenderer</Filter>
     </ClCompile>
+    <ClCompile Include="BlitPass.cpp">
+      <Filter>DeferredShading\BlitPass</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Axis.h">
@@ -203,6 +206,9 @@
     </ClInclude>
     <ClInclude Include="StaticModelRenderer.h">
       <Filter>Component\Renderer\StaticModelRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="BlitPass.h">
+      <Filter>DeferredShading\BlitPass</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -380,6 +386,12 @@
     <Filter Include="Resource\Shader\HLSL\Deferred\StaticModel">
       <UniqueIdentifier>{afde9007-7363-4529-96f7-acb3a0bcfbf7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DeferredShading\BlitPass">
+      <UniqueIdentifier>{12f6f8ea-3bd3-413d-9a10-608d5e07ee47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Shader\HLSL\Deferred\BlitPass">
+      <UniqueIdentifier>{e0794d76-6d81-40f9-99c8-000ecf4c56c0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ColorPS.hlsl">
@@ -471,6 +483,12 @@
     </FxCompile>
     <FxCompile Include="StaticModelShadowVS.hlsl">
       <Filter>Resource\Shader\HLSL\Deferred\ShadowPass</Filter>
+    </FxCompile>
+    <FxCompile Include="BlitPassVS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\BlitPass</Filter>
+    </FxCompile>
+    <FxCompile Include="BlitPassPS.hlsl">
+      <Filter>Resource\Shader\HLSL\Deferred\BlitPass</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

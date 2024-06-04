@@ -24,6 +24,8 @@ namespace Rocket::Core
 	class LightPass;
 	class ShadowPass;
 	class IRenderable;
+	class Camera;
+	class BlitPass;
 }
 
 namespace Rocket::Core
@@ -44,17 +46,20 @@ namespace Rocket::Core
 		virtual void Finalize() override;
 
 	private:
+		void InitSplitScreen();
 		void CreateDepthStencilStates();
+		void FrustumCulling(Camera* cam);
+		void RenderPerCamera(Camera* cam, DeferredBuffers* gBuffer, ID3D11RenderTargetView** renderTargetView);		// 카메라 별로 렌더링 하기 위해
 
 		void BeginRender(float r = 0.1f, float g = 0.1f, float b = 0.1f, float a = 0.1f);
-		void RenderHelperObject();
+		void RenderHelperObject(Camera* cam);
 		void RenderMesh();
 		void RenderText();
 		void RenderLine();
 		void RenderTexture();
-		void RenderCubeMap();
+		void RenderCubeMap(Camera* cam);
 		void RenderDebug();
-		void GBufferPass();
+		void GBufferPass(Camera* cam, DeferredBuffers* gBuffer);
 		void EndRender();
 
 		/// Initialize Member
@@ -74,16 +79,24 @@ namespace Rocket::Core
 
 		UINT _m4xMsaaQuality;
 
+		// 메인 렌더타겟 및 뷰포트
 		ComPtr<IDXGISwapChain> _swapChain;
 		ComPtr<ID3D11Texture2D> _backBuffer;
-		ComPtr<ID3D11RenderTargetView> _renderTargetView;
-		ComPtr<ID3D11Texture2D> _depthStencilBuffer;					// Deferred일때는 이것을 사용하지않고, DeferredBuffer의 뎁스스텐실 버퍼를 사용한다.
+		ComPtr<ID3D11RenderTargetView> _backBufferRTV;				// 백버퍼의 RenderTargetView
+		ComPtr<ID3D11Texture2D> _backBufferDepthBuffer;											// Deferred일때는 이것을 사용하지않고, DeferredBuffer의 뎁스스텐실 버퍼를 사용한다.
+		ComPtr<ID3D11DepthStencilView> _backBufferDSV;				// 백버퍼의 DepthStencilView	// Deferred일때는 이것을 사용하지않고, DeferredBuffer의 뎁스스텐실 버퍼를 사용한다.
+		D3D11_VIEWPORT _viewport;
+
+		// 화면 분할
+		// 0 : left, 1 : right
+		ComPtr<ID3D11Texture2D> _renderTargetTextureArr[2];
+		ComPtr<ID3D11RenderTargetView> _renderTargetViewArr[2];
+		ComPtr<ID3D11ShaderResourceView> _shaderResourceViewArr[2];
+		D3D11_VIEWPORT _viewportArr[2];		
+
 		ComPtr<ID3D11DepthStencilState> _defaultDepthStencilState;
 		ComPtr<ID3D11DepthStencilState> _cubeMapDepthStencilState;
-		ComPtr<ID3D11DepthStencilView> _depthStencilView;				// Deferred일때는 이것을 사용하지않고, DeferredBuffer의 뎁스스텐실 버퍼를 사용한다.
 		ComPtr<ID3D11BlendState> _defaultBlendState;
-		
-		D3D11_VIEWPORT _viewport;
 
 	private:
 		DirectX::SpriteBatch* _spriteBatch;
@@ -98,8 +111,10 @@ namespace Rocket::Core
 		/// deferred 관련
 	private:
 		std::unique_ptr<DeferredBuffers> _deferredBuffers;
+		std::unique_ptr<DeferredBuffers> _deferredBufferArr[2];		// 0 : left, 1 : right
 		std::unique_ptr<LightPass> _lightPass;
 		std::unique_ptr<ShadowPass> _shadowPass;
+		std::unique_ptr<BlitPass> _blitPass;
 
 	private:
 		ObjectManager& _objectManager;

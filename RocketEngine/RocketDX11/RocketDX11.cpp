@@ -26,6 +26,7 @@
 #include "DeferredBuffers.h"
 #include "LightPass.h"
 #include "ShadowPass.h"
+#include "BlitPass.h"
 
 namespace Rocket::Core
 {
@@ -69,7 +70,7 @@ namespace Rocket::Core
 		_device(), _deviceContext(),
 		_featureLevel(), _m4xMsaaQuality(),
 		_swapChain(), _backBuffer(),
-		_renderTargetView(), _depthStencilBuffer(), _depthStencilView(),
+		_backBufferRTV(), _backBufferDepthBuffer(), _backBufferDSV(),
 		_viewport(),
 		_objectManager(ObjectManager::Instance()),
 		_resourceManager(ResourceManager::Instance()),
@@ -195,7 +196,7 @@ namespace Rocket::Core
 		hr = _device->CreateRenderTargetView(
 			_backBuffer.Get(),
 			nullptr,
-			_renderTargetView.GetAddressOf()
+			_backBufferRTV.GetAddressOf()
 		);
 
 		D3D11_TEXTURE2D_DESC backBufferDesc;
@@ -218,7 +219,7 @@ namespace Rocket::Core
 		depthBufferDesc.CPUAccessFlags = 0;
 		depthBufferDesc.MiscFlags = 0;
 
-		HR(_device->CreateTexture2D(&depthBufferDesc, nullptr, &_depthStencilBuffer));
+		HR(_device->CreateTexture2D(&depthBufferDesc, nullptr, &_backBufferDepthBuffer));
 
 		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 		ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
@@ -228,7 +229,7 @@ namespace Rocket::Core
 		depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 		depthStencilViewDesc.Texture2D.MipSlice = 0;
 
-		HR(_device->CreateDepthStencilView(_depthStencilBuffer.Get(), &depthStencilViewDesc, &_depthStencilView));
+		HR(_device->CreateDepthStencilView(_backBufferDepthBuffer.Get(), &depthStencilViewDesc, &_backBufferDSV));
 		//HR(_device->CreateDepthStencilView(_depthStencilBuffer.Get(), NULL, &_depthStencilView));
 
 		CreateDepthStencilStates();
@@ -243,12 +244,39 @@ namespace Rocket::Core
 		_viewport.MinDepth = 0;
 		_viewport.MaxDepth = 1;
 
+		/// 화면분할에 필요한 것들 초기화
+		{
+			InitSplitScreen();
+
+			ZeroMemory(&_viewportArr[0], sizeof(D3D11_VIEWPORT));
+			_viewportArr[0].TopLeftX = 0;
+			_viewportArr[0].TopLeftY = 0;
+			_viewportArr[0].Height = (float)backBufferDesc.Height;
+			_viewportArr[0].Width = (float)backBufferDesc.Width / 2;
+			_viewportArr[0].MinDepth = 0;
+			_viewportArr[0].MaxDepth = 1;
+
+			ZeroMemory(&_viewportArr[1], sizeof(D3D11_VIEWPORT));
+			_viewportArr[1].TopLeftX = (float)backBufferDesc.Width / 2;
+			_viewportArr[1].TopLeftY = 0;
+			_viewportArr[1].Height = (float)backBufferDesc.Height;
+			_viewportArr[1].Width = (float)backBufferDesc.Width / 2;
+			_viewportArr[1].MinDepth = 0;
+			_viewportArr[1].MaxDepth = 1;
+		}
+
 		/// 기본 viewPort로 설정해준다.
 		_deviceContext->RSSetViewports(1, &_viewport);
 
 		/// deferredBuffers 초기화
 		_deferredBuffers = std::make_unique<DeferredBuffers>();
 		_deferredBuffers->Initialize(_device.Get(), depthBufferDesc.Width, depthBufferDesc.Height, 1000.0f, 0.1f);
+		// player 1 버퍼
+		_deferredBufferArr[0] = std::make_unique<DeferredBuffers>();
+		_deferredBufferArr[0]->Initialize(_device.Get(), depthBufferDesc.Width / 2, depthBufferDesc.Height, 1000.0f, 0.1f);
+		// player 2 버퍼
+		_deferredBufferArr[1] = std::make_unique<DeferredBuffers>();
+		_deferredBufferArr[1]->Initialize(_device.Get(), depthBufferDesc.Width / 2, depthBufferDesc.Height, 1000.0f, 0.1f);
 
 		/// DX 초기화 끝났으니 Manager들 초기화해준다.
 		_resourceManager.Initialize(_device.Get(), _deviceContext.Get());
@@ -263,6 +291,10 @@ namespace Rocket::Core
 		_shadowPass->Initialize(_resourceManager.GetVertexShader("StaticMeshShadowVS"), _resourceManager.GetVertexShader("DynamicModelShadowVS")
 			, _resourceManager.GetPixelShader("ShadowMapPS"));
 		_shadowPass->SetStaticModelVS(_resourceManager.GetVertexShader("StaticModelShadowVS"));
+
+		/// BlitPass 초기화
+		_blitPass = std::make_unique<BlitPass>();
+		_blitPass->Initialize(_device.Get(), _resourceManager.GetVertexShader("BlitPassVS"), _resourceManager.GetPixelShader("BlitPassPS"));
 
 		/// SpriteBatch, LineBatch, BasicEffect 초기화
 		_spriteBatch = new DirectX::SpriteBatch(_deviceContext.Get());
@@ -291,20 +323,24 @@ namespace Rocket::Core
 		color[2] = b;	// b
 		color[3] = a;	// a                                
 		// Clear the back buffer.
-		_deviceContext->ClearRenderTargetView(_renderTargetView.Get(), color);
+		_deviceContext->ClearRenderTargetView(_backBufferRTV.Get(), color);
 		// Clear the depth buffer.
 		_deviceContext->ClearDepthStencilView(_deferredBuffers->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		/// RenderTargetView 와 DepthStencilBuffer를 출력 병합 단계(Output Merger Stage)에 바인딩
 		//_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
-		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
+		_deviceContext->OMSetRenderTargets(1, _backBufferRTV.GetAddressOf(), _backBufferDSV.Get());
 
 		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
 		//Blend State Set.
 		_deviceContext->OMSetBlendState(_defaultBlendState.Get(), nullptr, 0xFF);
 
+		_deviceContext->RSSetViewports(1, &_viewport);
+
 		/// Deferred
 		_deferredBuffers->ClearRenderTargets(_deviceContext.Get(), 0.0f, 0.0f, 0.0f, 0.3f);
+		_deferredBufferArr[0]->ClearRenderTargets(_deviceContext.Get(), 1.0f, 0.0f, 0.0f, 1.0f);
+		_deferredBufferArr[1]->ClearRenderTargets(_deviceContext.Get(), 0.0f, 1.0f, 0.0f, 1.0f);
 	}
 
 	void RocketDX11::RenderMesh()
@@ -400,40 +436,19 @@ namespace Rocket::Core
 	{
 		_deltaTime = deltaTime;
 
-		Camera::GetMainCamera()->Update();
-		for (auto& light : _objectManager.GetDirectionalLightList())
+		Camera** mainCams = Camera::GetMainCamArr();
+		for (int i = 0; i < 2; i++)
 		{
-			light->Update();
-		}
-		
-		// Culling 및 Update Animation
-		Camera* mainCam = Camera::GetMainCamera();
-
-		for (auto meshRenderer : _objectManager.GetMeshRenderers())
-		{
-			if (mainCam->FrustumCulling(meshRenderer->GetBoundingBox()))
+			if (mainCams[i] != nullptr)
 			{
-				_renderList.push_back(meshRenderer);
+				mainCams[i]->Update();
 			}
 		}
 
-		for (auto staticModelRenderer : _objectManager.GetStaticModelRenderers())
-		{
-			if (mainCam->FrustumCulling(staticModelRenderer->GetBoundingBox()))
-			{
-				_renderList.push_back(staticModelRenderer);
-			}
-		}
-
+		// Update Animation
 		for (auto dynamicModelRenderer : _objectManager.GetDynamicModelRenderers())
 		{
-			bool isCulled = !mainCam->FrustumCulling(dynamicModelRenderer->GetBoundingBox());
-			dynamicModelRenderer->UpdateAnimation(deltaTime, isCulled);
-
-			if (!isCulled)
-			{
-				_renderList.push_back(dynamicModelRenderer);
-			}
+			dynamicModelRenderer->UpdateAnimation(deltaTime);
 		}
 
 		_objectManager._debugText->SetText(
@@ -451,33 +466,29 @@ namespace Rocket::Core
 	{
 		BeginRender(1.0f, 0.0f, 1.0f, 1.0f);
 
-		// TODO : 섀도우 맵 만들고 LightPass에 넘겨줘야함.
-		_shadowPass->GenerateShadowMap(_deviceContext.Get(), _deferredBuffers.get());
-
-		_deviceContext->RSSetViewports(1, &_viewport);
-
-		GBufferPass();
-
-		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), nullptr);
-		_lightPass->Render(_deviceContext.Get(), _deferredBuffers.get());
-
-		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _deferredBuffers->GetDepthStencilView());
-		if (_isDebugMode)
+		// 카메라가 하나 일 때
+		if (Camera::GetMainCamera(1) == nullptr)
 		{
-			RenderHelperObject();
+			auto mainCam = Camera::GetMainCamera(0);
+
+			RenderPerCamera(mainCam, _deferredBuffers.get(), _backBufferRTV.GetAddressOf());
 		}
-
-		RenderCubeMap();
-
-		_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), nullptr);
-
-		// 		RenderLine();
-		RenderText();
-		RenderTexture();
-
-		if (_isDebugMode)
+		else	// 카메라가 두 개일 때
 		{
-			RenderDebug();
+			for (int i = 0; i < 2; i++)
+			//for (int i = 1; i >= 0; i--)
+			{
+				auto mainCam = Camera::GetMainCamera(i);
+
+				RenderPerCamera(mainCam, _deferredBufferArr[i].get(), _renderTargetViewArr[i].GetAddressOf());
+				// TODO : 그려진 텍스쳐를 맞는 뷰포트를 이용해 백버퍼에 쓴다.
+				_deviceContext->OMSetRenderTargets(1, _backBufferRTV.GetAddressOf(), nullptr);
+				_deviceContext->RSSetViewports(1, &_viewportArr[i]);
+				_blitPass->Render(_deviceContext.Get(), _shaderResourceViewArr[i].GetAddressOf());
+
+				_renderList.clear();
+				_renderList.reserve(512);
+			}
 		}
 
 		EndRender();
@@ -492,8 +503,11 @@ namespace Rocket::Core
 		delete _lineBatch;
 		_basicEffect.reset();
 		_deferredBuffers.reset();
+		_deferredBufferArr[0].reset();
+		_deferredBufferArr[1].reset();
 		_lightPass.reset();
 		_shadowPass.reset();
+		_blitPass.reset();
 
 		// TODO : 여기서 Release를 먼저 해줬더니 아래에서 Reset 하면서 한번 더 지워서 RefCount가 -1이 되는 녀석이 하나 있다.. 뭐하는친구일까?
 // 
@@ -556,9 +570,9 @@ namespace Rocket::Core
 		_deviceContext->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETdeviceContext") - 1, L"ROCKETdeviceContext");
 		_swapChain->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETswapChain") - 1, L"ROCKETswapChain");
 		_backBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETbackBuffer") - 1, L"ROCKETbackBuffer");
-		_renderTargetView->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETrenderTargetView") - 1, L"ROCKETrenderTargetView");
-		_depthStencilBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETdepthStencilBuffer") - 1, L"ROCKETdepthStencilBuffer");
-		_depthStencilView->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETdepthStencilView") - 1, L"ROCKETdepthStencilView");
+		_backBufferRTV->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETrenderTargetView") - 1, L"ROCKETrenderTargetView");
+		_backBufferDepthBuffer->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETdepthStencilBuffer") - 1, L"ROCKETdepthStencilBuffer");
+		_backBufferDSV->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETdepthStencilView") - 1, L"ROCKETdepthStencilView");
 		_defaultDepthStencilState->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETdefaultDepthStencilState") - 1, L"ROCKETdefaultDepthStencilState");
 		_cubeMapDepthStencilState->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETcubeMapDepthStencilState") - 1, L"ROCKETcubeMapDepthStencilState");
 		_defaultBlendState->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"ROCKETdefaultBlendState") - 1, L"ROCKETdefaultBlendState");
@@ -568,19 +582,24 @@ namespace Rocket::Core
 		_deviceContext.Reset();
 		_swapChain.Reset();
 		_backBuffer.Reset();
-		_renderTargetView.Reset();
-		_depthStencilBuffer.Reset();
-		_depthStencilView.Reset();
+		_backBufferRTV.Reset();
+		_backBufferDepthBuffer.Reset();
+		_backBufferDSV.Reset();
 		_defaultDepthStencilState.Reset();
 		_cubeMapDepthStencilState.Reset();
 		_defaultBlendState.Reset();
 		_lineInputLayout.Reset();
+
+		for (int i = 0; i < 2; i++)
+		{
+			_renderTargetTextureArr[i].Reset();
+			_renderTargetViewArr[i].Reset();
+			_shaderResourceViewArr[i].Reset();
+		}
 	}
 
-	void RocketDX11::RenderHelperObject()
+	void RocketDX11::RenderHelperObject(Camera* cam)
 	{
-		auto cam = Camera::GetMainCamera();
-
 		_objectManager._grid->Update(DirectX::XMMatrixIdentity(), cam->GetViewMatrix(), cam->GetProjectionMatrix());
 		_objectManager._grid->Render(_deviceContext.Get());
 		_objectManager._axis->Update(DirectX::XMMatrixIdentity(), cam->GetViewMatrix(), cam->GetProjectionMatrix());
@@ -671,10 +690,10 @@ namespace Rocket::Core
 		HR(_device->CreateDepthStencilState(&cubeMapDepthStencilDesc, _cubeMapDepthStencilState.GetAddressOf()));
 	}
 
-	void RocketDX11::RenderCubeMap()
-	{
+	void RocketDX11::RenderCubeMap(Camera* cam)
+{
 		_deviceContext->OMSetDepthStencilState(_cubeMapDepthStencilState.Get(), 0);
-		_objectManager.GetCubeMap()->Render(_deviceContext.Get());
+		_objectManager.GetCubeMap()->Render(_deviceContext.Get(), cam);
 		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
 	}
 
@@ -696,7 +715,7 @@ namespace Rocket::Core
 			, DirectX::Colors::White
 			, 0.0f							// 회전 각도
 			, DirectX::XMFLOAT2(0, 0)		// 이미지의 원점 : 0.0f,0.0f가 좌측상단
-			, 1.0f/4.0f);
+			, 1.0f / 4.0f);
 
 
 		for (int i = 0; i < BUFFER_COUNT; i++)
@@ -716,22 +735,141 @@ namespace Rocket::Core
 		_spriteBatch->End();
 	}
 
-	void RocketDX11::GBufferPass()
+	void RocketDX11::GBufferPass(Camera* cam, DeferredBuffers* gBuffer)
 	{
-		// Frustum Culling
-		Camera* mainCam = Camera::GetMainCamera();
-
 		// Set RenderTarget
-		_deferredBuffers->SetRenderTargets(_deviceContext.Get());
+		gBuffer->SetRenderTargets(_deviceContext.Get());
+		gBuffer->SetViewport(_deviceContext.Get());
 		// _deferredBuffers->SetRenderTargets(_deviceContext.Get(), _depthStencilView.Get());
 
 		// Draw On G-Buffers
 		for (auto& renderable : _renderList)
 		{
-			renderable->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
+			renderable->Render(_deviceContext.Get(), cam->GetViewMatrix(), cam->GetProjectionMatrix());
 		}
 
 		// Debug Text
 		_objectManager._debugText->Append("\nObjects Draw : " + std::to_string(_renderList.size()));
 	}
+
+	void RocketDX11::FrustumCulling(Camera* cam)
+	{
+		for (auto meshRenderer : _objectManager.GetMeshRenderers())
+		{
+			if (cam->FrustumCulling(meshRenderer->GetBoundingBox()))
+			{
+				_renderList.push_back(meshRenderer);
+			}
+		}
+
+		for (auto staticModelRenderer : _objectManager.GetStaticModelRenderers())
+		{
+			if (cam->FrustumCulling(staticModelRenderer->GetBoundingBox()))
+			{
+				_renderList.push_back(staticModelRenderer);
+			}
+		}
+
+		for (auto dynamicModelRenderer : _objectManager.GetDynamicModelRenderers())
+		{
+			if (cam->FrustumCulling(dynamicModelRenderer->GetBoundingBox()))
+			{
+				_renderList.push_back(dynamicModelRenderer);
+			}
+		}
+	}
+
+	void RocketDX11::RenderPerCamera(Camera* cam, DeferredBuffers* gBuffer, ID3D11RenderTargetView** renderTargetView)
+	{
+		for (auto& light : _objectManager.GetDirectionalLightList())
+		{
+			light->Update(cam);
+		}
+
+		FrustumCulling(cam);
+
+		_shadowPass->GenerateShadowMap(_deviceContext.Get(), gBuffer);
+
+		//_deviceContext->RSSetViewports(1, &_viewport);
+
+		GBufferPass(cam, gBuffer);
+
+		_deviceContext->OMSetRenderTargets(1, renderTargetView, nullptr);
+		_lightPass->Render(_deviceContext.Get(), gBuffer, cam);
+
+		_deviceContext->OMSetRenderTargets(1, renderTargetView, gBuffer->GetDepthStencilView());
+		if (_isDebugMode)
+		{
+			RenderHelperObject(cam);
+		}
+		RenderCubeMap(cam);
+
+		_deviceContext->OMSetRenderTargets(1, renderTargetView, nullptr);
+
+		// 		RenderLine();
+		RenderText();
+		RenderTexture();
+
+		if (_isDebugMode)
+		{
+			RenderDebug();
+		}
+
+		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
+	}
+
+	void RocketDX11::InitSplitScreen()
+	{
+		UINT m4xMsaaQuality;
+		HR(_device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, 4, &m4xMsaaQuality));
+
+		// 렌더 타겟 텍스쳐 생성.
+		D3D11_TEXTURE2D_DESC textureDesc;
+		ZeroMemory(&textureDesc, sizeof(textureDesc));
+
+		textureDesc.Width = _screenWidth / 2;
+		textureDesc.Height = _screenHeight;
+		textureDesc.MipLevels = 1;
+		textureDesc.ArraySize = 1;
+		textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		textureDesc.SampleDesc.Count = 1;
+		textureDesc.SampleDesc.Quality = 0;
+		textureDesc.Usage = D3D11_USAGE_DEFAULT;
+		textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+		textureDesc.CPUAccessFlags = 0;
+		textureDesc.MiscFlags = 0;
+
+		for (int i = 0; i < 2; i++)
+		{
+			HR(_device->CreateTexture2D(&textureDesc, nullptr, _renderTargetTextureArr[i].GetAddressOf()));
+		}
+
+		// 렌더 타겟 뷰 생성.
+		D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+		ZeroMemory(&renderTargetViewDesc, sizeof(renderTargetViewDesc));
+
+		renderTargetViewDesc.Format = textureDesc.Format;
+		renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+		renderTargetViewDesc.Texture2D.MipSlice = 0;
+
+		for (int i = 0; i < 2; i++)
+		{
+			HR(_device->CreateRenderTargetView(_renderTargetTextureArr[i].Get(), &renderTargetViewDesc, _renderTargetViewArr[i].GetAddressOf()));
+		}
+
+		// 셰이더 리소스 뷰 생성.
+		D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
+		ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
+
+		shaderResourceViewDesc.Format = textureDesc.Format;
+		shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+		shaderResourceViewDesc.Texture2D.MipLevels = 1;
+
+		for (int i = 0; i < 2; i++)
+		{
+			HR(_device->CreateShaderResourceView(_renderTargetTextureArr[i].Get(), &shaderResourceViewDesc, _shaderResourceViewArr[i].GetAddressOf()));
+		}
+	}
+
 }

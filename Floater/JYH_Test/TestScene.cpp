@@ -11,6 +11,9 @@ void TestScene::Initialize()
 	GlideObject* glideObject = flt::CreateGameObject<GlideObject>(true);
 	glideObject->tr.SetPosition(0.0f, 20.0f, -400.0f);
 
+	GlideObject* glideObject2 = flt::CreateGameObject<GlideObject>(true);
+	glideObject2->tr.SetPosition(0.0f, 20.0f, -500.0f);
+
 	TestGameObejct* tObject = flt::CreateGameObject<TestGameObejct>(true);
 	tObject->tr.SetPosition(0.0f, 201.0f, 0.0f);
 

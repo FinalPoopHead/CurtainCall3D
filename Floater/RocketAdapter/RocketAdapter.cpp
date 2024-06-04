@@ -106,7 +106,8 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 	{
 		// 카메라 등록 로직
 		rocketObject->camera = factory->CreateCamera();
-		rocketObject->camera->SetAsMainCamera();
+		//rocketObject->camera->SetAsMainCamera();
+		rocketObject->camera->AddToMainCamera();
 		rocketObject->camera->BindTransform(&rocketObject->rocketTransform);
 	}
 
