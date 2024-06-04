@@ -589,6 +589,13 @@ namespace Rocket::Core
 		_cubeMapDepthStencilState.Reset();
 		_defaultBlendState.Reset();
 		_lineInputLayout.Reset();
+
+		for (int i = 0; i < 2; i++)
+		{
+			_renderTargetTextureArr[i].Reset();
+			_renderTargetViewArr[i].Reset();
+			_shaderResourceViewArr[i].Reset();
+		}
 	}
 
 	void RocketDX11::RenderHelperObject(Camera* cam)
