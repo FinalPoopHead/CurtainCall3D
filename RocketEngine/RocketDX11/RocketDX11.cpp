@@ -88,6 +88,9 @@ namespace Rocket::Core
 
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	/// public function
+
 	void RocketDX11::Initialize(void* hWnd, int screenWidth, int screenHeight)
 	{
 		HRESULT hr = S_OK;
@@ -314,188 +317,6 @@ namespace Rocket::Core
 			&_lineInputLayout));
 	}
 
-	void RocketDX11::BeginRender(float r, float g, float b, float a)
-	{
-		float color[4];
-
-		// Setup the color to clear the buffer to.
-		color[0] = r;	// r
-		color[1] = g;	// g
-		color[2] = b;	// b
-		color[3] = a;	// a                                
-		// Clear the back buffer.
-		_deviceContext->ClearRenderTargetView(_backBufferRTV.Get(), color);
-		// Clear the depth buffer.
-		_deviceContext->ClearDepthStencilView(_deferredBuffers->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-		/// RenderTargetView 와 DepthStencilBuffer를 출력 병합 단계(Output Merger Stage)에 바인딩
-		//_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
-		_deviceContext->OMSetRenderTargets(1, _backBufferRTV.GetAddressOf(), _backBufferDSV.Get());
-
-		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
-		//Blend State Set.
-		_deviceContext->OMSetBlendState(_defaultBlendState.Get(), nullptr, 0xFF);
-
-		_deviceContext->RSSetViewports(1, &_viewport);
-
-		/// Deferred
-		_deferredBuffers->ClearRenderTargets(_deviceContext.Get(), 0.0f, 0.0f, 0.0f, 0.3f);
-		_deferredBufferArr[0]->ClearRenderTargets(_deviceContext.Get(), 1.0f, 0.0f, 0.0f, 1.0f);
-		_deferredBufferArr[1]->ClearRenderTargets(_deviceContext.Get(), 0.0f, 1.0f, 0.0f, 1.0f);
-	}
-
-	void RocketDX11::RenderMesh()
-	{
-		// Frustum Culling
-		Camera* mainCam = Camera::GetMainCamera();
-
-		std::vector<IRenderable*> renderList;
-		renderList.reserve(256);
-
-		for (auto meshRenderer : _objectManager.GetMeshRenderers())
-		{
-			if (mainCam->FrustumCulling(meshRenderer->GetBoundingBox()))
-			{
-				renderList.push_back(meshRenderer);
-			}
-		}
-
-		for (auto dynamicModelRenderer : _objectManager.GetDynamicModelRenderers())
-		{
-			if (mainCam->FrustumCulling(dynamicModelRenderer->GetBoundingBox()))
-			{
-				renderList.push_back(dynamicModelRenderer);
-			}
-		}
-
-		// TODO : 전체 리스트에 있는 것들을 그리는 것이 아니라 현재 씬만 그려야 한다..
-// 		for (auto meshRenderer : _objectManager.GetStaticModelRenderers())
-// 		{
-// 			meshRenderer->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
-// 		}
-// 
-// 		for (auto dynamicModelRenderer : _objectManager.GetDynamicModelRenderers())
-// 		{
-// 			dynamicModelRenderer->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
-// 		}
-
-		for (auto& renderable : renderList)
-		{
-			renderable->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
-		}
-
-		_objectManager._debugText->Append("\nObjects Draw : " + std::to_string(renderList.size()));
-	}
-
-	void RocketDX11::RenderText()
-	{
-		_spriteBatch->Begin();
-		for (auto textRenderer : _objectManager.GetTextList())
-		{
-			textRenderer->Render(_spriteBatch);
-		}
-		_spriteBatch->End();
-	}
-
-	void RocketDX11::RenderTexture()
-	{
-		_spriteBatch->Begin();
-		// 이미지(UI)를 그리기 위한 함수
-		for (auto imageRenderer : _objectManager.GetImageList())
-		{
-			imageRenderer->Render(_spriteBatch);
-		}
-		_spriteBatch->End();
-	}
-
-	void RocketDX11::EndRender()
-	{
-		// Present the back buffer to the screen since rendering is complete.
-		if (_vSyncEnabled)
-		{
-			// Lock to screen refresh rate.
-			_swapChain->Present(1, 0);
-		}
-		else
-		{
-			// Present as fast as possible.
-			_swapChain->Present(0, 0);
-		}
-
-		_renderList.clear();
-		_renderList.reserve(512);
-
-		return;
-	}
-
-	void Rocket::Core::RocketDX11::SetDebugMode(bool isDebug)
-	{
-		_isDebugMode = isDebug;
-	}
-
-	void RocketDX11::Update(float deltaTime, int fps /*= 0*/)
-	{
-		_deltaTime = deltaTime;
-
-		Camera** mainCams = Camera::GetMainCamArr();
-		for (int i = 0; i < 2; i++)
-		{
-			if (mainCams[i] != nullptr)
-			{
-				mainCams[i]->Update();
-			}
-		}
-
-		// TODO : 원래 컬링도 같이 진행해서 불필요한 애니메이션 연산을 줄였는데 멀티카메라 때문에 어려워졌다 어떻게 하지..?
-		// Update Animation
-		for (auto dynamicModelRenderer : _objectManager.GetDynamicModelRenderers())
-		{
-			dynamicModelRenderer->UpdateAnimation(deltaTime);
-		}
-
-		_objectManager._debugText->SetText(
-			"deltaTime : " + std::to_string(_deltaTime)
-			+ "\nfps : " + std::to_string(fps)
-		);
-	}
-
-	void RocketDX11::OnResize(int _width, int _height)
-	{
-
-	}
-
-	void RocketDX11::Render()
-	{
-		BeginRender(1.0f, 0.0f, 1.0f, 1.0f);
-
-		// 카메라가 하나 일 때
-		if (Camera::GetMainCamera(1) == nullptr)
-		{
-			auto mainCam = Camera::GetMainCamera(0);
-
-			RenderPerCamera(mainCam, _deferredBuffers.get(), _backBufferRTV.GetAddressOf());
-		}
-		else	// 카메라가 두 개일 때
-		{
-			for (int i = 0; i < 2; i++)
-			//for (int i = 1; i >= 0; i--)
-			{
-				auto mainCam = Camera::GetMainCamera(i);
-
-				RenderPerCamera(mainCam, _deferredBufferArr[i].get(), _renderTargetViewArr[i].GetAddressOf());
-				// TODO : 그려진 텍스쳐를 맞는 뷰포트를 이용해 백버퍼에 쓴다.
-				_deviceContext->OMSetRenderTargets(1, _backBufferRTV.GetAddressOf(), nullptr);
-				_deviceContext->RSSetViewports(1, &_viewportArr[i]);
-				_blitPass->Render(_deviceContext.Get(), _shaderResourceViewArr[i].GetAddressOf());
-
-				_renderList.clear();
-				_renderList.reserve(512);
-			}
-		}
-
-		EndRender();
-	}
-
 	void RocketDX11::Finalize()
 	{
 		_objectManager.Finalize();
@@ -600,38 +421,122 @@ namespace Rocket::Core
 		}
 	}
 
-	void RocketDX11::RenderHelperObject(Camera* cam)
+	void RocketDX11::Update(float deltaTime, int fps /*= 0*/)
 	{
-		_objectManager._grid->Update(DirectX::XMMatrixIdentity(), cam->GetViewMatrix(), cam->GetProjectionMatrix());
-		_objectManager._grid->Render(_deviceContext.Get());
-		_objectManager._axis->Update(DirectX::XMMatrixIdentity(), cam->GetViewMatrix(), cam->GetProjectionMatrix());
-		_objectManager._axis->Render(_deviceContext.Get());
-	}
+		_deltaTime = deltaTime;
 
-	void RocketDX11::RenderLine()
-	{
-		_basicEffect->SetWorld(DirectX::XMMatrixIdentity());
-		_basicEffect->SetView(Camera::GetMainCamera()->GetViewMatrix());
-		_basicEffect->SetProjection(Camera::GetMainCamera()->GetProjectionMatrix());
-
-		_basicEffect->Apply(_deviceContext.Get());
-
-		_deviceContext->IASetInputLayout(_lineInputLayout.Get());
-
-		_lineBatch->Begin();
-
-		if (_objectManager.GetLineRenderer())
+		Camera** mainCams = Camera::GetMainCamArr();
+		for (int i = 0; i < 2; i++)
 		{
-			for (const auto& line : _objectManager.GetLineRenderer()->GetLines())
+			if (mainCams[i] != nullptr)
 			{
-				_lineBatch->DrawLine(DirectX::VertexPositionColor(line.startPos, line.color), DirectX::VertexPositionColor(line.endPos, line.color));
+				mainCams[i]->Update();
 			}
 		}
-		_lineBatch->End();
 
-		if (_objectManager.GetLineRenderer())
+		// TODO : 원래 컬링도 같이 진행해서 불필요한 애니메이션 연산을 줄였는데 멀티카메라 때문에 어려워졌다 어떻게 하지..?
+		// Update Animation
+		for (auto dynamicModelRenderer : _objectManager.GetDynamicModelRenderers())
 		{
-			_objectManager.GetLineRenderer()->Flush();
+			dynamicModelRenderer->UpdateAnimation(deltaTime);
+		}
+
+		_objectManager._debugText->SetText(
+			"deltaTime : " + std::to_string(_deltaTime)
+			+ "\nfps : " + std::to_string(fps)
+		);
+	}
+
+	void RocketDX11::Render()
+	{
+		BeginRender(1.0f, 0.0f, 1.0f, 1.0f);
+
+		// 카메라가 하나 일 때
+		if (Camera::GetMainCamera(1) == nullptr)
+		{
+			auto mainCam = Camera::GetMainCamera(0);
+
+			RenderPerCamera(mainCam, _deferredBuffers.get(), _backBufferRTV.GetAddressOf());
+		}
+		else	// 카메라가 두 개일 때
+		{
+			for (int i = 0; i < 2; i++)
+			//for (int i = 1; i >= 0; i--)
+			{
+				auto mainCam = Camera::GetMainCamera(i);
+
+				RenderPerCamera(mainCam, _deferredBufferArr[i].get(), _renderTargetViewArr[i].GetAddressOf());
+				// TODO : 그려진 텍스쳐를 맞는 뷰포트를 이용해 백버퍼에 쓴다.
+				_deviceContext->OMSetRenderTargets(1, _backBufferRTV.GetAddressOf(), nullptr);
+				_deviceContext->RSSetViewports(1, &_viewportArr[i]);
+				_blitPass->Render(_deviceContext.Get(), _shaderResourceViewArr[i].GetAddressOf());
+
+				_renderList.clear();
+				_renderList.reserve(512);
+			}
+		}
+
+		EndRender();
+	}
+
+	void RocketDX11::OnResize(int _width, int _height)
+	{
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	/// private function
+	void RocketDX11::InitSplitScreen()
+	{
+		UINT m4xMsaaQuality;
+		HR(_device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, 4, &m4xMsaaQuality));
+
+		// 렌더 타겟 텍스쳐 생성.
+		D3D11_TEXTURE2D_DESC textureDesc;
+		ZeroMemory(&textureDesc, sizeof(textureDesc));
+
+		textureDesc.Width = _screenWidth / 2;
+		textureDesc.Height = _screenHeight;
+		textureDesc.MipLevels = 1;
+		textureDesc.ArraySize = 1;
+		textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		textureDesc.SampleDesc.Count = 1;
+		textureDesc.SampleDesc.Quality = 0;
+		textureDesc.Usage = D3D11_USAGE_DEFAULT;
+		textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+		textureDesc.CPUAccessFlags = 0;
+		textureDesc.MiscFlags = 0;
+
+		for (int i = 0; i < 2; i++)
+		{
+			HR(_device->CreateTexture2D(&textureDesc, nullptr, _renderTargetTextureArr[i].GetAddressOf()));
+		}
+
+		// 렌더 타겟 뷰 생성.
+		D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+		ZeroMemory(&renderTargetViewDesc, sizeof(renderTargetViewDesc));
+
+		renderTargetViewDesc.Format = textureDesc.Format;
+		renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+		renderTargetViewDesc.Texture2D.MipSlice = 0;
+
+		for (int i = 0; i < 2; i++)
+		{
+			HR(_device->CreateRenderTargetView(_renderTargetTextureArr[i].Get(), &renderTargetViewDesc, _renderTargetViewArr[i].GetAddressOf()));
+		}
+
+		// 셰이더 리소스 뷰 생성.
+		D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
+		ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
+
+		shaderResourceViewDesc.Format = textureDesc.Format;
+		shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+		shaderResourceViewDesc.Texture2D.MipLevels = 1;
+
+		for (int i = 0; i < 2; i++)
+		{
+			HR(_device->CreateShaderResourceView(_renderTargetTextureArr[i].Get(), &shaderResourceViewDesc, _shaderResourceViewArr[i].GetAddressOf()));
 		}
 	}
 
@@ -692,68 +597,6 @@ namespace Rocket::Core
 		HR(_device->CreateDepthStencilState(&cubeMapDepthStencilDesc, _cubeMapDepthStencilState.GetAddressOf()));
 	}
 
-	void RocketDX11::RenderCubeMap(Camera* cam)
-{
-		_deviceContext->OMSetDepthStencilState(_cubeMapDepthStencilState.Get(), 0);
-		_objectManager.GetCubeMap()->Render(_deviceContext.Get(), cam);
-		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
-	}
-
-	void RocketDX11::RenderDebug()
-	{
-		float y = static_cast<float>(_screenHeight) / static_cast<float>(BUFFER_COUNT);
-		y *= BUFFER_COUNT - 1;
-		float x = static_cast<float>(_screenWidth) / static_cast<float>(BUFFER_COUNT);
-
-		/// 디퍼드 텍스쳐,셰도우맵 그리기
-		/// 디버그 텍스트 그리기
-		_spriteBatch->Begin();
-
-		auto shadowMap = _deferredBuffers->GetShadowMapSRV();
-		_spriteBatch->Draw(
-			shadowMap
-			, DirectX::XMFLOAT2(_screenWidth - 512.0f, 0)
-			, nullptr
-			, DirectX::Colors::White
-			, 0.0f							// 회전 각도
-			, DirectX::XMFLOAT2(0, 0)		// 이미지의 원점 : 0.0f,0.0f가 좌측상단
-			, 1.0f / 4.0f);
-
-
-		for (int i = 0; i < BUFFER_COUNT; i++)
-		{
-			auto deferredTexture = _deferredBuffers->GetShaderResourceView(i);
-			_spriteBatch->Draw(
-				deferredTexture
-				, DirectX::XMFLOAT2(x * i, y)
-				, nullptr
-				, DirectX::Colors::White
-				, 0.0f							// 회전 각도
-				, DirectX::XMFLOAT2(0, 0)		// 이미지의 원점 : 0.0f,0.0f가 좌측상단
-				, (1.0f / (float)BUFFER_COUNT));						// 이미지 스케일
-		}
-		_objectManager._debugText->Render(_spriteBatch);
-
-		_spriteBatch->End();
-	}
-
-	void RocketDX11::GBufferPass(Camera* cam, DeferredBuffers* gBuffer)
-	{
-		// Set RenderTarget
-		gBuffer->SetRenderTargets(_deviceContext.Get());
-		gBuffer->SetViewport(_deviceContext.Get());
-		// _deferredBuffers->SetRenderTargets(_deviceContext.Get(), _depthStencilView.Get());
-
-		// Draw On G-Buffers
-		for (auto& renderable : _renderList)
-		{
-			renderable->Render(_deviceContext.Get(), cam->GetViewMatrix(), cam->GetProjectionMatrix());
-		}
-
-		// Debug Text
-		_objectManager._debugText->Append("\nObjects Draw : " + std::to_string(_renderList.size()));
-	}
-
 	void RocketDX11::FrustumCulling(Camera* cam)
 	{
 		for (auto meshRenderer : _objectManager.GetMeshRenderers())
@@ -808,7 +651,7 @@ namespace Rocket::Core
 
 		_deviceContext->OMSetRenderTargets(1, renderTargetView, nullptr);
 
-		// 		RenderLine();
+		//	RenderLine();
 		RenderText();
 		RenderTexture();
 
@@ -820,58 +663,215 @@ namespace Rocket::Core
 		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
 	}
 
-	void RocketDX11::InitSplitScreen()
+	void RocketDX11::BeginRender(float r, float g, float b, float a)
 	{
-		UINT m4xMsaaQuality;
-		HR(_device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, 4, &m4xMsaaQuality));
+		float color[4];
 
-		// 렌더 타겟 텍스쳐 생성.
-		D3D11_TEXTURE2D_DESC textureDesc;
-		ZeroMemory(&textureDesc, sizeof(textureDesc));
+		// Setup the color to clear the buffer to.
+		color[0] = r;	// r
+		color[1] = g;	// g
+		color[2] = b;	// b
+		color[3] = a;	// a                                
+		// Clear the back buffer.
+		_deviceContext->ClearRenderTargetView(_backBufferRTV.Get(), color);
+		// Clear the depth buffer.
+		_deviceContext->ClearDepthStencilView(_deferredBuffers->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		textureDesc.Width = _screenWidth / 2;
-		textureDesc.Height = _screenHeight;
-		textureDesc.MipLevels = 1;
-		textureDesc.ArraySize = 1;
-		textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-		textureDesc.SampleDesc.Count = 1;
-		textureDesc.SampleDesc.Quality = 0;
-		textureDesc.Usage = D3D11_USAGE_DEFAULT;
-		textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-		textureDesc.CPUAccessFlags = 0;
-		textureDesc.MiscFlags = 0;
+		/// RenderTargetView 와 DepthStencilBuffer를 출력 병합 단계(Output Merger Stage)에 바인딩
+		//_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
+		_deviceContext->OMSetRenderTargets(1, _backBufferRTV.GetAddressOf(), _backBufferDSV.Get());
 
-		for (int i = 0; i < 2; i++)
+		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
+		//Blend State Set.
+		_deviceContext->OMSetBlendState(_defaultBlendState.Get(), nullptr, 0xFF);
+
+		_deviceContext->RSSetViewports(1, &_viewport);
+
+		/// Deferred
+		_deferredBuffers->ClearRenderTargets(_deviceContext.Get(), 0.0f, 0.0f, 0.0f, 0.3f);
+		_deferredBufferArr[0]->ClearRenderTargets(_deviceContext.Get(), 1.0f, 0.0f, 0.0f, 1.0f);
+		_deferredBufferArr[1]->ClearRenderTargets(_deviceContext.Get(), 0.0f, 1.0f, 0.0f, 1.0f);
+	}
+
+	void RocketDX11::EndRender()
+	{
+		// Present the back buffer to the screen since rendering is complete.
+		if (_vSyncEnabled)
 		{
-			HR(_device->CreateTexture2D(&textureDesc, nullptr, _renderTargetTextureArr[i].GetAddressOf()));
+			// Lock to screen refresh rate.
+			_swapChain->Present(1, 0);
+		}
+		else
+		{
+			// Present as fast as possible.
+			_swapChain->Present(0, 0);
 		}
 
-		// 렌더 타겟 뷰 생성.
-		D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-		ZeroMemory(&renderTargetViewDesc, sizeof(renderTargetViewDesc));
+		_renderList.clear();
+		_renderList.reserve(512);
 
-		renderTargetViewDesc.Format = textureDesc.Format;
-		renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-		renderTargetViewDesc.Texture2D.MipSlice = 0;
+		return;
+	}
 
-		for (int i = 0; i < 2; i++)
+	void RocketDX11::GBufferPass(Camera* cam, DeferredBuffers* gBuffer)
+	{
+		// Set RenderTarget
+		gBuffer->SetRenderTargets(_deviceContext.Get());
+		gBuffer->SetViewport(_deviceContext.Get());
+		// _deferredBuffers->SetRenderTargets(_deviceContext.Get(), _depthStencilView.Get());
+
+		// Draw On G-Buffers
+		for (auto& renderable : _renderList)
 		{
-			HR(_device->CreateRenderTargetView(_renderTargetTextureArr[i].Get(), &renderTargetViewDesc, _renderTargetViewArr[i].GetAddressOf()));
+			renderable->Render(_deviceContext.Get(), cam->GetViewMatrix(), cam->GetProjectionMatrix());
 		}
 
-		// 셰이더 리소스 뷰 생성.
-		D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
-		ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
+		// Debug Text
+		_objectManager._debugText->Append("\nObjects Draw : " + std::to_string(_renderList.size()));
+	}
 
-		shaderResourceViewDesc.Format = textureDesc.Format;
-		shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-		shaderResourceViewDesc.Texture2D.MipLevels = 1;
+	void RocketDX11::RenderMesh()
+	{
+		// Frustum Culling
+		Camera* mainCam = Camera::GetMainCamera();
 
-		for (int i = 0; i < 2; i++)
+		std::vector<IRenderable*> renderList;
+		renderList.reserve(256);
+
+		for (auto meshRenderer : _objectManager.GetMeshRenderers())
 		{
-			HR(_device->CreateShaderResourceView(_renderTargetTextureArr[i].Get(), &shaderResourceViewDesc, _shaderResourceViewArr[i].GetAddressOf()));
+			if (mainCam->FrustumCulling(meshRenderer->GetBoundingBox()))
+			{
+				renderList.push_back(meshRenderer);
+			}
+		}
+
+		for (auto dynamicModelRenderer : _objectManager.GetDynamicModelRenderers())
+		{
+			if (mainCam->FrustumCulling(dynamicModelRenderer->GetBoundingBox()))
+			{
+				renderList.push_back(dynamicModelRenderer);
+			}
+		}
+
+		// TODO : 전체 리스트에 있는 것들을 그리는 것이 아니라 현재 씬만 그려야 한다..
+// 		for (auto meshRenderer : _objectManager.GetStaticModelRenderers())
+// 		{
+// 			meshRenderer->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
+// 		}
+// 
+// 		for (auto dynamicModelRenderer : _objectManager.GetDynamicModelRenderers())
+// 		{
+// 			dynamicModelRenderer->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
+// 		}
+
+		for (auto& renderable : renderList)
+		{
+			renderable->Render(_deviceContext.Get(), mainCam->GetViewMatrix(), mainCam->GetProjectionMatrix());
+		}
+
+		_objectManager._debugText->Append("\nObjects Draw : " + std::to_string(renderList.size()));
+	}
+
+	void RocketDX11::RenderHelperObject(Camera* cam)
+	{
+		_objectManager._grid->Update(DirectX::XMMatrixIdentity(), cam->GetViewMatrix(), cam->GetProjectionMatrix());
+		_objectManager._grid->Render(_deviceContext.Get());
+		_objectManager._axis->Update(DirectX::XMMatrixIdentity(), cam->GetViewMatrix(), cam->GetProjectionMatrix());
+		_objectManager._axis->Render(_deviceContext.Get());
+	}
+
+	void RocketDX11::RenderCubeMap(Camera* cam)
+{
+		_deviceContext->OMSetDepthStencilState(_cubeMapDepthStencilState.Get(), 0);
+		_objectManager.GetCubeMap()->Render(_deviceContext.Get(), cam);
+		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
+	}
+
+	void RocketDX11::RenderText()
+	{
+		_spriteBatch->Begin();
+		for (auto textRenderer : _objectManager.GetTextList())
+		{
+			textRenderer->Render(_spriteBatch);
+		}
+		_spriteBatch->End();
+	}
+
+	void RocketDX11::RenderLine()
+	{
+		_basicEffect->SetWorld(DirectX::XMMatrixIdentity());
+		_basicEffect->SetView(Camera::GetMainCamera()->GetViewMatrix());
+		_basicEffect->SetProjection(Camera::GetMainCamera()->GetProjectionMatrix());
+
+		_basicEffect->Apply(_deviceContext.Get());
+
+		_deviceContext->IASetInputLayout(_lineInputLayout.Get());
+
+		_lineBatch->Begin();
+
+		if (_objectManager.GetLineRenderer())
+		{
+			for (const auto& line : _objectManager.GetLineRenderer()->GetLines())
+			{
+				_lineBatch->DrawLine(DirectX::VertexPositionColor(line.startPos, line.color), DirectX::VertexPositionColor(line.endPos, line.color));
+			}
+		}
+		_lineBatch->End();
+
+		if (_objectManager.GetLineRenderer())
+		{
+			_objectManager.GetLineRenderer()->Flush();
 		}
 	}
 
+	void RocketDX11::RenderTexture()
+	{
+		_spriteBatch->Begin();
+		// 이미지(UI)를 그리기 위한 함수
+		for (auto imageRenderer : _objectManager.GetImageList())
+		{
+			imageRenderer->Render(_spriteBatch);
+		}
+		_spriteBatch->End();
+	}
+
+	void RocketDX11::RenderDebug()
+	{
+		float y = static_cast<float>(_screenHeight) / static_cast<float>(BUFFER_COUNT);
+		y *= BUFFER_COUNT - 1;
+		float x = static_cast<float>(_screenWidth) / static_cast<float>(BUFFER_COUNT);
+
+		/// 디퍼드 텍스쳐,셰도우맵 그리기
+		/// 디버그 텍스트 그리기
+		_spriteBatch->Begin();
+
+		auto shadowMap = _deferredBuffers->GetShadowMapSRV();
+		_spriteBatch->Draw(
+			shadowMap
+			, DirectX::XMFLOAT2(_screenWidth - 512.0f, 0)
+			, nullptr
+			, DirectX::Colors::White
+			, 0.0f							// 회전 각도
+			, DirectX::XMFLOAT2(0, 0)		// 이미지의 원점 : 0.0f,0.0f가 좌측상단
+			, 1.0f / 4.0f);
+
+
+		for (int i = 0; i < BUFFER_COUNT; i++)
+		{
+			auto deferredTexture = _deferredBuffers->GetShaderResourceView(i);
+			_spriteBatch->Draw(
+				deferredTexture
+				, DirectX::XMFLOAT2(x * i, y)
+				, nullptr
+				, DirectX::Colors::White
+				, 0.0f							// 회전 각도
+				, DirectX::XMFLOAT2(0, 0)		// 이미지의 원점 : 0.0f,0.0f가 좌측상단
+				, (1.0f / (float)BUFFER_COUNT));						// 이미지 스케일
+		}
+		_objectManager._debugText->Render(_spriteBatch);
+
+		_spriteBatch->End();
+	}
+	//////////////////////////////////////////////////////////////////////////
 }
