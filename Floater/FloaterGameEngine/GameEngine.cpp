@@ -2,6 +2,7 @@
 #include "./include/internal/Scene.h"
 #include "../FloaterPlatform/include/Platform.h"
 #include "PhysicsEngine.h"
+#include "SoundEngine.h"
 
 
 flt::IRenderer* flt::GameEngine::GetRenderer()
@@ -31,6 +32,9 @@ void flt::GameEngine::Initialize()
 	//_renderer = _platform->CreateRenderer(RendererType::DX11);
 	_physicsEngine = new PhysicsEngine();
 	_physicsEngine->Initialize();
+
+	_soundEngine = new SoundEngine();
+	_soundEngine->Initialize();
 
 	_timer.Start();
 }
@@ -94,6 +98,10 @@ void flt::GameEngine::Finalize()
 	_physicsEngine->Finalize();
 	delete _physicsEngine;
 	_physicsEngine = nullptr;
+
+	_soundEngine->Finalize();
+	delete _soundEngine;
+	_soundEngine = nullptr;
 }
 
 flt::Scene* flt::GameEngine::SetScene(Scene* scene)

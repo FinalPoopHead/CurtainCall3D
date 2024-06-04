@@ -9,6 +9,7 @@ namespace flt
 	class IRenderer;
 	class Scene;
 	class PhysicsEngine;
+	class SoundEngine;
 
 
 	class GameEngine
@@ -49,6 +50,7 @@ namespace flt
 		Platform* _platform;
 		IRenderer* _renderer;
 		PhysicsEngine* _physicsEngine;
+		SoundEngine* _soundEngine;
 
 
 		Scene* _currentScene;
