@@ -66,18 +66,19 @@ namespace Rocket::Core
 namespace Rocket::Core
 {
 	RocketDX11::RocketDX11()
-		: _hWnd(), _screenWidth(), _screenHeight(), _vSyncEnabled(),
-		_device(), _deviceContext(),
-		_featureLevel(), _m4xMsaaQuality(),
-		_swapChain(), _backBuffer(),
-		_backBufferRTV(), _backBufferDepthBuffer(), _backBufferDSV(),
-		_viewport(),
-		_objectManager(ObjectManager::Instance()),
-		_resourceManager(ResourceManager::Instance()),
-		_spriteBatch(), _lineBatch(), _basicEffect(),
-		_lineInputLayout(),
-		_deltaTime(),
-		_isDebugMode(false)
+		: _hWnd(), _screenWidth(), _screenHeight(), _vSyncEnabled()
+		, _device(), _deviceContext()
+		, _featureLevel(), _m4xMsaaQuality()
+		, _swapChain(), _backBuffer()
+		, _backBufferRTV(), _backBufferDepthBuffer(), _backBufferDSV()
+		, _viewport()
+		, _objectManager(ObjectManager::Instance())
+		, _resourceManager(ResourceManager::Instance())
+		, _spriteBatch(), _lineBatch(), _basicEffect()
+		, _lineInputLayout()
+		, _deltaTime()
+		, _isDebugMode(false)
+		, _viewportArr()
 	{
 
 	}
@@ -445,6 +446,7 @@ namespace Rocket::Core
 			}
 		}
 
+		// TODO : 원래 컬링도 같이 진행해서 불필요한 애니메이션 연산을 줄였는데 멀티카메라 때문에 어려워졌다 어떻게 하지..?
 		// Update Animation
 		for (auto dynamicModelRenderer : _objectManager.GetDynamicModelRenderers())
 		{
@@ -699,9 +701,9 @@ namespace Rocket::Core
 
 	void RocketDX11::RenderDebug()
 	{
-		float y = _screenHeight / BUFFER_COUNT;
+		float y = static_cast<float>(_screenHeight) / static_cast<float>(BUFFER_COUNT);
 		y *= BUFFER_COUNT - 1;
-		float x = _screenWidth / BUFFER_COUNT;
+		float x = static_cast<float>(_screenWidth) / static_cast<float>(BUFFER_COUNT);
 
 		/// 디퍼드 텍스쳐,셰도우맵 그리기
 		/// 디버그 텍스트 그리기
