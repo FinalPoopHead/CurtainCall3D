@@ -20,7 +20,7 @@ namespace Rocket::Core
 
 	}
 
-	void LightPass::Render(ID3D11DeviceContext* deviceContext, DeferredBuffers* g_buffer)
+	void LightPass::Render(ID3D11DeviceContext* deviceContext, DeferredBuffers* g_buffer, Camera* cam)
 	{
 		deviceContext->IASetInputLayout(_vertexShader->GetInputLayout());
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
@@ -87,7 +87,7 @@ namespace Rocket::Core
 
 			CameraBufferType* cameraBufferDataPtr = (CameraBufferType*)mappedResource.pData;
 
-			cameraBufferDataPtr->cameraPosition = Camera::GetMainCamera()->GetPosition();
+			cameraBufferDataPtr->cameraPosition = cam->GetPosition();
 
 			deviceContext->Unmap(_pixelShader->GetConstantBuffer(bufferNumber), 0);
 

@@ -17,7 +17,7 @@ namespace Rocket::Core
 		_viewMatrix(),
 		_projectionMatrix()
 	{
-
+		UpdateProjectionMatrix();
 	}
 
 	Vector3 DirectionalLight::GetForward() const
@@ -25,16 +25,15 @@ namespace Rocket::Core
 		return _transform->GetForward();
 	}
 
-	void DirectionalLight::Update()
-	{
+	void DirectionalLight::Update(Camera* cam)
+{
 		// 카메라 근처의 적절한 위치로 위치 변경.
-		auto mainCam = Camera::GetMainCamera();
+		//auto mainCam = Camera::GetMainCamera();					// TODO : 메인 카메라가 2개일 경우에 대한 처리 필요. 매개변수로 카메라 받는게 제일 깔끔할거같다?
 		//_lengthZ = mainCam->GetLengthZ();
-		_lightPosForShadow = mainCam->GetPosition() + (mainCam->GetForward() * _shadowRadius);	// frustum의 중앙으로 보냄
+		_lightPosForShadow = cam->GetPosition() + (cam->GetForward() * _shadowRadius);	// frustum의 중앙으로 보냄
 		_lightPosForShadow -= _transform->GetForward() * _shadowRadius;							// 빛 방향의 반대방향으로 lengthZ만큼 보냄
 
 		UpdateViewMatrix();
-		UpdateProjectionMatrix();
 	}
 
 	void DirectionalLight::UpdateViewMatrix()

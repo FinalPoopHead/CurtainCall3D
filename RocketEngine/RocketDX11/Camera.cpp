@@ -7,16 +7,13 @@
 
 namespace Rocket::Core
 {
-	Camera* Camera::_mainCamera;
+	Camera* Camera::_mainCamera[2];
 
 	Camera::Camera()
 		: _nearZ(0.01f), _farZ(1500.0f), _aspect(16.0f / 9.0f), _fovY(70.0f),
-		_nearWindowHeight(), _farWindowHeight(),
 		_viewMatrix(), _projectionMatrix()
 		, _boundingFrustum()
 	{
-		_nearWindowHeight = 2.0f * _nearZ * std::tanf(DirectX::XMConvertToRadians(_fovY / 2));
-		_farWindowHeight = 2.0f * _farZ * std::tanf(DirectX::XMConvertToRadians(_fovY / 2));
 		UpdateProjectionMatrix();
 	}
 
@@ -75,18 +72,6 @@ namespace Rocket::Core
 		UpdateProjectionMatrix();
 	}
 
-	void Camera::SetNearHeight(float height)
-	{
-		_nearWindowHeight = height;
-		UpdateProjectionMatrix();
-	}
-
-	void Camera::SetFarHeight(float height)
-	{
-		_farWindowHeight = height;
-		UpdateProjectionMatrix();
-	}
-
 	void Camera::UpdateProjectionMatrix()
 	{
 		DirectX::XMMATRIX temp = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(_fovY / 2), _aspect, _nearZ, _farZ);
@@ -98,7 +83,8 @@ namespace Rocket::Core
 
 	void Camera::SetAsMainCamera()
 	{
-		_mainCamera = this;
+		_mainCamera[0] = this;
+		_mainCamera[1] = nullptr;
 	}
 
 	void Camera::BindTransform(RocketTransform* transform)
@@ -106,9 +92,9 @@ namespace Rocket::Core
 		_transform = transform;
 	}
 
-	Camera* Camera::GetMainCamera()
+	Camera* Camera::GetMainCamera(UINT index /*= 0*/)
 	{
-		return _mainCamera;
+		return _mainCamera[index];
 	}
 
 	DirectX::XMMATRIX Camera::GetWorldMatrix() const
@@ -155,6 +141,23 @@ namespace Rocket::Core
 	Vector3 Camera::GetRight() const
 	{
 		return _transform->GetRight();
+	}
+
+	void Camera::AddToMainCamera()
+	{
+		if (_mainCamera[0] == nullptr)
+		{
+			_mainCamera[0] = this;
+		}
+		else if (_mainCamera[1] == nullptr)
+		{
+			_mainCamera[1] = this;
+		}
+	}
+
+	Camera** Camera::GetMainCamArr()
+	{
+		return _mainCamera;
 	}
 
 }
