@@ -25,17 +25,17 @@ namespace Rocket::Core
 		virtual void SetFarZ(float farZ) override;
 		virtual void SetAspect(float aspect) override;
 		virtual void SetFOVY(float fov) override;
-		virtual void SetNearHeight(float height) override;
-		virtual void SetFarHeight(float height) override;
 		virtual void SetAsMainCamera() override;
+		virtual void AddToMainCamera() override;
 		virtual void BindTransform(RocketTransform* transform) override;
 
 		/// Static
 	public:
-		static Camera* GetMainCamera();
+		static Camera* GetMainCamera(UINT index = 0);
+		static Camera** GetMainCamArr();
 
 	private:
-		static Camera* _mainCamera;
+		static Camera* _mainCamera[2];
 
 	public:
 		DirectX::XMFLOAT3 GetPosition() const;
@@ -70,8 +70,6 @@ namespace Rocket::Core
 		float _farZ;					// frustum의 먼 평면까지의 거리
 		float _aspect;					// 가로 / 세로 비율
 		float _fovY;					// fovY각도를 60분법으로 갖고있음
-		float _nearWindowHeight;		// frustum의 가까운 평면의 높이
-		float _farWindowHeight;			// frustum의 먼 평면의 높이
 
 		DirectX::XMFLOAT4X4 _viewMatrix;		// 카메라의 로컬좌표'계' 또는 카메라 worldTM의 역행렬
 		DirectX::XMFLOAT4X4 _projectionMatrix;	// 카메라의 투영 행렬

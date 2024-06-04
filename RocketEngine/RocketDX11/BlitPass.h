@@ -15,15 +15,15 @@ namespace Rocket::Core
 
 namespace Rocket::Core
 {
-	class LightPass
+	class BlitPass
 	{
 	public:
-		LightPass();
-		~LightPass();
+		BlitPass();
+		~BlitPass();
 
 	public:
 		void Initialize(ID3D11Device* device, VertexShader* vertexShader, PixelShader* pixelShader);
-		void Render(ID3D11DeviceContext* deviceContext, DeferredBuffers* g_buffer, Camera* cam);
+		void Render(ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView** srv);
 
 	private:
 		void CreateSamplerState(ID3D11Device* device);
@@ -32,6 +32,5 @@ namespace Rocket::Core
 		VertexShader* _vertexShader;
 		PixelShader* _pixelShader;
 		ComPtr<ID3D11SamplerState> _sampleState;
-		ComPtr<ID3D11SamplerState> _shadowMapSamplerState;
 	};
 }

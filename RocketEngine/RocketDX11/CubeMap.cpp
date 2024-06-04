@@ -76,10 +76,8 @@ namespace Rocket::Core
 		_samplerState->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"CubeMapsamplerState") - 1, L"CubeMapsamplerState");
 	}
 
-	void CubeMap::Render(ID3D11DeviceContext* deviceContext)
+	void CubeMap::Render(ID3D11DeviceContext* deviceContext, Camera* cam)
 	{
-		Camera* mainCam = Camera::GetMainCamera();
-
 		deviceContext->IASetInputLayout(_cubeMapVS->GetInputLayout());
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		deviceContext->RSSetState(_cubeMapRenderState.Get());
@@ -97,8 +95,8 @@ namespace Rocket::Core
 
 			CubeMapBufferType* matrixBufferDataPtr = (CubeMapBufferType*)mappedResource.pData;
 
-			DirectX::XMMATRIX v = DirectX::XMMatrixTranspose(mainCam->GetViewMatrix());
-			DirectX::XMMATRIX p = DirectX::XMMatrixTranspose(mainCam->GetProjectionMatrix());
+			DirectX::XMMATRIX v = DirectX::XMMatrixTranspose(cam->GetViewMatrix());
+			DirectX::XMMATRIX p = DirectX::XMMatrixTranspose(cam->GetProjectionMatrix());
 
 			matrixBufferDataPtr->view = v;
 			matrixBufferDataPtr->projection = p;
