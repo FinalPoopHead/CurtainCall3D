@@ -2,6 +2,7 @@
 #include "SpriteRenderer.h"
 #include "ResourceManager.h"
 #include "Texture.h"
+#include "ObjectManager.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -35,6 +36,11 @@ namespace Rocket::Core
 
 	void SpriteRenderer::Render(DirectX::SpriteBatch* spriteBatch)
 	{
+		if (!_isActive)
+		{
+			return;
+		}
+
 		Vector3 scale;
 		Quaternion quat;
 		Vector3 pos;
@@ -61,9 +67,13 @@ namespace Rocket::Core
 		_worldTM = worldTM;
 	}
 
-
 	void SpriteRenderer::SetActive(bool isActive)
 	{
-		isActive = 1;
+		_isActive = isActive;
+	}
+
+	void SpriteRenderer::Destroy()
+	{
+		ObjectManager::Instance().DestroySpriteRenderer(this);
 	}
 }

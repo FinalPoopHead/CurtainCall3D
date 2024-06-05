@@ -18,11 +18,15 @@ namespace Rocket::Core
 		TextRenderer();
 		~TextRenderer();
 
+	public:
+		virtual void SetActive(bool isActive) override;
+		virtual void Destroy() override;
+		virtual bool IsActive() override { return _isActive; }
+
 		virtual std::string& GetText() override;
 		virtual Color GetColor() override;
 
 		virtual void SetWorldTM(const Matrix& worldTM) override;
-		virtual void SetActive(bool isActive) override;
 		virtual void SetText(const std::string& str) override;
 		virtual void SetColor(Color color) override;
 

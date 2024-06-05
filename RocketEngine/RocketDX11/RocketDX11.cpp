@@ -601,6 +601,11 @@ namespace Rocket::Core
 	{
 		for (auto meshRenderer : _objectManager.GetMeshRenderers())
 		{
+			if (!meshRenderer->IsActive())
+			{
+				continue;
+			}
+
 			if (cam->FrustumCulling(meshRenderer->GetBoundingBox()))
 			{
 				_renderList.push_back(meshRenderer);
@@ -609,6 +614,11 @@ namespace Rocket::Core
 
 		for (auto staticModelRenderer : _objectManager.GetStaticModelRenderers())
 		{
+			if (!staticModelRenderer->IsActive())
+			{
+				continue;
+			}
+
 			if (cam->FrustumCulling(staticModelRenderer->GetBoundingBox()))
 			{
 				_renderList.push_back(staticModelRenderer);
@@ -617,6 +627,11 @@ namespace Rocket::Core
 
 		for (auto dynamicModelRenderer : _objectManager.GetDynamicModelRenderers())
 		{
+			if (!dynamicModelRenderer->IsActive())
+			{
+				continue;
+			}
+
 			if (cam->FrustumCulling(dynamicModelRenderer->GetBoundingBox()))
 			{
 				_renderList.push_back(dynamicModelRenderer);
@@ -628,6 +643,11 @@ namespace Rocket::Core
 	{
 		for (auto& light : _objectManager.GetDirectionalLightList())
 		{
+			if (!light->IsActive())
+			{
+				continue;
+			}
+
 			light->Update(cam);
 		}
 

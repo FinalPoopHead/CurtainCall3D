@@ -287,7 +287,6 @@
     <ClInclude Include="IMaterial.h" />
     <ClInclude Include="IGraphicsObject.h" />
     <ClInclude Include="IResourceManager.h" />
-    <ClInclude Include="ISketchable.h" />
     <ClInclude Include="ISpriteRenderer.h" />
     <ClInclude Include="IMeshRenderer.h" />
     <ClInclude Include="IStaticModelRenderer.h" />

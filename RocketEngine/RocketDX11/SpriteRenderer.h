@@ -17,15 +17,21 @@ namespace Rocket::Core
 		SpriteRenderer();
 		~SpriteRenderer();
 
-		virtual void SetImage(const std::string& fileName) override;
+	public:
 		virtual void SetWorldTM(const Matrix& worldTM) override;
+		virtual void Destroy() override;
 		virtual void SetActive(bool isActive) override;
+		virtual bool IsActive() override { return _isActive; }
+
+		virtual void SetImage(const std::string& fileName) override;
 		virtual void SetColor(Color color) override;
 
 	public:
 		void Render(DirectX::SpriteBatch* spriteBatch);
 
 	private:
+		bool _isActive;
+
 		Color _color;
 		Matrix _worldTM;
 
@@ -33,6 +39,6 @@ namespace Rocket::Core
 		float _imageWidth;
 		float _imageHeight;
 
-		Texture* _texture;
+		Texture* _texture;		// Resource Manager에서 unique_ptr로 관리 중.
 	};
 }

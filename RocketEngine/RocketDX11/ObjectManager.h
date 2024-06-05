@@ -52,6 +52,15 @@ namespace Rocket::Core
 		LineRenderer* CreateLineRenderer();
 		DirectionalLight* CreateDirectionalLight();
 
+	public:
+		void DestroyCamera(Camera* camera);
+		void DestroyMeshRenderer(MeshRenderer* meshRenderer);
+		void DestroyDynamicModelRenderer(DynamicModelRenderer* dynamicModelRenderer);
+		void DestroyStaticModelRenderer(StaticModelRenderer* staticModelRenderer);
+		void DestroyTextRenderer(TextRenderer* textRenderer);
+		void DestroySpriteRenderer(SpriteRenderer* spriteRenderer);
+		void DestroyDirectionalLight(DirectionalLight* directionalLight);
+
 		/// Debug 객체들.
 	public:
 		std::unique_ptr<TextRenderer> _debugText;

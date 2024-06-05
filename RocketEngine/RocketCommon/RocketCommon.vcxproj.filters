@@ -55,11 +55,8 @@
     <Filter Include="Interface\Component\Renderer\2D">
       <UniqueIdentifier>{6f1a1e2b-e486-47d3-89d7-d1403914b95f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interface\Component\Renderer\3D\BaseClass">
+    <Filter Include="Interface\Component\Interface">
       <UniqueIdentifier>{b96f0641-cef9-4e1c-bc32-9af1fb240b16}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface\Component\Renderer\2D\BaseClass">
-      <UniqueIdentifier>{7223797a-b705-4860-b41e-3967d0ba019e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -126,10 +123,7 @@
       <Filter>Interface\Component\Renderer\3D</Filter>
     </ClInclude>
     <ClInclude Include="IGraphicsObject.h">
-      <Filter>Interface\Component\Renderer\3D\BaseClass</Filter>
-    </ClInclude>
-    <ClInclude Include="ISketchable.h">
-      <Filter>Interface\Component\Renderer\2D\BaseClass</Filter>
+      <Filter>Interface\Component\Interface</Filter>
     </ClInclude>
     <ClInclude Include="ISpriteRenderer.h">
       <Filter>Interface\Component\Renderer\2D</Filter>

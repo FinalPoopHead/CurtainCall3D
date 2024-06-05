@@ -19,6 +19,12 @@ namespace Rocket::Core
 		Camera();
 		~Camera();
 
+	public:
+		virtual void SetActive(bool isActive) override;
+		virtual void Destroy() override;
+		virtual void SetWorldTM(const Matrix& worldTM) override {}
+		virtual bool IsActive() override { return _isActive; }
+
 		/// ICamera 인터페이스 구현
 	public:
 		virtual void SetNearZ(float nearZ) override;
@@ -63,6 +69,7 @@ namespace Rocket::Core
 		void UpdateViewMatrix();
 
 	private:
+		bool _isActive;
 		RocketTransform* _transform;
 		DirectX::BoundingFrustum _boundingFrustum;
 

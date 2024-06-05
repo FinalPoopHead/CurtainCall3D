@@ -8,13 +8,17 @@ public:
 	~CubeController();
 
 	void Update(float deltaSecond) override;
+	void StartRolling(float rotateTime);
 
 private:
-	float _delayTime;		// 회전 사이의 딜레이 시간
-	float _rotateTime;		// 회전에 걸리는 시간
-	float _elapsedTime;		// 경과 시간
-	float _startEuler;		// 회전 시작 각도
-	float _targetEuler;		// 회전 목표 각도
+	void Roll(float deltaSecond);
+	void FinishRolling();			// Roll이 끝나면 마무리 각도 깔끔하게 하기 위함
+
+private:
+	bool _isRolling;		// 회전 중인지 여부
+	int _targetIndex;		// 회전 목표 각도 인덱스
+	float _rotateSpeed;		// 회전 속도 -> 주어진 회전시간의 역수
+	float _currentAngle;	// 현재 회전 각도
 	flt::Vector3f _rotatePivot;	// 회전 중심
 };
 
