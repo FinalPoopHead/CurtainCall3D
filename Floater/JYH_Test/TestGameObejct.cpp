@@ -47,6 +47,7 @@ void TestGameObejct::Update(float deltaTime)
 	else if (_elapsedTime > disableTime)
 	{
 		flt::RendererComponent* renderer = GetComponent<flt::RendererComponent>();
-		renderer->Disable();
+		//renderer->Disable();
+		this->Destroy();
 	}
 }
