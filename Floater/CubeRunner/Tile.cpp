@@ -5,16 +5,10 @@
 
 Tile::Tile()
 {
-	std::wstring filePath = L"..\\x64\\fbx\\SM_Box_Cargo.fbx";
+	std::wstring filePath = L"..\\x64\\fbx\\cube.fbx";
 
 	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>(true);
-
-	flt::ModelLoader loader;
-	flt::RawScene rawScene;
-	loader.Load(filePath, &rawScene);
-	flt::RawNode* node = rawScene.nodes[0];
-
-	renderer->SetRawNode(node);
+	renderer->SetFilePath(filePath);
 }
 
 Tile::~Tile()

@@ -136,6 +136,9 @@
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="CubeController.cpp" />
+    <ClCompile Include="GameManager.cpp" />
+    <ClCompile Include="GameManagerController.cpp" />
+    <ClCompile Include="ManagerObject.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NormalCube.cpp" />
@@ -145,6 +148,9 @@
   <ItemGroup>
     <ClInclude Include="Board.h" />
     <ClInclude Include="CubeController.h" />
+    <ClInclude Include="GameManager.h" />
+    <ClInclude Include="GameManagerController.h" />
+    <ClInclude Include="ManagerObject.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="NormalCube.h" />
     <ClInclude Include="TestCamera.h" />

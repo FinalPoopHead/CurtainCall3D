@@ -23,7 +23,7 @@ enum class TileStateFlag
 class Board : public flt::GameObject
 {
 public:
-	Board(int width, int height, float offset = 5.0f);
+	Board(int width, int height, float offset = 4.05f);
 	virtual ~Board();
 
 	void OnCreate() override;

@@ -1,6 +1,9 @@
 ﻿#include "CubeController.h"
 #include "../FloaterGameEngine/include/Input.h"
 
+#include "GameManager.h"
+
+constexpr float PIVOTSIZE = 2.0f;		// 피봇까지의 y,z 거리. 모델 사이즈에 맞게 변경해야함.
 constexpr float ROLLANGLE = 90.0f;		// 회전할 각도
 constexpr float TARGETANGLE[4] = { 90.0f, 180.0f, 270.0f, 360.0f };	// 회전 목표 각도
 
@@ -44,7 +47,7 @@ void CubeController::StartRolling(float rotateTime)
 	_isRolling = true;
 
 	flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
-	_rotatePivot = { pos.x, pos.y - 1.0f,pos.z + 1.0f };
+	_rotatePivot = { pos.x, pos.y - PIVOTSIZE, pos.z - PIVOTSIZE };
 	_rotateSpeed = 1 / rotateTime;
 
 	int prevIndex = (_targetIndex + 3) % 4;
@@ -67,10 +70,10 @@ void CubeController::Roll(float deltaSecond)
 	}
 	_currentAngle += deltaAngle;
 
-	_gameObject->tr.SetRotation({ 1.0f,0.0f,0.0f }, flt::DegToRad(_currentAngle));
+	_gameObject->tr.SetRotation({ 1.0f,0.0f,0.0f }, flt::DegToRad(-_currentAngle));
 
 	flt::Transform tr;
-	tr.SetRotation({ 1.0f,0.0f,0.0f }, flt::DegToRad(deltaAngle));
+	tr.SetRotation({ 1.0f,0.0f,0.0f }, flt::DegToRad(-deltaAngle));
 	dir = dir * tr.GetWorldMatrix4f();
 
 	_gameObject->tr.AddWorldPosition(-dir);

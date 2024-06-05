@@ -16,6 +16,15 @@
     <Filter Include="Component\CubeController">
       <UniqueIdentifier>{09726758-6f4f-4f60-9916-34afe686e5ea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObject\GameManager">
+      <UniqueIdentifier>{e75300b7-5dc8-4853-9d53-c96e9d125679}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameManager">
+      <UniqueIdentifier>{7ea8e426-d747-4597-a26b-f79537c33a1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\GameManagerController">
+      <UniqueIdentifier>{38727160-e6fc-451d-9d14-b54654eae4c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -39,6 +48,15 @@
     <ClCompile Include="CubeController.cpp">
       <Filter>Component\CubeController</Filter>
     </ClCompile>
+    <ClCompile Include="ManagerObject.cpp">
+      <Filter>GameObject\GameManager</Filter>
+    </ClCompile>
+    <ClCompile Include="GameManager.cpp">
+      <Filter>GameManager</Filter>
+    </ClCompile>
+    <ClCompile Include="GameManagerController.cpp">
+      <Filter>Component\GameManagerController</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h">
@@ -58,6 +76,15 @@
     </ClInclude>
     <ClInclude Include="CubeController.h">
       <Filter>Component\CubeController</Filter>
+    </ClInclude>
+    <ClInclude Include="ManagerObject.h">
+      <Filter>GameObject\GameManager</Filter>
+    </ClInclude>
+    <ClInclude Include="GameManager.h">
+      <Filter>GameManager</Filter>
+    </ClInclude>
+    <ClInclude Include="GameManagerController.h">
+      <Filter>Component\GameManagerController</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

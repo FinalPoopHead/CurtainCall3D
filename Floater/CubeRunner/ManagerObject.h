@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include "../FloaterGameEngine/include/EngineMinimal.h"
 
-class NormalCube : public flt::GameObject
+
+class ManagerObject : public flt::GameObject
 {
 public:
-	NormalCube();
-	~NormalCube();
+	ManagerObject();
+	~ManagerObject();
 };
 
