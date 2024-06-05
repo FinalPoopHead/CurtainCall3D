@@ -100,7 +100,7 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 
 	auto factory = Rocket::Core::CreateGraphicsObjectFactory();
 
-	rocketObject->transform = &renderable.transform;
+	rocketObject->transform = renderable.transform;
 
 	if (renderable.camera)
 	{

@@ -19,11 +19,8 @@ namespace flt
 	};
 }
 
-
-flt::BoxColliderComponent::BoxColliderComponent(GameObject* gameObject) :
-	Component<BoxColliderComponent>(gameObject),
-	Collider(gameObject),
-	_transform(&gameObject->transform),
+flt::BoxColliderComponent::BoxColliderComponent() :
+	_transform(nullptr),
 	_physcx(*GameEngine::Instance()->GetPhysicsEngine()->GetPhysics()),
 	_scene(*GameEngine::Instance()->GetPhysicsEngine()->GetScene()),
 	_physXData(new PhysXData()),
@@ -31,34 +28,24 @@ flt::BoxColliderComponent::BoxColliderComponent(GameObject* gameObject) :
 	_offset(0.0f, 0.0f, 0.0f, 0.0f),
 	_isKinematic(false)
 {
-	Vector4f pos = _transform->GetWorldPosition();
-	_physXData->transform.p.x = pos.x;
-	_physXData->transform.p.y = pos.y + 100.0f;
-	_physXData->transform.p.z = pos.z;
+	_physXData->transform.p.x = 0.0f;
+	_physXData->transform.p.y = 0.0f;
+	_physXData->transform.p.z = 0.0f;
 
-	Quaternion rot = _transform->GetWorldRotation();
-	_physXData->transform.q.x = rot.x;
-	_physXData->transform.q.y = rot.y;
-	_physXData->transform.q.z = rot.z;
-	_physXData->transform.q.w = rot.w;
+	_physXData->transform.q.x = 0.0f;
+	_physXData->transform.q.y = 0.0f;
+	_physXData->transform.q.z = 0.0f;
+	_physXData->transform.q.w = 1.0f;
 
 	_physXData->actor = _physcx.createRigidDynamic(_physXData->transform);
 	_physXData->actor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, _isKinematic);
-	//_physXData->actor->setSleepThreshold(5e-3f);
 	_physXData->actor->setSleepThreshold(5e-4f);
 	_physXData->actor->setWakeCounter(0.0f);
 
 	_physXData->actor->userData = static_cast<Collider*>(this);
 
 	_physXData->shape = _physcx.createShape(physx::PxBoxGeometry(_size.x, _size.y, _size.z), *_physcx.createMaterial(0.5f, 0.5f, 0.6f));
-	
-	auto contactOffset = _physXData->shape->getContactOffset();
-	
 	_physXData->actor->attachShape(*_physXData->shape);
-
-	physx::PxDominanceGroup group = 0;
-
-	_physXData->actor->setDominanceGroup(group);
 }
 
 flt::BoxColliderComponent::~BoxColliderComponent()
@@ -67,6 +54,19 @@ flt::BoxColliderComponent::~BoxColliderComponent()
 	_physXData->shape->release();
 
 	delete _physXData;
+}
+
+void flt::BoxColliderComponent::OnCreate()
+{
+	_transform = &Component::_gameObject->tr;
+	Collider::_gameObject = Component::_gameObject;
+
+	auto contactOffset = _physXData->shape->getContactOffset();
+
+
+	physx::PxDominanceGroup group = 0;
+
+	_physXData->actor->setDominanceGroup(group);
 }
 
 void flt::BoxColliderComponent::OnEnable()

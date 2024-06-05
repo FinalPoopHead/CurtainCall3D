@@ -12,8 +12,8 @@ namespace flt
 		friend class Scene;
 		friend class GameObject;
 	public:
-		ComponentBase() : ComponentBase(nullptr) {}
-		ComponentBase(GameObject* gameObject) : _isEnable(false), _gameObject(gameObject) {}
+		ComponentBase() : _isEnable(false), _gameObject(nullptr) {}
+		//ComponentBase(GameObject* gameObject) : _isEnable(false), _gameObject(gameObject) {}
 		virtual ~ComponentBase() {}
 
 		// 씬에 추가되었을 때 비활성화 여부와 상관 없이 호출
@@ -66,7 +66,7 @@ namespace flt
 		friend class GameObject;
 	public:
 		Component() : ComponentBase() {}
-		Component(GameObject* gameObject) : ComponentBase(gameObject) {}
+		//Component(GameObject* gameObject) : ComponentBase(gameObject) {}
 
 		//void PrintIndex()
 		//{

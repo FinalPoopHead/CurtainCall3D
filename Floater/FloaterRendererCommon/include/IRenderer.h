@@ -16,7 +16,8 @@ namespace flt
 
 	struct RendererObject
 	{
-		RendererObject(Transform& transform, const bool& isDraw) : 
+		RendererObject(const bool& isDraw) : RendererObject(nullptr, isDraw) {}
+		RendererObject(Transform* transform, const bool& isDraw) : 
 			transform(transform),
 			isDraw(isDraw),
 			node(nullptr),
@@ -29,7 +30,7 @@ namespace flt
 		// model
 		// material, texture
 		// shader
-		Transform& transform;
+		Transform* transform;
 		const bool& isDraw;
 		RawNode* node;
 		Camera* camera;

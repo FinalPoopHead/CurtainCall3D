@@ -6,9 +6,8 @@
 #include "../FloaterRendererCommon/include/RawNode.h"
 
 
-flt::RendererComponent::RendererComponent(GameObject* gameObject) :
-	Component<RendererComponent>(gameObject),
-	_rendererObject(new RendererObject{ gameObject->transform, _isDraw }),
+flt::RendererComponent::RendererComponent() :
+	_rendererObject(new RendererObject{ _isDraw }),
 	_renderer(*GameEngine::Instance()->GetRenderer()), 
 	_hObject(), 
 	_isDraw(true)
@@ -18,6 +17,11 @@ flt::RendererComponent::RendererComponent(GameObject* gameObject) :
 flt::RendererComponent::~RendererComponent()
 {
 	delete _rendererObject;
+}
+
+void flt::RendererComponent::OnCreate()
+{
+	_rendererObject->transform = &_gameObject->transform;
 }
 
 void flt::RendererComponent::OnEnable()

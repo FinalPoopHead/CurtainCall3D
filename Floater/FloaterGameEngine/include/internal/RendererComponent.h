@@ -13,14 +13,15 @@ namespace flt
 	class RendererComponent : public Component<RendererComponent>
 	{
 	public:
-		RendererComponent(GameObject* gameObject);
+		RendererComponent();
 		virtual ~RendererComponent();
 
-		void virtual OnEnable() override;
-		void virtual Update(float deltaSecond) override;
-		void virtual EndDraw() override;
+		virtual void OnCreate() override;
+		virtual void OnEnable() override;
+		virtual void Update(float deltaSecond) override;
+		virtual void EndDraw() override;
 		//void virtual OnDisable() override;
-		void virtual OnDestroy() override;
+		virtual void OnDestroy() override;
 
 	public:
 		void SetRawNode(RawNode* rawNode);

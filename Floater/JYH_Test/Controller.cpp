@@ -3,9 +3,7 @@
 #include <algorithm>
 
 
-Controller::Controller(flt::GameObject* gameObject) :
-	Component<Controller>(gameObject),
-	transform(gameObject->tr),
+Controller::Controller() :
 	_speed(10.0f)
 {
 
@@ -13,6 +11,7 @@ Controller::Controller(flt::GameObject* gameObject) :
 
 void Controller::Update(float deltaSecond)
 {
+	flt::Transform& transform = _gameObject->tr;
 	flt::KeyData rButtonDown = flt::GetKey(flt::KeyCode::mouseRButton);
 	if (rButtonDown)
 	{

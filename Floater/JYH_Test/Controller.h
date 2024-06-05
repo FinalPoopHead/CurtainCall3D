@@ -10,11 +10,10 @@ namespace flt
 class Controller : public flt::Component<Controller>
 {
 public:
-	Controller(flt::GameObject* gameObject);
+	Controller();
 	virtual void Update(float deltaSecond) override;
 
 private:
-	flt::Transform& transform;
 	float _speed;
 };
 

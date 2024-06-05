@@ -7,8 +7,8 @@
 TestGameObejct::TestGameObejct()
 	: flt::GameObject()
 {
-	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>();
-	flt::BoxColliderComponent* boxCollider = AddComponent<flt::BoxColliderComponent>();
+	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>(true);
+	flt::BoxColliderComponent* boxCollider = AddComponent<flt::BoxColliderComponent>(true);
 	boxCollider->UseKinematic(true);
 	boxCollider->SetSize({ 100.0f, 100.0f, 100.0f });
 

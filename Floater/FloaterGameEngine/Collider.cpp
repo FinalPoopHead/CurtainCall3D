@@ -2,7 +2,7 @@
 #include "./include/internal/GameObject.h"
 
 
-flt::Collider::Collider(GameObject* gameObject) : 
-	_gameObject(gameObject)
+flt::Collider::Collider() : 
+	_gameObject(nullptr)
 {
 }
