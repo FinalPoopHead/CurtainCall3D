@@ -14,7 +14,7 @@
       <Filter>Object\HelperObject</Filter>
     </ClCompile>
     <ClCompile Include="SpriteRenderer.cpp">
-      <Filter>Object\ImageRenderer</Filter>
+      <Filter>Component\SpriteRenderer</Filter>
     </ClCompile>
     <ClCompile Include="LineRenderer.cpp">
       <Filter>Object\LineRenderer</Filter>
@@ -109,7 +109,7 @@
       <Filter>Object\HelperObject</Filter>
     </ClInclude>
     <ClInclude Include="SpriteRenderer.h">
-      <Filter>Object\ImageRenderer</Filter>
+      <Filter>Component\SpriteRenderer</Filter>
     </ClInclude>
     <ClInclude Include="IResource.h">
       <Filter>Resource\Interface</Filter>
@@ -217,9 +217,6 @@
     </Filter>
     <Filter Include="Object\HelperObject">
       <UniqueIdentifier>{58879384-5c1a-44e3-9913-4dd22345d70c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Object\ImageRenderer">
-      <UniqueIdentifier>{41ded109-339b-444e-a6e6-a1bf560a3330}</UniqueIdentifier>
     </Filter>
     <Filter Include="Object\LineRenderer">
       <UniqueIdentifier>{29601c1e-6dd6-412d-8f40-c8d66e78a994}</UniqueIdentifier>
@@ -391,6 +388,9 @@
     </Filter>
     <Filter Include="Resource\Shader\HLSL\Deferred\BlitPass">
       <UniqueIdentifier>{e0794d76-6d81-40f9-99c8-000ecf4c56c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\SpriteRenderer">
+      <UniqueIdentifier>{41ded109-339b-444e-a6e6-a1bf560a3330}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

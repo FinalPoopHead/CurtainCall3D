@@ -13,6 +13,8 @@ namespace Rocket::Core
 	{
 	public:
 		virtual ~IDynamicModelRenderer() {}
+
+	public:
 		virtual void LoadModel(const std::string& fileName) = 0;
 		virtual void LoadBaseColorTexture(std::string fileName) = 0;
 		virtual void LoadNormalTexture(std::string fileName) = 0;

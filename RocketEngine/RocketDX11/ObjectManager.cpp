@@ -251,4 +251,73 @@ namespace Rocket::Core
 		return _staticModelRendererList;
 	}
 
+	void ObjectManager::DestroyCamera(Camera* camera)
+	{
+		auto iter = std::find(_cameraList.begin(), _cameraList.end(), camera);
+		if (iter != _cameraList.end())
+		{
+			_cameraList.erase(iter);
+			delete camera;
+		}
+	}
+
+	void ObjectManager::DestroyMeshRenderer(MeshRenderer* meshRenderer)
+	{
+		auto iter = std::find(_meshRendererList.begin(), _meshRendererList.end(), meshRenderer);
+		if (iter != _meshRendererList.end())
+		{
+			_meshRendererList.erase(iter);
+			delete meshRenderer;
+		}
+	}
+
+	void ObjectManager::DestroyDynamicModelRenderer(DynamicModelRenderer* dynamicModelRenderer)
+	{
+		auto iter = std::find(_dynamicModelRendererList.begin(), _dynamicModelRendererList.end(), dynamicModelRenderer);
+		if (iter != _dynamicModelRendererList.end())
+		{
+			_dynamicModelRendererList.erase(iter);
+			delete dynamicModelRenderer;
+		}
+	}
+
+	void ObjectManager::DestroyStaticModelRenderer(StaticModelRenderer* staticModelRenderer)
+	{
+		auto iter = std::find(_staticModelRendererList.begin(), _staticModelRendererList.end(), staticModelRenderer);
+		if (iter != _staticModelRendererList.end())
+		{
+			_staticModelRendererList.erase(iter);
+			delete staticModelRenderer;
+		}
+	}
+
+	void ObjectManager::DestroyTextRenderer(TextRenderer* textRenderer)
+	{
+		auto iter = std::find(_textList.begin(), _textList.end(), textRenderer);
+		if (iter != _textList.end())
+		{
+			_textList.erase(iter);
+			delete textRenderer;
+		}
+	}
+
+	void ObjectManager::DestroySpriteRenderer(SpriteRenderer* spriteRenderer)
+	{
+		auto iter = std::find(_spriteList.begin(), _spriteList.end(), spriteRenderer);
+		if (iter != _spriteList.end())
+		{
+			_spriteList.erase(iter);
+			delete spriteRenderer;
+		}
+	}
+
+	void ObjectManager::DestroyDirectionalLight(DirectionalLight* directionalLight)
+	{
+		auto iter = std::find(_directionalLightList.begin(), _directionalLightList.end(), directionalLight);
+		if (iter != _directionalLightList.end())
+		{
+			_directionalLightList.erase(iter);
+			delete directionalLight;
+		}
+	}
 }

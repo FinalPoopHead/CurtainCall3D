@@ -85,6 +85,11 @@ namespace Rocket::Core
 
 	void DynamicModelRenderer::UpdateAnimation(float deltaTime, bool isCulled /*= false*/)
 	{
+		if (!_isActive)
+		{
+			return;
+		}
+
 		if (_model->animations.empty())
 		{
 			return;
@@ -774,4 +779,8 @@ namespace Rocket::Core
 		return _model->animations.size();
 	}
 
+	void DynamicModelRenderer::Destroy()
+	{
+		ObjectManager::Instance().DestroyDynamicModelRenderer(this);
+	}
 }

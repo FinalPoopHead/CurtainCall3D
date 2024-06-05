@@ -16,4 +16,10 @@ namespace Rocket::Core
 	{
 
 	}
+
+	Material::~Material()
+	{
+
+	}
+
 }

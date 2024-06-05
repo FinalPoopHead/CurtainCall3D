@@ -16,6 +16,8 @@ namespace Rocket::Core
 	{
 	public:
 		virtual ~IMeshRenderer() {}
+
+	public:
 		// TODO : 외부에서 기본 도형들은 편하게 Set 할 수 있게 하면 좋을듯.
 		virtual void SetMesh(eMeshType meshType) = 0;
 		virtual void LoadMesh(std::string fileName) = 0;

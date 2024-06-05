@@ -50,7 +50,10 @@ namespace Rocket::Core
 
 			for (auto meshRenderer : objMgr.GetMeshRenderers())
 			{
-/*				staticMeshList.push_back(meshRenderer);*/
+				if (!meshRenderer->IsActive())
+				{
+					continue;
+				}
 
 				if (light->FrustumCulling(meshRenderer->GetBoundingBox()))
 				{
@@ -60,7 +63,10 @@ namespace Rocket::Core
 
 			for (auto staticModelRenderer : objMgr.GetStaticModelRenderers())
 			{
-				/*				staticMeshList.push_back(meshRenderer);*/
+				if (!staticModelRenderer->IsActive())
+				{
+					continue;
+				}
 
 				if (light->FrustumCulling(staticModelRenderer->GetBoundingBox()))
 				{
@@ -70,7 +76,10 @@ namespace Rocket::Core
 
 			for (auto dynamicModelRenderer : objMgr.GetDynamicModelRenderers())
 			{
-/*				dynamicModelList.push_back(dynamicModelRenderer);*/
+				if (!dynamicModelRenderer->IsActive())
+				{
+					continue;
+				}
 
 				if (light->FrustumCulling(dynamicModelRenderer->GetBoundingBox()))
 				{

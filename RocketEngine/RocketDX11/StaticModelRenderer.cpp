@@ -14,7 +14,6 @@ namespace Rocket::Core
 		: _model(nullptr)
 		, _material(nullptr)
 		, _isActive(true)
-		, _worldTM(Matrix::Identity)
 		, _boundingBox()
 	{
 
@@ -25,11 +24,6 @@ namespace Rocket::Core
 		// TODO : 원래는 ResourceManager에서 unique_ptr로 관리하고 있어야 하는데, 지금은 ObjectManager에서 생성할때 new Material()해서 받아온 것임.
 		//			ResourceManager에서 받아오도록 수정해야함.
 		delete _material;
-	}
-
-	void StaticModelRenderer::SetWorldTM(const Matrix& worldTM)
-	{
-		_worldTM = worldTM;
 	}
 
 	void StaticModelRenderer::SetActive(bool isActive)
@@ -398,4 +392,10 @@ namespace Rocket::Core
 			deviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
 		}
 	}
+
+	void StaticModelRenderer::Destroy()
+	{
+		ObjectManager::Instance().DestroyStaticModelRenderer(this);
+	}
+
 }

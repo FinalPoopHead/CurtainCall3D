@@ -9,11 +9,13 @@
 #include "Texture.h"
 
 namespace Rocket::Core
-{
+{	
+	// 현재는 사실상 머터리얼 구조체인 듯 하다..
 	class Material
 	{
 	public:
 		Material();
+		~Material();
 
 	public:
 		Texture* GetBaseColorTexture() const { return _baseColorTexture; }

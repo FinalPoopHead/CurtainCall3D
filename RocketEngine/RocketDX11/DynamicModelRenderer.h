@@ -28,8 +28,12 @@ namespace Rocket::Core
 		~DynamicModelRenderer();
 
 	public:
-		virtual void SetWorldTM(const Matrix& worldTM) override;
 		virtual void SetActive(bool isActive) override;
+		virtual void Destroy() override;
+		virtual bool IsActive() override { return _isActive; }
+
+	public:
+		virtual void SetWorldTM(const Matrix& worldTM) override;
 		virtual void LoadModel(const std::string& fileName) override;
 		virtual void LoadBaseColorTexture(std::string fileName) override;
 		virtual void LoadNormalTexture(std::string fileName) override;
@@ -53,12 +57,11 @@ namespace Rocket::Core
 		virtual void SetMetallic(float value) override;
 		virtual void SetRoughness(float value) override;
 
-	public:
 		virtual void Render(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj) override;
-		void RenderShadowMap(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj, VertexShader* vs, PixelShader* ps);
 
 	public:
 		void UpdateAnimation(float deltaTime, bool isCulled = false);			// 깊은 복사 해온 Node 데이터에 애니메이션 데이터를 적용한다.
+		void RenderShadowMap(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj, VertexShader* vs, PixelShader* ps);
 
 	public:
 		void SetMaterial(Material* val) { _material = val; }

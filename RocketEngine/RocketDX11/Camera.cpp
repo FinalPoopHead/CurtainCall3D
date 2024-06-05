@@ -4,13 +4,15 @@
 #include "VertexStruct.h"
 #include "GraphicsMacro.h"
 #include "../RocketCommon/RocketTransform.h"
+#include "ObjectManager.h"
 
 namespace Rocket::Core
 {
 	Camera* Camera::_mainCamera[2];
 
 	Camera::Camera()
-		: _nearZ(0.01f), _farZ(1500.0f), _aspect(16.0f / 9.0f), _fovY(70.0f),
+		: _isActive(true)
+		,_nearZ(0.01f), _farZ(1500.0f), _aspect(16.0f / 9.0f), _fovY(70.0f),
 		_viewMatrix(), _projectionMatrix()
 		, _boundingFrustum()
 	{
@@ -160,4 +162,13 @@ namespace Rocket::Core
 		return _mainCamera;
 	}
 
+	void Camera::SetActive(bool isActive)
+	{
+		_isActive = isActive;
+	}
+
+	void Camera::Destroy()
+	{
+		ObjectManager::Instance().DestroyCamera(this);
+	}
 }
