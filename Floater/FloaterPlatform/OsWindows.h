@@ -33,6 +33,8 @@ namespace flt
 		KeyData GetKey(KeyCode code);
 		bool GetGamePadState(int padIndex, GamePadState* outState);
 		bool SetGamePadVibration(int padIndex, float leftMotor, float rightMotor);
+		std::vector<int> GetGamePadIndexList();
+
 		//virtual void OnClosed();
 		void ShowCursor(bool isShow);
 

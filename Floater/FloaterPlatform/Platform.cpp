@@ -11,7 +11,7 @@ public:
 
 flt::Platform::Platform() : Platform(false)
 {
-	
+
 }
 
 flt::Platform::Platform(bool useConsole)
@@ -63,6 +63,11 @@ bool flt::Platform::GetGamePadState(int padIndex, GamePadState* outState)
 bool flt::Platform::SetGamePadVibration(int padIndex, float leftMotor, float rightMotor)
 {
 	return _pOsImpl->SetGamePadVibration(padIndex, leftMotor, rightMotor);
+}
+
+std::vector<int> flt::Platform::GetGamePadIndexList()
+{
+	return _pOsImpl->GetGamePadIndexList();
 }
 
 void flt::Platform::ShowCursor(bool isShow)

@@ -406,6 +406,20 @@ bool flt::OsWindows::SetGamePadVibration(int padIndex, float leftMotor, float ri
 	return true;
 }
 
+std::vector<int> flt::OsWindows::GetGamePadIndexList()
+{
+	std::vector<int> indexList;
+	for (int i = 0; i < 16; ++i)
+	{
+		if (_pGamePads[i].isConnected)
+		{
+			indexList.push_back(i);
+		}
+	}
+
+	return indexList;
+}
+
 void flt::OsWindows::ShowCursor(bool isShow)
 {
 	if (_isShowCursor == isShow)
