@@ -18,15 +18,26 @@ namespace flt
 		GameObject();
 		~GameObject();
 
-		virtual void Start() {}
+		// 씬에 추가되었을 때 비활성화 여부와 상관 없이 호출
+		virtual void OnCreate() {}
+		// 활성화 되었을때 호출
 		virtual void OnEnable() {}
+
+		virtual void FixedUpdate() {}
+
 		virtual void PreUpdate(float deltaSecond) {}
 		virtual void Update(float deltaSecond) {}
 		virtual void PostUpdate(float deltaSecond) {}
 		virtual void EndDraw() {}
+		// 비활성화 되었을때 호출 제거시 활성화 되어있다면 호출
 		virtual void OnDisable() {}
+		// 씬에 제거되었을 때 비활성화 여부와 상관 없이 호출
 		virtual void OnDestroy() {}
 		
+	public:
+		void Enable();
+		void Disable();
+		void Destroy();
 
 	public:
 		[[deprecated("Use Template Function")]] bool AddComponent(ComponentBase* component);
@@ -85,8 +96,8 @@ namespace flt
 	}
 
 	template <typename T>
-	concept GameObjectType = requires(T a)
+	concept GameObjectDerived = requires(T a)
 	{
-		std::is_base_of_v<GameObject, T>;
+		std::is_base_of_v<flt::GameObject, T>;
 	};
 }

@@ -1,11 +1,14 @@
 ﻿#include "TestCamera.h"
 #include "../FloaterGameEngine/include/internal/BuiltinComponent.h"
 #include "../FloaterGameEngine/include/Input.h"
+#include "Board.h"
 #include <algorithm>
+#include <iostream>
 
 
-TestCamera::TestCamera() :
+TestCamera::TestCamera(Board* board) :
 	flt::GameObject(), 
+	_board(board),
 	_speed(10.0f)
 {
 	AddComponent<flt::CameraComponent>();
@@ -69,5 +72,24 @@ void TestCamera::Update(float deltaSecond)
 		{
 			transform.AddWorldPosition(-flt::Transform::WorldUp() * speed * deltaSecond);
 		}
+	}
+
+	flt::KeyData lButtonDown = flt::GetKey(flt::KeyCode::mouseLButton);
+	if (lButtonDown)
+	{
+		flt::Vector4f pos = transform.GetWorldPosition();
+		int tileX = 0;
+		int tileZ = 0;
+
+		_board->ConvertToTileIndex(pos.x, pos.z, tileX, tileZ);
+
+		float worldX = 0.0f;
+		float worldZ = 0.0f;
+
+		_board->ConvertToTilePosition(tileX, tileZ, worldX, worldZ);
+
+		std::cout << "index : " << tileX << ", " << tileZ;
+		std::cout << " | center : " << worldX << ", " << worldZ;
+		std::cout << " | world : " << pos.x << ", " << pos.z << std::endl;
 	}
 }

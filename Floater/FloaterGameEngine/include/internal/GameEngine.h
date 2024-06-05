@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include "../../../FloaterUtil/include/Timer.h"
+#include <unordered_set>
+
 
 namespace flt
 {
@@ -7,6 +9,7 @@ namespace flt
 	class IRenderer;
 	class Scene;
 	class PhysicsEngine;
+	class SoundEngine;
 
 
 	class GameEngine
@@ -14,6 +17,7 @@ namespace flt
 		friend class Scene;
 		friend class RendererComponent;
 		friend class CameraComponent;
+
 
 	private:
 		GameEngine();
@@ -28,7 +32,8 @@ namespace flt
 		bool Update();
 		void Finalize();
 
-		void SetScene(Scene* scene);
+		Scene* SetScene(Scene* scene);
+		void AddScene(Scene* scene);
 		Scene* GetCurrentScene();
 
 		IRenderer* GetRenderer();
@@ -45,8 +50,11 @@ namespace flt
 		Platform* _platform;
 		IRenderer* _renderer;
 		PhysicsEngine* _physicsEngine;
+		SoundEngine* _soundEngine;
+
 
 		Scene* _currentScene;
+		std::unordered_set<Scene*> _scenes;
 		Timer _timer;
 
 		Timer _fixedUpdateTimer;

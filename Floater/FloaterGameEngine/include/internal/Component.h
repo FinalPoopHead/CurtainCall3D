@@ -16,7 +16,9 @@ namespace flt
 		ComponentBase(GameObject* gameObject) : _isEnable(false), _gameObject(gameObject) {}
 		virtual ~ComponentBase() {}
 
-		virtual void Start() {}
+		// 씬에 추가되었을 때 비활성화 여부와 상관 없이 호출
+		virtual void OnCreate() {}
+		// 활성화 되었을때 호출
 		virtual void OnEnable() {}
 
 		virtual void PrePhysics() {}
@@ -30,7 +32,9 @@ namespace flt
 		virtual void Update(float deltaSecond) {}
 		virtual void PostUpdate(float deltaSecond) {}
 		virtual void EndDraw() {}
+		// 비활성화 되었을때 호출 제거시 활성화 되어있다면 호출
 		virtual void OnDisable() {}
+		// 씬에 제거되었을 때 비활성화 여부와 상관 없이 호출
 		virtual void OnDestroy() {}
 
 

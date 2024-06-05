@@ -732,14 +732,12 @@ void flt::RBTree<Key, Value>::Clear()
 	_size = 0;
 }
 
-
 template<typename Key, typename Value>
 flt::RBTree<Key, Value>::RBTree() :
 	RBTree(1024)
 {
 
 }
-
 
 template<typename Key, typename Value>
 flt::RBTree<Key, Value>::RBTree(int capacity) :
@@ -751,8 +749,6 @@ flt::RBTree<Key, Value>::RBTree(int capacity) :
 {
 
 }
-
-
 
 template<typename Key, typename Value>
 flt::RBTree<Key, Value>::~RBTree()

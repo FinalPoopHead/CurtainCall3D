@@ -18,6 +18,12 @@
     <Filter Include="Component\impl">
       <UniqueIdentifier>{f07e4b8c-ab5a-4def-ab9c-28e6461792bd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Physics">
+      <UniqueIdentifier>{27d90a32-def9-401e-a8f4-2014d586bdb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sound">
+      <UniqueIdentifier>{986601c6-69b0-4de1-97a3-0d02b9d5727a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ID.h">
@@ -39,9 +45,6 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="include\Input.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsEngine.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="include\internal\BuiltinComponent.h">
@@ -68,6 +71,15 @@
     <ClInclude Include="include\EngineMinimal.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="PhysicsEngine.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundEngine.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="include\internal\SoundComponent.h">
+      <Filter>Component\impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -88,9 +100,6 @@
     <ClCompile Include="Input.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="PhysicsEngine.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="CameraComponent.cpp">
       <Filter>Component\impl</Filter>
     </ClCompile>
@@ -104,6 +113,18 @@
       <Filter>Component\impl</Filter>
     </ClCompile>
     <ClCompile Include="Collider.cpp">
+      <Filter>Component\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineMinimal.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsEngine.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundEngine.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundComponent.cpp">
       <Filter>Component\impl</Filter>
     </ClCompile>
   </ItemGroup>

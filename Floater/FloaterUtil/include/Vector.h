@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 namespace flt
 {
@@ -12,5 +12,3 @@ namespace flt
 #pragma endregion
 	};
 }
-
-

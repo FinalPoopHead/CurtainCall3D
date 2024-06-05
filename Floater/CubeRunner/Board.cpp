@@ -1,28 +1,35 @@
 ﻿#include "Board.h"
 #include "Tile.h"
 
-Board::Board(int width, int height)
-	: flt::GameObject()
-	, _width(width)
-	, _height(height)
-	, _tileState()
+Board::Board(int width, int height, float offset) :
+	flt::GameObject(),
+	_width(width),
+	_height(height),
+	_offset(offset),
+	_tileState()
 {
-	_tileState.resize(_width);
-	for (int i = 0; i < _width; ++i)
-	{
-		_tileState[i].resize(_height);
-	}
 
-	_tiles.resize(_width);
-	for (int i = 0; i < _width; ++i)
-	{
-		_tiles[i].reserve(_height);
+}
 
-		for (int j = 0; j < _height; ++j)
-		{
-			_tiles[i].push_back(flt::CreateGameObject<Tile>(true));
-		}
-	}
+Board::~Board()
+{
+
+}
+
+void Board::OnCreate()
+{
+	int width = _width;
+	int height = _height;
+
+	_width = 0;
+	_height = 0;
+
+	Resize(width, height);
+}
+
+void Board::OnDestroy()
+{
+	Resize(0, 0);
 }
 
 void Board::PreUpdate(float deltaTime)
@@ -72,9 +79,111 @@ TileStateFlag Board::QueryTileState(float x, float y)
 	return _tileState[tileX][tileY];
 }
 
-void Board::ConvertToTileIndex(float x, float y, int& outX, int& outY)
+void Board::ConvertToTileIndex(float x, float z, int& outX, int& outZ)
 {
+	flt::Vector4f pos = this->tr.GetWorldPosition();
+	x -= pos.x;
+	z -= pos.z;
 
+	x = x / _offset;
+	z = z / _offset;
+
+	x < 0.0f ? x -= 0.5f : x += 0.5f;
+	z < 0.0f ? z -= 0.5f : z += 0.5f;
+
+	outX = (int)x;
+	outZ = (int)z;
+}
+
+void Board::ConvertToTilePosition(int x, int z, float& outX, float& outZ)
+{
+	ConvertToTileLocalPosition(x, z, outX, outZ);
+
+	flt::Vector4f pos = this->tr.GetWorldPosition();
+	outX += pos.x;
+	outZ += pos.z;
+}
+
+void Board::Resize(int newWidth, int newHeight)
+{
+	_tileState.resize(newWidth);
+	for (int i = 0; i < newWidth; ++i)
+	{
+		_tileState[i].resize(newHeight);
+	}
+
+	// 타일 높이가 변화시 먼저 처리
+	if (newHeight < _height)
+	{
+		for (int i = 0; i < _width; ++i)
+		{
+			for (int j = newHeight; j < _height; ++j)
+			{
+				_tiles[i][j]->Destroy();
+			}
+
+			_tiles[i].resize(newHeight);
+		}
+	}
+	else if (newHeight > _height)
+	{
+		for (int i = 0; i < _width; ++i)
+		{
+			_tiles[i].resize(newHeight);
+			for (int j = _height; j < newHeight; ++j)
+			{
+				_tiles[i][j] = flt::CreateGameObject<Tile>(true);
+				_tiles[i][j]->tr.SetParent(&this->tr);
+
+				float x = 0.0f;
+				float z = 0.0f;
+				ConvertToTileLocalPosition(i, j, x, z);
+				_tiles[i][j]->tr.SetPosition({ x, 0.0f, z });
+			}
+		}
+	}
+
+	// 타일 너비가 작아지는경우 타일을 삭제
+	if (newWidth < _width)
+	{
+		for (int i = newWidth; i < _width; ++i)
+		{
+			for (auto& tile : _tiles[i])
+			{
+				tile->Destroy();
+			}
+		}
+	}
+	_tiles.resize(newWidth);
+
+	// 타일이 늘어나는 경우 타일을 추가
+	for (int i = _width; i < newWidth; ++i)
+	{
+		_tiles[i].resize(newHeight);
+
+		for (int j = 0; j < newHeight; ++j)
+		{
+			_tiles[i][j] = flt::CreateGameObject<Tile>(true);
+			_tiles[i][j]->tr.SetParent(&this->tr);
+
+			float x = 0.0f;
+			float z = 0.0f;
+			ConvertToTileLocalPosition(i, j, x, z);
+			_tiles[i][j]->tr.SetPosition({ x, 0.0f, z });
+		}
+	}
+
+	_width = newWidth;
+	_height = newHeight;
+}
+
+void Board::ConvertToTileLocalPosition(int x, int z, float& outX, float& outZ)
+{
+	outX = (float)x;
+	outZ = (float)z;
+
+	outX *= _offset;
+	outZ *= _offset;
 }
 
 void Board::UpdateBoard()

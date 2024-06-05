@@ -15,6 +15,21 @@ flt::GameObject::~GameObject()
 
 }
 
+void flt::GameObject::Enable()
+{
+	_scene->AddEnableGameObject(this, true);
+}
+
+void flt::GameObject::Disable()
+{
+	_scene->AddEnableGameObject(this, false);
+}
+
+void flt::GameObject::Destroy()
+{
+	_scene->AddDestroyGameObject(this);
+}
+
 bool flt::GameObject::AddComponent(ComponentBase* component)
 {
 	int index = component->GetIndex();

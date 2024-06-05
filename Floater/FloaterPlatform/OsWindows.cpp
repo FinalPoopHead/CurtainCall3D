@@ -406,6 +406,20 @@ bool flt::OsWindows::SetGamePadVibration(int padIndex, float leftMotor, float ri
 	return true;
 }
 
+std::vector<int> flt::OsWindows::GetGamePadIndexList()
+{
+	std::vector<int> indexList;
+	for (int i = 0; i < 16; ++i)
+	{
+		if (_pGamePads[i].isConnected)
+		{
+			indexList.push_back(i);
+		}
+	}
+
+	return indexList;
+}
+
 void flt::OsWindows::ShowCursor(bool isShow)
 {
 	if (_isShowCursor == isShow)
@@ -1007,7 +1021,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 				if (wParam == DBT_DEVICEARRIVAL)
 				{
 					wchar_t* data = dif->dbcc_name;
-					int size = wcslen(data) * sizeof(wchar_t);
+					size_t size = wcslen(data) * sizeof(wchar_t);
 					uint64 hash = flt::hash::xxh64::hash((char*)data, size, 0);
 					ASSERT(hash == 0, "해시값이 0이면 처음 연결되는것으로 세팅되어있음.");
 

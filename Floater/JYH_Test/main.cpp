@@ -2,6 +2,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include "../FloaterGameEngine/include\EngineMinimal.h"
+#include "../FloaterGameEngine/include/internal/GameEngine.h"
 #include "TestScene.h"
 #include "UnityLoadScene.h"
 #include <iostream>

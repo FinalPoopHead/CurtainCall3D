@@ -2,6 +2,7 @@
 #include "./include/internal/Scene.h"
 #include "../FloaterPlatform/include/Platform.h"
 #include "PhysicsEngine.h"
+#include "SoundEngine.h"
 
 
 flt::IRenderer* flt::GameEngine::GetRenderer()
@@ -31,6 +32,9 @@ void flt::GameEngine::Initialize()
 	//_renderer = _platform->CreateRenderer(RendererType::DX11);
 	_physicsEngine = new PhysicsEngine();
 	_physicsEngine->Initialize();
+
+	_soundEngine = new SoundEngine();
+	_soundEngine->Initialize();
 
 	_timer.Start();
 }
@@ -67,11 +71,24 @@ bool flt::GameEngine::Update()
 	_renderer->Render(deltaSecond);
 	_currentScene->EndRender();
 
+	_currentScene->EndFrame();
+
 	return closeWindow;
 }
 
 void flt::GameEngine::Finalize()
 {
+	if (_currentScene != nullptr)
+	{
+		_currentScene->Finalize();
+	}
+	_currentScene = nullptr;
+
+	for (auto& scene : _scenes)
+	{
+		delete scene;
+	}
+
 	_platform->DestroyRenderer(_renderer);
 	delete _platform;
 
@@ -81,10 +98,16 @@ void flt::GameEngine::Finalize()
 	_physicsEngine->Finalize();
 	delete _physicsEngine;
 	_physicsEngine = nullptr;
+
+	_soundEngine->Finalize();
+	delete _soundEngine;
+	_soundEngine = nullptr;
 }
 
-void flt::GameEngine::SetScene(Scene* scene)
+flt::Scene* flt::GameEngine::SetScene(Scene* scene)
 {
+	Scene* ret = _currentScene;
+
 	if(_currentScene != nullptr)
 	{
 		_currentScene->Finalize();
@@ -92,6 +115,13 @@ void flt::GameEngine::SetScene(Scene* scene)
 
 	_currentScene = scene;
 	_currentScene->Initialize();
+
+	return ret;
+}
+
+void flt::GameEngine::AddScene(Scene* scene)
+{
+	_scenes.insert(scene);
 }
 
 flt::Scene* flt::GameEngine::GetCurrentScene()
