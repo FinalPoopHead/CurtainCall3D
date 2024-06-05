@@ -1,22 +1,27 @@
 ﻿#pragma once
 #include "Component.h"
+#include <vector>
 #include <string>
 
 
 namespace flt
 {
 	class SoundEngine;
+	class Sound;
 
 	class SoundComponent : public Component<SoundComponent>
 	{
 	public:
 		SoundComponent();
 
-		void AddSound(std::wstring path);
+		int AddSound(std::wstring path);
+		void Play(int index);
+		void Stop(int index);
 
 
 	private:
 		SoundEngine* _soundEngine;
+		std::vector<Sound*> _sounds;
 	};
 
 }

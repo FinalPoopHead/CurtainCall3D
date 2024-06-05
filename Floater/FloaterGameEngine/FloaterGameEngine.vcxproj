@@ -36,6 +36,7 @@
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="include\internal\SoundComponent.h" />
     <ClInclude Include="include\internal\RendererNode.h" />
+    <ClInclude Include="Sound.h" />
     <ClInclude Include="SoundEngine.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
@@ -53,6 +54,7 @@
     <ClCompile Include="RendererNode.cpp" />
     <ClCompile Include="RendererComponent.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SoundComponent.cpp" />
     <ClCompile Include="SoundEngine.cpp" />
     <ClCompile Include="World.cpp" />

@@ -92,6 +92,9 @@
     <ClInclude Include="include\internal\RendererNode.h">
       <Filter>Manager\Resource\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -141,6 +144,9 @@
     </ClCompile>
     <ClCompile Include="RendererNode.cpp">
       <Filter>Manager\Resource\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
