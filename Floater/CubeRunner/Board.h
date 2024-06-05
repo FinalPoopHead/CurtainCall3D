@@ -10,7 +10,7 @@ enum class TileStateFlag
 	Tile = 0x0001,
 	Player = 0x0002,
 	Mine = 0x0004,
-	cube1 = 0x0010,
+	NormalCube = 0x0010,
 	cube2 = 0x0020,
 	cube3 = 0x0040,
 	cube4 = 0x0080,
@@ -23,7 +23,7 @@ enum class TileStateFlag
 class Board : public flt::GameObject
 {
 public:
-	Board(int width, int height, float offset = 4.05f);
+	Board(int width, int height, float offset = 4.00f);
 	virtual ~Board();
 
 	void OnCreate() override;

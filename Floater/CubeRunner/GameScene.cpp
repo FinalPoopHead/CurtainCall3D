@@ -15,7 +15,7 @@ void GameScene::Initialize()
 	camera->tr.SetPosition(0.0f, 5.0f, -10.0f);
 
 	NormalCube* cube = flt::CreateGameObject<NormalCube>(true);
-	cube->tr.SetPosition(0.0f, 4.0f, 36.4f);
+	cube->tr.SetPosition(0.0f, 4.0f, 36.0f);
 }
 
 void GameScene::Finalize()
