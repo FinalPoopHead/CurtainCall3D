@@ -154,13 +154,16 @@ bool flt::RocketAdapter::DeregisterObject(HOBJECT renderable)
 {
 	RocketObject* rocketObject = (RocketObject*)renderable;
 
-	if (0 < rocketObject->rkModel->animations.size())
+	if (rocketObject->rkModel)
 	{
-		rocketObject->renderer->Destroy();
-	}
-	else
-	{
-		rocketObject->staticModelRenderer->Destroy();
+		if (0 < rocketObject->rkModel->animations.size())
+		{
+			rocketObject->renderer->Destroy();
+		}
+		else
+		{
+			rocketObject->staticModelRenderer->Destroy();
+		}
 	}
 
 	auto iter = _objects.find(rocketObject);

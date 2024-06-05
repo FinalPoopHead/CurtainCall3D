@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include <vector>
+
 
 namespace FMOD
 {
@@ -14,8 +16,13 @@ namespace FMOD
 	class Reverb3D;
 }
 
+struct FMOD_CREATESOUNDEXINFO;
+
+
 namespace flt
 {
+	class Sound;
+
 	class SoundEngine
 	{
 	public:
@@ -23,10 +30,13 @@ namespace flt
 		void Initialize();
 		void Finalize();
 
+		bool CreateSound(void* buff, FMOD_CREATESOUNDEXINFO* exinfo, FMOD::Sound** sound);
+		bool CreateSound(const char* name, FMOD::Sound** sound);
+		void Play(Sound* sound);
+
 	private:
 		FMOD::System* _system;
-		FMOD::Sound* _sound;
-		FMOD::Channel* _channel;
+		std::vector<FMOD::ChannelGroup*> _channelGroups;
 
 		const float DISTANCEFACTOR = 1.0f;
 		const int   INTERFACE_UPDATETIME = 50; // ms
