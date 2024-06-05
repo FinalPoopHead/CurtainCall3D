@@ -441,12 +441,30 @@ flt::HOBJECT flt::RendererDX11::RegisterObject(RendererObject& renderable)
 		_cameras.push_back(node->camera);
 	}
 
-	return true;
+	return (HOBJECT)node;
 }
 
 bool flt::RendererDX11::DeregisterObject(HOBJECT renderable)
 {
-	return false;
+	DX11Node* node = (DX11Node*)renderable;
+	auto iter = std::find(_renderableObjects.begin(), _renderableObjects.end(), node);
+	if (iter == _renderableObjects.end())
+	{
+		return false;
+	}
+
+	if (node->camera)
+	{
+		auto cameraIter = std::find(_cameras.begin(), _cameras.end(), node->camera);
+		if (cameraIter != _cameras.end())
+		{
+			_cameras.erase(cameraIter);
+		}
+	}
+
+	_renderableObjects.erase(iter);
+
+	return true;
 }
 
 bool flt::RendererDX11::Test()
@@ -594,7 +612,7 @@ bool flt::RendererDX11::ForwardRender(float deltaTime)
 			// 상수 버퍼 임시 세팅
 			struct {
 				unsigned int gridCount;
-			} entityInitData {};
+			} entityInitData{};
 			entityInitData.gridCount = gridCounts[i];
 
 			struct {
@@ -851,6 +869,11 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 
 		for (auto& node : _renderableObjects)
 		{
+			if (node->isDraw == false)
+			{
+				continue;
+			}
+
 			Matrix4f worldMatrix = node->transform.GetWorldMatrix4f();
 			Matrix4f worldViewProjMatrix = worldMatrix * viewMatrix * projMatrix;
 			DirectX::XMMATRIX constBuffer0[2] = { ConvertXMMatrix(worldViewProjMatrix), ConvertXMMatrix(worldMatrix.Inverse().Transpose()) };
@@ -925,7 +948,7 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 	}
 
 	float blend[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	
+
 	_immediateContext->ClearRenderTargetView(_gBuffer[GBUFFER_SPECULAR].rtv.Get(), DirectX::Colors::Black);
 
 	{
@@ -1305,8 +1328,16 @@ void flt::RendererDX11::SetDX11Node(DX11Node* dxNode, RawNode& node)
 		meshBuilder.pImmediateContext = _immediateContext.Get();
 		meshBuilder.pRawMesh = &node.meshes[i];
 
-		meshBuilder.vsBuilder = DX11VertexShaderBuilder(L"../FloaterRendererDX11/VertexShader.hlsl");
-		meshBuilder.vsBuilder.pDevice = _device.Get();
+		if (node.skeleton)
+		{
+			meshBuilder.vsBuilder = DX11VertexShaderBuilder(L"../FloaterRendererDX11/VertexShader.hlsl");
+			meshBuilder.vsBuilder.pDevice = _device.Get();
+		}
+		else
+		{
+			meshBuilder.vsBuilder = DX11VertexShaderBuilder(L"../FloaterRendererDX11/StaticVertexShader.hlsl");
+			meshBuilder.vsBuilder.pDevice = _device.Get();
+		}
 
 		meshBuilder.psBuilder = DX11PixelShaderBuilder(L"../FloaterRendererDX11/DeferredPixelShader.hlsl");
 		meshBuilder.psBuilder.pDevice = _device.Get();

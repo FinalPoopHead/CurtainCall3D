@@ -131,6 +131,18 @@ void flt::Scene::AddEnableGameObject(GameObject* gameObject, bool isEnable)
 	}
 }
 
+void flt::Scene::AddEnableComponent(ComponentBase* component, bool isEnable)
+{
+	if (isEnable)
+	{
+		_componentsToEnable.emplace_back(component);
+	}
+	else
+	{
+		_componentsToDisable.emplace_back(component);
+	}
+}
+
 void flt::Scene::AddDestroyGameObject(GameObject* gameObject)
 {
 	bool isExist = false;
@@ -612,7 +624,6 @@ void flt::Scene::EndFrame()
 	for (int i = 0; i < _gameObjectsToDestroy.size(); ++i)
 	{
 		GameObject* object = _gameObjectsToDestroy[i];
-		_gameObjectsToDestroy.pop_back();
 
 		//이미 이 전 상태와 같다면 패스.
 		if (object->_isEnable == false)

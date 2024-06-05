@@ -24,6 +24,15 @@
     <Filter Include="Sound">
       <UniqueIdentifier>{986601c6-69b0-4de1-97a3-0d02b9d5727a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Manager">
+      <UniqueIdentifier>{45bc3190-7500-4fa4-986e-0a2f6be2ca12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager\Resource">
+      <UniqueIdentifier>{2d07b1e3-91f5-4a8d-b725-f33ecaa741e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager\Resource\Renderer">
+      <UniqueIdentifier>{d75ccb82-7c4d-473e-ba4d-919e071c8b44}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ID.h">
@@ -80,6 +89,9 @@
     <ClInclude Include="include\internal\SoundComponent.h">
       <Filter>Component\impl</Filter>
     </ClInclude>
+    <ClInclude Include="include\internal\RendererNode.h">
+      <Filter>Manager\Resource\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -126,6 +138,9 @@
     </ClCompile>
     <ClCompile Include="SoundComponent.cpp">
       <Filter>Component\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="RendererNode.cpp">
+      <Filter>Manager\Resource\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

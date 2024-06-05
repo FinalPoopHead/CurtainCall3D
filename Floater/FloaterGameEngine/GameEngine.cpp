@@ -15,6 +15,11 @@ flt::PhysicsEngine* flt::GameEngine::GetPhysicsEngine()
 	return _physicsEngine;
 }
 
+flt::SoundEngine* flt::GameEngine::GetSoundEngine()
+{
+	return _soundEngine;
+}
+
 flt::Platform* flt::GameEngine::GetPlatform()
 {
 	return _platform;

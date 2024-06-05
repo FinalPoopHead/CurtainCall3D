@@ -18,6 +18,7 @@ namespace flt
 	{
 		friend class GameObject;
 		friend class GameEngine;
+		friend class ComponentBase;
 
 		template<GameObjectDerived T, typename... TArgs>
 		friend T* flt::CreateGameObject(bool isEnabled, TArgs&&... args);
@@ -43,6 +44,7 @@ namespace flt
 
 	private:
 		void AddEnableGameObject(GameObject* gameObject, bool isEnable);
+		void AddEnableComponent(ComponentBase* component, bool isEnable);
 		void AddDestroyGameObject(GameObject* gameObject);
 
 	private:

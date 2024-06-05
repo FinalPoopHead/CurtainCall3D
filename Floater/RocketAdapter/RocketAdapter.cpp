@@ -57,6 +57,19 @@ bool flt::RocketAdapter::Render(float deltaTime)
 {
 	for (auto& obj : _objects)
 	{
+		if (obj->rkModel)
+		{
+			if (0 < obj->rkModel->animations.size())
+			{
+				obj->renderer->SetActive(obj->isDraw);
+			}
+			else
+			{
+				obj->staticModelRenderer->SetActive(obj->isDraw);
+			}
+		}
+
+
 		Transform temp;
 		temp.SetMatrix(obj->transform->GetWorldMatrix4f());
 
@@ -69,21 +82,8 @@ bool flt::RocketAdapter::Render(float deltaTime)
 		Vector4f wScale = temp.GetLocalScale();
 		obj->rocketTransform.SetLocalScale({ wScale.x, wScale.y, wScale.z });
 
-		//Vector4f wPos = obj->transform->GetWorldPosition();
-		//obj->rocketTransform.SetLocalPosition({ wPos.x, wPos.y, wPos.z });
-
-		//Quaternion wRot = obj->transform->GetWorldRotation();
-		//obj->rocketTransform.SetLocalRotation({ wRot.x, wRot.y, wRot.z, wRot.w });
-
-		//Vector3f wScale = obj->transform->GetWorldScale();
-		//obj->rocketTransform.SetLocalScale({ wScale.x, wScale.y, wScale.z });
-
 		if (obj->camera)
 		{
-// 			Vector3f pos = (Vector3f)obj->transform->GetWorldPosition();
-// 			Quaternion rot = obj->transform->GetWorldRotation();
-// 			obj->camera->BindTransform(&obj->rocketTransform);
-			//obj->camera->SetPositionAndRotation({ pos.x, pos.y, pos.z }, { rot.x, rot.y, rot.z, rot.w });
 		}
 	}
 
@@ -95,7 +95,7 @@ bool flt::RocketAdapter::Render(float deltaTime)
 
 flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 {
-	RocketObject* rocketObject = new(std::nothrow) RocketObject();
+	RocketObject* rocketObject = new(std::nothrow) RocketObject(renderable.isDraw);
 	ASSERT(rocketObject, "Failed to create RocketObject");
 
 	auto factory = Rocket::Core::CreateGraphicsObjectFactory();
@@ -119,7 +119,7 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 		//std::string pointer = std::to_string(reinterpret_cast<uint64_t>(rocketObject->rkModel));
 		std::string pointer = rocketObject->rkModel->name;
 		rsmgr->LoadModel(pointer, rocketObject->rkModel);
-		
+
 		if (renderable.node->meshes.size() > 0)
 		{
 			if (0 < rocketObject->rkModel->animations.size())
@@ -147,10 +147,29 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 	Rocket::Core::ReleaseFactory(factory);
 
 	_objects.insert(rocketObject);
-	return 0;
+	return (HOBJECT)rocketObject;
 }
 
 bool flt::RocketAdapter::DeregisterObject(HOBJECT renderable)
 {
-	return false;
+	RocketObject* rocketObject = (RocketObject*)renderable;
+
+	if (0 < rocketObject->rkModel->animations.size())
+	{
+		rocketObject->renderer->Destroy();
+	}
+	else
+	{
+		rocketObject->staticModelRenderer->Destroy();
+	}
+
+	auto iter = _objects.find(rocketObject);
+
+	if (iter == _objects.end())
+	{
+		return false;
+	}
+
+	_objects.erase(iter);
+	return true;
 }

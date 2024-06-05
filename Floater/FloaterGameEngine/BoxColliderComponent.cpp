@@ -21,8 +21,8 @@ namespace flt
 
 flt::BoxColliderComponent::BoxColliderComponent() :
 	_transform(nullptr),
-	_physcx(*GameEngine::Instance()->GetPhysicsEngine()->GetPhysics()),
-	_scene(*GameEngine::Instance()->GetPhysicsEngine()->GetScene()),
+	_physx(*GameEngine::Instance()->GetPhysicsEngine()->GetPhysics()),
+	_physxScene(*GameEngine::Instance()->GetPhysicsEngine()->GetScene()),
 	_physXData(new PhysXData()),
 	_size(10.0f, 10.0f, 10.0f),
 	_offset(0.0f, 0.0f, 0.0f, 0.0f),
@@ -37,14 +37,14 @@ flt::BoxColliderComponent::BoxColliderComponent() :
 	_physXData->transform.q.z = 0.0f;
 	_physXData->transform.q.w = 1.0f;
 
-	_physXData->actor = _physcx.createRigidDynamic(_physXData->transform);
+	_physXData->actor = _physx.createRigidDynamic(_physXData->transform);
 	_physXData->actor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, _isKinematic);
 	_physXData->actor->setSleepThreshold(5e-4f);
 	_physXData->actor->setWakeCounter(0.0f);
 
 	_physXData->actor->userData = static_cast<Collider*>(this);
 
-	_physXData->shape = _physcx.createShape(physx::PxBoxGeometry(_size.x, _size.y, _size.z), *_physcx.createMaterial(0.5f, 0.5f, 0.6f));
+	_physXData->shape = _physx.createShape(physx::PxBoxGeometry(_size.x, _size.y, _size.z), *_physx.createMaterial(0.5f, 0.5f, 0.6f));
 	_physXData->actor->attachShape(*_physXData->shape);
 }
 
@@ -71,12 +71,12 @@ void flt::BoxColliderComponent::OnCreate()
 
 void flt::BoxColliderComponent::OnEnable()
 {
-	_scene.addActor(*_physXData->actor);
+	_physxScene.addActor(*_physXData->actor);
 }
 
 void flt::BoxColliderComponent::OnDisable()
 {
-	_scene.removeActor(*_physXData->actor);
+	_physxScene.removeActor(*_physXData->actor);
 }
 
 void flt::BoxColliderComponent::PrePhysics()

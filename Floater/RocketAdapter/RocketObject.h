@@ -17,14 +17,15 @@ namespace flt
 {
 	struct RocketObject
 	{
-		RocketObject() :
+		RocketObject(const bool& isDraw) :
 			rocketTransform(),
 			transform(nullptr),
 			camera(nullptr),
 			renderer(nullptr),
 			staticModelRenderer(nullptr),
 			rkModel(nullptr),
-			isRegisted(false) {}
+			isRegisted(false),
+			isDraw(isDraw) {}
 
 		Rocket::Core::RocketTransform rocketTransform;
 		Transform* transform;
@@ -34,6 +35,7 @@ namespace flt
 		Rocket::Core::RawModel* rkModel;
 
 		bool isRegisted;
+		const bool& isDraw;
 	};
 }
 

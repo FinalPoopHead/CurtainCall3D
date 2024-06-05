@@ -8,5 +8,8 @@ public:
 	virtual ~TestGameObejct();
 
 	void Update(float deltaTime) override;
+
+private:
+	float _elapsedTime = 0.0f;
 };
 

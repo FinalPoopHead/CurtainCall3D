@@ -38,6 +38,7 @@ namespace flt
 
 		IRenderer* GetRenderer();
 		PhysicsEngine* GetPhysicsEngine();
+		SoundEngine* GetSoundEngine();
 		Platform* GetPlatform();
 
 	protected:
