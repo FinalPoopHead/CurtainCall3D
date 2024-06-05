@@ -36,6 +36,11 @@ void CubeController::Update(float deltaSecond)
 
 void CubeController::StartRolling(float rotateTime)
 {
+	if (_isRolling)
+	{
+		return;
+	}
+
 	_isRolling = true;
 
 	flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
@@ -48,6 +53,12 @@ void CubeController::StartRolling(float rotateTime)
 
 void CubeController::Roll(float deltaSecond)
 {
+	flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
+	flt::Vector4f pivot = {_rotatePivot.x, _rotatePivot.y, _rotatePivot.z, 1.0f};
+	flt::Vector4f dir = pivot - pos;
+
+	_gameObject->tr.AddWorldPosition(dir);
+
 	float deltaAngle = _rotateSpeed * deltaSecond * ROLLANGLE;
 	if (_currentAngle + deltaAngle >= TARGETANGLE[_targetIndex])
 	{
@@ -57,6 +68,12 @@ void CubeController::Roll(float deltaSecond)
 	_currentAngle += deltaAngle;
 
 	_gameObject->tr.SetRotation({ 1.0f,0.0f,0.0f }, flt::DegToRad(_currentAngle));
+
+	flt::Transform tr;
+	tr.SetRotation({ 1.0f,0.0f,0.0f }, flt::DegToRad(deltaAngle));
+	dir = dir * tr.GetWorldMatrix4f();
+
+	_gameObject->tr.AddWorldPosition(-dir);
 
 	if (!_isRolling)
 	{
