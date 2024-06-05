@@ -46,8 +46,8 @@ namespace flt
 	private:
 		Transform* _transform;
 
-		physx::PxPhysics& _physcx;
-		physx::PxScene& _scene;
+		physx::PxPhysics& _physx;
+		physx::PxScene& _physxScene;
 		PhysXData* _physXData;
 		
 		flt::Vector3f _size;
