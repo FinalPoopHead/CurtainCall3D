@@ -132,6 +132,32 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 				RawSkeleton*& skeleton = renderable.node->skeleton;
 				GenerateTransformHierarchyRecursive(rootBoneTransform, &skeleton->bones[skeleton->rootBoneIndex].transform);
 				rocketObject->renderer->BindTransform(&rocketObject->rocketTransform);
+
+				// 하드코딩 일단 0번만 넣어주자.
+				if (renderable.materials[0].textures[RawMaterial::TextureType::ALBEDO_OPACITY]->name != L"")
+				{
+					rocketObject->renderer->LoadBaseColorTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::ALBEDO_OPACITY]->name));
+				}
+
+				if (renderable.materials[0].textures[RawMaterial::TextureType::AO]->name != L"")
+				{
+					rocketObject->renderer->LoadAOTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::AO]->name));
+				}
+
+				if (renderable.materials[0].textures[RawMaterial::TextureType::METALLIC]->name != L"")
+				{
+					rocketObject->renderer->LoadMetallicTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::METALLIC]->name));
+				}
+
+				if (renderable.materials[0].textures[RawMaterial::TextureType::ROUGHNESS]->name != L"")
+				{
+					rocketObject->renderer->LoadRoughnessTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::ROUGHNESS]->name));
+				}
+
+				if (renderable.materials[0].textures[RawMaterial::TextureType::NORMAL]->name != L"")
+				{
+					rocketObject->renderer->LoadNormalTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::NORMAL]->name));
+				}
 			}
 			else
 			{
@@ -139,6 +165,32 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 				rocketObject->staticModelRenderer->LoadModel(pointer);
 
 				rocketObject->staticModelRenderer->BindTransform(&rocketObject->rocketTransform);
+
+				// 하드코딩 일단 0번만 넣어주자.
+				if (renderable.materials[0].textures[RawMaterial::TextureType::ALBEDO_OPACITY]->name != L"")
+				{
+					rocketObject->staticModelRenderer->LoadBaseColorTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::ALBEDO_OPACITY]->name));
+				}
+
+				if (renderable.materials[0].textures[RawMaterial::TextureType::AO]->name != L"")
+				{
+					rocketObject->staticModelRenderer->LoadAOTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::AO]->name));
+				}
+
+				if (renderable.materials[0].textures[RawMaterial::TextureType::METALLIC]->name != L"")
+				{
+					rocketObject->staticModelRenderer->LoadMetallicTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::METALLIC]->name));
+				}
+
+				if (renderable.materials[0].textures[RawMaterial::TextureType::ROUGHNESS]->name != L"")
+				{
+					rocketObject->staticModelRenderer->LoadRoughnessTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::ROUGHNESS]->name));
+				}
+
+				if (renderable.materials[0].textures[RawMaterial::TextureType::NORMAL]->name != L"")
+				{
+					rocketObject->staticModelRenderer->LoadNormalTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::NORMAL]->name));
+				}
 			}
 		}
 	}

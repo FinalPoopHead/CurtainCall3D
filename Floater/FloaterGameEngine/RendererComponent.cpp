@@ -3,7 +3,7 @@
 #include "./include/internal/GameObject.h"
 #include "./include/internal/Scene.h"
 #include "./include/internal/GameEngine.h"
-#include "../FloaterRendererCommon/include/RawNode.h"
+//#include "../FloaterRendererCommon/include/RawNode.h"
 
 
 flt::RendererComponent::RendererComponent() :
@@ -65,14 +65,25 @@ void flt::RendererComponent::OnDestroy()
 
 void flt::RendererComponent::SetRawNode(RawNode* rawNode)
 {
-	_rendererObject->node = rawNode;
+	_rendererObject->SetRawNode(rawNode);
 }
 
-void flt::RendererComponent::SetFilePath(std::wstring path)
+void flt::RendererComponent::SetFilePath(const std::wstring& path)
 {
 	RenderableBuilder builder(path);
 	_resource.Set(builder);
-	_rendererObject->node = _resource.Get()->node;
+	_rendererObject->SetRawNode(_resource.Get()->node);
+
+	if (_isRegisted)
+	{
+		_renderer.DeregisterObject(_hObject);
+		_hObject = _renderer.RegisterObject(*_rendererObject);
+	}
+}
+
+void flt::RendererComponent::SetMaterial(uint32 meshIndex, const std::wstring& path, RawMaterial::TextureType type)
+{
+	_rendererObject->SetMaterial(meshIndex, path, type);
 
 	if (_isRegisted)
 	{

@@ -10,6 +10,7 @@ TestGameObejct::TestGameObejct()
 	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>(true);
 	std::wstring filePath = L"..\\x64\\fbx\\Tile_Edge.fbx";
 	renderer->SetFilePath(filePath);
+	renderer->SetMaterial(0, L"abcd.jpg", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
 
 	flt::BoxColliderComponent* boxCollider = AddComponent<flt::BoxColliderComponent>(true);
 	boxCollider->UseKinematic(true);

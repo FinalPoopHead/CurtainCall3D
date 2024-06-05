@@ -29,23 +29,26 @@ bool flt::ModelLoader::Load(std::wstring path, RawScene* outRawScene)
 		return false;
 	}
 
-	size_t pos = path.find_last_of(L".");
-	std::wstring extension = path.substr(pos + 1);
-	for (auto& c : extension)
-	{
-		c = towlower(c);
-	}
+	//size_t pos = path.find_last_of(L".");
+	//std::wstring extension = path.substr(pos + 1);
+	//for (auto& c : extension)
+	//{
+	//	c = towlower(c);
+	//}
+
+	std::filesystem::path filePath(path);
+	std::wstring extension = filePath.extension().wstring();
 
 	_pAssimpLoader->Load(path, outRawScene);
 
 	return true;
 
 	// 현재 사용하지 않음. 미 구현
-	if (extension == L"fbx")
+	if (extension == L".fbx")
 	{
 		_pFBXLoader->Load(path, outRawScene);
 	}
-	else if (extension == L"gltf" || extension == L"glb")
+	else if (extension == L".gltf" || extension == L".glb")
 	{
 		_pGLTFLoader->Load(path, outRawScene);
 	}

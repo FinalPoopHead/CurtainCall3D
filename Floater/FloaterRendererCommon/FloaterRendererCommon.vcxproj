@@ -60,6 +60,7 @@
     <ClCompile Include="CoordSystem.cpp" />
     <ClCompile Include="FBXLoader.cpp" />
     <ClCompile Include="GLTFLoader.cpp" />
+    <ClCompile Include="IRenderer.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="RawMaterial.cpp" />
