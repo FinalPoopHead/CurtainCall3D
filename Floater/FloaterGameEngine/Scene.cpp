@@ -131,6 +131,18 @@ void flt::Scene::AddEnableGameObject(GameObject* gameObject, bool isEnable)
 	}
 }
 
+void flt::Scene::AddEnableComponent(ComponentBase* component, bool isEnable)
+{
+	if (isEnable)
+	{
+		_componentsToEnable.emplace_back(component);
+	}
+	else
+	{
+		_componentsToDisable.emplace_back(component);
+	}
+}
+
 void flt::Scene::AddDestroyGameObject(GameObject* gameObject)
 {
 	bool isExist = false;

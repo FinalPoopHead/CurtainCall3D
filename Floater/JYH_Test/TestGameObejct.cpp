@@ -34,11 +34,19 @@ void TestGameObejct::Update(float deltaTime)
 	flt::GamePadState outState;
 	bool ret = GetGamePadState(0, &outState);
 
-	static float elapsedTime = 0.0f;
-	elapsedTime += deltaTime;
+	_elapsedTime += deltaTime;
+	static float enableTime = 2.0f;
+	static float disableTime = 1.0f;
 
-	if (elapsedTime > 3.0f)
+	if (_elapsedTime > enableTime)
 	{
-		this->Destroy();
+		flt::RendererComponent* renderer = GetComponent<flt::RendererComponent>();
+		renderer->Enable();
+		_elapsedTime = 0.0f;
+	}
+	else if (_elapsedTime > disableTime)
+	{
+		flt::RendererComponent* renderer = GetComponent<flt::RendererComponent>();
+		renderer->Disable();
 	}
 }

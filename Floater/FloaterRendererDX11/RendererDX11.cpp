@@ -869,6 +869,11 @@ bool flt::RendererDX11::DeferredRender(float deltaTime)
 
 		for (auto& node : _renderableObjects)
 		{
+			if (node->isDraw == false)
+			{
+				continue;
+			}
+
 			Matrix4f worldMatrix = node->transform.GetWorldMatrix4f();
 			Matrix4f worldViewProjMatrix = worldMatrix * viewMatrix * projMatrix;
 			DirectX::XMMATRIX constBuffer0[2] = { ConvertXMMatrix(worldViewProjMatrix), ConvertXMMatrix(worldMatrix.Inverse().Transpose()) };

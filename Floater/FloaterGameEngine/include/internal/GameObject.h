@@ -14,6 +14,8 @@ namespace flt
 	{
 		friend class Scene;
 		friend class RendererComponent;
+		friend class ComponentBase;
+
 	public:
 		GameObject();
 		~GameObject();
