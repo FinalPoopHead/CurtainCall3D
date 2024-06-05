@@ -1,11 +1,12 @@
-﻿#include "Tile.h"
+﻿#include "NormalCube.h"
+#include "CubeController.h"
 #include "../FloaterRendererCommon/include/ModelLoader.h"
-#include <iostream>
 
-
-Tile::Tile()
+NormalCube::NormalCube()
 {
 	std::wstring filePath = L"..\\x64\\fbx\\SM_Box_Cargo.fbx";
+
+	AddComponent<CubeController>(true);
 
 	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>(true);
 
@@ -17,27 +18,7 @@ Tile::Tile()
 	renderer->SetRawNode(node);
 }
 
-Tile::~Tile()
+NormalCube::~NormalCube()
 {
 
-}
-
-void Tile::OnCreate()
-{
-	std::cout << "Tile OnCreate" << std::endl;
-}
-
-void Tile::OnEnable()
-{
-	std::cout << "Tile OnEnable" << std::endl;
-}
-
-void Tile::OnDisable()
-{
-	std::cout << "Tile OnDisable" << std::endl;
-}
-
-void Tile::OnDestroy()
-{
-	std::cout << "Tile OnDestroy" << std::endl;
 }

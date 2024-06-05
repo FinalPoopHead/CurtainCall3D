@@ -11,7 +11,7 @@ TestCamera::TestCamera(Board* board) :
 	_board(board),
 	_speed(10.0f)
 {
-	AddComponent<flt::CameraComponent>();
+	AddComponent<flt::CameraComponent>(true);
 }
 
 void TestCamera::Update(float deltaSecond)

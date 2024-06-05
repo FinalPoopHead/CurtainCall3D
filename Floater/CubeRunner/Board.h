@@ -7,9 +7,17 @@ class Tile;
 enum class TileStateFlag
 {
 	None = 0x0000,
-	Player = 0x0001,
-	Cube = 0x0002,
-	Mine = 0x0004
+	Tile = 0x0001,
+	Player = 0x0002,
+	Mine = 0x0004,
+	cube1 = 0x0010,
+	cube2 = 0x0020,
+	cube3 = 0x0040,
+	cube4 = 0x0080,
+	cube5 = 0x0100,
+	cube6 = 0x0200,
+	cube7 = 0x0400,
+	cube8 = 0x0800
 };
 
 class Board : public flt::GameObject
