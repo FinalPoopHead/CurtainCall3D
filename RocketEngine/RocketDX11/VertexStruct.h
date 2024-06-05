@@ -109,20 +109,20 @@ namespace Rocket::Core
 		UINT nodeIndex;				// 노드 인덱스
 
 		Vertex() 
-		: position(), UV(), normal(), tangent(), nodeIndex() {}
+		: position(), UV(), normal(), tangent(), bitangent(), nodeIndex() {}
 		Vertex(const DirectX::XMFLOAT3& p, const DirectX::XMFLOAT2& uv, const DirectX::XMFLOAT3& n, const DirectX::XMFLOAT3& t)
-			: position(p), UV(uv), normal(n), tangent(t),nodeIndex() {}
+			: position(p), UV(uv), normal(n), tangent(t), bitangent(), nodeIndex() {}
 		Vertex(
 			float px, float py, float pz,
 			float u, float v,
 			float nx, float ny, float nz,
 			float tx, float ty, float tz)
 			: position(px, py, pz), UV(u, v),
-			normal(nx, ny, nz), tangent(tx, ty, tz), nodeIndex() {}
+			normal(nx, ny, nz), tangent(tx, ty, tz), bitangent(), nodeIndex() {}
 		Vertex(const DirectX::XMFLOAT3& p, const DirectX::XMFLOAT2& uv)
-			: position(p), UV(uv), normal{ 0, 0, 0 }, tangent{ 0, 0, 0 }, nodeIndex() {}
+			: position(p), UV(uv), normal{ 0, 0, 0 }, tangent{ 0, 0, 0 }, bitangent(), nodeIndex() {}
 		Vertex(const DirectX::XMFLOAT3& p, const DirectX::XMFLOAT3& n, const DirectX::XMFLOAT2& uv)
-			: position(p), normal(n), UV(uv), tangent{ 0, 0, 0 }, nodeIndex() {}
+			: position(p), normal(n), UV(uv), tangent{ 0, 0, 0 }, bitangent(), nodeIndex() {}
 		Vertex(const DirectX::XMFLOAT3& p, const DirectX::XMFLOAT2& uv, const DirectX::XMFLOAT3& n, const DirectX::XMFLOAT3& t, const DirectX::XMFLOAT3& bt, const UINT& ni)
 			: position(p), UV(uv), normal(n), tangent(t), bitangent(bt), nodeIndex(ni) {}
 	};

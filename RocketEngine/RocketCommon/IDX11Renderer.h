@@ -11,16 +11,11 @@ namespace Rocket::Core
 	{
 	public:
 		virtual void Initialize(void* hWnd, int screenWidth, int screenHeight) abstract;	//그래픽스 엔진을 초기화한다.
-
-		virtual void SetDebugMode(bool isDebug) abstract;	// 디버그 모드를 설정한다.
-
-		virtual void Update(float deltaTime, int fps = 0) abstract;		// 그래픽스 엔진을 업데이트한다.
-
-		virtual void Render() abstract;						// 그래픽스 엔진을 렌더링한다.	
-
-		virtual void OnResize(int _width, int _height) abstract;	// 그래픽스 엔진의 윈도우 크기를 조정한다.
-
 		virtual void Finalize() abstract;					// 그래픽스 엔진을 종료한다.
+		virtual void Update(float deltaTime, int fps = 0) abstract;		// 그래픽스 엔진을 업데이트한다.
+		virtual void Render() abstract;						// 그래픽스 엔진을 렌더링한다.	
+		virtual void OnResize(int _width, int _height) abstract;	// 그래픽스 엔진의 윈도우 크기를 조정한다.
+		virtual void SetDebugMode(bool isDebug) abstract;	// 디버그 모드를 설정한다.
 	};
 
 	/// dllexport 하는 렌더러를 반환하는 팩토리 함수.

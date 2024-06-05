@@ -20,7 +20,7 @@ void TestScene::Initialize()
 	TestGameObejct* tObject2 = flt::CreateGameObject<TestGameObejct>(true);
 	tObject2->tr.SetPosition(0.0f, 0.0f, 0.0f);
 }
-
+ 
 void TestScene::Finalize()
 {
 

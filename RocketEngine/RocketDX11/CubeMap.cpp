@@ -16,15 +16,24 @@ namespace Rocket::Core
 
 
 	CubeMap::CubeMap()
-		:_cubeMapTexture(),
-		_vertexBuffer(),
-		_indexBuffer(),
-		_cubeMapRenderState(),
-		_samplerState(),
-		_vertexCount(),
-		_indexCount(),
-		_cubeMapVS(),
-		_cubeMapPS()
+		:_cubeMapTexture()
+		, _vertexBuffer()
+		, _indexBuffer()
+		, _cubeMapRenderState()
+		, _samplerState()
+		, _vertexCount()
+		, _indexCount()
+		, _cubeMapVS()
+		, _cubeMapPS()
+		, _BRDF2DLUTPS()
+		, _BRDF2DLUTTexture()
+		, _device()
+		, _deviceContext()
+		, _irradianceTexture()
+		, _prefilteredTexture()
+		, _irradianceMapPS()
+		, _prefilteredMapPS()
+
 	{
 
 	}
@@ -308,8 +317,8 @@ namespace Rocket::Core
 		{
 			D3D11_TEXTURE2D_DESC textureDesc;
 			ZeroMemory(&textureDesc, sizeof(textureDesc));
-			textureDesc.Width = IRRADIANCEMAPSIZE;
-			textureDesc.Height = IRRADIANCEMAPSIZE;
+			textureDesc.Width = static_cast<UINT>(IRRADIANCEMAPSIZE);
+			textureDesc.Height = static_cast<UINT>(IRRADIANCEMAPSIZE);
 			textureDesc.MipLevels = 1;
 			textureDesc.ArraySize = 6;	// 6 faces
 			textureDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;

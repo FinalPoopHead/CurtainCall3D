@@ -20,6 +20,8 @@ namespace Rocket::Core
 		, _animationTick(0.0)
 		, _rootTransform(nullptr)
 		, _boundingBox()
+		, _armatureRootNode()
+		, _nowAnim()
 	{
 
 	}

@@ -11,6 +11,7 @@ namespace Rocket::Core
 {
 
 	BlitPass::BlitPass()
+		: _vertexShader(), _pixelShader(), _sampleState()
 	{
 
 	}

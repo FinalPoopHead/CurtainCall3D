@@ -39,11 +39,11 @@ namespace Rocket::Core
 	public:
 		//그래픽스 엔진을 초기화한다.
 		virtual void Initialize(void* hWnd, int screenWidth, int screenHeight) override;
-		virtual void SetDebugMode(bool isDebug) override;
+		virtual void Finalize() override;
 		virtual void Update(float deltaTime, int fps = 0) override;
 		virtual void Render() override;
 		virtual void OnResize(int _width, int _height) override;
-		virtual void Finalize() override;
+		virtual void SetDebugMode(bool isDebug) override { _isDebugMode = isDebug; }
 
 	private:
 		void InitSplitScreen();
@@ -52,15 +52,16 @@ namespace Rocket::Core
 		void RenderPerCamera(Camera* cam, DeferredBuffers* gBuffer, ID3D11RenderTargetView** renderTargetView);		// 카메라 별로 렌더링 하기 위해
 
 		void BeginRender(float r = 0.1f, float g = 0.1f, float b = 0.1f, float a = 0.1f);
-		void RenderHelperObject(Camera* cam);
+		void EndRender();
+
+		void GBufferPass(Camera* cam, DeferredBuffers* gBuffer);
 		void RenderMesh();
+		void RenderHelperObject(Camera* cam);
+		void RenderCubeMap(Camera* cam);
 		void RenderText();
 		void RenderLine();
 		void RenderTexture();
-		void RenderCubeMap(Camera* cam);
 		void RenderDebug();
-		void GBufferPass(Camera* cam, DeferredBuffers* gBuffer);
-		void EndRender();
 
 		/// Initialize Member
 	private:
