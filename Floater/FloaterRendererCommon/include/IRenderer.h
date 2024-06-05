@@ -23,8 +23,6 @@ namespace flt
 			node(nullptr),
 			camera(nullptr),
 			name() {}
-		// 1. 그릴때 필요한것들.
-		// 2. 게임 엔진상에서 데이터를 바꾸고 싶은것들.
 
 		// transform
 		// model

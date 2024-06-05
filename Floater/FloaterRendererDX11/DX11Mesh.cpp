@@ -122,13 +122,13 @@ flt::DX11Mesh* flt::DX11MeshBuilder::build() const
 	ID3D11SamplerState* samplerState = nullptr;
 	pDevice->CreateSamplerState(&samplerDesc, &samplerState);
 
-	DX11VertexShaderBuilder vsBuilder(L"../FloaterRendererDX11/VertexShader.hlsl");
-	vsBuilder.pDevice = pDevice;
+	//DX11VertexShaderBuilder vsBuilder(L"../FloaterRendererDX11/VertexShader.hlsl");
+	//vsBuilder.pDevice = pDevice;
 
-	DX11PixelShaderBuilder psBuilder(L"../FloaterRendererDX11/DeferredPixelShader.hlsl");
-	psBuilder.pDevice = pDevice;
+	//DX11PixelShaderBuilder psBuilder(L"../FloaterRendererDX11/DeferredPixelShader.hlsl");
+	//psBuilder.pDevice = pDevice;
 
-	DX11Mesh* pMesh = new DX11Mesh(vsBuilder, psBuilder);
+	DX11Mesh* pMesh = new DX11Mesh(this->vsBuilder, this->psBuilder);
 	pMesh->vertexBuffer = vertexBuffer;
 	pMesh->singleVertexSize = sizeof(Vertex::type);
 	pMesh->indexBuffer = indexBuffer;

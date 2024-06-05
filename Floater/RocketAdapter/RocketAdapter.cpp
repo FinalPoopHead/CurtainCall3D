@@ -147,10 +147,20 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 	Rocket::Core::ReleaseFactory(factory);
 
 	_objects.insert(rocketObject);
-	return 0;
+	return (HOBJECT)rocketObject;
 }
 
 bool flt::RocketAdapter::DeregisterObject(HOBJECT renderable)
 {
-	return false;
+	RocketObject* rocketObject = (RocketObject*)renderable;
+
+	auto iter = _objects.find(rocketObject);
+
+	if (iter == _objects.end())
+	{
+		return false;
+	}
+
+	_objects.erase(iter);
+	return true;
 }

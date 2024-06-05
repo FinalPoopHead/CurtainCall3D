@@ -67,6 +67,7 @@ namespace flt
 		DX11VertexShaderBuilder& operator=(DX11VertexShaderBuilder&& other) noexcept
 		{
 			IBuilder<DX11VertexShader>::operator=(std::move(other));
+			filePath = std::move(other.filePath);
 			pDevice = other.pDevice;
 			other.pDevice = nullptr;
 			return *this;
@@ -82,5 +83,3 @@ namespace flt
 		std::vector<int> constantBufferSizes;
 	};
 }
-
-

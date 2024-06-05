@@ -612,7 +612,6 @@ void flt::Scene::EndFrame()
 	for (int i = 0; i < _gameObjectsToDestroy.size(); ++i)
 	{
 		GameObject* object = _gameObjectsToDestroy[i];
-		_gameObjectsToDestroy.pop_back();
 
 		//이미 이 전 상태와 같다면 패스.
 		if (object->_isEnable == false)

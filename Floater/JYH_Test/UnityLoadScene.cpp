@@ -103,12 +103,13 @@ void UnityLoadScene::LoadUnityJson()
 
 				flt::RendererComponent* renderer = gameObject->AddComponent<flt::RendererComponent>(true);
 
-				flt::ModelLoader loader;
-				flt::RawScene rawScene;
-				loader.Load(filePath, &rawScene);
-				flt::RawNode* node = rawScene.nodes[0];
+				//flt::ModelLoader loader;
+				//flt::RawScene rawScene;
+				//loader.Load(filePath, &rawScene);
+				//flt::RawNode* node = rawScene.nodes[0];
 
-				renderer->SetRawNode(node);
+				//renderer->SetRawNode(node);
+				renderer->SetFilePath(filePath);
 			}
 
 			if (v.HasMember("Position"))

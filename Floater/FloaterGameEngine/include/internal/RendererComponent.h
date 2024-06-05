@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include "Component.h"
 #include "../../../FloaterUtil/include/FloaterType.h"
-
+#include "RendererNode.h"
+#include <string>
 
 
 namespace flt
@@ -18,6 +19,7 @@ namespace flt
 
 		virtual void OnCreate() override;
 		virtual void OnEnable() override;
+		virtual void OnDisable() override;
 		virtual void Update(float deltaSecond) override;
 		virtual void EndDraw() override;
 		//void virtual OnDisable() override;
@@ -25,12 +27,15 @@ namespace flt
 
 	public:
 		void SetRawNode(RawNode* rawNode);
+		void SetFilePath(std::wstring path);
 
 
 	private:
+		Resource<RendererNode> _resource;
 		RendererObject* _rendererObject;
 		IRenderer& _renderer;
 		uint64 _hObject;
 		bool _isDraw;
+		bool _isRegisted;
 	};
 }
