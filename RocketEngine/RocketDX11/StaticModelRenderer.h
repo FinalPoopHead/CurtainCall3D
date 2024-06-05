@@ -31,8 +31,12 @@ namespace Rocket::Core
 		~StaticModelRenderer();
 
 	public:
-		virtual void SetWorldTM(const Matrix& worldTM) override;
+		virtual void SetWorldTM(const Matrix& worldTM) override {}
 		virtual void SetActive(bool isActive) override;
+		virtual void Destroy() override;
+		virtual bool IsActive() override { return _isActive; }
+
+	public:
 		virtual void LoadModel(std::string fileName) override;
 		virtual void LoadBaseColorTexture(std::string fileName) override;
 		virtual void LoadNormalTexture(std::string fileName) override;
@@ -63,7 +67,6 @@ namespace Rocket::Core
 		RocketTransform* _transform;
 		StaticModel* _model;
 		Material* _material;
-		DirectX::XMMATRIX _worldTM;
 		bool _isActive;
 		DirectX::BoundingBox _boundingBox;		// frustumCulling 용
 	};

@@ -16,6 +16,12 @@ namespace Rocket::Core
 	public:
 		DirectionalLight();
 
+	public:
+		virtual void SetActive(bool isActive) override;
+		virtual void Destroy() override;
+		virtual void SetWorldTM(const Matrix& worldTM) override {};
+		virtual bool IsActive() override { return _isActive; }
+
 		virtual void BindTransform(RocketTransform* transform) override { _transform = transform; }
 		virtual void SetDiffuseColor(const Color& color) override { _diffuseColor = color; }
 		virtual void SetAmbientColor(const Color& color) override { _ambientColor = color; }
@@ -44,6 +50,7 @@ namespace Rocket::Core
 		void UpdateProjectionMatrix();
 
 	private:
+		bool _isActive;
 		RocketTransform* _transform;
 
 		// Legacy Light Properties

@@ -31,8 +31,12 @@ namespace Rocket::Core
 		~MeshRenderer();
 
 	public:
-		virtual void SetWorldTM(const Matrix& worldTM) override;
+		virtual void SetWorldTM(const Matrix& worldTM) override {}
 		virtual void SetActive(bool isActive) override;
+		virtual void Destroy() override;
+		virtual bool IsActive() override { return _isActive; }
+
+	public:
 		virtual void SetMesh(eMeshType meshType) override;
 		virtual void LoadMesh(std::string fileName) override;
 		virtual void LoadBaseColorTexture(std::string fileName) override;
@@ -64,7 +68,6 @@ namespace Rocket::Core
 		RocketTransform* _transform;
 		StaticMesh* _mesh;
 		Material* _material;
-		DirectX::XMMATRIX _worldTM;
 		bool _isActive;
 		DirectX::BoundingBox _boundingBox;		// frustumCulling 용
 	};

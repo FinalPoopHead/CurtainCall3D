@@ -1,13 +1,14 @@
 ﻿#include "TextRenderer.h"
+#include "ObjectManager.h"
 
 namespace Rocket::Core
 {
 	TextRenderer::TextRenderer()
-		: _isActive(true),
-		_font(nullptr), 
-		_text("Default Text"), 
-		_color(DirectX::Colors::White),
-		_worldTM(Matrix::Identity)
+		: _isActive(true)
+		, _font(nullptr) 
+		, _text("Default Text")
+		, _color(DirectX::Colors::White)
+		, _worldTM(Matrix::Identity)
 	{
 
 	}
@@ -44,8 +45,10 @@ namespace Rocket::Core
 
 	void TextRenderer::Render(DirectX::SpriteBatch* spriteBatch)
 	{
-		if(!_isActive)
+		if (!_isActive)
+		{
 			return;
+		}
 
 		std::wstring wstr(_text.begin(), _text.end());
 		_font->DrawString(spriteBatch, wstr.c_str(), DirectX::XMFLOAT2(_worldTM.m[3][0], _worldTM.m[3][1]), _color);
@@ -64,6 +67,11 @@ namespace Rocket::Core
 	void TextRenderer::Append(const std::string& str)
 	{
 		_text.append(str);
+	}
+
+	void TextRenderer::Destroy()
+	{
+		ObjectManager::Instance().DestroyTextRenderer(this);
 	}
 
 }

@@ -4,7 +4,7 @@
 
 NormalCube::NormalCube()
 {
-	std::wstring filePath = L"..\\x64\\fbx\\SM_Box_Cargo.fbx";
+	std::wstring filePath = L"..\\x64\\fbx\\cube.fbx";
 
 	AddComponent<CubeController>(true);
 

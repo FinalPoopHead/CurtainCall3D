@@ -1,21 +1,23 @@
 ﻿#include "DirectionalLight.h"
 #include "../RocketCommon/RocketTransform.h"
 #include "Camera.h"
+#include "ObjectManager.h"
 
 namespace Rocket::Core
 {
 	DirectionalLight::DirectionalLight()
-		: _transform(nullptr),
-		_diffuseColor(1.0f, 1.0f, 1.0f, 1.0f),
-		_ambientColor(0.3f, 0.3f, 0.3f, 0.3f),
-		_specularColor(1.0f, 1.0f, 1.0f, 1.0f),
-		_specularPower(4.0f),
-		_lengthZ(0.0f),
-		_shadowRadius(50.0f),
-		_lightPosForShadow(Vector3::Zero),
-		_boundingFrustum(),
-		_viewMatrix(),
-		_projectionMatrix()
+		: _isActive(true)
+		, _transform(nullptr) 
+		, _diffuseColor(1.0f, 1.0f, 1.0f, 1.0f)
+		, _ambientColor(0.3f, 0.3f, 0.3f, 0.3f)
+		, _specularColor(1.0f, 1.0f, 1.0f, 1.0f)
+		, _specularPower(4.0f)
+		, _lengthZ(0.0f)
+		, _shadowRadius(50.0f)
+		, _lightPosForShadow(Vector3::Zero)
+		, _boundingFrustum()
+		, _viewMatrix()
+		, _projectionMatrix()
 	{
 		UpdateProjectionMatrix();
 	}
@@ -128,4 +130,13 @@ namespace Rocket::Core
 		return transformedFrustum.Intersects(boundingSphere);
 	}
 
+	void DirectionalLight::SetActive(bool isActive)
+	{
+		_isActive = isActive;
+	}
+
+	void DirectionalLight::Destroy()
+	{
+		ObjectManager::Instance().DestroyDirectionalLight(this);
+	}
 }

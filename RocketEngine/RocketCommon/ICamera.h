@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "MathHeader.h"
+#include "IGraphicsObject.h"
 
 namespace Rocket::Core
 {
@@ -8,7 +8,7 @@ namespace Rocket::Core
 
 namespace Rocket::Core
 {
-	class ICamera
+	class ICamera : public IGraphicsObject
 	{
 	public:
 		virtual void SetNearZ(float nearZ) = 0;
