@@ -2,6 +2,7 @@
 #include "Component.h"
 #include "../../../FloaterUtil/include/FloaterType.h"
 #include "RendererNode.h"
+#include "../../../FloaterRendererCommon/include/RawNode.h"
 #include <string>
 
 
@@ -27,7 +28,8 @@ namespace flt
 
 	public:
 		void SetRawNode(RawNode* rawNode);
-		void SetFilePath(std::wstring path);
+		void SetFilePath(const std::wstring& path);
+		void SetMaterial(uint32 meshIndex, const std::wstring& path, RawMaterial::TextureType type);
 
 
 	private:

@@ -24,6 +24,9 @@ namespace flt
 			camera(nullptr),
 			name() {}
 
+		void SetRawNode(RawNode* rawNode);
+		void SetMaterial(uint32 meshIndex, const std::wstring& path, RawMaterial::TextureType type);
+
 		// transform
 		// model
 		// material, texture
@@ -31,6 +34,7 @@ namespace flt
 		Transform* transform;
 		const bool& isDraw;
 		RawNode* node;
+		std::vector<RawMaterial> materials;
 		Camera* camera;
 		std::wstring name;
 	};

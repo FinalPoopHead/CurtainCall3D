@@ -58,5 +58,6 @@ bool flt::SoundEngine::CreateSound(const char* name, FMOD::Sound** sound)
 
 void flt::SoundEngine::Play(flt::Sound* sound)
 {
-	_system->playSound(sound->_fSound, _channelGroups[sound->_category], false, &sound->_channel);
+	FMOD_RESULT result = _system->playSound(sound->_fSound, _channelGroups[sound->_category], false, &sound->_channel);
+	ASSERT(result == FMOD_OK, "재생 실패");
 }
