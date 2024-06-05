@@ -9,7 +9,7 @@ namespace flt::__impl
 
 flt::GameEngineWrapper::GameEngineWrapper() : engine(GameEngine::Instance())
 {
-	std::cout << "wrapper " << this << std::endl;
+	//std::cout << "wrapper " << this << std::endl;
 }
 
 flt::Scene* flt::GameEngineWrapper::GetCurrentScene()

@@ -7,7 +7,7 @@ namespace flt
 	class Collider
 	{
 	public:
-		Collider(GameObject* gameObject);
+		Collider();
 
 		GameObject* _gameObject;
 	};

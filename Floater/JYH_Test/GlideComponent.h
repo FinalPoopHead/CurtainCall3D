@@ -12,7 +12,6 @@ class GlideComponent : public flt::Component<GlideComponent>
 {
 public:
 	GlideComponent(flt::GameObject* gameObject) :
-		Component<GlideComponent>(gameObject),
 		MaxThrustSpeed(100.0f),
 		MinThrustSpeed(10.0f),
 		ThrustFactor(10.0f),

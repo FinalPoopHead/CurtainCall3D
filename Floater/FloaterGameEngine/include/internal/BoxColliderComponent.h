@@ -19,10 +19,11 @@ namespace flt
 	class BoxColliderComponent : public Component<BoxColliderComponent>, public Collider
 	{
 	public:
-		BoxColliderComponent(GameObject* gameObject);
+		BoxColliderComponent();
 		virtual ~BoxColliderComponent();
 
 	public:
+		virtual void OnCreate() override;
 		virtual void OnEnable() override;
 		virtual void OnDisable() override;
 

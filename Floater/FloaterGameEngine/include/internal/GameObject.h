@@ -43,8 +43,8 @@ namespace flt
 		[[deprecated("Use Template Function")]] bool AddComponent(ComponentBase* component);
 		void RemoveComponent(ComponentBase* component);
 
-		template<ComponentType T>
-		T* AddComponent(bool isEnabled = true);
+		template<ComponentType T, typename... TArgs>
+		T* AddComponent(bool isEnabled, TArgs&&... args);
 
 		template <typename T>
 		T* GetComponent();
@@ -59,11 +59,12 @@ namespace flt
 	};
 
 
-	template<ComponentType T>
-	T* flt::GameObject::AddComponent(bool isEnabled /*= true*/)
+	template<ComponentType T, typename... TArgs>
+	T* flt::GameObject::AddComponent(bool isEnabled, TArgs&&... args)
 	{
-		ComponentBase* component = new T(this);
+		ComponentBase* component = new T(std::forward<TArgs>(args)...);
 		int index = component->GetIndex();
+		//component->_gameObject = this;
 
 		if (_components.size() <= index)
 		{

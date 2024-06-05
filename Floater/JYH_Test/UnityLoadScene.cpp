@@ -101,7 +101,7 @@ void UnityLoadScene::LoadUnityJson()
 				std::wstring filePath = L"..\\x64\\fbx\\";
 				filePath += flt::ToWstring(fileName);
 
-				flt::RendererComponent* renderer = gameObject->AddComponent<flt::RendererComponent>();
+				flt::RendererComponent* renderer = gameObject->AddComponent<flt::RendererComponent>(true);
 
 				flt::ModelLoader loader;
 				flt::RawScene rawScene;
@@ -141,7 +141,7 @@ void UnityLoadScene::LoadUnityJson()
 
 				if (colliderType == 1) // Box
 				{
-					flt::BoxColliderComponent* collider = gameObject->AddComponent<flt::BoxColliderComponent>();
+					flt::BoxColliderComponent* collider = gameObject->AddComponent<flt::BoxColliderComponent>(true);
 
 					if (v.HasMember("BoxColliderSize"))
 					{

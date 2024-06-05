@@ -409,7 +409,7 @@ bool flt::RendererDX11::Render(float deltaTime)
 
 flt::HOBJECT flt::RendererDX11::RegisterObject(RendererObject& renderable)
 {
-	DX11Node* node = new DX11Node(renderable.transform, renderable.isDraw);
+	DX11Node* node = new DX11Node(*renderable.transform, renderable.isDraw);
 	if (!node)
 	{
 		return false;
