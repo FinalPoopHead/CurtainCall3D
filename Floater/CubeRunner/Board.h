@@ -45,6 +45,7 @@ public:
 
 	void GenerateRandomStage();
 	void RollCubes(float RollingTime);
+	void BackToPool(flt::GameObject* obj, CubeController* cubeCtr);
 
 private:
 	//void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
@@ -60,10 +61,10 @@ private:
 	std::vector<std::vector<TileStateFlag>> _tileState;
 	std::vector<std::vector<Tile*>> _tiles;
 
-	std::list<std::pair<const type_info&, CubeController*>> _cubeControllers;				// 현재 보드 위에 굴러가는 큐브들
-	std::list<AdvantageCube*> _advantageCubePool;		// 어드밴티지 큐브 풀
-	std::list<DarkCube*> _darkCubePool;				// 다크 큐브 풀
-	std::list<NormalCube*> _normalCubePool;			// 노말 큐브 풀
+	std::list<CubeController*> _cubeControllers;	// 현재 보드 위에 굴러가는 큐브들
+	std::list<AdvantageCube*> _advantageCubePool;								// 어드밴티지 큐브 풀
+	std::list<DarkCube*> _darkCubePool;											// 다크 큐브 풀
+	std::list<NormalCube*> _normalCubePool;										// 노말 큐브 풀
 
 	bool _isGenerated = false;
 };

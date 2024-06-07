@@ -34,9 +34,16 @@ void CubeController::Update(float deltaSecond)
 	if(_isFalling)
 	{
 		Fall(deltaSecond);
+		if(IsFallEnough())
+		{
+			_board->BackToPool(_gameObject, this);
+
+			_isFalling = false;
+			_isRolling = false;
+		}
 	}
 
-	if (IsOutofBoard())
+	if (!_isRolling && IsOutofBoard())
 	{
 		StartFalling();
 	}
@@ -134,6 +141,18 @@ bool CubeController::IsOutofBoard()
 	auto state = _board->QueryTileState(pos.x,pos.z);
 
 	if(state == TileStateFlag::None)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool CubeController::IsFallEnough()
+{
+	if (_gameObject->tr.GetWorldPosition().y <= -100.0f)
 	{
 		return true;
 	}

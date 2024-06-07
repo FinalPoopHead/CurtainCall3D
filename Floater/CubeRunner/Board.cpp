@@ -61,7 +61,7 @@ void Board::PreUpdate(float deltaTime)
 {
 	UpdateBoard();
 
-	if (flt::GetKey(flt::KeyCode::r))
+	if (flt::GetKeyDown(flt::KeyCode::r))
 	{
 		if (!_isGenerated)
 		{
@@ -70,7 +70,7 @@ void Board::PreUpdate(float deltaTime)
 		}
 	}
 
-	if (flt::GetKey(flt::KeyCode::spacebar))
+	if (flt::GetKeyDown(flt::KeyCode::spacebar))
 	{
 		RollCubes(ROLLINGTIME);
 	}
@@ -112,8 +112,13 @@ TileStateFlag Board::QueryTileState(float x, float y)
 	int tileY = 0;
 	ConvertToTileIndex(x, y, tileX, tileY);
 
-	ASSERT(tileX >= 0 && tileX < _width, "Out of Range");
-	ASSERT(tileY >= 0 && tileY < _height, "Out of Range");
+// 	ASSERT(tileX >= 0 && tileX < _width, "Out of Range");
+// 	ASSERT(tileY >= 0 && tileY < _height, "Out of Range");
+
+	if (tileX < 0 || tileX >= _width || tileY < 0 || tileY >= _height)
+	{
+		return TileStateFlag::None;
+	}
 
 	return _tileState[tileX][tileY];
 }
@@ -169,6 +174,7 @@ void Board::GenerateRandomStage()
 				}
 				cube = _normalCubePool.front();
 				_normalCubePool.pop_front();
+				_tileState[i][j] = TileStateFlag::NormalCube;
 				break;
 			case 1:
 				if (_darkCubePool.empty())
@@ -177,6 +183,7 @@ void Board::GenerateRandomStage()
 				}
 				cube = _darkCubePool.front();
 				_darkCubePool.pop_front();
+				_tileState[i][j] = TileStateFlag::DarkCube;
 				break;
 			case 2:
 				if (_advantageCubePool.empty())
@@ -185,6 +192,7 @@ void Board::GenerateRandomStage()
 				}
 				cube = _advantageCubePool.front();
 				_advantageCubePool.pop_front();
+				_tileState[i][j] = TileStateFlag::AdvantageCube;
 				break;
 			default:
 				ASSERT(false, "Invalid Random Value");
@@ -192,7 +200,7 @@ void Board::GenerateRandomStage()
 			}
 
 			auto cubeCtr = cube->GetComponent<CubeController>();
-			_cubeControllers.push_back({ typeid(*cube), cubeCtr });
+			_cubeControllers.push_back(cubeCtr);
 
 			cube->tr.SetPosition({ x, 4.0f, z, 1.0f });
 			cube->Enable();
@@ -204,8 +212,35 @@ void Board::RollCubes(float RollingTime)
 {
 	for (auto& cubeCtr : _cubeControllers)
 	{
-		cubeCtr.second->StartRolling(RollingTime);
+		cubeCtr->StartRolling(RollingTime);
 	}
+}
+
+void Board::BackToPool(flt::GameObject* obj, CubeController* cubeCtr)
+{
+	std::string temp = typeid(*obj).name();
+	if (temp.compare(typeid(NormalCube).name()) == 0)
+	{
+		auto normalCube = dynamic_cast<NormalCube*>(obj);
+		_normalCubePool.push_back(normalCube);
+	}
+	else if (temp.compare(typeid(DarkCube).name()) == 0)
+	{
+		auto darkCube = dynamic_cast<DarkCube*>(obj);
+		_darkCubePool.push_back(darkCube);
+	}
+	else if (temp.compare(typeid(AdvantageCube).name()) == 0)
+	{
+		auto advantageCube = dynamic_cast<AdvantageCube*>(obj);
+		_advantageCubePool.push_back(advantageCube);
+	}
+	else
+	{
+		ASSERT(false, "Invalid Cube Type");
+	}
+
+	obj->Disable();
+	_cubeControllers.remove(cubeCtr);
 }
 
 void Board::Resize(int newWidth, int newHeight)
@@ -274,6 +309,14 @@ void Board::Resize(int newWidth, int newHeight)
 			float z = 0.0f;
 			ConvertToTileLocalPosition(i, j, x, z);
 			_tiles[i][j]->tr.SetPosition({ x, 0.0f, z });
+		}
+	}
+
+	for (int i = 0; i < newWidth; ++i)
+	{
+		for(int j=0;j<newHeight;++j)
+		{
+			_tileState[i][j] = TileStateFlag::Tile;
 		}
 	}
 

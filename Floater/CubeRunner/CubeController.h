@@ -20,6 +20,7 @@ private:
 	void FinishRolling();			// Roll이 끝나면 마무리 각도 깔끔하게 하기 위함
 	void Fall(float deltaSecond);
 	bool IsOutofBoard();			// 보드를 벗어나는지 체크
+	bool IsFallEnough();			// 충분히 떨어졌는지 체크
 
 private:
 	Board* _board;			// 게임의 바닥 보드. 사실 상 게임매니저.
