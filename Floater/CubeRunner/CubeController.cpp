@@ -1,11 +1,12 @@
 ﻿#include "CubeController.h"
 #include "../FloaterGameEngine/include/Input.h"
 
-#include "GameManager.h"
+#include "Board.h"
 
 constexpr float PIVOTSIZE = 2.0f;		// 피봇까지의 y,z 거리. 모델 사이즈에 맞게 변경해야함.
 constexpr float ROLLANGLE = 90.0f;		// 회전할 각도
 constexpr float TARGETANGLE[4] = { 90.0f, 180.0f, 270.0f, 360.0f };	// 회전 목표 각도
+constexpr float GRAVITY = 9.8f;
 
 CubeController::CubeController()
 	: _isRolling(false)
@@ -34,11 +35,16 @@ void CubeController::Update(float deltaSecond)
 	{
 		Fall(deltaSecond);
 	}
+
+	if (IsOutofBoard())
+	{
+		StartFalling();
+	}
 }
 
 void CubeController::StartRolling(float rotateTime)
 {
-	if (_isRolling)
+	if (_isRolling || _isFalling)
 	{
 		return;
 	}
@@ -61,6 +67,7 @@ void CubeController::StartFalling()
 	}
 
 	_isFalling = true;
+	_fallSpeed = 0.0f;
 }
 
 void CubeController::Roll(float deltaSecond)
@@ -116,5 +123,22 @@ void CubeController::FinishRolling()
 
 void CubeController::Fall(float deltaSecond)
 {
+	_fallSpeed += GRAVITY * deltaSecond;
+	flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
+	_gameObject->tr.AddWorldPosition( 0.0f, -_fallSpeed * deltaSecond, 0.0f);
+}
 
+bool CubeController::IsOutofBoard()
+{
+	auto pos = _gameObject->tr.GetWorldPosition();
+	auto state = _board->QueryTileState(pos.x,pos.z);
+
+	if(state == TileStateFlag::None)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }

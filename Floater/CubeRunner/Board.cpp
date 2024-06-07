@@ -39,12 +39,15 @@ void Board::OnCreate()
 	for (int i = 0; i < CUBECOUNT; i++)
 	{
 		NormalCube* normalCube = flt::CreateGameObject<NormalCube>(false);
+		normalCube->GetComponent<CubeController>()->SetBoard(this);
 		_normalCubePool.push_back(normalCube);
 
 		AdvantageCube* advantageCube = flt::CreateGameObject<AdvantageCube>(false);
+		advantageCube->GetComponent<CubeController>()->SetBoard(this);
 		_advantageCubePool.push_back(advantageCube);
 
 		DarkCube* darkCube = flt::CreateGameObject<DarkCube>(false);
+		darkCube->GetComponent<CubeController>()->SetBoard(this);
 		_darkCubePool.push_back(darkCube);
 	}
 }
