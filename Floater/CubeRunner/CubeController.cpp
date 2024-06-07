@@ -9,6 +9,7 @@ constexpr float TARGETANGLE[4] = { 90.0f, 180.0f, 270.0f, 360.0f };	// 회전 �
 
 CubeController::CubeController()
 	: _isRolling(false)
+	, _isFalling(false)
 	, _targetIndex(0)
 	, _rotateSpeed(0.0f)
 	, _currentAngle(0.0f)
@@ -24,12 +25,15 @@ CubeController::~CubeController()
 
 void CubeController::Update(float deltaSecond)
 {
-	if (!_isRolling)
+	if (_isRolling)
 	{
-		return;
+		Roll(deltaSecond);
 	}
 
-	Roll(deltaSecond);
+	if(_isFalling)
+	{
+		Fall(deltaSecond);
+	}
 }
 
 void CubeController::StartRolling(float rotateTime)
@@ -47,6 +51,16 @@ void CubeController::StartRolling(float rotateTime)
 
 	int prevIndex = (_targetIndex + 3) % 4;
 	_currentAngle = prevIndex == 3 ? 0.0f : TARGETANGLE[prevIndex];
+}
+
+void CubeController::StartFalling()
+{
+	if (_isFalling || _isRolling)
+	{
+		return;
+	}
+
+	_isFalling = true;
 }
 
 void CubeController::Roll(float deltaSecond)
@@ -98,4 +112,9 @@ void CubeController::FinishRolling()
 	// 	finalEulerAngles.y = Mathf.Round(finalEulerAngles.y / 90f) * 90f;
 	// 	finalEulerAngles.z = Mathf.Round(finalEulerAngles.z / 90f) * 90f;
 	// 	transform.eulerAngles = finalEulerAngles;
+}
+
+void CubeController::Fall(float deltaSecond)
+{
+
 }
