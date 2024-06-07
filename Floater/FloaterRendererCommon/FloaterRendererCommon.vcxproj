@@ -23,6 +23,7 @@
     <ClInclude Include="CoordSystem.h" />
     <ClInclude Include="FBXLoader.h" />
     <ClInclude Include="GLTFLoader.h" />
+    <ClInclude Include="include\AnimState.h" />
     <ClInclude Include="include\IBuilder.h" />
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\ModelLoader.h" />
@@ -31,6 +32,7 @@
     <ClInclude Include="include\RawNode.h" />
     <ClInclude Include="include\RawSkeleton.h" />
     <ClInclude Include="include\Rect.h" />
+    <ClInclude Include="include\RendererObject.h" />
     <ClInclude Include="include\Resource.h" />
     <ClInclude Include="include\ResourceMgr.h" />
     <ClInclude Include="include\Transform.h" />
@@ -68,6 +70,7 @@
     <ClCompile Include="RawNode.cpp" />
     <ClCompile Include="RawScene.cpp" />
     <ClCompile Include="RawTexture.cpp" />
+    <ClCompile Include="RendererObject.cpp" />
     <ClCompile Include="ResourceMgr.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="VertexNormalData.cpp" />

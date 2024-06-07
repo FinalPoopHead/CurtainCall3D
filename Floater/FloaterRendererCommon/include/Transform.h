@@ -71,6 +71,7 @@ namespace flt
 		Matrix4f GetWorldMatrix4f() const noexcept;
 
 		void LookAt(Vector4f target);
+		void LookAt(float x, float y, float z);
 		Vector4f Forward() const noexcept;
 		Vector4f Right() const noexcept;
 		Vector4f Up() const noexcept;
