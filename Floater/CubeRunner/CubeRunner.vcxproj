@@ -134,29 +134,21 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AdvantageCube.cpp" />
-    <ClCompile Include="DarkCube.cpp" />
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="CubeController.cpp" />
-    <ClCompile Include="GameManager.cpp" />
-    <ClCompile Include="GameManagerController.cpp" />
-    <ClCompile Include="ManagerObject.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NormalCube.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="TestCamera.cpp" />
     <ClCompile Include="Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AdvantageCube.h" />
-    <ClInclude Include="DarkCube.h" />
     <ClInclude Include="Board.h" />
     <ClInclude Include="CubeController.h" />
-    <ClInclude Include="GameManager.h" />
-    <ClInclude Include="GameManagerController.h" />
-    <ClInclude Include="ManagerObject.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="NormalCube.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="TestCamera.h" />
     <ClInclude Include="Tile.h" />
   </ItemGroup>
