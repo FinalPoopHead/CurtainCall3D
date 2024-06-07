@@ -37,6 +37,7 @@ namespace flt
 
 		KeyData GetKey(KeyCode code);
 		KeyData GetKeyDown(KeyCode code);
+		KeyData GetKeyUp(KeyCode code);
 
 		bool GetGamePadState(int padIndex, GamePadState* outState);
 		bool SetGamePadVibration(int padIndex, float leftMotor, float rightMotor);

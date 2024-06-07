@@ -42,6 +42,9 @@
     <ClInclude Include="WinGamePadImpl.h">
       <Filter>Windows</Filter>
     </ClInclude>
+    <ClInclude Include="KeyState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FloaterPlatform.cpp">
