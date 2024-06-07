@@ -38,23 +38,14 @@ void Board::OnCreate()
 	// Create CubePool
 	for (int i = 0; i < CUBECOUNT; i++)
 	{
-		NormalCube* cube = flt::CreateGameObject<NormalCube>(false);
-		_normalCubePool.push_back(cube);
-		//_board->AddCube(normalCube);
-	}
+		NormalCube* normalCube = flt::CreateGameObject<NormalCube>(false);
+		_normalCubePool.push_back(normalCube);
 
-	for (int i = 0; i < CUBECOUNT; i++)
-	{
-		AdvantageCube* cube = flt::CreateGameObject<AdvantageCube>(false);
-		_advantageCubePool.push_back(cube);
-		//_board->AddCube(advantageCube);
-	}
+		AdvantageCube* advantageCube = flt::CreateGameObject<AdvantageCube>(false);
+		_advantageCubePool.push_back(advantageCube);
 
-	for (int i = 0; i < CUBECOUNT; i++)
-	{
-		DarkCube* cube = flt::CreateGameObject<DarkCube>(false);
-		_darkCubePool.push_back(cube);
-		//_board->AddCube(darkCube);
+		DarkCube* darkCube = flt::CreateGameObject<DarkCube>(false);
+		_darkCubePool.push_back(darkCube);
 	}
 }
 

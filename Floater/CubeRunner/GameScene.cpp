@@ -6,7 +6,7 @@
 
 void GameScene::Initialize()
 {
-	ManagerObject* managerObj = flt::CreateGameObject<ManagerObject>(true);
+	//ManagerObject* managerObj = flt::CreateGameObject<ManagerObject>(true);
 
 	Board* board = flt::CreateGameObject<Board>(true, 5, 10);
 	board->tr.SetPosition(0.0f, 0.0f, 0.0f);
