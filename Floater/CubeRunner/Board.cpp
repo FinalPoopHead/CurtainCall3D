@@ -1,5 +1,14 @@
 ﻿#include "Board.h"
+#include "../FloaterGameEngine/include/Input.h"
+
 #include "Tile.h"
+#include "AdvantageCube.h"
+#include "DarkCube.h"
+#include "NormalCube.h"
+#include "CubeController.h"
+
+constexpr int CUBECOUNT = 64;
+constexpr float ROLLINGTIME = 1.0f;
 
 Board::Board(int width, int height, float offset) :
 	flt::GameObject(),
@@ -25,6 +34,28 @@ void Board::OnCreate()
 	_height = 0;
 
 	Resize(width, height);
+
+	// Create CubePool
+	for (int i = 0; i < CUBECOUNT; i++)
+	{
+		NormalCube* cube = flt::CreateGameObject<NormalCube>(false);
+		_normalCubePool.push_back(cube);
+		//_board->AddCube(normalCube);
+	}
+
+	for (int i = 0; i < CUBECOUNT; i++)
+	{
+		AdvantageCube* cube = flt::CreateGameObject<AdvantageCube>(false);
+		_advantageCubePool.push_back(cube);
+		//_board->AddCube(advantageCube);
+	}
+
+	for (int i = 0; i < CUBECOUNT; i++)
+	{
+		DarkCube* cube = flt::CreateGameObject<DarkCube>(false);
+		_darkCubePool.push_back(cube);
+		//_board->AddCube(darkCube);
+	}
 }
 
 void Board::OnDestroy()
@@ -35,6 +66,16 @@ void Board::OnDestroy()
 void Board::PreUpdate(float deltaTime)
 {
 	UpdateBoard();
+
+	if (flt::GetKey(flt::KeyCode::r))
+	{
+		GenerateRandomStage();
+	}
+
+	if (flt::GetKey(flt::KeyCode::spacebar))
+	{
+		RollCubes(ROLLINGTIME);
+	}
 }
 
 bool Board::SetTileState(float x, float y, TileStateFlag state)
@@ -102,6 +143,67 @@ void Board::ConvertToTilePosition(int x, int z, float& outX, float& outZ)
 	flt::Vector4f pos = this->tr.GetWorldPosition();
 	outX += pos.x;
 	outZ += pos.z;
+}
+
+void Board::GenerateRandomStage()
+{
+	for (int i = 0; i < _width; ++i)
+	{
+		for (int j = 0; j < _height; ++j)
+		{
+			int randValue = rand() % 3;
+
+			float x = _tiles[i][j]->tr.GetWorldPosition().x;
+			float z = _tiles[i][j]->tr.GetWorldPosition().z;
+
+			flt::GameObject* cube = nullptr;
+
+			switch (randValue)
+			{
+			case 0:
+				if (_normalCubePool.empty())
+				{
+					ASSERT(false, "NormalCubePool is Empty");
+				}
+				cube = _normalCubePool.front();
+				_normalCubePool.pop_front();
+				break;
+			case 1:
+				if (_darkCubePool.empty())
+				{
+					ASSERT(false, "DarkCubePool is Empty");
+				}
+				cube = _darkCubePool.front();
+				_darkCubePool.pop_front();
+				break;
+			case 2:
+				if (_advantageCubePool.empty())
+				{
+					ASSERT(false, "AdvantageCubePool is Empty");
+				}
+				cube = _advantageCubePool.front();
+				_advantageCubePool.pop_front();
+				break;
+			default:
+				ASSERT(false, "Invalid Random Value");
+			break;
+			}
+
+			auto cubeCtr = cube->GetComponent<CubeController>();
+			_cubeControllers.push_back({ typeid(*cube), cubeCtr });
+
+			cube->tr.SetPosition({ x, 4.0f, z, 1.0f });
+			cube->Enable();
+		}
+	}
+}
+
+void Board::RollCubes(float RollingTime)
+{
+	for (auto& cubeCtr : _cubeControllers)
+	{
+		cubeCtr.second->StartRolling(RollingTime);
+	}
 }
 
 void Board::Resize(int newWidth, int newHeight)

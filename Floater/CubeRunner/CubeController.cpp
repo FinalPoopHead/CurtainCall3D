@@ -24,11 +24,6 @@ CubeController::~CubeController()
 
 void CubeController::Update(float deltaSecond)
 {
-	if (flt::GetKey(flt::KeyCode::spacebar))
-	{
-		StartRolling(1.0f);
-	}
-
 	if (!_isRolling)
 	{
 		return;

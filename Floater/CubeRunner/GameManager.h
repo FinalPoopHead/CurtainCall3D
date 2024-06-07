@@ -1,5 +1,7 @@
 ﻿#pragma once
-#include "../FloaterGameEngine/include/EngineMinimal.h"
+#include <vector>
+
+class Board;
 
 /// <summary>
 /// 컴포넌트나 게임오브젝트를 바로 싱글턴으로 만들지 않고
@@ -28,5 +30,11 @@ private:
 
 public:
 	void Initialize();
-	void Update();
+	void Finalize();
+	void Update(float deltaSecond);
+
+	void SetBoard(Board* board) { _board = board; }
+
+private:
+	Board* _board;
 };
