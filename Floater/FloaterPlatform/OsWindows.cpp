@@ -3,6 +3,7 @@
 
 #include "OsWindows.h"
 #include "./include/GamePad.h"
+#include "KeyState.h"
 #include <iostream>
 #include <algorithm>
 #include <memory>
@@ -12,9 +13,7 @@
 #include "../FloaterUtil/include/ConvString.h"
 #include "../FloaterUtil/include/Hash.h"
 
-// TODO : include 폴더로 이동 해야함.
 #include "../RocketAdapter/include/CreateRenderer.h"
-
 #include "../FloaterRendererCommon/include/ResourceMgr.h"
 
 #include <DbgHelp.h>
@@ -47,7 +46,7 @@ flt::OsWindows::OsWindows(bool useConsole) :
 	_hwnd(NULL),
 	_isActivated(false),
 	_keyTimer(),
-	_pKeyStates{ new(std::nothrow) bool[(int)KeyCode::MAX] },
+	_pKeyStates{ new(std::nothrow) KeyState[(int)KeyCode::MAX] },
 	_pKeyDatas{ new(std::nothrow) KeyData[(int)KeyCode::MAX] },
 	_keyUp(),
 	_consoleHwnd(NULL),
@@ -359,7 +358,7 @@ void flt::OsWindows::DestroyRenderer(IRenderer* renderer)
 
 flt::KeyData flt::OsWindows::GetKey(KeyCode code)
 {
-	if (_pKeyStates[(int)code])
+	if (_pKeyStates[(int)code].isStay)
 	{
 		return _pKeyDatas[(int)code];
 	}
@@ -371,14 +370,26 @@ flt::KeyData flt::OsWindows::GetKey(KeyCode code)
 
 flt::KeyData flt::OsWindows::GetKeyDown(KeyCode code)
 {
-	ASSERT(false, "구현되지 않은 함수");
-	return KeyData();
+	if (_pKeyStates[(int)code].isDown)
+	{
+		return _pKeyDatas[(int)code];
+	}
+
+	KeyData keydata;
+	keydata.keyTime = 0x8000'0000'0000'0000;
+	return keydata;
 }
 
 flt::KeyData flt::OsWindows::GetKeyUp(KeyCode code)
 {
-	ASSERT(false, "구현되지 않은 함수");
-	return KeyData();
+	if (_pKeyStates[(int)code].isUp)
+	{
+		return _pKeyDatas[(int)code];
+	}
+
+	KeyData keydata;
+	keydata.keyTime = 0x8000'0000'0000'0000;
+	return keydata;
 }
 
 bool flt::OsWindows::GetGamePadState(int padIndex, GamePadState* outState)
@@ -464,10 +475,17 @@ std::wstring flt::OsWindows::GetExePath()
 
 void flt::OsWindows::UpdateKeyState()
 {
+	for (int i = 0; i < (int)KeyCode::MAX; ++i)
+	{
+		_pKeyStates[i].isDown = false;
+		_pKeyStates[i].isUp = false;
+	}
+
 	// keyUp 처리
 	for (const auto& index : _keyUp)
 	{
-		_pKeyStates[index] = false;
+		_pKeyStates[index].isStay = false;
+		_pKeyStates[index].isUp = true;
 		_pKeyDatas[index].keyTime = 0;
 	}
 	_keyUp.clear();
@@ -475,22 +493,22 @@ void flt::OsWindows::UpdateKeyState()
 	// 매 프레임 초기화 해줘야 하는 키들.
 	// 현재 마우스 좌표, 휠업 다운.
 
-	_pKeyStates[(int)KeyCode::mouseRelativePos] = false;
+	_pKeyStates[(int)KeyCode::mouseRelativePos].isStay = false;
 	_pKeyDatas[(int)KeyCode::mouseRelativePos].keyTime = 0;
 	_pKeyDatas[(int)KeyCode::mouseRelativePos].x = 0;
 	_pKeyDatas[(int)KeyCode::mouseRelativePos].y = 0;
 
-	_pKeyStates[(int)KeyCode::mouseAbsolutePos] = false;
+	_pKeyStates[(int)KeyCode::mouseAbsolutePos].isStay = false;
 	_pKeyDatas[(int)KeyCode::mouseAbsolutePos].keyTime = 0;
 	_pKeyDatas[(int)KeyCode::mouseAbsolutePos].x = 0;
 	_pKeyDatas[(int)KeyCode::mouseAbsolutePos].y = 0;
 
-	_pKeyStates[(int)KeyCode::mouseWheelUp] = false;
+	_pKeyStates[(int)KeyCode::mouseWheelUp].isStay = false;
 	_pKeyDatas[(int)KeyCode::mouseWheelUp].keyTime = 0;
 	_pKeyDatas[(int)KeyCode::mouseWheelUp].x = 0;
 	_pKeyDatas[(int)KeyCode::mouseWheelUp].y = 0;
 
-	_pKeyStates[(int)KeyCode::mouseWheelDown] = false;
+	_pKeyStates[(int)KeyCode::mouseWheelDown].isStay = false;
 	_pKeyDatas[(int)KeyCode::mouseWheelDown].keyTime = 0;
 	_pKeyDatas[(int)KeyCode::mouseWheelDown].x = 0;
 	_pKeyDatas[(int)KeyCode::mouseWheelDown].y = 0;
@@ -856,8 +874,10 @@ void flt::OsWindows::SetKeyState(KeyCode code, const KeyData& data, bool isActiv
 		if (_pKeyDatas[(int)code].keyTime == 0)
 		{
 			_pKeyDatas[(int)code] = data;
+			_pKeyStates[(int)code].isDown = true;
 		}
-		_pKeyStates[(int)code] = true;
+
+		_pKeyStates[(int)code].isStay = true;
 	}
 
 	if (isInActive)

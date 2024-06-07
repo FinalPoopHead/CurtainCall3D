@@ -15,6 +15,7 @@ namespace flt
 	class IRenderer;
 	struct GamePadState;
 	struct WinGamePad;
+	struct KeyState;
 
 	class OsWindows
 	{
@@ -61,7 +62,7 @@ namespace flt
 		bool _isActivated;
 
 		Timer _keyTimer;
-		bool* _pKeyStates;
+		KeyState* _pKeyStates;
 		KeyData* _pKeyDatas;
 		std::vector<int> _keyUp;
 		bool _isShowCursor;

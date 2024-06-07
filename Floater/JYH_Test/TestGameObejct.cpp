@@ -100,4 +100,16 @@ void TestGameObejct::Update(float deltaTime)
 	{
 		GetComponent<flt::RendererComponent>()->PlayAnimation(1, true);
 	}
+
+	keyData = GetKeyDown(flt::KeyCode::f);
+	if (keyData)
+	{
+		std::cout << "KeyDown: f" << std::endl;
+	}
+
+	keyData = GetKeyUp(flt::KeyCode::f);
+	if (keyData)
+	{
+		std::cout << "KeyUp: f" << std::endl;
+	}
 }

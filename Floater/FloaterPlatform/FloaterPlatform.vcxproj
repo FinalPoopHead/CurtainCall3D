@@ -159,6 +159,7 @@
     <ClInclude Include="include\GamePad.h" />
     <ClInclude Include="include\EnumType.h" />
     <ClInclude Include="include\KeyCode.h" />
+    <ClInclude Include="KeyState.h" />
     <ClInclude Include="OsPlatform.h" />
     <ClInclude Include="include\Platform.h" />
     <ClInclude Include="OsWindows.h" />
