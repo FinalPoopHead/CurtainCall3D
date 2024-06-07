@@ -72,6 +72,9 @@
     <ClCompile Include="AdvantageCube.cpp">
       <Filter>GameObject\Cube\AdvantageCube</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>GameObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h">
@@ -106,6 +109,9 @@
     </ClInclude>
     <ClInclude Include="AdvantageCube.h">
       <Filter>GameObject\Cube\AdvantageCube</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>GameObject</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

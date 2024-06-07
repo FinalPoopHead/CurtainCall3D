@@ -136,6 +136,7 @@
   <ItemGroup>
     <ClCompile Include="AdvantageCube.cpp" />
     <ClCompile Include="Board.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CubeController.cpp" />
     <ClCompile Include="DarkCube.cpp" />
     <ClCompile Include="GameManager.cpp" />
@@ -150,6 +151,7 @@
   <ItemGroup>
     <ClInclude Include="AdvantageCube.h" />
     <ClInclude Include="Board.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeController.h" />
     <ClInclude Include="DarkCube.h" />
     <ClInclude Include="GameManager.h" />

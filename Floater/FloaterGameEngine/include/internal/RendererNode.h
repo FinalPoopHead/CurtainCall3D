@@ -19,8 +19,7 @@ namespace flt
 
 	struct RenderableBuilder : public IBuilder<RendererNode>
 	{
-		RenderableBuilder() : RenderableBuilder(L"") {}
-		RenderableBuilder(const std::wstring filePath) : filePath(filePath) {}
+		RenderableBuilder(const std::wstring filePath) : IBuilder<RendererNode>(filePath), filePath(filePath) {}
 		RenderableBuilder(const RenderableBuilder& other) = delete;
 
 		virtual RendererNode* build() const override;
