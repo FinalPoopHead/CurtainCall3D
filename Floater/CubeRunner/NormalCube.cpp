@@ -1,6 +1,5 @@
 ﻿#include "NormalCube.h"
 #include "CubeController.h"
-#include "../FloaterRendererCommon/include/ModelLoader.h"
 
 NormalCube::NormalCube()
 {
