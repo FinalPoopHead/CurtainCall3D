@@ -24,6 +24,8 @@ enum class TileStateFlag
 	CubeArriving	= 0x2000
 };
 
+#define BLOCKED_TILE ((int)TileStateFlag::AdvantageMine | (int)TileStateFlag::NormalCube | (int)TileStateFlag::DarkCube | (int)TileStateFlag::AdvantageCube | (int)TileStateFlag::CubeLeaving | (int)TileStateFlag::CubeArriving)
+
 class Board : public flt::GameObject
 {
 public:
