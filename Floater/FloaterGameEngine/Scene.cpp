@@ -118,7 +118,15 @@ void flt::Scene::AddEnableGameObject(GameObject* gameObject, bool isEnable)
 				break;
 			}
 		}
-		//ASSERT(isExist, "Not exist game object");
+		for (auto& object : _gameObjectsToCreate)
+		{
+			if (object == gameObject)
+			{
+				isExist = true;
+				break;
+			}
+		}
+		ASSERT(isExist, "Not exist game object");
 	}
 
 	if (isEnable)
@@ -453,29 +461,23 @@ void flt::Scene::StartFrame()
 		_gameObjectsToCreate.pop_back();
 
 		_gameObjects.emplace_back(object);
+
+		for (auto& component : object->_components)
+		{
+			if (component == nullptr)
+			{
+				continue;
+			}
+
+			component->OnCreate();
+		}
+		object->OnCreate();
+
 		if (object->_isEnable)
 		{
 			object->_isEnable = false;
 			_gameObjectsToEnable.emplace_back(object);
-			for (auto& component : object->_components)
-			{
-				if (component == nullptr)
-				{
-					continue;
-				}
-
-				if (!component->_isEnable)
-				{
-					continue;
-				}
-				// true일 경우 아래에서 이미 호출한줄 알고 비활성상태로 바꿔줌.
-				//component->_isEnable = false;
-				//_componentsToEnable.emplace_back(component);
-				component->OnCreate();
-			}
 		}
-
-		object->OnCreate();
 	}
 
 	while (!_gameObjectsToEnable.empty())

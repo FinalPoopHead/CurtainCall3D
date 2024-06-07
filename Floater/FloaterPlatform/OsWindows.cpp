@@ -369,6 +369,18 @@ flt::KeyData flt::OsWindows::GetKey(KeyCode code)
 	return keydata;
 }
 
+flt::KeyData flt::OsWindows::GetKeyDown(KeyCode code)
+{
+	ASSERT(false, "구현되지 않은 함수");
+	return KeyData();
+}
+
+flt::KeyData flt::OsWindows::GetKeyUp(KeyCode code)
+{
+	ASSERT(false, "구현되지 않은 함수");
+	return KeyData();
+}
+
 bool flt::OsWindows::GetGamePadState(int padIndex, GamePadState* outState)
 {
 	ASSERT(outState, "outState가 nullptr입니다.");
