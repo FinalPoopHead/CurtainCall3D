@@ -1,44 +1,15 @@
 ﻿#pragma once
 #include <string>
-#include "RawNode.h"
+#include "RendererObject.h"
 #include "../../FloaterUtil/include/FloaterType.h"
-
 
 namespace flt
 {
-	class Transform;
-
-	enum class RendererFlag
-	{
-		SOFTWARE = 0x0000'0001,
-		ACCELERATED = 0x0000'0002
-	};
-
-	struct RendererObject
-	{
-		RendererObject(const bool& isDraw) : RendererObject(nullptr, isDraw) {}
-		RendererObject(Transform* transform, const bool& isDraw) : 
-			transform(transform),
-			isDraw(isDraw),
-			node(nullptr),
-			camera(nullptr),
-			name() {}
-
-		void SetRawNode(RawNode* rawNode);
-		void SetMaterial(uint32 meshIndex, const std::wstring& path, RawMaterial::TextureType type);
-
-		// transform
-		// model
-		// material, texture
-		// shader
-		Transform* transform;
-		const bool& isDraw;
-		RawNode* node;
-		std::vector<RawMaterial> materials;
-		Camera* camera;
-		std::wstring name;
-	};
-
+	//enum class RendererFlag
+	//{
+	//	SOFTWARE = 0x0000'0001,
+	//	ACCELERATED = 0x0000'0002
+	//};
 	using HOBJECT = uint64;
 
 	class IRenderer
@@ -50,7 +21,6 @@ namespace flt
 		virtual bool Render(float deltaTime) = 0;
 		virtual HOBJECT RegisterObject(RendererObject& renderable) = 0;
 		virtual bool DeregisterObject(HOBJECT renderable) = 0;
-
 
 		virtual bool Test() { return false; };
 	};

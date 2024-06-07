@@ -58,6 +58,34 @@ bool flt::SoundEngine::CreateSound(const char* name, FMOD::Sound** sound)
 
 void flt::SoundEngine::Play(flt::Sound* sound)
 {
+	if (sound->_channel)
+	{
+		bool isPlaying = false;
+		sound->_channel->isPlaying(&isPlaying);
+
+		if (isPlaying)
+		{
+			bool ispaused = false;
+			sound->_channel->getPaused(&ispaused);
+
+			if (ispaused)
+			{
+				sound->_channel->setPaused(false);
+			}
+
+			return;
+		}
+	}
 	FMOD_RESULT result = _system->playSound(sound->_fSound, _channelGroups[sound->_category], false, &sound->_channel);
 	ASSERT(result == FMOD_OK, "재생 실패");
+}
+
+void flt::SoundEngine::Pause(Sound* sound)
+{
+	FMOD_RESULT result = sound->_channel->setPaused(true);
+}
+
+void flt::SoundEngine::Stop(flt::Sound* sound)
+{
+	FMOD_RESULT result = sound->_channel->stop();
 }

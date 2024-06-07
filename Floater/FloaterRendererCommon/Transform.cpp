@@ -397,6 +397,11 @@ void flt::Transform::LookAt(Vector4f target)
 	_rotation.Normalize();
 }
 
+void flt::Transform::LookAt(float x, float y, float z)
+{
+	LookAt({ x, y, z, 1.0f });
+}
+
 flt::Vector4f flt::Transform::Forward() const noexcept
 {
 	return (Vector4f(0.f, 0.f, 1.f, 0.f) * GetWorldMatrix4f()).Normalize();

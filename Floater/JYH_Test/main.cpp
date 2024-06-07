@@ -21,8 +21,8 @@ int main(int argc, char* argv[])
 	//UnityLoadScene unityLoadScene(L"..\\x64\\data\\SoaringMap.json");
 	//pGameEngine->SetScene(&unityLoadScene);
 
-	TestScene testScene;
-	pGameEngine->SetScene(&testScene);
+	TestScene* testScene = flt::CreateScene<TestScene>();
+	pGameEngine->SetScene(testScene);
 
 	//int loopCount = 0;
 	while (pGameEngine->Update())

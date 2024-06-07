@@ -33,6 +33,8 @@ namespace flt
 		bool CreateSound(void* buff, FMOD_CREATESOUNDEXINFO* exinfo, FMOD::Sound** sound);
 		bool CreateSound(const char* name, FMOD::Sound** sound);
 		void Play(Sound* sound);
+		void Pause(Sound* sound);
+		void Stop(Sound* sound);
 
 	private:
 		FMOD::System* _system;
