@@ -1,8 +1,7 @@
-﻿#include "NormalCube.h"
+﻿#include "AdvantageCube.h"
 #include "CubeController.h"
-#include "../FloaterRendererCommon/include/ModelLoader.h"
 
-NormalCube::NormalCube()
+AdvantageCube::AdvantageCube()
 {
 	std::wstring filePath = L"..\\x64\\fbx\\cube.fbx";
 	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>(true);
@@ -11,7 +10,7 @@ NormalCube::NormalCube()
 	AddComponent<CubeController>(true);
 }
 
-NormalCube::~NormalCube()
+AdvantageCube::~AdvantageCube()
 {
 
 }

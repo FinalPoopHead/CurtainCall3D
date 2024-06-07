@@ -10,5 +10,8 @@ public:
 	virtual void Initialize() override;
 	virtual void Finalize() override;
 
+public:
+
+
 private:
 };

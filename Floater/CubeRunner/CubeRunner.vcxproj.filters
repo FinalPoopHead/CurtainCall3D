@@ -16,6 +16,27 @@
     <Filter Include="Component\CubeController">
       <UniqueIdentifier>{09726758-6f4f-4f60-9916-34afe686e5ea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObject\GameManager">
+      <UniqueIdentifier>{e75300b7-5dc8-4853-9d53-c96e9d125679}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameManager">
+      <UniqueIdentifier>{7ea8e426-d747-4597-a26b-f79537c33a1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\GameManagerController">
+      <UniqueIdentifier>{38727160-e6fc-451d-9d14-b54654eae4c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\Cube">
+      <UniqueIdentifier>{3d24930b-04fd-4fdb-98d1-8e8daf4d984e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\Cube\NormalCube">
+      <UniqueIdentifier>{eac8eaaf-0079-4a75-8b4b-3a16711ff7c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\Cube\AdvantageCube">
+      <UniqueIdentifier>{d06d897e-2a26-499d-aff6-d69e3cdd2750}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\Cube\DarkCube">
+      <UniqueIdentifier>{388ce62a-f815-4bde-b0f8-b66260f101ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -33,11 +54,26 @@
     <ClCompile Include="Tile.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
-    <ClCompile Include="NormalCube.cpp">
-      <Filter>GameObject</Filter>
-    </ClCompile>
     <ClCompile Include="CubeController.cpp">
       <Filter>Component\CubeController</Filter>
+    </ClCompile>
+    <ClCompile Include="ManagerObject.cpp">
+      <Filter>GameObject\GameManager</Filter>
+    </ClCompile>
+    <ClCompile Include="GameManager.cpp">
+      <Filter>GameManager</Filter>
+    </ClCompile>
+    <ClCompile Include="GameManagerController.cpp">
+      <Filter>Component\GameManagerController</Filter>
+    </ClCompile>
+    <ClCompile Include="NormalCube.cpp">
+      <Filter>GameObject\Cube\NormalCube</Filter>
+    </ClCompile>
+    <ClCompile Include="AdvantageCube.cpp">
+      <Filter>GameObject\Cube\AdvantageCube</Filter>
+    </ClCompile>
+    <ClCompile Include="DarkCube.cpp">
+      <Filter>GameObject\Cube\DarkCube</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -53,11 +89,26 @@
     <ClInclude Include="Tile.h">
       <Filter>GameObject</Filter>
     </ClInclude>
-    <ClInclude Include="NormalCube.h">
-      <Filter>GameObject</Filter>
-    </ClInclude>
     <ClInclude Include="CubeController.h">
       <Filter>Component\CubeController</Filter>
+    </ClInclude>
+    <ClInclude Include="ManagerObject.h">
+      <Filter>GameObject\GameManager</Filter>
+    </ClInclude>
+    <ClInclude Include="GameManager.h">
+      <Filter>GameManager</Filter>
+    </ClInclude>
+    <ClInclude Include="GameManagerController.h">
+      <Filter>Component\GameManagerController</Filter>
+    </ClInclude>
+    <ClInclude Include="NormalCube.h">
+      <Filter>GameObject\Cube\NormalCube</Filter>
+    </ClInclude>
+    <ClInclude Include="AdvantageCube.h">
+      <Filter>GameObject\Cube\AdvantageCube</Filter>
+    </ClInclude>
+    <ClInclude Include="DarkCube.h">
+      <Filter>GameObject\Cube\DarkCube</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
