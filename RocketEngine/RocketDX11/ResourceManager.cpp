@@ -84,8 +84,8 @@ namespace Rocket::Core
 		_sphereMesh = std::make_unique<SphereMesh>();
 		_sphereMesh->Initialize(device);
 
-		//_defaultTexture = GetTexture("darkbrickdxt1.dds");
-		_defaultTexture = GetTexture("CubeTexture.png");
+		_defaultTexture = GetTexture("darkbrickdxt1.dds");
+		//_defaultTexture = GetTexture("CubeTexture.png");
 
 		_defaultFont = std::make_unique<DirectX::SpriteFont>(_device, (FONT_PATH + L"NotoSansKR.spritefont").c_str());
 

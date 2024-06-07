@@ -9,6 +9,7 @@ Tile::Tile()
 
 	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>(true);
 	renderer->SetFilePath(filePath);
+	renderer->SetMaterial(0, L"NormalCube.png", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
 }
 
 Tile::~Tile()

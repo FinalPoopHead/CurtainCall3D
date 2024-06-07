@@ -7,14 +7,17 @@ constexpr float PIVOTSIZE = 2.0f;		// 피봇까지의 y,z 거리. 모델 사이�
 constexpr float ROLLANGLE = 90.0f;		// 회전할 각도
 constexpr float TARGETANGLE[4] = { 90.0f, 180.0f, 270.0f, 360.0f };	// 회전 목표 각도
 constexpr float GRAVITY = 9.8f;
+constexpr float STARTFALLSPEED = 5.0f;
 
 CubeController::CubeController()
-	: _isRolling(false)
+	: _board(nullptr)
+	, _isRolling(false)
 	, _isFalling(false)
 	, _targetIndex(0)
 	, _rotateSpeed(0.0f)
 	, _currentAngle(0.0f)
 	, _rotatePivot(0.0f, 0.0f, 0.0f)
+	, _fallSpeed(0.0f)
 {
 
 }
@@ -45,6 +48,7 @@ void CubeController::Update(float deltaSecond)
 
 	if (!_isRolling && IsOutofBoard())
 	{
+		// TODO : 체력 감소 또는 게임 오버 처리 필요.
 		StartFalling();
 	}
 }
@@ -74,7 +78,7 @@ void CubeController::StartFalling()
 	}
 
 	_isFalling = true;
-	_fallSpeed = 0.0f;
+	_fallSpeed = STARTFALLSPEED;
 }
 
 void CubeController::Roll(float deltaSecond)
