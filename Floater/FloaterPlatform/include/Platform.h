@@ -36,6 +36,7 @@ namespace flt
 		void DestroyRenderer(IRenderer* renderer);
 
 		KeyData GetKey(KeyCode code);
+		KeyData GetKeyDown(KeyCode code);
 
 		bool GetGamePadState(int padIndex, GamePadState* outState);
 		bool SetGamePadVibration(int padIndex, float leftMotor, float rightMotor);

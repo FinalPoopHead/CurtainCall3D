@@ -6,6 +6,7 @@
 namespace flt
 {
 	KeyData GetKey(KeyCode code);
+	KeyData GetKeyDown(KeyCode code);
 
 	bool GetGamePadState(int padIndex, GamePadState* outState);
 

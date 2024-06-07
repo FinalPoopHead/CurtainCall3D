@@ -55,6 +55,11 @@ flt::KeyData flt::Platform::GetKey(KeyCode code)
 	return _pOsImpl->GetKey(code);
 }
 
+flt::KeyData flt::Platform::GetKeyDown(KeyCode code)
+{
+	return _pOsImpl->GetKeyDown(code);
+}
+
 bool flt::Platform::GetGamePadState(int padIndex, GamePadState* outState)
 {
 	return _pOsImpl->GetGamePadState(padIndex, outState);
