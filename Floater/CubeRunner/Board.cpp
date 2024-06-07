@@ -112,10 +112,11 @@ TileStateFlag Board::QueryTileState(float x, float y)
 	int tileY = 0;
 	ConvertToTileIndex(x, y, tileX, tileY);
 
-// 	ASSERT(tileX >= 0 && tileX < _width, "Out of Range");
-// 	ASSERT(tileY >= 0 && tileY < _height, "Out of Range");
-
-	if (tileX < 0 || tileX >= _width || tileY < 0 || tileY >= _height)
+	if (tileX < 0 || tileX >= _width)
+	{
+		return TileStateFlag::None;
+	}
+	if (tileY < 0 || tileY >= _height)
 	{
 		return TileStateFlag::None;
 	}
@@ -246,9 +247,14 @@ void Board::BackToPool(flt::GameObject* obj, CubeController* cubeCtr)
 void Board::Resize(int newWidth, int newHeight)
 {
 	_tileState.resize(newWidth);
+
 	for (int i = 0; i < newWidth; ++i)
 	{
 		_tileState[i].resize(newHeight);
+		for (int j = 0; j < newHeight; ++j)
+		{
+			_tileState[i][j] = TileStateFlag::Tile;
+		}
 	}
 
 	// 타일 높이가 변화시 먼저 처리
