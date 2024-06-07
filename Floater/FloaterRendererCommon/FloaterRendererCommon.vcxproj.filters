@@ -111,6 +111,12 @@
     <ClInclude Include="include\Light.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="include\RendererObject.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AnimState.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Transform.cpp">
@@ -159,6 +165,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="IRenderer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="RendererObject.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

@@ -45,3 +45,13 @@ void flt::SoundComponent::Play(int index)
 {
 	_soundEngine->Play(_sounds[index]);
 }
+
+void flt::SoundComponent::Pause(int index)
+{
+	_soundEngine->Pause(_sounds[index]);
+}
+
+void flt::SoundComponent::Stop(int index)
+{
+	_soundEngine->Stop(_sounds[index]);
+}

@@ -55,35 +55,67 @@ bool flt::RocketAdapter::Finalize()
 
 bool flt::RocketAdapter::Render(float deltaTime)
 {
-	for (auto& obj : _objects)
+	for (auto& [rkObj, pair] : _objects)
 	{
-		if (obj->rkModel)
+		if (rkObj->rkModel)
 		{
-			if (0 < obj->rkModel->animations.size())
+			if (0 < rkObj->rkModel->animations.size())
 			{
-				obj->renderer->SetActive(obj->isDraw);
+				rkObj->renderer->SetActive(rkObj->isDraw);
 			}
 			else
 			{
-				obj->staticModelRenderer->SetActive(obj->isDraw);
+				rkObj->staticModelRenderer->SetActive(rkObj->isDraw);
 			}
 		}
 
-
 		Transform temp;
-		temp.SetMatrix(obj->transform->GetWorldMatrix4f());
+		temp.SetMatrix(rkObj->transform->GetWorldMatrix4f());
 
 		Vector4f wPos = temp.GetLocalPosition();
-		obj->rocketTransform.SetLocalPosition({ wPos.x, wPos.y, wPos.z });
+		rkObj->rocketTransform.SetLocalPosition({ wPos.x, wPos.y, wPos.z });
 
 		Quaternion wRot = temp.GetLocalRotation();
-		obj->rocketTransform.SetLocalRotation({ wRot.x, wRot.y, wRot.z, wRot.w });
+		rkObj->rocketTransform.SetLocalRotation({ wRot.x, wRot.y, wRot.z, wRot.w });
 
 		Vector4f wScale = temp.GetLocalScale();
-		obj->rocketTransform.SetLocalScale({ wScale.x, wScale.y, wScale.z });
+		rkObj->rocketTransform.SetLocalScale({ wScale.x, wScale.y, wScale.z });
 
-		if (obj->camera)
+		auto& rendererObject = pair.first;
+		auto& animState = pair.second;
+
+		if (rendererObject->animState.index == -1)
 		{
+			continue;
+		}
+
+		if (animState.index == rendererObject->animState.index && 
+			animState.isPlaying == rendererObject->animState.isPlaying)
+		{
+			continue;
+		}
+
+		animState = rendererObject->animState;
+
+		if (animState.isPlaying)
+		{
+			if (rkObj->rkModel)
+			{
+				if (0 < rkObj->rkModel->animations.size())
+				{
+					rkObj->renderer->PlayAnimation(animState.index, animState.isLoop);
+				}
+			}
+		}
+		else
+		{
+			if (rkObj->rkModel)
+			{
+				if (0 < rkObj->rkModel->animations.size())
+				{
+					rkObj->renderer->ForceStopAnimation();
+				}
+			}
 		}
 	}
 
@@ -102,9 +134,9 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 
 	rocketObject->transform = renderable.transform;
 
+	// 카메라 등록 로직
 	if (renderable.camera)
 	{
-		// 카메라 등록 로직
 		rocketObject->camera = factory->CreateCamera();
 		//rocketObject->camera->SetAsMainCamera();
 		rocketObject->camera->AddToMainCamera();
@@ -198,7 +230,7 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 
 	Rocket::Core::ReleaseFactory(factory);
 
-	_objects.insert(rocketObject);
+	_objects.insert({ rocketObject, {&renderable, AnimState{renderable.animState}} });
 	return (HOBJECT)rocketObject;
 }
 

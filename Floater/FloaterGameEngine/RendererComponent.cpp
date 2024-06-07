@@ -3,6 +3,7 @@
 #include "./include/internal/GameObject.h"
 #include "./include/internal/Scene.h"
 #include "./include/internal/GameEngine.h"
+#include "../FloaterRendererCommon/include/RawSkeleton.h"
 //#include "../FloaterRendererCommon/include/RawNode.h"
 
 
@@ -90,4 +91,34 @@ void flt::RendererComponent::SetMaterial(uint32 meshIndex, const std::wstring& p
 		_renderer.DeregisterObject(_hObject);
 		_hObject = _renderer.RegisterObject(*_rendererObject);
 	}
+}
+
+std::vector<std::wstring> flt::RendererComponent::GetAnimaionList() const
+{
+	std::vector<std::wstring> list;
+	if (!_rendererObject->node->skeleton)
+	{
+		return list;
+	}
+
+	list.reserve(_rendererObject->node->skeleton->animations.size());
+
+	for (const auto& animation : _rendererObject->node->skeleton->animations)
+	{
+		list.push_back(animation.name);
+	}
+
+	return list;
+}
+
+void flt::RendererComponent::PlayAnimation(uint32 index, bool isLoop)
+{
+	_rendererObject->animState.index = index;
+	_rendererObject->animState.isLoop = isLoop;
+	_rendererObject->animState.isPlaying = true;
+}
+
+void flt::RendererComponent::StopAnimation()
+{
+	_rendererObject->animState.isPlaying = false;
 }

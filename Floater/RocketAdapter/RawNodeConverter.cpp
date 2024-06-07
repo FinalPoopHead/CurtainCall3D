@@ -108,24 +108,6 @@ Rocket::Core::RawModel* flt::ConvertModel(const flt::RawNode& rootNode)
 					rocketAnimData->scaleTimestamps.push_back(0);
 				}
 
-				//for (const auto& key : animation.clips[i].keyPosition)
-				//{
-				//	rocketAnimData->positions.push_back({ key.position.x, key.position.y, key.position.z });
-				//	rocketAnimData->positionTimestamps.push_back(key.time);
-				//}
-
-				//for (const auto& key : animation.clips[i].keyRotation)
-				//{
-				//	rocketAnimData->rotations.push_back({ key.rotation.x, key.rotation.y, key.rotation.z, key.rotation.w });
-				//	rocketAnimData->rotationTimestamps.push_back(key.time);
-				//}
-
-				//for (const auto& key : animation.clips[i].keyScale)
-				//{
-				//	rocketAnimData->scales.push_back({ key.scale.x, key.scale.y, key.scale.z });
-				//	rocketAnimData->scaleTimestamps.push_back(key.time);
-				//}
-
 				rocketAnimation->nodeAnimations.push_back(rocketAnimData);
 			}
 

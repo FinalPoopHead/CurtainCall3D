@@ -9,6 +9,8 @@ namespace FMOD
 
 namespace flt
 {
+	class SoundEngine;
+	class SoundComponent;
 
 	class Sound
 	{

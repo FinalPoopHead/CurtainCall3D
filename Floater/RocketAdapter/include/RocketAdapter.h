@@ -30,6 +30,6 @@ namespace flt
 	private:
 		Rocket::Core::IDX11Renderer* _impl;
 
-		std::set<RocketObject*> _objects;
+		std::unordered_map<RocketObject*, std::pair<RendererObject*, AnimState>> _objects;
 	};
 }
