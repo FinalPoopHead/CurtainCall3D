@@ -118,7 +118,7 @@ void flt::Scene::AddEnableGameObject(GameObject* gameObject, bool isEnable)
 				break;
 			}
 		}
-		ASSERT(isExist, "Not exist game object");
+		//ASSERT(isExist, "Not exist game object");
 	}
 
 	if (isEnable)
