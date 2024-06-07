@@ -11,7 +11,7 @@ flt::RendererComponent::RendererComponent() :
 	_rendererObject(new RendererObject{ _isDraw }),
 	_renderer(*GameEngine::Instance()->GetRenderer()), 
 	_hObject(), 
-	_isDraw(true),
+	_isDraw(false),
 	_isRegisted(false)
 {
 }
