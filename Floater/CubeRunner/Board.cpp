@@ -60,7 +60,11 @@ void Board::PreUpdate(float deltaTime)
 
 	if (flt::GetKey(flt::KeyCode::r))
 	{
-		GenerateRandomStage();
+		if (!_isGenerated)
+		{
+			GenerateRandomStage();
+			_isGenerated = true;
+		}
 	}
 
 	if (flt::GetKey(flt::KeyCode::spacebar))
@@ -138,6 +142,10 @@ void Board::ConvertToTilePosition(int x, int z, float& outX, float& outZ)
 
 void Board::GenerateRandomStage()
 {
+	std::cout << _normalCubePool.size() << std::endl;
+	std::cout << _darkCubePool.size() << std::endl;
+	std::cout << _advantageCubePool.size() << std::endl;
+
 	for (int i = 0; i < _width; ++i)
 	{
 		for (int j = 0; j < _height; ++j)
