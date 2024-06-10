@@ -3,11 +3,11 @@
 
 
 
-class GameManagerController : public flt::Component<GameManagerController>
+class GameManager : public flt::Component<GameManager>
 {
 public:
-	GameManagerController();
-	~GameManagerController();
+	GameManager();
+	~GameManager();
 
 public:
 	virtual void OnCreate() override;		// 사실상 초기화

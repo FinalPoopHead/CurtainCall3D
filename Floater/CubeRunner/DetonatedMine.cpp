@@ -1,16 +1,16 @@
-﻿#include "Mine.h"
+﻿#include "DetonatedMine.h"
 
-Mine::Mine()
+DetonatedMine::DetonatedMine()
 {
 	// TODO : 임시로 아무 모델링파일 넣어둠
 	std::wstring filePath = L"..\\Resources\\Models\\Sphere.fbx";
 
 	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>(true);
 	renderer->SetFilePath(filePath);
-	renderer->SetMaterial(0, L"../Resources/Textures/AdvantageCube.png", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
+	renderer->SetMaterial(0, L"../Resources/Textures/T_WEP_Basic_009_D.png", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
 }
 
-Mine::~Mine()
+DetonatedMine::~DetonatedMine()
 {
 
 }

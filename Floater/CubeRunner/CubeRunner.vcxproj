@@ -139,7 +139,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CubeController.cpp" />
     <ClCompile Include="DarkCube.cpp" />
-    <ClCompile Include="GameManager.cpp" />
+    <ClCompile Include="DetonatedMine.cpp" />
     <ClCompile Include="GameManagerController.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="main.cpp" />
@@ -155,7 +155,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeController.h" />
     <ClInclude Include="DarkCube.h" />
-    <ClInclude Include="GameManager.h" />
+    <ClInclude Include="DetonatedMine.h" />
     <ClInclude Include="GameManagerController.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Mine.h" />

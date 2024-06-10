@@ -314,6 +314,8 @@ bool Board::SetMine(float x, float z)
 void Board::DetonateMine()
 {
 	_isDirty = true;
+	_tiles[_minePos.first][_minePos.second]->DisableMine();
+	_tiles[_minePos.first][_minePos.second]->EnableDetonated();
 	_tileState[_minePos.first][_minePos.second] = (int)_tileState[_minePos.first][_minePos.second] & ~((int)TileStateFlag::Mine);
 	_tileState[_minePos.first][_minePos.second] = (int)_tileState[_minePos.first][_minePos.second] | (int)TileStateFlag::Detonate;
 }
@@ -485,6 +487,7 @@ void Board::UpdateDetonate()
 				_minePos.first = -1;
 				_minePos.second = -1;
 				_tiles[i][j]->DisableMine();
+				_tiles[i][j]->DisableDetonated();
 
 				_tileState[i][j] = (int)_tileState[i][j] & ~CUBE;
 			}

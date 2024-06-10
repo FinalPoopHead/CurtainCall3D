@@ -1,28 +1,28 @@
-﻿#include "GameManagerController.h"
+﻿#include "GameManager.h"
 #include "../FloaterGameEngine/include/Input.h"
 
 
-GameManagerController::GameManagerController()
+GameManager::GameManager()
 {
 
 }
 
-GameManagerController::~GameManagerController()
+GameManager::~GameManager()
 {
 
 }
 
-void GameManagerController::OnCreate()
+void GameManager::OnCreate()
 {
 
 }
 
-void GameManagerController::OnDestroy()
+void GameManager::OnDestroy()
 {
 
 }
 
-void GameManagerController::Update(float deltaSecond)
+void GameManager::Update(float deltaSecond)
 {
 
 }

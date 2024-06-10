@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include "Tile.h"
 #include "Mine.h"
+#include "DetonatedMine.h"
 
 Tile::Tile()
 	: _cube(nullptr)
@@ -14,6 +15,10 @@ Tile::Tile()
 	_mine = flt::CreateGameObject<Mine>(false);
 	_mine->tr.SetParent(&tr);
 	_mine->tr.AddWorldPosition(0.0f, 5.0f, 0.0f);
+
+	_detonated = flt::CreateGameObject<DetonatedMine>(false);
+	_detonated->tr.SetParent(&tr);
+	_detonated->tr.AddWorldPosition(0.0f, 5.0f, 0.0f);
 }
 
 Tile::~Tile()
@@ -49,4 +54,14 @@ void Tile::EnableMine()
 void Tile::DisableMine()
 {
 	_mine->Disable();
+}
+
+void Tile::EnableDetonated()
+{
+	_detonated->Enable();
+}
+
+void Tile::DisableDetonated()
+{
+	_detonated->Disable();
 }
