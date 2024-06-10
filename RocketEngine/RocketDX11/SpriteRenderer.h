@@ -23,7 +23,7 @@ namespace Rocket::Core
 		virtual void SetActive(bool isActive) override;
 		virtual bool IsActive() override { return _isActive; }
 
-		virtual void SetImage(const std::string& fileName) override;
+		virtual void SetImage(const std::string& filePath) override;
 		virtual void SetColor(Color color) override;
 
 	public:

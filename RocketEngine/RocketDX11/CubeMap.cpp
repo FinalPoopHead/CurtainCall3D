@@ -148,14 +148,14 @@ namespace Rocket::Core
 		std::string pureName = fileName.substr(0, fileName.find_last_of("."));
 		std::string extension = fileName.substr(fileName.find_last_of(".") + 1);
 		//_cubeMapTexture = ResourceManager::Instance().GetTexture(fileName);
-		_cubeMapTexture = ResourceManager::Instance().GetTexture(pureName + "EnvHDR" + "." + extension);
+		_cubeMapTexture = ResourceManager::Instance().GetTexture("../Resources/Textures/" + pureName + "EnvHDR" + "." + extension);
 
 		//_irradianceTexture = std::make_unique<Texture>();
 
 		// TODO : 아래 텍스쳐들 hlsl을 통해 직접 만들기.
-		_irradianceTexture = ResourceManager::Instance().GetTexture(pureName + "DiffuseHDR" + "." + extension);
-		_prefilteredTexture = ResourceManager::Instance().GetTexture(pureName + "SpecularHDR" + "." + extension);
-		_BRDF2DLUTTexture = ResourceManager::Instance().GetTexture(pureName + "Brdf" + "." + extension);
+		_irradianceTexture = ResourceManager::Instance().GetTexture("../Resources/Textures/" + pureName + "DiffuseHDR" + "." + extension);
+		_prefilteredTexture = ResourceManager::Instance().GetTexture("../Resources/Textures/" + pureName + "SpecularHDR" + "." + extension);
+		_BRDF2DLUTTexture = ResourceManager::Instance().GetTexture("../Resources/Textures/" + pureName + "Brdf" + "." + extension);
 
 		//GenerateIBLTextures();
 	}

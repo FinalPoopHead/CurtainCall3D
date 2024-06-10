@@ -20,11 +20,11 @@ enum class TileStateFlag
 	NormalCube		= 0x0100,
 	DarkCube		= 0x0200,
 	AdvantageCube	= 0x0400,
-	CubeLeaving		= 0x1000,
-	CubeArriving	= 0x2000
+	CubeMoving		= 0x1000
 };
 
-#define BLOCKED_TILE ((int)TileStateFlag::AdvantageMine | (int)TileStateFlag::NormalCube | (int)TileStateFlag::DarkCube | (int)TileStateFlag::AdvantageCube | (int)TileStateFlag::CubeLeaving | (int)TileStateFlag::CubeArriving)
+#define BLOCKED_TILE ((int)TileStateFlag::NormalCube | (int)TileStateFlag::DarkCube | (int)TileStateFlag::AdvantageCube | (int)TileStateFlag::CubeMoving)
+#define CUBE ((int)TileStateFlag::NormalCube | (int)TileStateFlag::DarkCube | (int)TileStateFlag::AdvantageCube)
 
 class Board : public flt::GameObject
 {
@@ -40,13 +40,13 @@ public:
 	void Resize(int width, int height);
 	bool SetTileState(float x, float y, TileStateFlag state);
 	bool AddTileState(float x, float y, TileStateFlag state);
-	TileStateFlag QueryTileState(float x, float y);
+	int QueryTileState(float x, float y);
 
 	void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
 	void ConvertToTilePosition(int x, int z, float& outX, float& outZ);
 
 	void GenerateRandomStage();
-	void RollCubes(float RollingTime);
+	void TickCubesRolling(float RollingTime);			// 일괄적으로 굴리기 시작.
 	void BackToPool(flt::GameObject* obj, CubeController* cubeCtr);
 
 private:
@@ -60,7 +60,7 @@ private:
 	int _height;
 	float _tileSize;
 
-	std::vector<std::vector<TileStateFlag>> _tileState;
+	std::vector<std::vector<int>> _tileState;
 	std::vector<std::vector<Tile*>> _tiles;
 
 	std::list<CubeController*> _cubeControllers;	// 현재 보드 위에 굴러가는 큐브들
@@ -69,5 +69,8 @@ private:
 	std::list<NormalCube*> _normalCubePool;										// 노말 큐브 풀
 
 	bool _isGenerated = false;
+	bool _isRolling = false;
+	bool _isDirty = false;
+	float _elapsedTime;
 };
 

@@ -19,7 +19,7 @@ namespace Rocket::Core
 		~Texture();
 
 	public:
-		void LoadFromFile(ID3D11Device* device, std::string fileName);
+		void LoadFromFile(ID3D11Device* device, std::string filePath, bool isFullPath = true);
 		void SetResource(ID3D11Resource* resource);
 		void SetSRV(ID3D11ShaderResourceView* srv);
 		ID3D11Resource* GetResource();

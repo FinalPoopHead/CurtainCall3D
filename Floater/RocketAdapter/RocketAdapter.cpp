@@ -186,29 +186,29 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 				rocketObject->renderer->BindTransform(&rocketObject->rocketTransform);
 
 				// 하드코딩 일단 0번만 넣어주자.
-				if (renderable.materials[0].textures[RawMaterial::TextureType::ALBEDO_OPACITY]->name != L"")
+				if (renderable.materials[0].textures[RawMaterial::TextureType::ALBEDO_OPACITY]->path != L"")
 				{
-					rocketObject->renderer->LoadBaseColorTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::ALBEDO_OPACITY]->name));
+					rocketObject->renderer->LoadBaseColorTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::ALBEDO_OPACITY]->path));
 				}
 
-				if (renderable.materials[0].textures[RawMaterial::TextureType::AO]->name != L"")
+				if (renderable.materials[0].textures[RawMaterial::TextureType::AO]->path != L"")
 				{
-					rocketObject->renderer->LoadAOTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::AO]->name));
+					rocketObject->renderer->LoadAOTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::AO]->path));
 				}
 
-				if (renderable.materials[0].textures[RawMaterial::TextureType::METALLIC]->name != L"")
+				if (renderable.materials[0].textures[RawMaterial::TextureType::METALLIC]->path != L"")
 				{
-					rocketObject->renderer->LoadMetallicTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::METALLIC]->name));
+					rocketObject->renderer->LoadMetallicTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::METALLIC]->path));
 				}
 
-				if (renderable.materials[0].textures[RawMaterial::TextureType::ROUGHNESS]->name != L"")
+				if (renderable.materials[0].textures[RawMaterial::TextureType::ROUGHNESS]->path != L"")
 				{
-					rocketObject->renderer->LoadRoughnessTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::ROUGHNESS]->name));
+					rocketObject->renderer->LoadRoughnessTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::ROUGHNESS]->path));
 				}
 
-				if (renderable.materials[0].textures[RawMaterial::TextureType::NORMAL]->name != L"")
+				if (renderable.materials[0].textures[RawMaterial::TextureType::NORMAL]->path != L"")
 				{
-					rocketObject->renderer->LoadNormalTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::NORMAL]->name));
+					rocketObject->renderer->LoadNormalTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::NORMAL]->path));
 				}
 			}
 			else
@@ -219,29 +219,29 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 				rocketObject->staticModelRenderer->BindTransform(&rocketObject->rocketTransform);
 
 				// 하드코딩 일단 0번만 넣어주자.
-				if (renderable.materials[0].textures[RawMaterial::TextureType::ALBEDO_OPACITY]->name != L"")
+				if (renderable.materials[0].textures[RawMaterial::TextureType::ALBEDO_OPACITY]->path != L"")
 				{
-					rocketObject->staticModelRenderer->LoadBaseColorTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::ALBEDO_OPACITY]->name));
+					rocketObject->staticModelRenderer->LoadBaseColorTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::ALBEDO_OPACITY]->path));
 				}
 
-				if (renderable.materials[0].textures[RawMaterial::TextureType::AO]->name != L"")
+				if (renderable.materials[0].textures[RawMaterial::TextureType::AO]->path != L"")
 				{
-					rocketObject->staticModelRenderer->LoadAOTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::AO]->name));
+					rocketObject->staticModelRenderer->LoadAOTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::AO]->path));
 				}
 
-				if (renderable.materials[0].textures[RawMaterial::TextureType::METALLIC]->name != L"")
+				if (renderable.materials[0].textures[RawMaterial::TextureType::METALLIC]->path != L"")
 				{
-					rocketObject->staticModelRenderer->LoadMetallicTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::METALLIC]->name));
+					rocketObject->staticModelRenderer->LoadMetallicTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::METALLIC]->path));
 				}
 
-				if (renderable.materials[0].textures[RawMaterial::TextureType::ROUGHNESS]->name != L"")
+				if (renderable.materials[0].textures[RawMaterial::TextureType::ROUGHNESS]->path != L"")
 				{
-					rocketObject->staticModelRenderer->LoadRoughnessTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::ROUGHNESS]->name));
+					rocketObject->staticModelRenderer->LoadRoughnessTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::ROUGHNESS]->path));
 				}
 
-				if (renderable.materials[0].textures[RawMaterial::TextureType::NORMAL]->name != L"")
+				if (renderable.materials[0].textures[RawMaterial::TextureType::NORMAL]->path != L"")
 				{
-					rocketObject->staticModelRenderer->LoadNormalTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::NORMAL]->name));
+					rocketObject->staticModelRenderer->LoadNormalTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::NORMAL]->path));
 				}
 			}
 		}

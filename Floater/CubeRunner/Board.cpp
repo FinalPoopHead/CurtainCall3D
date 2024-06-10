@@ -11,11 +11,15 @@ constexpr int CUBECOUNT = 64;
 constexpr float ROLLINGTIME = 1.0f;
 
 Board::Board(int width, int height, float offset) :
-	flt::GameObject(),
-	_width(width),
-	_height(height),
-	_tileSize(offset),
-	_tileState()
+	flt::GameObject()
+	, _width(width)
+	, _height(height)
+	, _tileSize(offset)
+	, _tileState()
+	, _isGenerated(false)
+	, _isRolling(false)
+	, _isDirty(false)
+	, _elapsedTime(0.0f)
 {
 
 }
@@ -59,7 +63,16 @@ void Board::OnDestroy()
 
 void Board::PreUpdate(float deltaTime)
 {
-	UpdateBoard();
+	/// 업데이트 순서
+	/// 1. 이동이 다 끝나면 타일 상태 업데이트
+	/// 2. 타일상태 업데이트하면서 플레이어와 겹치면 기절시키기
+	/// 3. 플레이어 위치 업데이트해서 타일상태에 기입
+
+	if (!_isRolling && _isDirty)
+	{
+		_isDirty = false;
+		UpdateBoard();
+	}
 
 	if (flt::GetKeyDown(flt::KeyCode::r))
 	{
@@ -70,9 +83,25 @@ void Board::PreUpdate(float deltaTime)
 		}
 	}
 
-	if (flt::GetKeyDown(flt::KeyCode::spacebar))
+	if (flt::GetKeyDown(flt::KeyCode::f))
 	{
-		RollCubes(ROLLINGTIME);
+		if (!_isRolling)
+		{
+			TickCubesRolling(ROLLINGTIME);
+			_isRolling = true;
+			_isDirty = true;
+			_elapsedTime = 0.0f;
+		}
+	}
+
+	if (_isRolling)
+	{
+		_elapsedTime += deltaTime;
+		if (_elapsedTime >= ROLLINGTIME)
+		{
+			_isRolling = false;
+			_elapsedTime = 0.0f;
+		}
 	}
 }
 
@@ -87,7 +116,7 @@ bool Board::SetTileState(float x, float y, TileStateFlag state)
 	ASSERT(tileX >= 0 && tileX < _width, "Out of Range");
 	ASSERT(tileY >= 0 && tileY < _height, "Out of Range");
 
-	_tileState[tileX][tileY] = state;
+	_tileState[tileX][tileY] = (int)state;
 
 	return true;
 }
@@ -101,12 +130,12 @@ bool Board::AddTileState(float x, float y, TileStateFlag state)
 	ASSERT(tileX >= 0 && tileX < _width, "Out of Range");
 	ASSERT(tileY >= 0 && tileY < _height, "Out of Range");
 
-	_tileState[tileX][tileY] = (TileStateFlag)((int)_tileState[tileX][tileY] | (int)state);
+	_tileState[tileX][tileY] = (int)_tileState[tileX][tileY] | (int)state;
 
 	return true;
 }
 
-TileStateFlag Board::QueryTileState(float x, float y)
+int Board::QueryTileState(float x, float y)
 {
 	int tileX = 0;
 	int tileY = 0;
@@ -114,11 +143,11 @@ TileStateFlag Board::QueryTileState(float x, float y)
 
 	if (tileX < 0 || tileX >= _width)
 	{
-		return TileStateFlag::None;
+		return (int)TileStateFlag::None;
 	}
 	if (tileY < 0 || tileY >= _height)
 	{
-		return TileStateFlag::None;
+		return (int)TileStateFlag::None;
 	}
 
 	return _tileState[tileX][tileY];
@@ -163,7 +192,7 @@ void Board::GenerateRandomStage()
 
 	for (int i = 0; i < _width; ++i)
 	{
-		for (int j = 0; j < _height; ++j)
+		for (int j = _height - 1; j > _height - _width - 2; --j)
 		{
 			int randValue = rand() % 3;
 
@@ -181,7 +210,7 @@ void Board::GenerateRandomStage()
 				}
 				cube = _normalCubePool.front();
 				_normalCubePool.pop_front();
-				_tileState[i][j] = TileStateFlag::NormalCube;
+				_tileState[i][j] = _tileState[i][j] | (int)TileStateFlag::NormalCube;
 				break;
 			case 1:
 				if (_darkCubePool.empty())
@@ -190,7 +219,7 @@ void Board::GenerateRandomStage()
 				}
 				cube = _darkCubePool.front();
 				_darkCubePool.pop_front();
-				_tileState[i][j] = TileStateFlag::DarkCube;
+				_tileState[i][j] = _tileState[i][j] | (int)TileStateFlag::DarkCube;
 				break;
 			case 2:
 				if (_advantageCubePool.empty())
@@ -199,11 +228,11 @@ void Board::GenerateRandomStage()
 				}
 				cube = _advantageCubePool.front();
 				_advantageCubePool.pop_front();
-				_tileState[i][j] = TileStateFlag::AdvantageCube;
+				_tileState[i][j] = _tileState[i][j] | (int)TileStateFlag::AdvantageCube;
 				break;
 			default:
 				ASSERT(false, "Invalid Random Value");
-			break;
+				break;
 			}
 
 			auto cubeCtr = cube->GetComponent<CubeController>();
@@ -211,11 +240,12 @@ void Board::GenerateRandomStage()
 
 			cube->tr.SetPosition({ x, 4.0f, z, 1.0f });
 			cube->Enable();
+			_tiles[i][j]->_cube = cube;
 		}
 	}
 }
 
-void Board::RollCubes(float RollingTime)
+void Board::TickCubesRolling(float RollingTime)
 {
 	for (auto& cubeCtr : _cubeControllers)
 	{
@@ -224,7 +254,7 @@ void Board::RollCubes(float RollingTime)
 }
 
 void Board::BackToPool(flt::GameObject* obj, CubeController* cubeCtr)
-{
+{	
 	std::string temp = typeid(*obj).name();
 	if (temp.compare(typeid(NormalCube).name()) == 0)
 	{
@@ -259,7 +289,7 @@ void Board::Resize(int newWidth, int newHeight)
 		_tileState[i].resize(newHeight);
 		for (int j = 0; j < newHeight; ++j)
 		{
-			_tileState[i][j] = TileStateFlag::Tile;
+			_tileState[i][j] = (int)TileStateFlag::Tile;
 		}
 	}
 
@@ -326,9 +356,9 @@ void Board::Resize(int newWidth, int newHeight)
 
 	for (int i = 0; i < newWidth; ++i)
 	{
-		for(int j=0;j<newHeight;++j)
+		for (int j = 0; j < newHeight; ++j)
 		{
-			_tileState[i][j] = TileStateFlag::Tile;
+			_tileState[i][j] = (int)TileStateFlag::Tile;
 		}
 	}
 
@@ -347,5 +377,63 @@ void Board::ConvertToTileLocalPosition(int x, int z, float& outX, float& outZ)
 
 void Board::UpdateBoard()
 {
+	// 1. 큐브 이동 처리
+	// 2. Player 깔렸는지 확인
+	// 3. 폭파 상태 처리
 
+	bool isPlayerCrushed = false;
+
+	for (int i = 0; i < _width; i++)
+	{
+		for (int j = 0; j < _height; j++)
+		{
+			if (j + 1 >= _height)
+			{
+				_tileState[i][j] = (int)_tileState[i][j] & ~CUBE;
+				_tiles[i][j]->_cube = nullptr;
+				continue;
+			}
+			else
+			{
+				// 1. 큐브 이동
+				_tileState[i][j] = (int)_tileState[i][j] & ~CUBE;		// 큐브 타입만 제거
+				_tileState[i][j] = (int)_tileState[i][j] | ((int)_tileState[i][j + 1] & CUBE);	// 큐브 타입 이동
+				_tiles[i][j]->_cube = _tiles[i][j + 1]->_cube;
+				_tiles[i][j + 1]->_cube = nullptr;
+
+				// 2. Check Player Crushed
+				if ((int)_tileState[i][j] & (int)TileStateFlag::Player)
+				{
+					if ((int)_tileState[i][j] & CUBE)
+					{
+						isPlayerCrushed = true;
+					}
+				}
+
+				// 3. 폭파 상태 처리
+				if ((int)_tileState[i][j] & (int)TileStateFlag::Detonate)
+				{
+					TileStateFlag cubeType = (TileStateFlag)((int)_tileState[i][j] & CUBE);
+
+					switch (cubeType)
+					{
+					case TileStateFlag::NormalCube:
+						// NormalCube 수납
+						BackToPool(_tiles[i][j]->_cube, _tiles[i][j]->_cube->GetComponent<CubeController>()); // 임시
+						break;
+					case TileStateFlag::DarkCube:
+						// DarkCube 수납 및 체력 감소
+						BackToPool(_tiles[i][j]->_cube, _tiles[i][j]->_cube->GetComponent<CubeController>()); // 임시
+						break;
+					case TileStateFlag::AdvantageCube:
+						// AdvantageCube 수납 및 AdvantageMine 설치
+						BackToPool(_tiles[i][j]->_cube, _tiles[i][j]->_cube->GetComponent<CubeController>()); // 임시
+						break;
+					default:
+						break;
+					}
+				}
+			}
+		}
+	}
 }

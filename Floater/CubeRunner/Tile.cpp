@@ -4,12 +4,13 @@
 
 
 Tile::Tile()
+	: _cube(nullptr)
 {
 	std::wstring filePath = L"..\\Resources\\Models\\cube.fbx";
 
 	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>(true);
 	renderer->SetFilePath(filePath);
-	renderer->SetMaterial(0, L"NormalCube.png", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
+	renderer->SetMaterial(0, L"../Resources/Textures/NormalCube.png", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
 }
 
 Tile::~Tile()

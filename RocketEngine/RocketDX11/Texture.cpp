@@ -53,12 +53,16 @@ namespace Rocket::Core
 		_textureSRV.Reset();
 	}
 
-	void Texture::LoadFromFile(ID3D11Device* device, std::string fileName)
+	void Texture::LoadFromFile(ID3D11Device* device, std::string filePath, bool isFullPath /*= true*/)
 	{
-		std::string fullPath = TEXTURE_PATH + fileName;
-		std::wstring wFileName(fullPath.begin(), fullPath.end());
+		std::string fullPath = filePath;
+		if(!isFullPath)
+		{
+			fullPath = TEXTURE_PATH + filePath;
+		}
 
-		std::string extension = fileName.substr(fileName.find_last_of(".") + 1);
+		std::wstring wFileName(fullPath.begin(), fullPath.end());
+		std::string extension = fullPath.substr(fullPath.find_last_of(".") + 1);
 
 		if (_access(fullPath.c_str(), 0) == -1)
 		{
