@@ -58,7 +58,7 @@ private:
 private:
 	int _width;
 	int _height;
-	float _offset;
+	float _tileSize;
 
 	std::vector<std::vector<TileStateFlag>> _tileState;
 	std::vector<std::vector<Tile*>> _tiles;
