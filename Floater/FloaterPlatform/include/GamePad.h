@@ -48,6 +48,8 @@ namespace flt
 		};
 
 		int buttons;
+		int buttonsDown;
+		int buttonsUp;
 		float lStickX;
 		float lStickY;
 		float rStickX;

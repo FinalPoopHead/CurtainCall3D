@@ -128,6 +128,37 @@ bool flt::Xbox::Get(WinGamePad* outGamePad)
 	//	|= ((state.buttons & XBOX_DPAD_DOWN) ? outGamePad->state.DOWN : 0)
 	//	|= ((state.buttons & XBOX_DPAD_LEFT) ? outGamePad->state.LEFT : 0)
 	//	|= ((state.buttons & XBOX_DPAD_RIGHT) ? outGamePad->state.RIGHT : 0);
+	outGamePad->state.buttonsDown = 0;
+	outGamePad->state.buttonsDown |= !(outGamePad->state.buttons & GamePadState::ButtonFlag::A) && (state.buttons & XBOX_A) ? outGamePad->state.A : 0;
+	outGamePad->state.buttonsDown |= !(outGamePad->state.buttons & GamePadState::ButtonFlag::B) && (state.buttons & XBOX_B) ? outGamePad->state.B : 0;
+	outGamePad->state.buttonsDown |= !(outGamePad->state.buttons & GamePadState::ButtonFlag::X) && (state.buttons & XBOX_X) ? outGamePad->state.X : 0;
+	outGamePad->state.buttonsDown |= !(outGamePad->state.buttons & GamePadState::ButtonFlag::Y) && (state.buttons & XBOX_Y) ? outGamePad->state.Y : 0;
+	outGamePad->state.buttonsDown |= !(outGamePad->state.buttons & GamePadState::ButtonFlag::BACK) && (state.buttons & XBOX_BACK) ? outGamePad->state.BACK : 0;
+	outGamePad->state.buttonsDown |= !(outGamePad->state.buttons & GamePadState::ButtonFlag::START) && (state.buttons & XBOX_START) ? outGamePad->state.START : 0;
+	outGamePad->state.buttonsDown |= !(outGamePad->state.buttons & GamePadState::ButtonFlag::LB) && (state.buttons & XBOX_LEFT_SHOULDER) ? outGamePad->state.LB : 0;
+	outGamePad->state.buttonsDown |= !(outGamePad->state.buttons & GamePadState::ButtonFlag::RB) && (state.buttons & XBOX_RIGHT_SHOULDER) ? outGamePad->state.RB : 0;
+	outGamePad->state.buttonsDown |= !(outGamePad->state.buttons & GamePadState::ButtonFlag::LSTICK) && (state.buttons & XBOX_LEFT_THUMB) ? outGamePad->state.LSTICK : 0;
+	outGamePad->state.buttonsDown |= !(outGamePad->state.buttons & GamePadState::ButtonFlag::RSTICK) && (state.buttons & XBOX_RIGHT_THUMB) ? outGamePad->state.RSTICK : 0;
+	outGamePad->state.buttonsDown |= !(outGamePad->state.buttons & GamePadState::ButtonFlag::UP) && (state.buttons & XBOX_DPAD_UP) ? outGamePad->state.UP : 0;
+	outGamePad->state.buttonsDown |= !(outGamePad->state.buttons & GamePadState::ButtonFlag::DOWN) && (state.buttons & XBOX_DPAD_DOWN) ? outGamePad->state.DOWN : 0;
+	outGamePad->state.buttonsDown |= !(outGamePad->state.buttons & GamePadState::ButtonFlag::LEFT) && (state.buttons & XBOX_DPAD_LEFT) ? outGamePad->state.LEFT : 0;
+	outGamePad->state.buttonsDown |= !(outGamePad->state.buttons & GamePadState::ButtonFlag::RIGHT) && (state.buttons & XBOX_DPAD_RIGHT) ? outGamePad->state.RIGHT : 0;
+
+	outGamePad->state.buttonsUp = 0;
+	outGamePad->state.buttonsUp |= (outGamePad->state.buttons & GamePadState::ButtonFlag::A) && !(state.buttons & XBOX_A) ? outGamePad->state.A : 0;
+	outGamePad->state.buttonsUp |= (outGamePad->state.buttons & GamePadState::ButtonFlag::B) && !(state.buttons & XBOX_B) ? outGamePad->state.B : 0;
+	outGamePad->state.buttonsUp |= (outGamePad->state.buttons & GamePadState::ButtonFlag::X) && !(state.buttons & XBOX_X) ? outGamePad->state.X : 0;
+	outGamePad->state.buttonsUp |= (outGamePad->state.buttons & GamePadState::ButtonFlag::Y) && !(state.buttons & XBOX_Y) ? outGamePad->state.Y : 0;
+	outGamePad->state.buttonsUp |= (outGamePad->state.buttons & GamePadState::ButtonFlag::BACK) && !(state.buttons & XBOX_BACK) ? outGamePad->state.BACK : 0;
+	outGamePad->state.buttonsUp |= (outGamePad->state.buttons & GamePadState::ButtonFlag::START) && !(state.buttons & XBOX_START) ? outGamePad->state.START : 0;
+	outGamePad->state.buttonsUp |= (outGamePad->state.buttons & GamePadState::ButtonFlag::LB) && !(state.buttons & XBOX_LEFT_SHOULDER) ? outGamePad->state.LB : 0;
+	outGamePad->state.buttonsUp |= (outGamePad->state.buttons & GamePadState::ButtonFlag::RB) && !(state.buttons & XBOX_RIGHT_SHOULDER) ? outGamePad->state.RB : 0;
+	outGamePad->state.buttonsUp |= (outGamePad->state.buttons & GamePadState::ButtonFlag::LSTICK) && !(state.buttons & XBOX_LEFT_THUMB) ? outGamePad->state.LSTICK : 0;
+	outGamePad->state.buttonsUp |= (outGamePad->state.buttons & GamePadState::ButtonFlag::RSTICK) && !(state.buttons & XBOX_RIGHT_THUMB) ? outGamePad->state.RSTICK : 0;
+	outGamePad->state.buttonsUp |= (outGamePad->state.buttons & GamePadState::ButtonFlag::UP) && !(state.buttons & XBOX_DPAD_UP) ? outGamePad->state.UP : 0;
+	outGamePad->state.buttonsUp |= (outGamePad->state.buttons & GamePadState::ButtonFlag::DOWN) && !(state.buttons & XBOX_DPAD_DOWN) ? outGamePad->state.DOWN : 0;
+	outGamePad->state.buttonsUp |= (outGamePad->state.buttons & GamePadState::ButtonFlag::LEFT) && !(state.buttons & XBOX_DPAD_LEFT) ? outGamePad->state.LEFT : 0;
+	outGamePad->state.buttonsUp |= (outGamePad->state.buttons & GamePadState::ButtonFlag::RIGHT) && !(state.buttons & XBOX_DPAD_RIGHT) ? outGamePad->state.RIGHT : 0;
 
 	outGamePad->state.buttons = 0;
 	outGamePad->state.buttons |= ((state.buttons & XBOX_A) ? outGamePad->state.A : 0);
@@ -156,10 +187,16 @@ bool flt::Xbox::Get(WinGamePad* outGamePad)
 
 	std::fabs(outGamePad->state.lTrigger) < outGamePad->deadZone.lTrigger ? outGamePad->state.lTrigger = 0.f : 0.f;
 	std::fabs(outGamePad->state.rTrigger) < outGamePad->deadZone.rTrigger ? outGamePad->state.rTrigger = 0.f : 0.f;
-	std::fabs(outGamePad->state.lStickX) < outGamePad->deadZone.leftStick ? outGamePad->state.lStickX = 0.f : 0.f;
-	std::fabs(outGamePad->state.lStickY) < outGamePad->deadZone.leftStick ? outGamePad->state.lStickY = 0.f : 0.f;
-	std::fabs(outGamePad->state.rStickX) < outGamePad->deadZone.rightStick ? outGamePad->state.rStickX = 0.f : 0.f;
-	std::fabs(outGamePad->state.rStickY) < outGamePad->deadZone.rightStick ? outGamePad->state.rStickY = 0.f : 0.f;
+	if ((std::fabs(outGamePad->state.lStickX) + std::fabs(outGamePad->state.lStickY)) < outGamePad->deadZone.leftStick)
+	{
+		outGamePad->state.lStickX = 0.f;
+		outGamePad->state.lStickY = 0.f;
+	}
+	if ((std::fabs(outGamePad->state.rStickX) + std::fabs(outGamePad->state.rStickY)) < outGamePad->deadZone.rightStick)
+	{
+		outGamePad->state.rStickX = 0.f;
+		outGamePad->state.rStickY = 0.f;
+	}
 
 	return true;
 }
