@@ -1,10 +1,14 @@
 ﻿#include <iostream>
 #include "Tile.h"
 #include "Mine.h"
+#include "AdvantageMine.h"
 #include "DetonatedMine.h"
 
 Tile::Tile()
 	: _cube(nullptr)
+	, _mine(nullptr)
+	, _advantageMine(nullptr)
+	, _detonated(nullptr)
 {
 	std::wstring filePath = L"..\\Resources\\Models\\cube.fbx";
 
@@ -14,11 +18,15 @@ Tile::Tile()
 
 	_mine = flt::CreateGameObject<Mine>(false);
 	_mine->tr.SetParent(&tr);
-	_mine->tr.AddWorldPosition(0.0f, 5.0f, 0.0f);
+	_mine->tr.AddWorldPosition(0.0f, 8.0f, 0.0f);
+
+	_advantageMine = flt::CreateGameObject<AdvantageMine>(false);
+	_advantageMine->tr.SetParent(&tr);
+	_advantageMine->tr.AddWorldPosition(0.0f, 8.0f, 0.0f);
 
 	_detonated = flt::CreateGameObject<DetonatedMine>(false);
 	_detonated->tr.SetParent(&tr);
-	_detonated->tr.AddWorldPosition(0.0f, 5.0f, 0.0f);
+	_detonated->tr.AddWorldPosition(0.0f, 8.0f, 0.0f);
 }
 
 Tile::~Tile()
@@ -64,4 +72,14 @@ void Tile::EnableDetonated()
 void Tile::DisableDetonated()
 {
 	_detonated->Disable();
+}
+
+void Tile::EnableAdvantageMine()
+{
+	_advantageMine->Enable();
+}
+
+void Tile::DisableAdvantageMine()
+{
+	_advantageMine->Disable();
 }

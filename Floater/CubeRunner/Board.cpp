@@ -8,7 +8,7 @@
 #include "CubeController.h"
 
 constexpr int CUBECOUNT = 64;
-constexpr float ROLLINGTIME = 1.0f;
+constexpr float ROLLINGTIME = 1.5f;
 
 Board::Board(int width, int height, float offset) :
 	flt::GameObject()
@@ -16,11 +16,14 @@ Board::Board(int width, int height, float offset) :
 	, _height(height)
 	, _tileSize(offset)
 	, _tileState()
+	, _tiles()
 	, _isGenerated(false)
 	, _isRolling(false)
+	, _justFinishedRolling(false)
 	, _isDirty(false)
 	, _elapsedTime(0.0f)
 	, _minePos({ -1,-1 })
+	, _advantageMinePosList()
 {
 
 }
@@ -320,6 +323,23 @@ void Board::DetonateMine()
 	_tileState[_minePos.first][_minePos.second] = (int)_tileState[_minePos.first][_minePos.second] | (int)TileStateFlag::Detonate;
 }
 
+void Board::DetonateAdvantageMine()
+{
+	_isDirty = true;
+
+	while (!_advantageMinePosList.empty())
+	{
+		auto&[x, y] = _advantageMinePosList.front();
+
+		_tiles[x][y]->DisableAdvantageMine();
+		_tiles[x][y]->EnableDetonated();
+		_tileState[x][y] = (int)_tileState[x][y] & ~((int)TileStateFlag::AdvantageMine);
+		_tileState[x][y] = (int)_tileState[x][y] | (int)TileStateFlag::Detonate;
+
+		_advantageMinePosList.pop_front();
+	}
+}
+
 void Board::Resize(int newWidth, int newHeight)
 {
 	_tileState.resize(newWidth);
@@ -477,6 +497,24 @@ void Board::UpdateDetonate()
 					break;
 				case TileStateFlag::AdvantageCube:
 					// AdvantageCube 수납 및 AdvantageMine 설치
+				{
+					for (int m = -1; m <= 1; m++)
+					{
+						for (int n = -1; n <= 1; n++)
+						{
+							int nextX = i + m;
+							int nextY = j + n;
+							if (nextX < 0 || nextX >= _width || nextY < 0 || nextY >= _height)
+							{
+								continue;
+							}
+
+							_tileState[nextX][nextY] = _tileState[nextX][nextY] | (int)TileStateFlag::AdvantageMine;
+							_tiles[nextX][nextY]->EnableAdvantageMine();
+							_advantageMinePosList.push_back({ nextX, nextY });
+						}
+					}
+				}
 					BackToPool(_tiles[i][j]->_cube, _tiles[i][j]->_cube->GetComponent<CubeController>()); // 임시
 					break;
 				default:

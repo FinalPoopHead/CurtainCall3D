@@ -75,6 +75,12 @@ void Player::Update(float deltaSecond)
 		}
 	}
 
+	keyData = flt::GetKeyDown(flt::KeyCode::enter);
+	if (keyData)
+	{
+		_board->DetonateAdvantageMine();
+	}
+
 	int tileState = _board->QueryTileState(nextPos.x, nextPos.z);
 	int blocked = BLOCKED_TILE;
 	if (tileState != (int)TileStateFlag::None && (tileState & blocked) == 0)
