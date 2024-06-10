@@ -1,40 +1,18 @@
 ﻿#pragma once
-#include <vector>
+#include "../FloaterGameEngine/include/EngineMinimal.h"
 
-class Board;
 
-/// <summary>
-/// 컴포넌트나 게임오브젝트를 바로 싱글턴으로 만들지 않고
-/// 게임매니저가 이 클래스를 사용해 게임을 진행한다.
-/// </summary>
-class GameManager
+
+class GameManager : public flt::Component<GameManager>
 {
-	// 싱글턴 코드
 public:
-	static GameManager& Instance()
-	{
-		static GameManager instance;
-		return instance;
-	}
-
-protected:
-	GameManager() = default;
-
-private:
-	GameManager(const GameManager& rhs) = delete;
-	GameManager(GameManager&& rhs) = delete;
-	GameManager& operator=(const GameManager& rhs) = delete;
-	GameManager& operator=(GameManager&& rhs) = delete;
-
-	////////////////////////////////////////////
+	GameManager();
+	~GameManager();
 
 public:
-	void Initialize();
-	void Finalize();
-	void Update(float deltaSecond);
-
-	void SetBoard(Board* board) { _board = board; }
+	virtual void OnCreate() override;		// 사실상 초기화
+	virtual void OnDestroy() override;		// 사실상 해제	
+	virtual void Update(float deltaSecond) override;
 
 private:
-	Board* _board;
 };

@@ -4,7 +4,10 @@
 #include "Board.h"
 
 
-Player::Player(Board* board) : _board(board), _padIndex(-1), _speed(10.0f)
+Player::Player(Board* board)
+	: _board(board)
+	, _padIndex(-1)
+	, _speed(10.0f)
 {
 	//AddComponent<flt::CameraComponent>(true);
 	flt:: RendererComponent* renderer = AddComponent<flt::RendererComponent>(true);
@@ -36,30 +39,47 @@ void Player::Update(float deltaSecond)
 	flt::Vector4f pos = tr.GetWorldPosition();
 	flt::Vector4f nextPos = pos;
 
-	flt::KeyData keyData = flt::GetKey(flt::KeyCode::w);
+	flt::KeyData keyData = flt::GetKey(flt::KeyCode::i);
 	if (keyData)
 	{
 		nextPos += tr.WorldForward() * _speed * deltaSecond;
 	}
 
-	keyData = flt::GetKey(flt::KeyCode::s);
+	keyData = flt::GetKey(flt::KeyCode::k);
 	if (keyData)
 	{
 		nextPos += -tr.WorldForward() * _speed * deltaSecond;
 	}
 
-	keyData = flt::GetKey(flt::KeyCode::a);
+	keyData = flt::GetKey(flt::KeyCode::j);
 	if (keyData)
 	{
 		nextPos += -tr.WorldRight() * _speed * deltaSecond;
 	}
 
-	keyData = flt::GetKey(flt::KeyCode::d);
+	keyData = flt::GetKey(flt::KeyCode::l);
 	if (keyData)
 	{
 		nextPos += tr.WorldRight() * _speed * deltaSecond;
 	}
 
+	keyData = flt::GetKeyDown(flt::KeyCode::spacebar);
+	if (keyData)
+	{
+		bool isSetSuccess = _board->SetMine(pos.x, pos.z);
+
+		if(!isSetSuccess)
+		{
+			_board->DetonateMine();
+		}
+	}
+
+	keyData = flt::GetKeyDown(flt::KeyCode::enter);
+	if (keyData)
+	{
+		_board->DetonateAdvantageMine();
+	}
+	
 	flt::GamePadState state;
 	if (flt::GetGamePadState(_padIndex, &state))
 	{
