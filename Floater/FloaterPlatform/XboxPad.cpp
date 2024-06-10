@@ -1,5 +1,6 @@
 ﻿#include "XboxPad.h"
 #include <string>
+#include <cmath>
 #include "../FloaterUtil/include/FloaterMacro.h"
 #include "../FloaterUtil/include/Hash.h"
 #include <winioctl.h>
@@ -150,6 +151,15 @@ bool flt::Xbox::Get(WinGamePad* outGamePad)
 	outGamePad->state.lStickY = state.lStickY / 32768.f;
 	outGamePad->state.rStickX = state.rStickX / 32768.f;
 	outGamePad->state.rStickY = state.rStickY / 32768.f;
+
+	// DeadZone 처리
+
+	std::fabs(outGamePad->state.lTrigger) < outGamePad->deadZone.lTrigger ? outGamePad->state.lTrigger = 0.f : 0.f;
+	std::fabs(outGamePad->state.rTrigger) < outGamePad->deadZone.rTrigger ? outGamePad->state.rTrigger = 0.f : 0.f;
+	std::fabs(outGamePad->state.lStickX) < outGamePad->deadZone.leftStick ? outGamePad->state.lStickX = 0.f : 0.f;
+	std::fabs(outGamePad->state.lStickY) < outGamePad->deadZone.leftStick ? outGamePad->state.lStickY = 0.f : 0.f;
+	std::fabs(outGamePad->state.rStickX) < outGamePad->deadZone.rightStick ? outGamePad->state.rStickX = 0.f : 0.f;
+	std::fabs(outGamePad->state.rStickY) < outGamePad->deadZone.rightStick ? outGamePad->state.rStickY = 0.f : 0.f;
 
 	return true;
 }

@@ -9,6 +9,7 @@ public:
 	Player(Board* board);
 	~Player() {}
 
+	virtual void OnEnable() override;
 	virtual void Update(float deltaSecond) override;
 
 	void SetPadIndex(int padIndex) { _padIndex = padIndex; }

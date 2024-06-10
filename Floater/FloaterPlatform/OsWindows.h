@@ -36,6 +36,7 @@ namespace flt
 		KeyData GetKeyUp(KeyCode code);
 		bool GetGamePadState(int padIndex, GamePadState* outState);
 		bool SetGamePadVibration(int padIndex, float leftMotor, float rightMotor);
+		bool SetGamePadAnalogDeadZone(int padIndex, GamePadDeadZone* deadZone);
 		std::vector<int> GetGamePadIndexList();
 
 		//virtual void OnClosed();
@@ -51,7 +52,8 @@ namespace flt
 		void HandleMouseRawData(const RAWMOUSE& data);
 		void HandleGamePadRawData(const RAWINPUT* raw);
 
-		void SetKeyState(KeyCode code, const KeyData& data, bool isActive, bool isInActive);
+		void SetKeyState(KeyCode code, const KeyData& data, bool isKeyDown, bool isKeyUp);
+		void SetKeyState(KeyCode code, const KeyData& data, bool isActive);
 
 		WinGamePad* FindEmptyGamePad(uint64 hash);
 		

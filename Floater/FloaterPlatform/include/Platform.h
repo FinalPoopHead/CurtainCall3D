@@ -41,6 +41,7 @@ namespace flt
 
 		bool GetGamePadState(int padIndex, GamePadState* outState);
 		bool SetGamePadVibration(int padIndex, float leftMotor, float rightMotor);
+		bool SetGamePadAnalogDeadZone(int padIndex, GamePadDeadZone* deadZone);
 		std::vector<int> GetGamePadIndexList();
 
 		void ShowCursor(bool isShow);

@@ -17,19 +17,18 @@ Player::Player(Board* board) : _board(board), _padIndex(-1), _speed(10.0f)
 	renderer->SetMaterial(0, L"..\\Resources\\Textures\\Rob02White_Roughness.png", flt::RawMaterial::TextureType::ROUGHNESS);
 	//renderer->SetFilePath(L"../Resources/Models/cube.fbx");
 
-	Camera* camera = flt::CreateGameObject<Camera>(true);
-	camera->tr.SetParent(&this->tr);
-	//camera->tr.SetPosition(0.0f, 50.0f, -25.0f);
-	camera->tr.SetPosition(0.0f, 50.0f, 0.0f);
-	camera->tr.LookAt(0.0f, 0.0f, 0.0f);
-	//camera->tr.AddLocalRotation({1.0f, 0.0f, 0.0f}, flt::DegToRad(70.0f));
-	//camera->tr.AddLocalRotation({0.0f, 0.0f, 1.0f}, flt::DegToRad(45.0f));
+	Camera* camera = flt::CreateGameObject<Camera>(true, this);
 
 	float x = 0.0f;
 	float z = 0.0f;
 
 	_board->ConvertToTilePosition(2, 0, x, z);
 	tr.SetPosition(x, 5.0f, z);
+}
+
+void Player::OnEnable()
+{
+	_padIndex = 0;
 }
 
 void Player::Update(float deltaSecond)
@@ -40,39 +39,45 @@ void Player::Update(float deltaSecond)
 	flt::KeyData keyData = flt::GetKey(flt::KeyCode::w);
 	if (keyData)
 	{
-		nextPos += tr.Forward() * _speed * deltaSecond;
+		nextPos += tr.WorldForward() * _speed * deltaSecond;
 	}
 
 	keyData = flt::GetKey(flt::KeyCode::s);
 	if (keyData)
 	{
-		nextPos += -tr.Forward() * _speed * deltaSecond;
+		nextPos += -tr.WorldForward() * _speed * deltaSecond;
 	}
 
 	keyData = flt::GetKey(flt::KeyCode::a);
 	if (keyData)
 	{
-		nextPos += -tr.Right() * _speed * deltaSecond;
+		nextPos += -tr.WorldRight() * _speed * deltaSecond;
 	}
 
 	keyData = flt::GetKey(flt::KeyCode::d);
 	if (keyData)
 	{
-		nextPos += tr.Right() * _speed * deltaSecond;
+		nextPos += tr.WorldRight() * _speed * deltaSecond;
 	}
 
-	keyData = flt::GetKey(flt::KeyCode::spacebar);
-	if (keyData)
+	flt::GamePadState state;
+	if (flt::GetGamePadState(_padIndex, &state))
 	{
-
+		nextPos.z += state.lStickY * _speed * deltaSecond;
+		nextPos.x += state.lStickX * _speed * deltaSecond;
 	}
+
+	tr.LookAt(nextPos);
 
 	int tileState = _board->QueryTileState(nextPos.x, nextPos.z);
 	int blocked = BLOCKED_TILE;
 	if (tileState != (int)TileStateFlag::None && (tileState & blocked) == 0)
 	{
-		tr.SetPosition(nextPos);
+		tr.SetWorldPosition(nextPos);
 	}
+
+
+
 
 	// 디버그용 코드
 	keyData = flt::GetKey(flt::KeyCode::mouseLButton);
