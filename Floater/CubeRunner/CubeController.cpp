@@ -1,18 +1,23 @@
 ﻿#include "CubeController.h"
 #include "../FloaterGameEngine/include/Input.h"
 
-#include "GameManager.h"
+#include "Board.h"
 
 constexpr float PIVOTSIZE = 2.0f;		// 피봇까지의 y,z 거리. 모델 사이즈에 맞게 변경해야함.
 constexpr float ROLLANGLE = 90.0f;		// 회전할 각도
 constexpr float TARGETANGLE[4] = { 90.0f, 180.0f, 270.0f, 360.0f };	// 회전 목표 각도
+constexpr float GRAVITY = 9.8f;
+constexpr float STARTFALLSPEED = 5.0f;
 
 CubeController::CubeController()
-	: _isRolling(false)
+	: _board(nullptr)
+	, _isRolling(false)
+	, _isFalling(false)
 	, _targetIndex(0)
 	, _rotateSpeed(0.0f)
 	, _currentAngle(0.0f)
 	, _rotatePivot(0.0f, 0.0f, 0.0f)
+	, _fallSpeed(0.0f)
 {
 
 }
@@ -24,17 +29,33 @@ CubeController::~CubeController()
 
 void CubeController::Update(float deltaSecond)
 {
-	if (!_isRolling)
+	if (_isRolling)
 	{
-		return;
+		Roll(deltaSecond);
 	}
 
-	Roll(deltaSecond);
+	if(_isFalling)
+	{
+		Fall(deltaSecond);
+		if(IsFallEnough())
+		{
+			_board->BackToPool(_gameObject, this);
+
+			_isFalling = false;
+			_isRolling = false;
+		}
+	}
+
+	if (!_isRolling && IsOutofBoard())
+	{
+		// TODO : 체력 감소 또는 게임 오버 처리 필요.
+		StartFalling();
+	}
 }
 
 void CubeController::StartRolling(float rotateTime)
 {
-	if (_isRolling)
+	if (_isRolling || _isFalling)
 	{
 		return;
 	}
@@ -47,6 +68,17 @@ void CubeController::StartRolling(float rotateTime)
 
 	int prevIndex = (_targetIndex + 3) % 4;
 	_currentAngle = prevIndex == 3 ? 0.0f : TARGETANGLE[prevIndex];
+}
+
+void CubeController::StartFalling()
+{
+	if (_isFalling || _isRolling)
+	{
+		return;
+	}
+
+	_isFalling = true;
+	_fallSpeed = STARTFALLSPEED;
 }
 
 void CubeController::Roll(float deltaSecond)
@@ -98,4 +130,38 @@ void CubeController::FinishRolling()
 	// 	finalEulerAngles.y = Mathf.Round(finalEulerAngles.y / 90f) * 90f;
 	// 	finalEulerAngles.z = Mathf.Round(finalEulerAngles.z / 90f) * 90f;
 	// 	transform.eulerAngles = finalEulerAngles;
+}
+
+void CubeController::Fall(float deltaSecond)
+{
+	_fallSpeed += GRAVITY * deltaSecond;
+	flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
+	_gameObject->tr.AddWorldPosition( 0.0f, -_fallSpeed * deltaSecond, 0.0f);
+}
+
+bool CubeController::IsOutofBoard()
+{
+	auto pos = _gameObject->tr.GetWorldPosition();
+	auto state = _board->QueryTileState(pos.x,pos.z);
+
+	if(state == TileStateFlag::None)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool CubeController::IsFallEnough()
+{
+	if (_gameObject->tr.GetWorldPosition().y <= -100.0f)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
