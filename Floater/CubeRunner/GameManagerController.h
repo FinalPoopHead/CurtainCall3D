@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "../FloaterGameEngine/include/EngineMinimal.h"
 
-class GameManger;
+
 
 class GameManagerController : public flt::Component<GameManagerController>
 {
@@ -15,5 +15,4 @@ public:
 	virtual void Update(float deltaSecond) override;
 
 private:
-	//GameManager& _gameManager;
 };
