@@ -5,6 +5,7 @@
 #include "./include/internal/GameEngine.h"
 #include "../FloaterRendererCommon/include/RawSkeleton.h"
 //#include "../FloaterRendererCommon/include/RawNode.h"
+#include <filesystem>
 
 
 flt::RendererComponent::RendererComponent() :
@@ -64,6 +65,25 @@ void flt::RendererComponent::OnDestroy()
 	}
 }
 
+void flt::RendererComponent::SetText(const std::wstring& text)
+{
+	_rendererObject->text = text;
+}
+
+void flt::RendererComponent::SetImage(const std::wstring& path)
+{
+	std::filesystem::path p(path);
+	ASSERT(std::filesystem::exists(p), "File not found");
+	std::wstring absPath = std::filesystem::absolute(p);
+	_rendererObject->imgName = path;
+
+	if (_isRegisted)
+	{
+		_renderer.DeregisterObject(_hObject);
+		_hObject = _renderer.RegisterObject(*_rendererObject);
+	}
+}
+
 void flt::RendererComponent::SetRawNode(RawNode* rawNode)
 {
 	_rendererObject->SetRawNode(rawNode);
@@ -71,6 +91,8 @@ void flt::RendererComponent::SetRawNode(RawNode* rawNode)
 
 void flt::RendererComponent::SetFilePath(const std::wstring& path)
 {
+	std::filesystem::path p(path);
+	ASSERT(std::filesystem::exists(p), "File not found");
 	RenderableBuilder builder(path);
 	_resource.Set(builder);
 	_rendererObject->SetRawNode(_resource.Get()->node);

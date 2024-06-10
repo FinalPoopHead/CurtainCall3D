@@ -2,6 +2,7 @@
 #include "OsPlatform.h"
 #include "../FloaterRendererCommon/include/IRenderer.h"
 #include <chrono>
+#include <filesystem>
 
 class flt::Platform::impl : public PLATFORM_OS
 {
@@ -88,4 +89,14 @@ void flt::Platform::ShowCursor(bool isShow)
 std::wstring flt::Platform::GetExePath()
 {
 	return _pOsImpl->GetExePath();
+}
+
+std::wstring flt::Platform::GetAbsPath(std::wstring relativePath)
+{
+	std::filesystem::path p(relativePath);
+	ASSERT(p.is_absolute() == false, "Already absolute path");
+
+	std::filesystem::path b(_pOsImpl->GetExePath());
+	std::filesystem::path a = std::filesystem::absolute(b / p);
+	return a;
 }

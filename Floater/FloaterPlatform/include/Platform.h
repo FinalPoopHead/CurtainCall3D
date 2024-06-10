@@ -46,6 +46,7 @@ namespace flt
 		void ShowCursor(bool isShow);
 
 		std::wstring GetExePath();
+		std::wstring GetAbsPath(std::wstring relativePath);
 
 		//virtual void OnResize() {};
 		//virtual void OnFullScreen() {};

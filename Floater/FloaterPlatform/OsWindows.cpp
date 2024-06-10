@@ -473,6 +473,13 @@ std::wstring flt::OsWindows::GetExePath()
 	return _exePath;  
 }
 
+std::wstring flt::OsWindows::GetAbsPath(std::wstring relativePath)
+{
+	ASSERT(!_exePath.empty(), "exePath가 비어있습니다.");
+	ASSERT(false, "구현 안됨");
+	return std::wstring{};
+}
+
 void flt::OsWindows::UpdateKeyState()
 {
 	for (int i = 0; i < (int)KeyCode::MAX; ++i)

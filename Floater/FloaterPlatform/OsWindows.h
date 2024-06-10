@@ -42,6 +42,7 @@ namespace flt
 		void ShowCursor(bool isShow);
 
 		std::wstring GetExePath();
+		std::wstring GetAbsPath(std::wstring relativePath);
 
 	private:
 		void UpdateKeyState();

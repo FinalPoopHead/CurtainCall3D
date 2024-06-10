@@ -9,6 +9,8 @@ namespace Rocket
 		class ICamera;
 		class IDynamicModelRenderer;
 		class IStaticModelRenderer;
+		class ISpriteRenderer;
+		class ITextRenderer;
 		struct RawModel;
 	}
 }
@@ -23,6 +25,8 @@ namespace flt
 			camera(nullptr),
 			renderer(nullptr),
 			staticModelRenderer(nullptr),
+			spriteRenderer(nullptr),
+			textRenderer(nullptr),
 			rkModel(nullptr),
 			isRegisted(false),
 			isDraw(isDraw) {}
@@ -32,6 +36,8 @@ namespace flt
 		Rocket::Core::ICamera* camera;
 		Rocket::Core::IDynamicModelRenderer* renderer;
 		Rocket::Core::IStaticModelRenderer* staticModelRenderer;
+		Rocket::Core::ISpriteRenderer* spriteRenderer;
+		Rocket::Core::ITextRenderer* textRenderer;
 		Rocket::Core::RawModel* rkModel;
 
 		bool isRegisted;

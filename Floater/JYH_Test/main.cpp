@@ -6,12 +6,15 @@
 #include "TestScene.h"
 #include "UnityLoadScene.h"
 #include <iostream>
+#include <filesystem>
 
 
 int main(int argc, char* argv[])
 {
 	setlocale(LC_ALL, ".UTF8");
 	std::cout << std::boolalpha;
+
+	std::filesystem::path path = std::filesystem::current_path();
 
 	////cpu 캐시 크기 가져오기
 	////std::cout << std::hardware_destructive_interference_size << std::endl;
