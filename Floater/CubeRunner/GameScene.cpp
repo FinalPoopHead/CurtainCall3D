@@ -4,6 +4,7 @@
 #include "TestCamera.h"
 #include "NormalCube.h"
 #include "ManagerObject.h"
+#include "Camera.h"
 
 void GameScene::Initialize()
 {
@@ -17,8 +18,11 @@ void GameScene::Initialize()
 	//TestCamera* camera = flt::CreateGameObject<TestCamera>(true, board);
 	//camera->tr.SetPosition(0.0f, 5.0f, -10.0f);
 
-	//NormalCube* cube = flt::CreateGameObject<NormalCube>(true);
-	//cube->tr.SetPosition(0.0f, 4.0f, 36.0f);
+// 	Camera* camera = flt::CreateGameObject<Camera>(true);
+// 	camera->tr.SetPosition(0.0f, 5.0f, -10.0f);
+
+// 	NormalCube* cube = flt::CreateGameObject<NormalCube>(true);
+// 	cube->tr.SetPosition(0.0f, 4.0f, 36.0f);
 }
 
 void GameScene::Finalize()
