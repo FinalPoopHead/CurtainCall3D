@@ -236,14 +236,27 @@ namespace Rocket::Core
 
 	Texture* ResourceManager::GetTexture(std::string fileName)
 	{
-		if (_textures.find(fileName) == _textures.end())
+		std::string fileNameWithExtension;
+
+		/// 경로 제외하기 위한 로직
+		size_t slashIndex = fileName.find_last_of("/\\");
+		if (slashIndex != std::string::npos)
 		{
-			std::unique_ptr<Texture> texture = std::make_unique<Texture>();
-			texture->LoadFromFile(_device, fileName);
-			_textures.insert({ fileName,std::move(texture) });
+			fileNameWithExtension = fileName.substr(slashIndex + 1, fileName.length() - slashIndex);
+		}
+		else
+		{
+			fileNameWithExtension = fileName;
 		}
 
-		return _textures.at(fileName).get();
+		if (_textures.find(fileNameWithExtension) == _textures.end())
+		{
+			std::unique_ptr<Texture> texture = std::make_unique<Texture>();
+			texture->LoadFromFile(_device, fileNameWithExtension);
+			_textures.insert({ fileNameWithExtension,std::move(texture) });
+		}
+
+		return _textures.at(fileNameWithExtension).get();
 	}
 
 	Model* ResourceManager::GetModel(const std::string& fileName)
