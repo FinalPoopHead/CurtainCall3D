@@ -63,5 +63,13 @@ void Player::Update(float deltaSecond)
 		tr.SetPosition(nextPos);
 	}
 
+	// 디버그용 코드
+	keyData = flt::GetKey(flt::KeyCode::mouseLButton);
+	if (keyData)
+	{
+		flt::Vector4f pos = tr.GetWorldPosition();
+		std::cout << "Player Position : " << pos.x << ", " << pos.y << ", " << pos.z << std::endl;
+	}
+
 }
 
