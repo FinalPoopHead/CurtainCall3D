@@ -8,9 +8,9 @@ Player::Player(Board* board) : _board(board), _padIndex(-1), _speed(10.0f)
 {
 	//AddComponent<flt::CameraComponent>(true);
 	flt:: RendererComponent* renderer = AddComponent<flt::RendererComponent>(true);
-	std::wstring filePath = L"..\\x64\\fbx\\Rob02.fbx";
+	std::wstring filePath = L"..\\Resources\\Models\\Rob02.fbx";
 	renderer->SetFilePath(filePath);
-	renderer->SetMaterial(0, L"..\\x64\\fbx\\Textures\\Rob02Yellow_AlbedoTransparency.png", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
+	renderer->SetMaterial(0, L"..\\Resources\\Textures\\Rob02Yellow_AlbedoTransparency.png", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
 
 
 	Camera* camera = flt::CreateGameObject<Camera>(true);

@@ -93,39 +93,38 @@ bool flt::RocketAdapter::Render(float deltaTime)
 		auto& rendererObject = pair.first;
 		auto& animState = pair.second;
 
-		if (rendererObject->animState.index == -1)
+		if (rendererObject->animState.index != -1)
 		{
-			continue;
-		}
-
-		if (animState.index == rendererObject->animState.index && 
-			animState.isPlaying == rendererObject->animState.isPlaying)
-		{
-			continue;
-		}
-
-		animState = rendererObject->animState;
-
-		if (animState.isPlaying)
-		{
-			if (rkObj->rkModel)
+			if (!(animState.index == rendererObject->animState.index && animState.isPlaying == rendererObject->animState.isPlaying))
 			{
-				if (0 < rkObj->rkModel->animations.size())
+				animState = rendererObject->animState;
+
+				if (animState.isPlaying)
 				{
-					rkObj->renderer->PlayAnimation(animState.index, animState.isLoop);
+					if (rkObj->rkModel)
+					{
+						if (0 < rkObj->rkModel->animations.size())
+						{
+							rkObj->renderer->PlayAnimation(animState.index, animState.isLoop);
+						}
+					}
+				}
+				else
+				{
+					if (rkObj->rkModel)
+					{
+						if (0 < rkObj->rkModel->animations.size())
+						{
+							rkObj->renderer->ForceStopAnimation();
+						}
+					}
 				}
 			}
 		}
-		else
-		{
-			if (rkObj->rkModel)
-			{
-				if (0 < rkObj->rkModel->animations.size())
-				{
-					rkObj->renderer->ForceStopAnimation();
-				}
-			}
-		}
+
+
+
+
 
 		if (rkObj->spriteRenderer)
 		{
@@ -247,7 +246,7 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 			}
 		}
 	}
-	
+
 	if (renderable.imgName != L"")
 	{
 		rocketObject->spriteRenderer = factory->CreateSpriteRenderer();
