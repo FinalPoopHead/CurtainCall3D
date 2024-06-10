@@ -15,6 +15,7 @@ namespace flt
 			handle(NULL),
 			type(GamePadType::UNKNOWN),
 			state(),
+			deadZone(),
 			isConnected(false) {}
 
 		std::wstring path;
@@ -22,6 +23,7 @@ namespace flt
 		HANDLE handle;
 		GamePadType type;
 		GamePadState state;
+		GamePadDeadZone deadZone;
 		bool isConnected;
 	};
 }

@@ -20,19 +20,18 @@ Player::Player(Board* board)
 	renderer->SetMaterial(0, L"..\\Resources\\Textures\\Rob02White_Roughness.png", flt::RawMaterial::TextureType::ROUGHNESS);
 	//renderer->SetFilePath(L"../Resources/Models/cube.fbx");
 
-	Camera* camera = flt::CreateGameObject<Camera>(true);
-	camera->tr.SetParent(&this->tr);
-	//camera->tr.SetPosition(0.0f, 50.0f, -25.0f);
-	camera->tr.SetPosition(0.0f, 50.0f, 0.0f);
-	camera->tr.LookAt(0.0f, 0.0f, 0.0f);
-	//camera->tr.AddLocalRotation({1.0f, 0.0f, 0.0f}, flt::DegToRad(70.0f));
-	//camera->tr.AddLocalRotation({0.0f, 0.0f, 1.0f}, flt::DegToRad(45.0f));
+	Camera* camera = flt::CreateGameObject<Camera>(true, this);
 
 	float x = 0.0f;
 	float z = 0.0f;
 
 	_board->ConvertToTilePosition(2, 0, x, z);
 	tr.SetPosition(x, 5.0f, z);
+}
+
+void Player::OnEnable()
+{
+	_padIndex = 0;
 }
 
 void Player::Update(float deltaSecond)
@@ -43,25 +42,25 @@ void Player::Update(float deltaSecond)
 	flt::KeyData keyData = flt::GetKey(flt::KeyCode::i);
 	if (keyData)
 	{
-		nextPos += tr.Forward() * _speed * deltaSecond;
+		nextPos += tr.WorldForward() * _speed * deltaSecond;
 	}
 
 	keyData = flt::GetKey(flt::KeyCode::k);
 	if (keyData)
 	{
-		nextPos += -tr.Forward() * _speed * deltaSecond;
+		nextPos += -tr.WorldForward() * _speed * deltaSecond;
 	}
 
 	keyData = flt::GetKey(flt::KeyCode::j);
 	if (keyData)
 	{
-		nextPos += -tr.Right() * _speed * deltaSecond;
+		nextPos += -tr.WorldRight() * _speed * deltaSecond;
 	}
 
 	keyData = flt::GetKey(flt::KeyCode::l);
 	if (keyData)
 	{
-		nextPos += tr.Right() * _speed * deltaSecond;
+		nextPos += tr.WorldRight() * _speed * deltaSecond;
 	}
 
 	keyData = flt::GetKeyDown(flt::KeyCode::spacebar);
@@ -80,13 +79,25 @@ void Player::Update(float deltaSecond)
 	{
 		_board->DetonateAdvantageMine();
 	}
+	
+	flt::GamePadState state;
+	if (flt::GetGamePadState(_padIndex, &state))
+	{
+		nextPos.z += state.lStickY * _speed * deltaSecond;
+		nextPos.x += state.lStickX * _speed * deltaSecond;
+	}
+
+	tr.LookAt(nextPos);
 
 	int tileState = _board->QueryTileState(nextPos.x, nextPos.z);
 	int blocked = BLOCKED_TILE;
 	if (tileState != (int)TileStateFlag::None && (tileState & blocked) == 0)
 	{
-		tr.SetPosition(nextPos);
+		tr.SetWorldPosition(nextPos);
 	}
+
+
+
 
 	// 디버그용 코드
 	keyData = flt::GetKey(flt::KeyCode::mouseLButton);
@@ -104,6 +115,41 @@ void Player::Update(float deltaSecond)
 
 		printf("%.3f, %.3f | %d, %d | %.3f, %.3f\n", pos.x, pos.z, tileX, tileZ, x, z);
 	}
+
+	if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
+	{
+		printf("A\n");
+	}
+	if (state.buttonsDown & flt::GamePadState::ButtonFlag::B)
+	{
+		printf("B\n");
+	}
+	if (state.buttonsDown & flt::GamePadState::ButtonFlag::X)
+	{
+		printf("X\n");
+	}
+	if (state.buttonsDown & flt::GamePadState::ButtonFlag::Y)
+	{
+		printf("Y\n");
+	}
+
+	if (state.buttonsUp & flt::GamePadState::ButtonFlag::A)
+	{
+		printf("A Up\n");
+	}
+	if (state.buttonsUp & flt::GamePadState::ButtonFlag::B)
+	{
+		printf("B Up\n");
+	}
+	if (state.buttonsUp & flt::GamePadState::ButtonFlag::X)
+	{
+		printf("X Up\n");
+	}
+	if (state.buttonsUp & flt::GamePadState::ButtonFlag::Y)
+	{
+		printf("Y Up\n");
+	}
+
 
 }
 

@@ -407,6 +407,7 @@ bool flt::OsWindows::GetGamePadState(int padIndex, GamePadState* outState)
 	}
 
 	*outState = _pGamePads[padIndex].state;
+
 	return true;
 }
 
@@ -426,6 +427,22 @@ bool flt::OsWindows::SetGamePadVibration(int padIndex, float leftMotor, float ri
 	rightMotor = std::clamp(rightMotor, 0.0f, 1.0f);
 
 	Xbox::Set(&_pGamePads[padIndex], (BYTE)(leftMotor * 255), (BYTE)(rightMotor * 255));
+	return true;
+}
+
+bool flt::OsWindows::SetGamePadAnalogDeadZone(int padIndex, GamePadDeadZone* deadZone)
+{
+	if (padIndex < 0 || padIndex >= 16)
+	{
+		return false;
+	}
+
+	if (_pGamePads[padIndex].isConnected == false)
+	{
+		return false;
+	}
+
+	_pGamePads[padIndex].deadZone = *deadZone;
 	return true;
 }
 
@@ -528,7 +545,17 @@ void flt::OsWindows::HandleKeyboardRawData(const RAWKEYBOARD& data)
 	keyData.keyTime = _keyTimer.GetLabTimeMicroSeconds();
 	keyData.x = 0;
 	keyData.y = 0;
-	SetKeyState((KeyCode)code, keyData, data.Flags == RI_KEY_MAKE, data.Flags && RI_KEY_BREAK);
+	
+	// 확장키의경우 flag로 RI_KEY_E0 가 오는데 이때 KeyUp인지 Down인지 구분이 안됨.
+	// 이경우에는 Message 값으로 판단을 해야하는데 확장 키가 아닐 경우에도 Message가 오기 때문에
+	// 항상 Message로 판단.
+	// SYS가 붙은경우 ALT와 함께 눌린 키를 의미함.
+	//SetKeyState((KeyCode)code, keyData, data.Flags & RI_KEY_MAKE, data.Flags & RI_KEY_BREAK);
+	SetKeyState((KeyCode)code, 
+		keyData, 
+		data.Message == WM_KEYDOWN || data.Message == WM_SYSKEYDOWN, 
+		data.Message == WM_KEYUP || data.Message == WM_SYSKEYUP
+	);
 }
 
 void flt::OsWindows::HandleMouseRawData(const RAWMOUSE& data)
@@ -874,7 +901,28 @@ void flt::OsWindows::HandleGamePadRawData(const RAWINPUT* raw)
 	}
 }
 
-void flt::OsWindows::SetKeyState(KeyCode code, const KeyData& data, bool isActive, bool isInActive)
+void flt::OsWindows::SetKeyState(KeyCode code, const KeyData& data, bool isKeyDown, bool isKeyUp)
+{
+	if (isKeyDown)
+	{
+		if (_pKeyDatas[(int)code].keyTime == 0)
+		{
+			_pKeyDatas[(int)code] = data;
+			_pKeyStates[(int)code].isDown = true;
+		}
+
+		_pKeyStates[(int)code].isStay = true;
+	}
+
+	if (isKeyUp)
+	{
+		_keyUp.push_back((int)code);
+	}
+
+	ASSERT((isKeyDown != true || isKeyUp != true), "둘 다 True인 경우가 있는지 체크.");
+}
+
+void flt::OsWindows::SetKeyState(KeyCode code, const KeyData& data, bool isActive)
 {
 	if (isActive)
 	{
@@ -886,8 +934,7 @@ void flt::OsWindows::SetKeyState(KeyCode code, const KeyData& data, bool isActiv
 
 		_pKeyStates[(int)code].isStay = true;
 	}
-
-	if (isInActive)
+	else
 	{
 		_keyUp.push_back((int)code);
 	}

@@ -76,6 +76,11 @@ bool flt::Platform::SetGamePadVibration(int padIndex, float leftMotor, float rig
 	return _pOsImpl->SetGamePadVibration(padIndex, leftMotor, rightMotor);
 }
 
+bool flt::Platform::SetGamePadAnalogDeadZone(int padIndex, GamePadDeadZone* deadZone)
+{
+	return _pOsImpl->SetGamePadAnalogDeadZone(padIndex, deadZone);
+}
+
 std::vector<int> flt::Platform::GetGamePadIndexList()
 {
 	return _pOsImpl->GetGamePadIndexList();

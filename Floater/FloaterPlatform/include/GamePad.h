@@ -9,6 +9,14 @@ namespace flt
 		UNKNOWN
 	};
 
+	struct GamePadDeadZone
+	{
+		float leftStick = 0.1f;
+		float rightStick = 0.1f;
+		float lTrigger = 0.1f;
+		float rTrigger = 0.1f;
+	};
+
 	struct GamePadState
 	{
 		enum ButtonFlag : int
@@ -40,6 +48,8 @@ namespace flt
 		};
 
 		int buttons;
+		int buttonsDown;
+		int buttonsUp;
 		float lStickX;
 		float lStickY;
 		float rStickX;
