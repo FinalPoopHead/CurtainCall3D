@@ -12,6 +12,9 @@ Player::Player(Board* board) : _board(board), _padIndex(-1), _speed(10.0f)
 	std::wstring filePath = L"..\\Resources\\Models\\Rob02.fbx";
 	renderer->SetFilePath(filePath);
 	renderer->SetMaterial(0, L"..\\Resources\\Textures\\Rob02Yellow_AlbedoTransparency.png", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
+	renderer->SetMaterial(0, L"..\\Resources\\Textures\\Rob02_Normal.dds", flt::RawMaterial::TextureType::NORMAL);
+	renderer->SetMaterial(0, L"..\\Resources\\Textures\\Rob02White_MetallicSmoothness.dds", flt::RawMaterial::TextureType::METALLIC);
+	renderer->SetMaterial(0, L"..\\Resources\\Textures\\Rob02White_Roughness.png", flt::RawMaterial::TextureType::ROUGHNESS);
 	//renderer->SetFilePath(L"../Resources/Models/cube.fbx");
 
 	Camera* camera = flt::CreateGameObject<Camera>(true);
@@ -58,9 +61,15 @@ void Player::Update(float deltaSecond)
 		nextPos += tr.Right() * _speed * deltaSecond;
 	}
 
-	TileStateFlag tileState = _board->QueryTileState(nextPos.x, nextPos.z);
-	TileStateFlag blocked = (TileStateFlag)BLOCKED_TILE;
-	if (tileState != TileStateFlag::None && ((int)tileState & (int)blocked) == 0)
+	keyData = flt::GetKey(flt::KeyCode::spacebar);
+	if (keyData)
+	{
+
+	}
+
+	int tileState = _board->QueryTileState(nextPos.x, nextPos.z);
+	int blocked = BLOCKED_TILE;
+	if (tileState != (int)TileStateFlag::None && (tileState & blocked) == 0)
 	{
 		tr.SetPosition(nextPos);
 	}

@@ -234,29 +234,32 @@ namespace Rocket::Core
 		return _meshes.at(fileName).get();
 	}
 
-	Texture* ResourceManager::GetTexture(std::string fileName)
+	Rocket::Core::Texture* ResourceManager::GetTexture(std::string filePath, bool isFullPath /*= true*/)
 	{
-		std::string fileNameWithExtension;
+		std::string fullPath = filePath;
 
-		/// 경로 제외하기 위한 로직
-		size_t slashIndex = fileName.find_last_of("/\\");
-		if (slashIndex != std::string::npos)
+		if(!isFullPath)
 		{
-			fileNameWithExtension = fileName.substr(slashIndex + 1, fileName.length() - slashIndex);
-		}
-		else
-		{
-			fileNameWithExtension = fileName;
+			/// 경로 제외하기 위한 로직
+			size_t slashIndex = filePath.find_last_of("/\\");
+			if (slashIndex != std::string::npos)
+			{
+				fullPath = filePath.substr(slashIndex + 1, filePath.length() - slashIndex);
+			}
+			else
+			{
+				fullPath = filePath;
+			}
 		}
 
-		if (_textures.find(fileNameWithExtension) == _textures.end())
+		if (_textures.find(fullPath) == _textures.end())
 		{
 			std::unique_ptr<Texture> texture = std::make_unique<Texture>();
-			texture->LoadFromFile(_device, fileNameWithExtension);
-			_textures.insert({ fileNameWithExtension,std::move(texture) });
+			texture->LoadFromFile(_device, fullPath, isFullPath);
+			_textures.insert({ fullPath,std::move(texture) });
 		}
 
-		return _textures.at(fileNameWithExtension).get();
+		return _textures.at(fullPath).get();
 	}
 
 	Model* ResourceManager::GetModel(const std::string& fileName)

@@ -14,7 +14,7 @@
       <Filter>Object\HelperObject</Filter>
     </ClCompile>
     <ClCompile Include="SpriteRenderer.cpp">
-      <Filter>Component\SpriteRenderer</Filter>
+      <Filter>Component\Renderer\SpriteRenderer</Filter>
     </ClCompile>
     <ClCompile Include="LineRenderer.cpp">
       <Filter>Object\LineRenderer</Filter>
@@ -109,7 +109,7 @@
       <Filter>Object\HelperObject</Filter>
     </ClInclude>
     <ClInclude Include="SpriteRenderer.h">
-      <Filter>Component\SpriteRenderer</Filter>
+      <Filter>Component\Renderer\SpriteRenderer</Filter>
     </ClInclude>
     <ClInclude Include="IResource.h">
       <Filter>Resource\Interface</Filter>
@@ -389,7 +389,7 @@
     <Filter Include="Resource\Shader\HLSL\Deferred\BlitPass">
       <UniqueIdentifier>{e0794d76-6d81-40f9-99c8-000ecf4c56c0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Component\SpriteRenderer">
+    <Filter Include="Component\Renderer\SpriteRenderer">
       <UniqueIdentifier>{41ded109-339b-444e-a6e6-a1bf560a3330}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

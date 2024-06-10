@@ -20,9 +20,9 @@ namespace Rocket::Core
 
 	}
 
-	void SpriteRenderer::SetImage(const std::string& fileName)
+	void SpriteRenderer::SetImage(const std::string& filePath)
 	{
-		_texture = ResourceManager::Instance().GetTexture(fileName);
+		_texture = ResourceManager::Instance().GetTexture(filePath);
 
 		D3D11_TEXTURE2D_DESC textureDesc;
 		ComPtr<ID3D11Resource> resource;

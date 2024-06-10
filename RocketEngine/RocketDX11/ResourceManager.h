@@ -53,7 +53,7 @@ namespace Rocket::Core
 		Mesh* GetMesh(eMeshType meshType) const;
 		Mesh* GetMesh(const std::string& fileName);
 		Model* GetModel(const std::string& fileName);
-		Texture* GetTexture(std::string fileName);
+		Texture* GetTexture(std::string filePath, bool isFullPath = true);
 		Texture* GetDefaultTexture() const { return _defaultTexture; }
 		Material* GetDefaultMaterial() const { return _defaultMaterial.get(); }		
 		VertexShader* GetVertexShader(const std::string& name);

@@ -11,4 +11,7 @@ public:
 	virtual void OnEnable() override;
 	virtual void OnDisable() override;
 	virtual void OnDestroy() override;
+
+public:
+	flt::GameObject* _cube;		// 현재 타일에 있는 큐브
 };

@@ -144,7 +144,7 @@ bool CubeController::IsOutofBoard()
 	auto pos = _gameObject->tr.GetWorldPosition();
 	auto state = _board->QueryTileState(pos.x,pos.z);
 
-	if(state == TileStateFlag::None)
+	if(state == (int)TileStateFlag::None)
 	{
 		return true;
 	}
