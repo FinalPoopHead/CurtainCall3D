@@ -96,5 +96,40 @@ void Player::Update(float deltaSecond)
 		printf("%.3f, %.3f | %d, %d | %.3f, %.3f\n", pos.x, pos.z, tileX, tileZ, x, z);
 	}
 
+	if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
+	{
+		printf("A\n");
+	}
+	if (state.buttonsDown & flt::GamePadState::ButtonFlag::B)
+	{
+		printf("B\n");
+	}
+	if (state.buttonsDown & flt::GamePadState::ButtonFlag::X)
+	{
+		printf("X\n");
+	}
+	if (state.buttonsDown & flt::GamePadState::ButtonFlag::Y)
+	{
+		printf("Y\n");
+	}
+
+	if (state.buttonsUp & flt::GamePadState::ButtonFlag::A)
+	{
+		printf("A Up\n");
+	}
+	if (state.buttonsUp & flt::GamePadState::ButtonFlag::B)
+	{
+		printf("B Up\n");
+	}
+	if (state.buttonsUp & flt::GamePadState::ButtonFlag::X)
+	{
+		printf("X Up\n");
+	}
+	if (state.buttonsUp & flt::GamePadState::ButtonFlag::Y)
+	{
+		printf("Y Up\n");
+	}
+
+
 }
 
