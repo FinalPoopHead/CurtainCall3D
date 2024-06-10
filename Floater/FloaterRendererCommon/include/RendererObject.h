@@ -19,7 +19,9 @@ namespace flt
 			node(nullptr),
 			camera(nullptr),
 			animState(),
-			name() {}
+			imgName(L""),
+			text(L""),
+			name(L"") {}
 
 		void SetRawNode(RawNode* rawNode);
 		void SetMaterial(uint32 meshIndex, const std::wstring& path, RawMaterial::TextureType type);
@@ -34,6 +36,8 @@ namespace flt
 		std::vector<RawMaterial> materials;
 		Camera* camera;
 		AnimState animState;
+		std::wstring imgName;
+		std::wstring text;
 		std::wstring name;
 	};
 }

@@ -81,41 +81,61 @@ bool flt::RocketAdapter::Render(float deltaTime)
 		Vector4f wScale = temp.GetLocalScale();
 		rkObj->rocketTransform.SetLocalScale({ wScale.x, wScale.y, wScale.z });
 
+		Matrix4f worldTM = temp.GetWorldMatrix4f();
+		DirectX::SimpleMath::Matrix dxWorldTM
+		{
+			worldTM.e[0][0], worldTM.e[0][1], worldTM.e[0][2], worldTM.e[0][3],
+			worldTM.e[1][0], worldTM.e[1][1], worldTM.e[1][2], worldTM.e[1][3],
+			worldTM.e[2][0], worldTM.e[2][1], worldTM.e[2][2], worldTM.e[2][3],
+			worldTM.e[3][0], worldTM.e[3][1], worldTM.e[3][2], worldTM.e[3][3]
+		};
+
 		auto& rendererObject = pair.first;
 		auto& animState = pair.second;
 
-		if (rendererObject->animState.index == -1)
+		if (rendererObject->animState.index != -1)
 		{
-			continue;
-		}
-
-		if (animState.index == rendererObject->animState.index && 
-			animState.isPlaying == rendererObject->animState.isPlaying)
-		{
-			continue;
-		}
-
-		animState = rendererObject->animState;
-
-		if (animState.isPlaying)
-		{
-			if (rkObj->rkModel)
+			if (!(animState.index == rendererObject->animState.index && animState.isPlaying == rendererObject->animState.isPlaying))
 			{
-				if (0 < rkObj->rkModel->animations.size())
+				animState = rendererObject->animState;
+
+				if (animState.isPlaying)
 				{
-					rkObj->renderer->PlayAnimation(animState.index, animState.isLoop);
+					if (rkObj->rkModel)
+					{
+						if (0 < rkObj->rkModel->animations.size())
+						{
+							rkObj->renderer->PlayAnimation(animState.index, animState.isLoop);
+						}
+					}
+				}
+				else
+				{
+					if (rkObj->rkModel)
+					{
+						if (0 < rkObj->rkModel->animations.size())
+						{
+							rkObj->renderer->ForceStopAnimation();
+						}
+					}
 				}
 			}
 		}
-		else
+
+
+
+
+
+		if (rkObj->spriteRenderer)
 		{
-			if (rkObj->rkModel)
-			{
-				if (0 < rkObj->rkModel->animations.size())
-				{
-					rkObj->renderer->ForceStopAnimation();
-				}
-			}
+			rkObj->spriteRenderer->SetActive(rkObj->isDraw);
+			rkObj->spriteRenderer->SetWorldTM(dxWorldTM);
+		}
+
+		if (rkObj->textRenderer)
+		{
+			rkObj->textRenderer->SetActive(rkObj->isDraw);
+			rkObj->textRenderer->SetWorldTM(dxWorldTM);
 		}
 	}
 
@@ -227,6 +247,17 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 		}
 	}
 
+	if (renderable.imgName != L"")
+	{
+		rocketObject->spriteRenderer = factory->CreateSpriteRenderer();
+		rocketObject->spriteRenderer->SetImage(ToString(renderable.imgName));
+	}
+
+	if (renderable.text != L"")
+	{
+		rocketObject->textRenderer = factory->CreateTextRenderer();
+		rocketObject->textRenderer->SetText(ToString(renderable.text));
+	}
 
 	Rocket::Core::ReleaseFactory(factory);
 
@@ -248,6 +279,21 @@ bool flt::RocketAdapter::DeregisterObject(HOBJECT renderable)
 		{
 			rocketObject->staticModelRenderer->Destroy();
 		}
+	}
+
+	if (rocketObject->spriteRenderer)
+	{
+		rocketObject->spriteRenderer->Destroy();
+	}
+
+	if (rocketObject->textRenderer)
+	{
+		rocketObject->textRenderer->Destroy();
+	}
+
+	if (rocketObject->camera)
+	{
+		rocketObject->camera->Destroy();
 	}
 
 	auto iter = _objects.find(rocketObject);

@@ -14,7 +14,7 @@ Board::Board(int width, int height, float offset) :
 	flt::GameObject(),
 	_width(width),
 	_height(height),
-	_offset(offset),
+	_tileSize(offset),
 	_tileState()
 {
 
@@ -130,11 +130,17 @@ void Board::ConvertToTileIndex(float x, float z, int& outX, int& outZ)
 	x -= pos.x;
 	z -= pos.z;
 
-	x = x / _offset;
-	z = z / _offset;
+	x += _tileSize / 2.0f;
+	z += _tileSize / 2.0f;
 
-	x < 0.0f ? x -= 0.5f : x += 0.5f;
-	z < 0.0f ? z -= 0.5f : z += 0.5f;
+	x = x / _tileSize;
+	z = z / _tileSize;
+
+	x += x < 0.0f ? - 1.0f : 0.0f;
+	z += z < 0.0f ? - 1.0f : 0.0f;
+
+	//x < 0.0f ? x -= 0.5f : x += 0.5f;
+	//z < 0.0f ? z -= 0.5f : z += 0.5f;
 
 	outX = (int)x;
 	outZ = (int)z;
@@ -335,8 +341,8 @@ void Board::ConvertToTileLocalPosition(int x, int z, float& outX, float& outZ)
 	outX = (float)x;
 	outZ = (float)z;
 
-	outX *= _offset;
-	outZ *= _offset;
+	outX *= _tileSize;
+	outZ *= _tileSize;
 }
 
 void Board::UpdateBoard()

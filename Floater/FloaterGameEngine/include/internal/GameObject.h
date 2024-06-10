@@ -40,6 +40,7 @@ namespace flt
 		void Enable();
 		void Disable();
 		void Destroy();
+		bool isEnable() const { return _isEnable; }
 
 	public:
 		[[deprecated("Use Template Function")]] bool AddComponent(ComponentBase* component);

@@ -27,7 +27,8 @@ namespace flt
 		virtual void OnDestroy() override;
 
 	public:
-		void SetRawNode(RawNode* rawNode);
+		void SetText(const std::wstring& text);
+		void SetImage(const std::wstring& path);
 		void SetFilePath(const std::wstring& path);
 		void SetMaterial(uint32 meshIndex, const std::wstring& path, RawMaterial::TextureType type);
 		std::vector<std::wstring> GetAnimaionList() const;
@@ -35,6 +36,9 @@ namespace flt
 		//void PlayAnimation(const std::wstring& name);
 		void PlayAnimation(uint32 index, bool isLoop);
 		void StopAnimation();
+
+	private:
+		void SetRawNode(RawNode* rawNode);
 
 	private:
 		Resource<RendererNode> _resource;

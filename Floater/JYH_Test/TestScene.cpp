@@ -19,8 +19,13 @@ void TestScene::Initialize()
 	/*TestGameObejct* tObject = flt::CreateGameObject<TestGameObejct>(true);
 	tObject->tr.SetPosition(0.0f, 201.0f, 0.0f);*/
 
-	TestGameObejct* tObject2 = flt::CreateGameObject<TestGameObejct>(true);
-	tObject2->tr.SetPosition(0.0f, 0.0f, 0.0f);
+	//TestGameObejct* tObject2 = flt::CreateGameObject<TestGameObejct>(true);
+	//tObject2->tr.SetPosition(0.0f, 0.0f, 0.0f);
+
+	flt::GameObject* tObject3 = flt::CreateGameObject<flt::GameObject>(true);
+	flt::RendererComponent* tRenderer = tObject3->AddComponent<flt::RendererComponent>(true);
+	tRenderer->SetImage(L"..\\Resources\\abcd.jpg");
+	tObject3->tr.SetPosition(0.0f, 0.0f, 0.0f);
 }
  
 void TestScene::Finalize()
