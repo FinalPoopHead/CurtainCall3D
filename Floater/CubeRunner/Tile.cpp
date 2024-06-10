@@ -1,7 +1,6 @@
-﻿#include "Tile.h"
-#include "../FloaterRendererCommon/include/ModelLoader.h"
-#include <iostream>
-
+﻿#include <iostream>
+#include "Tile.h"
+#include "Mine.h"
 
 Tile::Tile()
 	: _cube(nullptr)
@@ -11,6 +10,10 @@ Tile::Tile()
 	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>(true);
 	renderer->SetFilePath(filePath);
 	renderer->SetMaterial(0, L"../Resources/Textures/NormalCube.png", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
+
+	_mine = flt::CreateGameObject<Mine>(false);
+	_mine->tr.SetParent(&tr);
+	_mine->tr.AddWorldPosition(0.0f, 5.0f, 0.0f);
 }
 
 Tile::~Tile()
@@ -36,4 +39,14 @@ void Tile::OnDisable()
 void Tile::OnDestroy()
 {
 	std::cout << "Tile OnDestroy" << std::endl;
+}
+
+void Tile::EnableMine()
+{
+	_mine->Enable();
+}
+
+void Tile::DisableMine()
+{
+	_mine->Disable();
 }

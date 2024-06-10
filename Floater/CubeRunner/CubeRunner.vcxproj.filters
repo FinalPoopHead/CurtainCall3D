@@ -34,6 +34,9 @@
     <Filter Include="GameObject\Cube\NormalCube">
       <UniqueIdentifier>{a3685e99-0b03-4a0a-a463-e8b9bdf37556}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObject\Mine">
+      <UniqueIdentifier>{49423e8b-f146-4177-b743-c8eccafccce2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -75,6 +78,9 @@
     <ClCompile Include="Camera.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
+    <ClCompile Include="Mine.cpp">
+      <Filter>GameObject\Mine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h">
@@ -112,6 +118,9 @@
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Mine.h">
+      <Filter>GameObject\Mine</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

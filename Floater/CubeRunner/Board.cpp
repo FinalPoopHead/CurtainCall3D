@@ -20,6 +20,7 @@ Board::Board(int width, int height, float offset) :
 	, _isRolling(false)
 	, _isDirty(false)
 	, _elapsedTime(0.0f)
+	, _minePos({ -1,-1 })
 {
 
 }
@@ -68,10 +69,16 @@ void Board::PreUpdate(float deltaTime)
 	/// 2. 타일상태 업데이트하면서 플레이어와 겹치면 기절시키기
 	/// 3. 플레이어 위치 업데이트해서 타일상태에 기입
 
+	if (!_isRolling && _justFinishedRolling)
+	{
+		_justFinishedRolling = false;
+		UpdateBoard();
+	}
+
 	if (!_isRolling && _isDirty)
 	{
 		_isDirty = false;
-		UpdateBoard();
+		UpdateDetonate();
 	}
 
 	if (flt::GetKeyDown(flt::KeyCode::r))
@@ -89,7 +96,7 @@ void Board::PreUpdate(float deltaTime)
 		{
 			TickCubesRolling(ROLLINGTIME);
 			_isRolling = true;
-			_isDirty = true;
+			_justFinishedRolling = false;
 			_elapsedTime = 0.0f;
 		}
 	}
@@ -100,6 +107,7 @@ void Board::PreUpdate(float deltaTime)
 		if (_elapsedTime >= ROLLINGTIME)
 		{
 			_isRolling = false;
+			_justFinishedRolling = true;
 			_elapsedTime = 0.0f;
 		}
 	}
@@ -280,6 +288,36 @@ void Board::BackToPool(flt::GameObject* obj, CubeController* cubeCtr)
 	_cubeControllers.remove(cubeCtr);
 }
 
+bool Board::SetMine(float x, float z)
+{
+	if(_minePos.first != -1 && _minePos.second != -1)
+	{
+		return false;
+	}
+
+	_isDirty = true;
+	int tileX = 0;
+	int tileZ = 0;
+	ConvertToTileIndex(x, z, tileX, tileZ);
+
+	ASSERT(tileX >= 0 && tileX < _width, "Out of Range");
+	ASSERT(tileZ >= 0 && tileZ < _height, "Out of Range");
+
+	_tileState[tileX][tileZ] = (int)_tileState[tileX][tileZ] | (int)TileStateFlag::Mine;
+
+	_tiles[tileX][tileZ]->EnableMine();
+
+	_minePos = { tileX, tileZ };
+	return true;
+}
+
+void Board::DetonateMine()
+{
+	_isDirty = true;
+	_tileState[_minePos.first][_minePos.second] = (int)_tileState[_minePos.first][_minePos.second] & ~((int)TileStateFlag::Mine);
+	_tileState[_minePos.first][_minePos.second] = (int)_tileState[_minePos.first][_minePos.second] | (int)TileStateFlag::Detonate;
+}
+
 void Board::Resize(int newWidth, int newHeight)
 {
 	_tileState.resize(newWidth);
@@ -409,30 +447,46 @@ void Board::UpdateBoard()
 						isPlayerCrushed = true;
 					}
 				}
+			}
+		}
+	}
+}
 
-				// 3. 폭파 상태 처리
-				if ((int)_tileState[i][j] & (int)TileStateFlag::Detonate)
+void Board::UpdateDetonate()
+{
+	for (int i = 0; i < _width; i++)
+	{
+		for (int j = 0; j < _height; j++)
+		{
+			// 3. 폭파 상태 처리
+			if ((int)_tileState[i][j] & (int)TileStateFlag::Detonate)
+			{
+				TileStateFlag cubeType = (TileStateFlag)((int)_tileState[i][j] & CUBE);
+
+				switch (cubeType)
 				{
-					TileStateFlag cubeType = (TileStateFlag)((int)_tileState[i][j] & CUBE);
-
-					switch (cubeType)
-					{
-					case TileStateFlag::NormalCube:
-						// NormalCube 수납
-						BackToPool(_tiles[i][j]->_cube, _tiles[i][j]->_cube->GetComponent<CubeController>()); // 임시
-						break;
-					case TileStateFlag::DarkCube:
-						// DarkCube 수납 및 체력 감소
-						BackToPool(_tiles[i][j]->_cube, _tiles[i][j]->_cube->GetComponent<CubeController>()); // 임시
-						break;
-					case TileStateFlag::AdvantageCube:
-						// AdvantageCube 수납 및 AdvantageMine 설치
-						BackToPool(_tiles[i][j]->_cube, _tiles[i][j]->_cube->GetComponent<CubeController>()); // 임시
-						break;
-					default:
-						break;
-					}
+				case TileStateFlag::NormalCube:
+					// NormalCube 수납
+					BackToPool(_tiles[i][j]->_cube, _tiles[i][j]->_cube->GetComponent<CubeController>()); // 임시
+					break;
+				case TileStateFlag::DarkCube:
+					// DarkCube 수납 및 체력 감소
+					BackToPool(_tiles[i][j]->_cube, _tiles[i][j]->_cube->GetComponent<CubeController>()); // 임시
+					break;
+				case TileStateFlag::AdvantageCube:
+					// AdvantageCube 수납 및 AdvantageMine 설치
+					BackToPool(_tiles[i][j]->_cube, _tiles[i][j]->_cube->GetComponent<CubeController>()); // 임시
+					break;
+				default:
+					break;
 				}
+
+				_tileState[i][j] = (int)_tileState[i][j] & ~((int)TileStateFlag::Detonate);
+				_minePos.first = -1;
+				_minePos.second = -1;
+				_tiles[i][j]->DisableMine();
+
+				_tileState[i][j] = (int)_tileState[i][j] & ~CUBE;
 			}
 		}
 	}

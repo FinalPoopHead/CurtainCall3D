@@ -143,6 +143,7 @@
     <ClCompile Include="GameManagerController.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mine.cpp" />
     <ClCompile Include="NormalCube.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="TestCamera.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameManagerController.h" />
     <ClInclude Include="GameScene.h" />
+    <ClInclude Include="Mine.h" />
     <ClInclude Include="NormalCube.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="TestCamera.h" />

@@ -12,6 +12,10 @@ public:
 	virtual void OnDisable() override;
 	virtual void OnDestroy() override;
 
+	void EnableMine();
+	void DisableMine();
+
 public:
 	flt::GameObject* _cube;		// 현재 타일에 있는 큐브
+	flt::GameObject* _mine;		// 지뢰
 };
