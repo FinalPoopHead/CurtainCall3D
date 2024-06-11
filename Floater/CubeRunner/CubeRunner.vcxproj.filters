@@ -16,12 +16,6 @@
     <Filter Include="Component\CubeController">
       <UniqueIdentifier>{09726758-6f4f-4f60-9916-34afe686e5ea}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Component\GameManagerController">
-      <UniqueIdentifier>{c5f50a54-555f-48e3-8f0b-3037a056407b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameManager">
-      <UniqueIdentifier>{615f0905-2850-4a6a-a164-d9cb75730167}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GameObject\Cube">
       <UniqueIdentifier>{7c6faaa5-d5a8-4e5d-8264-fa265fd2718d}</UniqueIdentifier>
     </Filter>
@@ -33,6 +27,12 @@
     </Filter>
     <Filter Include="GameObject\Cube\NormalCube">
       <UniqueIdentifier>{a3685e99-0b03-4a0a-a463-e8b9bdf37556}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\Mine">
+      <UniqueIdentifier>{49423e8b-f146-4177-b743-c8eccafccce2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\GameManager">
+      <UniqueIdentifier>{c5f50a54-555f-48e3-8f0b-3037a056407b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -57,12 +57,6 @@
     <ClCompile Include="Player.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
-    <ClCompile Include="GameManagerController.cpp">
-      <Filter>Component\GameManagerController</Filter>
-    </ClCompile>
-    <ClCompile Include="GameManager.cpp">
-      <Filter>GameManager</Filter>
-    </ClCompile>
     <ClCompile Include="NormalCube.cpp">
       <Filter>GameObject\Cube\NormalCube</Filter>
     </ClCompile>
@@ -74,6 +68,18 @@
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Mine.cpp">
+      <Filter>GameObject\Mine</Filter>
+    </ClCompile>
+    <ClCompile Include="DetonatedMine.cpp">
+      <Filter>GameObject\Mine</Filter>
+    </ClCompile>
+    <ClCompile Include="GameManager.cpp">
+      <Filter>Component\GameManager</Filter>
+    </ClCompile>
+    <ClCompile Include="AdvantageMine.cpp">
+      <Filter>GameObject\Mine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -95,12 +101,6 @@
     <ClInclude Include="Player.h">
       <Filter>GameObject</Filter>
     </ClInclude>
-    <ClInclude Include="GameManagerController.h">
-      <Filter>Component\GameManagerController</Filter>
-    </ClInclude>
-    <ClInclude Include="GameManager.h">
-      <Filter>GameManager</Filter>
-    </ClInclude>
     <ClInclude Include="NormalCube.h">
       <Filter>GameObject\Cube\NormalCube</Filter>
     </ClInclude>
@@ -112,6 +112,18 @@
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Mine.h">
+      <Filter>GameObject\Mine</Filter>
+    </ClInclude>
+    <ClInclude Include="DetonatedMine.h">
+      <Filter>GameObject\Mine</Filter>
+    </ClInclude>
+    <ClInclude Include="GameManager.h">
+      <Filter>Component\GameManager</Filter>
+    </ClInclude>
+    <ClInclude Include="AdvantageMine.h">
+      <Filter>GameObject\Mine</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

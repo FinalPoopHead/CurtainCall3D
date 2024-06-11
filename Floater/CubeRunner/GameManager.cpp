@@ -1,14 +1,23 @@
 ﻿#include "GameManager.h"
-#include "../FloaterGameEngine/include/EngineMinimal.h"
 #include "../FloaterGameEngine/include/Input.h"
-#include "Board.h"
 
-void GameManager::Initialize()
+
+GameManager::GameManager()
 {
 
 }
 
-void GameManager::Finalize()
+GameManager::~GameManager()
+{
+
+}
+
+void GameManager::OnCreate()
+{
+
+}
+
+void GameManager::OnDestroy()
 {
 
 }

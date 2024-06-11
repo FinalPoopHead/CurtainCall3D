@@ -50,12 +50,16 @@ public:
 	void GenerateRandomStage();
 	void TickCubesRolling(float RollingTime);			// 일괄적으로 굴리기 시작.
 	void BackToPool(flt::GameObject* obj, CubeController* cubeCtr);
+	bool SetMine(float x, float z);		// position X,Z에 지뢰를 설치한다.
+	void DetonateMine();					// 지뢰를 폭파시킨다.
+	void DetonateAdvantageMine();			// 어드밴티지 지뢰를 폭파시킨다.
 
 private:
 	//void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
 	void ConvertToTileLocalPosition(int x, int z, float& outX, float& outZ);
 
 	void UpdateBoard();
+	void UpdateDetonate();
 
 private:
 	int _width;
@@ -72,7 +76,11 @@ private:
 
 	bool _isGenerated = false;
 	bool _isRolling = false;
+	bool _justFinishedRolling = false;
 	bool _isDirty = false;
 	float _elapsedTime;
+
+	std::pair<int,int> _minePos;
+	std::list<std::pair<int,int>> _advantageMinePosList;
 };
 

@@ -15,8 +15,8 @@ void GameScene::Initialize()
 
 	Player* player = flt::CreateGameObject<Player>(true, board);
 	
-// 	TestCamera* camera = flt::CreateGameObject<TestCamera>(true, board);
-// 	camera->tr.SetPosition(0.0f, 5.0f, -10.0f);
+ 	TestCamera* camera = flt::CreateGameObject<TestCamera>(true, board);
+ 	camera->tr.SetPosition(0.0f, 5.0f, -10.0f);
 
 // 	Camera* camera = flt::CreateGameObject<Camera>(true);
 // 	camera->tr.SetPosition(0.0f, 5.0f, -10.0f);

@@ -443,6 +443,7 @@ bool flt::OsWindows::SetGamePadAnalogDeadZone(int padIndex, GamePadDeadZone* dea
 	}
 
 	_pGamePads[padIndex].deadZone = *deadZone;
+	return true;
 }
 
 std::vector<int> flt::OsWindows::GetGamePadIndexList()
