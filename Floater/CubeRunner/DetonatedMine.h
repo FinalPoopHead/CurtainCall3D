@@ -7,4 +7,3 @@ public:
 	DetonatedMine();
 	~DetonatedMine();
 };
-

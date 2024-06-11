@@ -39,7 +39,7 @@ void CubeController::Update(float deltaSecond)
 		Fall(deltaSecond);
 		if(IsFallEnough())
 		{
-			_board->BackToPool(_gameObject, this);
+			_board->BackToPool(_gameObject);
 
 			_isFalling = false;
 			_isRolling = false;
@@ -79,6 +79,7 @@ void CubeController::StartFalling()
 
 	_isFalling = true;
 	_fallSpeed = STARTFALLSPEED;
+	_board->RemoveFromControllerList(this);
 }
 
 void CubeController::Roll(float deltaSecond)

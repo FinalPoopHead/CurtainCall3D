@@ -153,3 +153,8 @@ void Player::Update(float deltaSecond)
 
 }
 
+void Player::SetGameOver()
+{
+
+}
+

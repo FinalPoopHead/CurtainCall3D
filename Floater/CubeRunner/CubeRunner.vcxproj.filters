@@ -31,7 +31,7 @@
     <Filter Include="GameObject\Mine">
       <UniqueIdentifier>{49423e8b-f146-4177-b743-c8eccafccce2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Component\GameManager">
+    <Filter Include="GameObject\GameManager">
       <UniqueIdentifier>{c5f50a54-555f-48e3-8f0b-3037a056407b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -75,11 +75,11 @@
     <ClCompile Include="DetonatedMine.cpp">
       <Filter>GameObject\Mine</Filter>
     </ClCompile>
-    <ClCompile Include="GameManager.cpp">
-      <Filter>Component\GameManager</Filter>
-    </ClCompile>
     <ClCompile Include="AdvantageMine.cpp">
       <Filter>GameObject\Mine</Filter>
+    </ClCompile>
+    <ClCompile Include="GameManager.cpp">
+      <Filter>GameObject\GameManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -119,11 +119,11 @@
     <ClInclude Include="DetonatedMine.h">
       <Filter>GameObject\Mine</Filter>
     </ClInclude>
-    <ClInclude Include="GameManager.h">
-      <Filter>Component\GameManager</Filter>
-    </ClInclude>
     <ClInclude Include="AdvantageMine.h">
       <Filter>GameObject\Mine</Filter>
+    </ClInclude>
+    <ClInclude Include="GameManager.h">
+      <Filter>GameObject\GameManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
