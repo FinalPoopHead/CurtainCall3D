@@ -89,6 +89,11 @@ void flt::Transform::SetWorldPosition(const Vector4f& position)
 	}
 }
 
+void flt::Transform::SetWorldPosition(float x, float y, float z)
+{
+	SetWorldPosition({ x, y, z, 1.0f });
+}
+
 void flt::Transform::SetPosition(const Vector3f& position)
 {
 	SetPosition(position.x, position.y, position.z);
@@ -372,23 +377,24 @@ void flt::Transform::LookAt(Vector4f target)
 
 	axis.Vector3Normalize();
 
-	float test = wantLook.Vector3Dot(currLook);
+	float dot = wantLook.Vector3Dot(currLook);
 
 	float angle = 0.0f;
 
 	// 아크 코사인의 정의역이 -1 ~ 1이므로 그 이상일 경우 가장 가까운 각으로 보정해 준다.
 	// 단, 1이아닌 0.99999같은 값으로 설정했을 경우에 연속으로 LookAt을 호출할 경우 오차가 누적되어 떨림 증상이 발생한다.
-	if (test > 1.f)
+	if (dot > 1.f)
 	{
 		angle = 0.0f;
 	}
-	else if (test < -1.f)
+	else if (dot < -1.f)
 	{
+		axis = Vector4f(0.f, 1.f, 0.f, 0.f);
 		angle = PI<float>;
 	}
 	else
 	{
-		angle = acos(test);
+		angle = acos(dot);
 	}
 
 	Quaternion q{ axis, angle };

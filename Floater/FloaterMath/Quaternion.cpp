@@ -179,4 +179,33 @@ namespace flt
 		}
 	}
 
+	void Quaternion::Look(Vector3f direction, Vector3f up /*= Vector3f(0.0f, 1.0f, 0.0f)*/) noexcept
+	{
+		Vector3f currDirection{ 0.0f, 0.0f, 1.0f };
+		direction.Normalize();
+
+		//Vector3f axis = direction.Cross(currDirection);
+		Vector3f axis = currDirection.Cross(direction);
+		axis.Normalize();
+
+		float dot = direction.Dot(currDirection);
+		float angle = 0.0f;
+
+		if (dot > 1.f)
+		{
+			angle = 0.0f;
+		}
+		else if (dot < -1.f)
+		{
+			angle = PI<float>;
+		}
+		else
+		{
+			angle = acosf(dot);
+		}
+
+		*this = Quaternion(axis, angle);
+		Normalize();
+	}
+
 }
