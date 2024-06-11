@@ -34,6 +34,9 @@
     <Filter Include="GameObject\GameManager">
       <UniqueIdentifier>{c5f50a54-555f-48e3-8f0b-3037a056407b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObject\UI">
+      <UniqueIdentifier>{84ae94a8-11c1-4f39-ae14-a9fb28439183}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
