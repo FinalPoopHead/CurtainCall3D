@@ -162,6 +162,7 @@ Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt:
 					ASSERT(rocketMaterial->diffuseTexture, "Failed to allocate memory for texture");
 					rocketMaterial->diffuseTexture->name = ToString(material.textures[i]->name);
 					rocketMaterial->diffuseTexture->path = ToString(material.textures[i]->path);
+					rocketMaterial->textures.push_back(rocketMaterial->diffuseTexture);
 				}
 				break;
 				case flt::RawMaterial::TextureType::NORMAL:
@@ -170,6 +171,7 @@ Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt:
 					ASSERT(rocketMaterial->normalTexture, "Failed to allocate memory for texture");
 					rocketMaterial->normalTexture->name = ToString(material.textures[i]->name);
 					rocketMaterial->normalTexture->path = ToString(material.textures[i]->path);
+					rocketMaterial->textures.push_back(rocketMaterial->normalTexture);
 				}
 				break;
 				case flt::RawMaterial::TextureType::METALLIC:
@@ -193,6 +195,7 @@ Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt:
 					ASSERT(rocketMaterial->emissiveTexture, "Failed to allocate memory for texture");
 					rocketMaterial->emissiveTexture->name = ToString(material.textures[i]->name);
 					rocketMaterial->emissiveTexture->path = ToString(material.textures[i]->path);
+					rocketMaterial->textures.push_back(rocketMaterial->emissiveTexture);
 				}
 				break;
 				case flt::RawMaterial::TextureType::HEIGHT:
@@ -206,6 +209,7 @@ Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt:
 					ASSERT(rocketMaterial->opacityTexture, "Failed to allocate memory for texture");
 					rocketMaterial->opacityTexture->name = ToString(material.textures[i]->name);
 					rocketMaterial->opacityTexture->path = ToString(material.textures[i]->path);
+					rocketMaterial->textures.push_back(rocketMaterial->opacityTexture);
 				}
 				break;
 				case flt::RawMaterial::TextureType::UNKNOWN:

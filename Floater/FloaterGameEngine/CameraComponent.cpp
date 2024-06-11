@@ -14,6 +14,12 @@ flt::CameraComponent::CameraComponent() :
 	
 }
 
+flt::CameraComponent::~CameraComponent()
+{
+	delete _rendererObject;
+	_rendererObject = nullptr;
+}
+
 void flt::CameraComponent::OnCreate()
 {
 	_rendererObject->transform = &_gameObject->transform;
@@ -44,4 +50,7 @@ void flt::CameraComponent::OnDestroy()
 	{
 		_renderer.DeregisterObject(_hObject);
 	}
+
+	delete _rendererObject->camera;
+	_rendererObject->camera = nullptr;
 }

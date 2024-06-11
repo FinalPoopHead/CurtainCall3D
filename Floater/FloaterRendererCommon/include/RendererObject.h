@@ -23,6 +23,8 @@ namespace flt
 			text(L""),
 			name(L"") {}
 
+		~RendererObject();
+
 		void SetRawNode(RawNode* rawNode);
 		void SetMaterial(uint32 meshIndex, const std::wstring& path, RawMaterial::TextureType type);
 

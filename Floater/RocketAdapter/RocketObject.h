@@ -35,6 +35,7 @@ namespace flt
 		~RocketObject();
 
 		void RemoveRKNodeRecursive(Rocket::Core::RawNode* node);
+		void RemoveRKTransformRecursive(Rocket::Core::RocketTransform* transform);
 
 		Rocket::Core::RocketTransform rocketTransform;
 		Transform* transform;

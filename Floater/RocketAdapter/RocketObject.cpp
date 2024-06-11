@@ -16,6 +16,11 @@ flt::RocketObject::~RocketObject()
 		camera->Destroy();
 	}
 
+	for (auto& tr : rocketTransform.GetChildren())
+	{
+		RemoveRKTransformRecursive(tr);
+	}
+
 	if (rkModel)
 	{
 		if (0 < rkModel->animations.size())
@@ -28,7 +33,26 @@ flt::RocketObject::~RocketObject()
 		}
 
 		RemoveRKNodeRecursive(rkModel->rootNode);
+		for (auto& mesh : rkModel->meshes)
+		{
+			for (auto& texture : mesh->material->textures)
+			{
+				delete texture;
+			}
+			delete mesh->material;
 
+			delete mesh;
+		}
+
+		for (auto& [name, animation] : rkModel->animations)
+		{
+			for (auto& animData : animation->nodeAnimations)
+			{
+				delete animData;
+			}
+
+			delete animation;
+		}
 		delete rkModel;
 	}
 
@@ -50,5 +74,16 @@ void flt::RocketObject::RemoveRKNodeRecursive(Rocket::Core::RawNode* node)
 		RemoveRKNodeRecursive(child);
 	}
 
+	delete node->bindedBone;
 	delete node;
+}
+
+void flt::RocketObject::RemoveRKTransformRecursive(Rocket::Core::RocketTransform* transform)
+{
+	for (auto& child : transform->GetChildren())
+	{
+		RemoveRKTransformRecursive(child);
+	}
+
+	delete transform;
 }

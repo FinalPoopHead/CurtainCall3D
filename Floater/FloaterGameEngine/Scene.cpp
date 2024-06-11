@@ -783,13 +783,31 @@ void flt::Scene::EndScene()
 				continue;
 			}
 			delete component;
+			//component = nullptr;
 		}
 		delete object;
+		//object = nullptr;
 
 		_gameObjects.pop_back();
 	}
 
-	_gameObjectsToCreate.clear();
+	while (!_gameObjectsToCreate.empty())
+	{
+		GameObject* object = _gameObjectsToCreate.back();
+		_gameObjectsToCreate.pop_back();
+
+		for (auto& component : object->_components)
+		{
+			if (component == nullptr)
+			{
+				continue;
+			}
+			delete component;
+		}
+		delete object;
+	}
+
+
 	_gameObjectsToEnable.clear();
 	_gameObjectsToDisable.clear();
 	_gameObjectsToDestroy.clear();

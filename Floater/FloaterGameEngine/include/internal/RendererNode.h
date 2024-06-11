@@ -11,6 +11,10 @@ namespace flt
 	class RendererNode
 	{
 	public:
+		RendererNode() : node(nullptr) {}
+		~RendererNode();
+
+	public:
 		void Release();
 		RawNode* node;
 	};

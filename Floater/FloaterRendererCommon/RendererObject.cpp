@@ -2,6 +2,10 @@
 #include <filesystem>
 
 
+flt::RendererObject::~RendererObject()
+{
+}
+
 void flt::RendererObject::SetRawNode(RawNode* rawNode)
 {
 	node = rawNode;
