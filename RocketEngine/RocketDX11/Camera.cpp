@@ -183,6 +183,7 @@ namespace Rocket::Core
 			}
 			else
 			{
+				_mainCamera[0] = nullptr;
 				isLastMainCamera = true;
 			}
 

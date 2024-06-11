@@ -263,7 +263,7 @@ namespace Rocket::Core
 
 		if (isLastMainCamera)
 		{
-			if (!_cameraList.empty())
+			if (_cameraList.empty())
 			{
 				// 모든 카메라가 없는 경우
 				// 그런 경우가 있을 수 있는데 앞단에서 Render를 호출 안해주기로 했음.

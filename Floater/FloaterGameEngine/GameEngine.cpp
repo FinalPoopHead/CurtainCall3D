@@ -46,7 +46,7 @@ void flt::GameEngine::Initialize()
 
 bool flt::GameEngine::Update()
 {
-	if (_changeScene)
+	if (_nextScene)
 	{
 		ChangeScene();
 	}
@@ -115,7 +115,7 @@ void flt::GameEngine::Finalize()
 
 flt::Scene* flt::GameEngine::SetScene(Scene* scene)
 {
-	_changeScene = scene;
+	_nextScene = scene;
 	Scene* ret = _currentScene;
 
 	return ret;
@@ -135,7 +135,7 @@ flt::GameEngine::GameEngine() :
 	_platform(nullptr),
 	_renderer(nullptr),
 	_physicsEngine(nullptr),
-	_changeScene(nullptr),
+	_nextScene(nullptr),
 	_currentScene(nullptr),
 	_timer(),
 	_fixedUpdateElapsedSecond(0.0f)
@@ -160,18 +160,18 @@ flt::GameEngine* flt::GameEngine::Instance()
 
 void flt::GameEngine::ChangeScene()
 {
-	ASSERT(_changeScene, "ChangeScene is nullptr");
+	ASSERT(_nextScene, "ChangeScene is nullptr");
 	if (_currentScene != nullptr)
 	{
 		_currentScene->Finalize();
 		_currentScene->EndScene();
 	}
 
-	_currentScene = _changeScene;
+	_currentScene = _nextScene;
 	_currentScene->StartScene();
 	_currentScene->Initialize();
 
-	_changeScene = nullptr;
+	_nextScene = nullptr;
 }
 
 flt::GameEngine* flt::GameEngine::_instance = nullptr;

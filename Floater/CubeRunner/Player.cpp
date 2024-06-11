@@ -4,6 +4,9 @@
 #include "Board.h"
 
 
+//TEST Include
+#include "MainMenuScene.h"
+
 Player::Player(Board* board)
 	: _board(board)
 	, _isGameOver(false)
@@ -188,6 +191,11 @@ void Player::Update(float deltaSecond)
 		printf("Y Up\n");
 	}
 
+	if (flt::GetKeyDown(flt::KeyCode::enter))
+	{
+		static MainMenuScene* scene = flt::CreateScene<MainMenuScene>();
+		flt::SetScene(scene);
+	}
 
 }
 

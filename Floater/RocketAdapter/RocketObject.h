@@ -12,6 +12,7 @@ namespace Rocket
 		class ISpriteRenderer;
 		class ITextRenderer;
 		struct RawModel;
+		struct RawNode;
 	}
 }
 
@@ -30,6 +31,10 @@ namespace flt
 			rkModel(nullptr),
 			isRegisted(false),
 			isDraw(isDraw) {}
+
+		~RocketObject();
+
+		void RemoveRKNodeRecursive(Rocket::Core::RawNode* node);
 
 		Rocket::Core::RocketTransform rocketTransform;
 		Transform* transform;

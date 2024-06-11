@@ -54,7 +54,7 @@ namespace flt
 		PhysicsEngine* _physicsEngine;
 		SoundEngine* _soundEngine;
 
-		Scene* _changeScene;
+		Scene* _nextScene;
 		Scene* _currentScene;
 		std::unordered_set<Scene*> _scenes;
 		Timer _timer;
