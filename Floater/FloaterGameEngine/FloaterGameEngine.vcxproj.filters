@@ -33,6 +33,9 @@
     <Filter Include="Manager\Resource\Renderer">
       <UniqueIdentifier>{d75ccb82-7c4d-473e-ba4d-919e071c8b44}</UniqueIdentifier>
     </Filter>
+    <Filter Include="fltween">
+      <UniqueIdentifier>{12ef68a7-da52-4242-acc3-c2d8acc86ec4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ID.h">
@@ -95,6 +98,9 @@
     <ClInclude Include="Sound.h">
       <Filter>Sound</Filter>
     </ClInclude>
+    <ClInclude Include="FlTween.h">
+      <Filter>fltween</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -147,6 +153,9 @@
     </ClCompile>
     <ClCompile Include="Sound.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="FlTween.cpp">
+      <Filter>fltween</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

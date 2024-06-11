@@ -12,6 +12,10 @@ public:
 	virtual void PostUpdate(float deltaSecond) override;
 
 private:
+	flt::Quaternion CalcTargetRotation();
+	flt::Vector3f CalcTargetPosition();
+
+private:
 	Player* _player;
 	Board* _board;
 	float _height;
@@ -20,6 +24,11 @@ private:
 	float _posZOffsest;
 	float _playerDistance;
 	float _lookDegree;
+	float _movSpeed;
+	float _rotSpeed;
 
-	flt::Quaternion _targetRotation;
+	flt::Quaternion _currRotation;
+
+	flt::Vector3f _currPosition;
+
 };
