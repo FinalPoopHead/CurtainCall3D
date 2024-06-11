@@ -39,7 +39,7 @@ void CubeController::Update(float deltaSecond)
 		Fall(deltaSecond);
 		if(IsFallEnough())
 		{
-			_board->BackToPool(_gameObject, this);
+			_board->BackToPool(_gameObject);
 
 			_isFalling = false;
 			_isRolling = false;
@@ -51,6 +51,11 @@ void CubeController::Update(float deltaSecond)
 		// TODO : 체력 감소 또는 게임 오버 처리 필요.
 		StartFalling();
 	}
+}
+
+void CubeController::OnDisable()
+{
+	_board->RemoveFromControllerList(this);
 }
 
 void CubeController::StartRolling(float rotateTime)
@@ -79,6 +84,7 @@ void CubeController::StartFalling()
 
 	_isFalling = true;
 	_fallSpeed = STARTFALLSPEED;
+	_board->RemoveFromControllerList(this);
 }
 
 void CubeController::Roll(float deltaSecond)
