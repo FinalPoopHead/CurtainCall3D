@@ -53,6 +53,11 @@ void CubeController::Update(float deltaSecond)
 	}
 }
 
+void CubeController::OnDisable()
+{
+	_board->RemoveFromControllerList(this);
+}
+
 void CubeController::StartRolling(float rotateTime)
 {
 	if (_isRolling || _isFalling)
