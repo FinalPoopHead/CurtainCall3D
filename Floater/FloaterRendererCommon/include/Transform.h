@@ -35,6 +35,7 @@ namespace flt
 		void SetPosition(const Vector3f& position);
 		void SetPosition(const Vector4f& position);
 		void SetWorldPosition(const Vector4f& position);
+		void SetWorldPosition(float x, float y, float z);
 
 		Quaternion GetLocalRotation() const noexcept { return _rotation; }
 		Quaternion GetWorldRotation() const noexcept;

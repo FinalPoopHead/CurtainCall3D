@@ -171,6 +171,22 @@ int Board::QueryTileState(float x, float y)
 	return _tileState[tileX][tileY];
 }
 
+bool Board::GetCenterPosition(float& x, float& y)
+{
+	float leftX = 0.0f;
+	float leftY = 0.0f;
+	ConvertToTilePosition(0, 0, leftX, leftY);
+
+	float rightX = 0.0f;
+	float rightY = 0.0f;
+	ConvertToTilePosition(_width - 1, _height - 1, rightX, rightY);
+
+	x = (leftX + rightX) / 2.0f;
+	y = (leftY + rightY) / 2.0f;
+
+	return true;
+}
+
 void Board::ConvertToTileIndex(float x, float z, int& outX, int& outZ)
 {
 	flt::Vector4f pos = this->tr.GetWorldPosition();

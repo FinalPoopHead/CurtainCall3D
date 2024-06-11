@@ -158,6 +158,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="bezier.h" />
+    <ClInclude Include="Ease.h" />
     <ClInclude Include="include\Common.h" />
     <ClInclude Include="include\floaterMath.h" />
     <ClInclude Include="include\Matrix4f.h" />
@@ -168,6 +170,7 @@
     <ClInclude Include="include\Matrix3f.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="bezier.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Matrix3f.cpp" />
     <ClCompile Include="Matrix4f.cpp" />
