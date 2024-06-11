@@ -657,6 +657,7 @@ int flt::AssimpLoader::CalcAINodeCountRecursive(aiNode* pNode)
 void flt::AssimpLoader::ClearPrivateData()
 {
 	_aiNodeMap.clear();
+	// 밖으로 전달할 포인터를 저장하기에 delete하지 않음
 	_RawNodeMap.clear();
 	_boneIndexMap.clear();
 	_skeletonMap.clear();
