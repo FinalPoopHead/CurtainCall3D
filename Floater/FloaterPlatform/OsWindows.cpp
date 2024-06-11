@@ -983,7 +983,7 @@ flt::WinGamePad* flt::OsWindows::FindEmptyGamePad(uint64 hash)
 
 LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	static OsWindows* thisPtr = nullptr;
+	static OsWindows* thisPtr = nullptr;	// WM_CREATE에서 할당
 	switch (msg)
 	{
 		case WM_INPUT:
