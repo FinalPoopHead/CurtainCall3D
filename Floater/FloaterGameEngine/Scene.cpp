@@ -10,57 +10,7 @@ flt::Scene::Scene() :
 
 flt::Scene::~Scene()
 {
-	for (auto& object : _gameObjects)
-	{
-		if (object->_isEnable == false)
-		{
-			continue;
-		}
-
-		for (auto& component : object->_components)
-		{
-			if (component == nullptr)
-			{
-				continue;
-			}
-
-			if (component->_isEnable == false)
-			{
-				continue;
-			}
-
-			component->OnDisable();
-		}
-		object->OnDisable();
-	}
-
-	for (auto& object : _gameObjects)
-	{
-		for (auto& component : object->_components)
-		{
-			if (component == nullptr)
-			{
-				continue;
-			}
-
-			component->OnDestroy();
-		}
-		object->OnDestroy();
-	}
-
-	for (auto& object : _gameObjects)
-	{
-		for (auto& component : object->_components)
-		{
-			if (component == nullptr)
-			{
-				continue;
-			}
-			delete component;
-		}
-		delete object;
-	}
-	_gameObjects.clear();
+	
 }
 
 void flt::Scene::Initialize()
@@ -775,4 +725,64 @@ void flt::Scene::EndFrame()
 	}
 	_gameObjectsToDestroy.clear();
 	*/
+}
+
+void flt::Scene::StartScene()
+{
+
+}
+
+void flt::Scene::EndScene()
+{
+	for (auto& object : _gameObjects)
+	{
+		if (object->_isEnable == false)
+		{
+			continue;
+		}
+
+		for (auto& component : object->_components)
+		{
+			if (component == nullptr)
+			{
+				continue;
+			}
+
+			if (component->_isEnable == false)
+			{
+				continue;
+			}
+
+			component->OnDisable();
+		}
+		object->OnDisable();
+	}
+
+	for (auto& object : _gameObjects)
+	{
+		for (auto& component : object->_components)
+		{
+			if (component == nullptr)
+			{
+				continue;
+			}
+
+			component->OnDestroy();
+		}
+		object->OnDestroy();
+	}
+
+	for (auto& object : _gameObjects)
+	{
+		for (auto& component : object->_components)
+		{
+			if (component == nullptr)
+			{
+				continue;
+			}
+			delete component;
+		}
+		delete object;
+	}
+	_gameObjects.clear();
 }

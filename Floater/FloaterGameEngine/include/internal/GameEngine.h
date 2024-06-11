@@ -41,7 +41,8 @@ namespace flt
 		SoundEngine* GetSoundEngine();
 		Platform* GetPlatform();
 
-	protected:
+	private:
+		void ChangeScene();
 
 
 	private:
@@ -53,7 +54,7 @@ namespace flt
 		PhysicsEngine* _physicsEngine;
 		SoundEngine* _soundEngine;
 
-
+		Scene* _changeScene;
 		Scene* _currentScene;
 		std::unordered_set<Scene*> _scenes;
 		Timer _timer;

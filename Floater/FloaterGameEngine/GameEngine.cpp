@@ -46,6 +46,10 @@ void flt::GameEngine::Initialize()
 
 bool flt::GameEngine::Update()
 {
+	if (_changeScene)
+	{
+		ChangeScene();
+	}
 	ASSERT(_currentScene, "Scene is not set");
 
 	_timer.Update();
@@ -111,15 +115,8 @@ void flt::GameEngine::Finalize()
 
 flt::Scene* flt::GameEngine::SetScene(Scene* scene)
 {
+	_changeScene = scene;
 	Scene* ret = _currentScene;
-
-	if(_currentScene != nullptr)
-	{
-		_currentScene->Finalize();
-	}
-
-	_currentScene = scene;
-	_currentScene->Initialize();
 
 	return ret;
 }
@@ -134,10 +131,11 @@ flt::Scene* flt::GameEngine::GetCurrentScene()
 	return _currentScene;
 }
 
-flt::GameEngine::GameEngine() : 
-	_platform(nullptr), 
+flt::GameEngine::GameEngine() :
+	_platform(nullptr),
 	_renderer(nullptr),
 	_physicsEngine(nullptr),
+	_changeScene(nullptr),
 	_currentScene(nullptr),
 	_timer(),
 	_fixedUpdateElapsedSecond(0.0f)
@@ -158,6 +156,22 @@ flt::GameEngine* flt::GameEngine::Instance()
 		_instance->Initialize();
 	}
 	return _instance;
+}
+
+void flt::GameEngine::ChangeScene()
+{
+	ASSERT(_changeScene, "ChangeScene is nullptr");
+	if (_currentScene != nullptr)
+	{
+		_currentScene->Finalize();
+		_currentScene->EndScene();
+	}
+
+	_currentScene = _changeScene;
+	_currentScene->StartScene();
+	_currentScene->Initialize();
+
+	_changeScene = nullptr;
 }
 
 flt::GameEngine* flt::GameEngine::_instance = nullptr;

@@ -144,6 +144,10 @@
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="GameManager.cpp" />
+    <ClCompile Include="MainMenuScene.cpp" />
+    <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="MenuItem.cpp" />
+    <ClCompile Include="MenuSelector.cpp" />
     <ClCompile Include="Mine.cpp" />
     <ClCompile Include="NormalCube.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -160,6 +164,10 @@
     <ClInclude Include="DetonatedMine.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="GameManager.h" />
+    <ClInclude Include="MainMenuScene.h" />
+    <ClInclude Include="Menu.h" />
+    <ClInclude Include="MenuItem.h" />
+    <ClInclude Include="MenuSelector.h" />
     <ClInclude Include="Mine.h" />
     <ClInclude Include="NormalCube.h" />
     <ClInclude Include="Player.h" />
