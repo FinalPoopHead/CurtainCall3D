@@ -53,7 +53,7 @@ namespace Rocket::Core
 		DirectionalLight* CreateDirectionalLight();
 
 	public:
-		void DestroyCamera(Camera* camera);
+		void DestroyCamera(Camera* camera, bool isLastMainCamera = false);
 		void DestroyMeshRenderer(MeshRenderer* meshRenderer);
 		void DestroyDynamicModelRenderer(DynamicModelRenderer* dynamicModelRenderer);
 		void DestroyStaticModelRenderer(StaticModelRenderer* staticModelRenderer);
