@@ -10,6 +10,8 @@
 
 constexpr int CUBECOUNT = 64;
 constexpr float ROLLINGTIME = 1.5f;
+constexpr int CUBEDAMAGE = 1;
+constexpr int DARKCUBEDAMAGE = 1;
 
 Board::Board(GameManager* gameManager, int playerIndex, int width, int height, float offset /*= 4.00f*/) :
 	flt::GameObject()
@@ -24,6 +26,7 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _advantageCubePool()
 	, _darkCubePool()
 	, _normalCubePool()
+	, _isGameOver(false)
 	, _isStageRunning(false)
 	, _isRolling(false)
 	, _justFinishedRolling(false)
@@ -220,6 +223,11 @@ void Board::ConvertToTilePosition(int x, int z, float& outX, float& outZ)
 
 void Board::GenerateRandomStage()
 {
+	if (_isGameOver)
+	{
+		return;
+	}
+
 	std::cout << _normalCubePool.size() << std::endl;
 	std::cout << _darkCubePool.size() << std::endl;
 	std::cout << _advantageCubePool.size() << std::endl;
@@ -294,6 +302,7 @@ void Board::BackToPool(flt::GameObject* obj)
 	{
 		auto normalCube = dynamic_cast<NormalCube*>(obj);
 		_normalCubePool.push_back(normalCube);
+		_gameManager->ReduceHP(_playerIndex, CUBEDAMAGE);
 	}
 	else if (temp.compare(typeid(DarkCube).name()) == 0)
 	{
@@ -304,6 +313,7 @@ void Board::BackToPool(flt::GameObject* obj)
 	{
 		auto advantageCube = dynamic_cast<AdvantageCube*>(obj);
 		_advantageCubePool.push_back(advantageCube);
+		_gameManager->ReduceHP(_playerIndex, CUBEDAMAGE);
 	}
 	else
 	{
@@ -325,6 +335,11 @@ void Board::RemoveFromControllerList(CubeController* cubeCtr)
 
 bool Board::SetMine(float x, float z)
 {
+	if (_isGameOver)
+	{
+		return false;
+	}
+
 	if (_minePos.first != -1 && _minePos.second != -1)
 	{
 		return false;
@@ -348,6 +363,11 @@ bool Board::SetMine(float x, float z)
 
 void Board::DetonateMine()
 {
+	if (_isGameOver)
+	{
+		return;
+	}
+
 	auto&[x,y] = _minePos;
 	_isDirty = true;
 	_tiles[x][y]->DisableMine();
@@ -358,6 +378,11 @@ void Board::DetonateMine()
 
 void Board::DetonateAdvantageMine()
 {
+	if (_isGameOver)
+	{
+		return;
+	}
+
 	_isDirty = true;
 
 	while (!_advantageMinePosList.empty())
@@ -388,7 +413,7 @@ void Board::DetonateAdvantageMine()
 
 void Board::SetGameOver()
 {
-
+	_isGameOver = true;
 }
 
 void Board::Resize(int newWidth, int newHeight)
@@ -540,18 +565,19 @@ void Board::UpdateDetonate()
 				{
 				case TileStateFlag::NormalCube:
 					// NormalCube 수납
-					BackToPool(_tiles[i][j]->_cube); // 임시
+					BackToPool(_tiles[i][j]->_cube);
 					break;
 				case TileStateFlag::DarkCube:
 					// DarkCube 수납 및 체력 감소
-					BackToPool(_tiles[i][j]->_cube); // 임시
+					_gameManager->ReduceHP(_playerIndex, DARKCUBEDAMAGE);
+					BackToPool(_tiles[i][j]->_cube);
 					break;
 				case TileStateFlag::AdvantageCube:
 					// AdvantageCube 수납 및 AdvantageMine 설치
 					_tileState[i][j] = _tileState[i][j] | (int)TileStateFlag::AdvantageMine;
 					_tiles[i][j]->EnableAdvantageMine();
 					_advantageMinePosList.push_back({ i,j });
-					BackToPool(_tiles[i][j]->_cube); // 임시
+					BackToPool(_tiles[i][j]->_cube);\
 					break;
 				default:
 					break;

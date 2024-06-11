@@ -6,6 +6,7 @@
 
 Player::Player(Board* board)
 	: _board(board)
+	, _isGameOver(false)
 	, _padIndex(-1)
 	, _speed(10.0f)
 {
@@ -36,6 +37,11 @@ void Player::OnEnable()
 
 void Player::Update(float deltaSecond)
 {
+	if (_isGameOver)
+	{
+		return;
+	}
+
 	flt::Vector4f pos = tr.GetWorldPosition();
 	flt::Vector4f nextPos{};
 
@@ -187,6 +193,6 @@ void Player::Update(float deltaSecond)
 
 void Player::SetGameOver()
 {
-
+	_isGameOver = true;
 }
 

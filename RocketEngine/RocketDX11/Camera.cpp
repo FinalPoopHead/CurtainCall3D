@@ -154,6 +154,9 @@ namespace Rocket::Core
 		else if (_mainCamera[1] == nullptr)
 		{
 			_mainCamera[1] = this;
+
+			_mainCamera[0]->SetAspect(8.0f / 9.0f);
+			_mainCamera[1]->SetAspect(8.0f / 9.0f);
 		}
 	}
 
@@ -169,6 +172,26 @@ namespace Rocket::Core
 
 	void Camera::Destroy()
 	{
-		ObjectManager::Instance().DestroyCamera(this);
+		bool isLastMainCamera = false;
+
+		// 메인 카메라인 경우
+		if (_mainCamera[0] == this)
+		{
+			if (_mainCamera[1] != nullptr)
+			{
+				_mainCamera[1]->SetAsMainCamera();
+			}
+			else
+			{
+				isLastMainCamera = true;
+			}
+
+		}
+		else if (_mainCamera[1] == this)
+		{
+			_mainCamera[0]->SetAsMainCamera();
+		}
+
+		ObjectManager::Instance().DestroyCamera(this, isLastMainCamera);
 	}
 }
