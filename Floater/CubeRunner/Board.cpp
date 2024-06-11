@@ -6,18 +6,25 @@
 #include "DarkCube.h"
 #include "NormalCube.h"
 #include "CubeController.h"
+#include "GameManager.h"
 
 constexpr int CUBECOUNT = 64;
 constexpr float ROLLINGTIME = 1.5f;
 
-Board::Board(int width, int height, float offset) :
+Board::Board(GameManager* gameManager, int playerIndex, int width, int height, float offset /*= 4.00f*/) :
 	flt::GameObject()
+	, _gameManager(gameManager)
+	, _playerIndex(playerIndex)
 	, _width(width)
 	, _height(height)
 	, _tileSize(offset)
 	, _tileState()
 	, _tiles()
-	, _isGenerated(false)
+	, _cubeControllers()
+	, _advantageCubePool()
+	, _darkCubePool()
+	, _normalCubePool()
+	, _isStageRunning(false)
 	, _isRolling(false)
 	, _justFinishedRolling(false)
 	, _isDirty(false)
@@ -86,16 +93,16 @@ void Board::PreUpdate(float deltaTime)
 
 	if (flt::GetKeyDown(flt::KeyCode::r))
 	{
-		if (!_isGenerated)
+		if (!_isStageRunning)
 		{
 			GenerateRandomStage();
-			_isGenerated = true;
+			_isStageRunning = true;
 		}
 	}
 
 	if (flt::GetKeyDown(flt::KeyCode::f))
 	{
-		if (!_isRolling)
+		if (!_isRolling && _isStageRunning)
 		{
 			TickCubesRolling(ROLLINGTIME);
 			_isRolling = true;
@@ -192,8 +199,8 @@ void Board::ConvertToTileIndex(float x, float z, int& outX, int& outZ)
 	x = x / _tileSize;
 	z = z / _tileSize;
 
-	x += x < 0.0f ? - 1.0f : 0.0f;
-	z += z < 0.0f ? - 1.0f : 0.0f;
+	x += x < 0.0f ? -1.0f : 0.0f;
+	z += z < 0.0f ? -1.0f : 0.0f;
 
 	//x < 0.0f ? x -= 0.5f : x += 0.5f;
 	//z < 0.0f ? z -= 0.5f : z += 0.5f;
@@ -280,8 +287,8 @@ void Board::TickCubesRolling(float RollingTime)
 	}
 }
 
-void Board::BackToPool(flt::GameObject* obj, CubeController* cubeCtr)
-{	
+void Board::BackToPool(flt::GameObject* obj)
+{
 	std::string temp = typeid(*obj).name();
 	if (temp.compare(typeid(NormalCube).name()) == 0)
 	{
@@ -304,12 +311,21 @@ void Board::BackToPool(flt::GameObject* obj, CubeController* cubeCtr)
 	}
 
 	obj->Disable();
+}
+
+void Board::RemoveFromControllerList(CubeController* cubeCtr)
+{
 	_cubeControllers.remove(cubeCtr);
+
+	if (_cubeControllers.empty())
+	{
+		_isStageRunning = false;
+	}
 }
 
 bool Board::SetMine(float x, float z)
 {
-	if(_minePos.first != -1 && _minePos.second != -1)
+	if (_minePos.first != -1 && _minePos.second != -1)
 	{
 		return false;
 	}
@@ -332,11 +348,12 @@ bool Board::SetMine(float x, float z)
 
 void Board::DetonateMine()
 {
+	auto&[x,y] = _minePos;
 	_isDirty = true;
-	_tiles[_minePos.first][_minePos.second]->DisableMine();
-	_tiles[_minePos.first][_minePos.second]->EnableDetonated();
-	_tileState[_minePos.first][_minePos.second] = (int)_tileState[_minePos.first][_minePos.second] & ~((int)TileStateFlag::Mine);
-	_tileState[_minePos.first][_minePos.second] = (int)_tileState[_minePos.first][_minePos.second] | (int)TileStateFlag::Detonate;
+	_tiles[x][y]->DisableMine();
+	_tiles[x][y]->EnableDetonated();
+	_tileState[x][y] = (int)_tileState[x][y] & ~((int)TileStateFlag::Mine);
+	_tileState[x][y] = (int)_tileState[x][y] | (int)TileStateFlag::Detonate;
 }
 
 void Board::DetonateAdvantageMine()
@@ -345,15 +362,33 @@ void Board::DetonateAdvantageMine()
 
 	while (!_advantageMinePosList.empty())
 	{
-		auto&[x, y] = _advantageMinePosList.front();
-
-		_tiles[x][y]->DisableAdvantageMine();
-		_tiles[x][y]->EnableDetonated();
+		auto& [x, y] = _advantageMinePosList.front();
 		_tileState[x][y] = (int)_tileState[x][y] & ~((int)TileStateFlag::AdvantageMine);
-		_tileState[x][y] = (int)_tileState[x][y] | (int)TileStateFlag::Detonate;
+		_tiles[x][y]->DisableAdvantageMine();
+
+		for (int m = -1; m <= 1; m++)
+		{
+			for (int n = -1; n <= 1; n++)
+			{
+				int nextX = x + m;
+				int nextY = y + n;
+				if (nextX < 0 || nextX >= _width || nextY < 0 || nextY >= _height)
+				{
+					continue;
+				}
+
+				_tileState[nextX][nextY] = _tileState[nextX][nextY] | (int)TileStateFlag::Detonate;
+				_tiles[nextX][nextY]->EnableDetonated();
+			}
+		}
 
 		_advantageMinePosList.pop_front();
 	}
+}
+
+void Board::SetGameOver()
+{
+
 }
 
 void Board::Resize(int newWidth, int newHeight)
@@ -505,46 +540,41 @@ void Board::UpdateDetonate()
 				{
 				case TileStateFlag::NormalCube:
 					// NormalCube 수납
-					BackToPool(_tiles[i][j]->_cube, _tiles[i][j]->_cube->GetComponent<CubeController>()); // 임시
+					BackToPool(_tiles[i][j]->_cube); // 임시
 					break;
 				case TileStateFlag::DarkCube:
 					// DarkCube 수납 및 체력 감소
-					BackToPool(_tiles[i][j]->_cube, _tiles[i][j]->_cube->GetComponent<CubeController>()); // 임시
+					BackToPool(_tiles[i][j]->_cube); // 임시
 					break;
 				case TileStateFlag::AdvantageCube:
 					// AdvantageCube 수납 및 AdvantageMine 설치
-				{
-					for (int m = -1; m <= 1; m++)
-					{
-						for (int n = -1; n <= 1; n++)
-						{
-							int nextX = i + m;
-							int nextY = j + n;
-							if (nextX < 0 || nextX >= _width || nextY < 0 || nextY >= _height)
-							{
-								continue;
-							}
-
-							_tileState[nextX][nextY] = _tileState[nextX][nextY] | (int)TileStateFlag::AdvantageMine;
-							_tiles[nextX][nextY]->EnableAdvantageMine();
-							_advantageMinePosList.push_back({ nextX, nextY });
-						}
-					}
-				}
-					BackToPool(_tiles[i][j]->_cube, _tiles[i][j]->_cube->GetComponent<CubeController>()); // 임시
+					_tileState[i][j] = _tileState[i][j] | (int)TileStateFlag::AdvantageMine;
+					_tiles[i][j]->EnableAdvantageMine();
+					_advantageMinePosList.push_back({ i,j });
+					BackToPool(_tiles[i][j]->_cube); // 임시
 					break;
 				default:
 					break;
 				}
 
 				_tileState[i][j] = (int)_tileState[i][j] & ~((int)TileStateFlag::Detonate);
-				_minePos.first = -1;
-				_minePos.second = -1;
-				_tiles[i][j]->DisableMine();
 				_tiles[i][j]->DisableDetonated();
 
 				_tileState[i][j] = (int)_tileState[i][j] & ~CUBE;
 			}
 		}
 	}
+
+	for (int i = 0; i < _width; i++)
+	{
+		for (int j = 0; j < _height; j++)
+		{
+			if (_tileState[i][j] & (int)TileStateFlag::Mine)
+			{
+				return;
+			}
+		}
+	}
+	_minePos.first = -1;
+	_minePos.second = -1;
 }

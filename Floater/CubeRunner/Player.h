@@ -13,6 +13,7 @@ public:
 	virtual void Update(float deltaSecond) override;
 
 	void SetPadIndex(int padIndex) { _padIndex = padIndex; }
+	void SetGameOver();
 
 private:
 	Board* _board;

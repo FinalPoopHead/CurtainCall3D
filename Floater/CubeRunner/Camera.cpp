@@ -1,4 +1,5 @@
-﻿#include "Camera.h"
+﻿#include <algorithm>
+#include "Camera.h"
 #include "Player.h"
 #include "Board.h"
 #include "../FloaterGameEngine/include/Input.h"
