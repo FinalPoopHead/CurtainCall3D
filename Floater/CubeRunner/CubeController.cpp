@@ -8,6 +8,7 @@ constexpr float ROLLANGLE = 90.0f;		// 회전할 각도
 constexpr float TARGETANGLE[4] = { 90.0f, 180.0f, 270.0f, 360.0f };	// 회전 목표 각도
 constexpr float GRAVITY = 9.8f;
 constexpr float STARTFALLSPEED = 5.0f;
+constexpr float FALLHEIGHT = -50.0f;
 
 CubeController::CubeController()
 	: _board(nullptr)
@@ -162,7 +163,7 @@ bool CubeController::IsOutofBoard()
 
 bool CubeController::IsFallEnough()
 {
-	if (_gameObject->tr.GetWorldPosition().y <= -100.0f)
+	if (_gameObject->tr.GetWorldPosition().y <= FALLHEIGHT)
 	{
 		return true;
 	}

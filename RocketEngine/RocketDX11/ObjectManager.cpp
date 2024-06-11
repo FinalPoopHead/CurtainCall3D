@@ -2,6 +2,7 @@
 
 #include "..\\RocketCommon\\IGraphicsObject.h"
 
+#include "ResourcePath.h"
 #include "ResourceManager.h"
 #include "Camera.h"
 #include "MeshRenderer.h"
@@ -132,7 +133,7 @@ namespace Rocket::Core
 	Rocket::Core::SpriteRenderer* ObjectManager::CreateImage()
 	{
 		SpriteRenderer* temp = new SpriteRenderer();
-		temp->SetImage("test.jpg");
+		temp->SetImage(TEXTURE_PATH + "test.jpg");
 		_spriteList.emplace_back(temp);
 
 		return temp;
@@ -251,13 +252,23 @@ namespace Rocket::Core
 		return _staticModelRendererList;
 	}
 
-	void ObjectManager::DestroyCamera(Camera* camera)
+	void ObjectManager::DestroyCamera(Camera* camera, bool isLastMainCamera /*= false*/)
 	{
 		auto iter = std::find(_cameraList.begin(), _cameraList.end(), camera);
 		if (iter != _cameraList.end())
 		{
 			_cameraList.erase(iter);
 			delete camera;
+		}
+
+		if (isLastMainCamera)
+		{
+			if (!_cameraList.empty())
+			{
+				// 모든 카메라가 없는 경우
+				assert(false);
+			}
+			_cameraList.front()->SetAsMainCamera();
 		}
 	}
 
