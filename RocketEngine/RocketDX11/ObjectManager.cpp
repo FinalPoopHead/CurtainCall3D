@@ -2,6 +2,7 @@
 
 #include "..\\RocketCommon\\IGraphicsObject.h"
 
+#include "ResourcePath.h"
 #include "ResourceManager.h"
 #include "Camera.h"
 #include "MeshRenderer.h"
@@ -132,7 +133,7 @@ namespace Rocket::Core
 	Rocket::Core::SpriteRenderer* ObjectManager::CreateImage()
 	{
 		SpriteRenderer* temp = new SpriteRenderer();
-		temp->SetImage("test.jpg");
+		temp->SetImage(TEXTURE_PATH + "test.jpg");
 		_spriteList.emplace_back(temp);
 
 		return temp;

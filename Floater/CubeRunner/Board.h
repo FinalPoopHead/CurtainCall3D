@@ -44,7 +44,6 @@ public:
 	int QueryTileState(float x, float y);
 	bool GetCenterPosition(float& x, float& y);
 
-
 	void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
 	void ConvertToTilePosition(int x, int z, float& outX, float& outZ);
 
@@ -80,6 +79,7 @@ private:
 	std::list<DarkCube*> _darkCubePool;											// 다크 큐브 풀
 	std::list<NormalCube*> _normalCubePool;										// 노말 큐브 풀
 
+	bool _isGameOver = false;
 	bool _isStageRunning = false;
 	bool _isRolling = false;
 	bool _justFinishedRolling = false;

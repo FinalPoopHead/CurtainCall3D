@@ -17,6 +17,9 @@ void GameScene::Initialize()
 
 	Player* player1 = flt::CreateGameObject<Player>(true, board1);
 
+	gameManager->SetBoard(0, board1);
+	gameManager->SetPlayer(0, player1);
+
 // 	Board* board2 = flt::CreateGameObject<Board>(true, gameManager, playerIndex++, 5, 10);
 // 	board2->tr.SetPosition(25.0f, 0.0f, 0.0f);
 // 
