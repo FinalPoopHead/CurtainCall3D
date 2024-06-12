@@ -7,7 +7,7 @@ constexpr float PIVOTSIZE = 2.0f;		// 피봇까지의 y,z 거리. 모델 사이�
 constexpr float ROLLANGLE = 90.0f;		// 회전할 각도
 constexpr float TARGETANGLE[4] = { 90.0f, 180.0f, 270.0f, 360.0f };	// 회전 목표 각도
 constexpr float GRAVITY = 9.8f;
-constexpr float STARTFALLSPEED = 5.0f;
+constexpr float STARTFALLSPEED = 8.0f;
 constexpr float FALLHEIGHT = -50.0f;
 
 CubeController::CubeController()
@@ -33,6 +33,7 @@ void CubeController::Update(float deltaSecond)
 	if (_isRolling)
 	{
 		Roll(deltaSecond);
+		return;
 	}
 
 	if(_isFalling)
@@ -45,6 +46,7 @@ void CubeController::Update(float deltaSecond)
 			_isFalling = false;
 			_isRolling = false;
 		}
+		return;
 	}
 
 	if (!_isRolling && IsOutofBoard())
@@ -86,6 +88,7 @@ void CubeController::StartFalling()
 	_isFalling = true;
 	_fallSpeed = STARTFALLSPEED;
 	_board->RemoveFromControllerList(this);
+	_board->ReduceHPbyCubeFalling();
 }
 
 void CubeController::Roll(float deltaSecond)
@@ -123,6 +126,7 @@ void CubeController::FinishRolling()
 {
 	_targetIndex++;
 	_targetIndex %= 4;
+	_board->OnEndCubeRolling();
 
 	// 	// 정밀한 위치 조정
 	// 	Vector3 finalPosition = transform.position;
@@ -141,7 +145,7 @@ void CubeController::FinishRolling()
 
 void CubeController::Fall(float deltaSecond)
 {
-	_fallSpeed += GRAVITY * deltaSecond;
+	_fallSpeed += GRAVITY * deltaSecond * _board->GetFFValue();
 	flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
 	_gameObject->tr.AddWorldPosition( 0.0f, -_fallSpeed * deltaSecond, 0.0f);
 }
