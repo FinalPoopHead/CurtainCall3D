@@ -3,7 +3,7 @@
 DetonatedMine::DetonatedMine()
 {
 	// TODO : 임시로 아무 모델링파일 넣어둠
-	std::wstring filePath = L"..\\Resources\\Models\\Sphere.fbx";
+	std::wstring filePath = L"..\\Resources\\Models\\Cone.fbx";
 
 	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>(true);
 	renderer->SetFilePath(filePath);

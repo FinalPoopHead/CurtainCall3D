@@ -8,9 +8,13 @@ using Microsoft::WRL::ComPtr;
 
 namespace Rocket::Core
 {
-	SpriteRenderer::SpriteRenderer()
-		: _imageWidth(),
-		_imageHeight()
+	SpriteRenderer::SpriteRenderer() : 
+		_isActive(true)
+		, _color()
+		, _worldTM()
+		, _imageWidth()
+		, _imageHeight()
+		, _texture()
 	{
 		_color = DirectX::Colors::White;
 	}

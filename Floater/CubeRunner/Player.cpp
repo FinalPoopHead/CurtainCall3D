@@ -75,9 +75,11 @@ void Player::Update(float deltaSecond)
 	keyData = flt::GetKeyDown(flt::KeyCode::j);
 	if (keyData)
 	{
-		bool isSetSuccess = _board->SetMine(pos.x, pos.z);
-
-		if(!isSetSuccess)
+		if (!_board->IsMineSet())
+		{
+			_board->SetMine(pos.x, pos.z);
+		}
+		else
 		{
 			_board->DetonateMine();
 		}
