@@ -42,7 +42,7 @@
     <ClInclude Include="Ease.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="bezier.h">
+    <ClInclude Include="Bezier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -65,7 +65,7 @@
     <ClCompile Include="Matrix3f.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="bezier.cpp">
+    <ClCompile Include="Bezier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

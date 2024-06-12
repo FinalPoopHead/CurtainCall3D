@@ -12,6 +12,7 @@ public:
 	void SetMenu(Menu* menu);
 	void Select(flt::KeyCode keyCode);
 
+protected:
 	void Update(float deltaSecond) override;
 
 private:

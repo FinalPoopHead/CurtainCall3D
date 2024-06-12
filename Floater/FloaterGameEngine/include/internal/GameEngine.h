@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "../../../FloaterUtil/include/Timer.h"
 #include <unordered_set>
+#include <memory>
 
 
 namespace flt
@@ -18,14 +19,12 @@ namespace flt
 		friend class RendererComponent;
 		friend class CameraComponent;
 
-
 	private:
 		GameEngine();
 		~GameEngine();
 	
 	public:
 		static GameEngine* Instance();
-
 
 	public:
 		void Initialize();
@@ -44,15 +43,17 @@ namespace flt
 	private:
 		void ChangeScene();
 
-
 	private:
 		static GameEngine* _instance;
 
 	private:
-		Platform* _platform;
+		std::unique_ptr<Platform> _platform;
+		std::unique_ptr<PhysicsEngine> _physicsEngine;
+		std::unique_ptr<SoundEngine> _soundEngine;
+
 		IRenderer* _renderer;
-		PhysicsEngine* _physicsEngine;
-		SoundEngine* _soundEngine;
+		//PhysicsEngine* _physicsEngine;
+		//SoundEngine* _soundEngine;
 
 		Scene* _nextScene;
 		Scene* _currentScene;

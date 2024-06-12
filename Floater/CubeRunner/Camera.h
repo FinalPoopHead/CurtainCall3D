@@ -9,6 +9,8 @@ class Camera : public flt::GameObject
 {
 public:
 	Camera(Player* player, Board* board);
+
+protected:
 	virtual void PostUpdate(float deltaSecond) override;
 
 private:

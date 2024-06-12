@@ -12,17 +12,17 @@ flt::IRenderer* flt::GameEngine::GetRenderer()
 
 flt::PhysicsEngine* flt::GameEngine::GetPhysicsEngine()
 {
-	return _physicsEngine;
+	return _physicsEngine.get();
 }
 
 flt::SoundEngine* flt::GameEngine::GetSoundEngine()
 {
-	return _soundEngine;
+	return _soundEngine.get();
 }
 
 flt::Platform* flt::GameEngine::GetPlatform()
 {
-	return _platform;
+	return _platform.get();
 }
 
 void flt::GameEngine::Initialize()
@@ -31,14 +31,14 @@ void flt::GameEngine::Initialize()
 #ifdef _DEBUG
 	isDebug = true;
 #endif
-	_platform = new Platform(isDebug);
+	_platform = std::make_unique<Platform>(isDebug);
 	_platform->Initialize(1280, 720, L"name", L"");
 	_renderer = _platform->CreateRenderer(RendererType::ROCKET_DX11);
 	//_renderer = _platform->CreateRenderer(RendererType::DX11);
-	_physicsEngine = new PhysicsEngine();
+	_physicsEngine = std::make_unique<PhysicsEngine>();
 	_physicsEngine->Initialize();
 
-	_soundEngine = new SoundEngine();
+	_soundEngine = std::make_unique<SoundEngine>();
 	_soundEngine->Initialize();
 
 	_timer.Start();
@@ -99,22 +99,27 @@ void flt::GameEngine::Finalize()
 	}
 
 	_platform->DestroyRenderer(_renderer);
-	delete _platform;
+	//delete _platform;
 
 	_renderer = nullptr;
 	_platform = nullptr;
 
 	_physicsEngine->Finalize();
-	delete _physicsEngine;
+	//delete _physicsEngine;
 	_physicsEngine = nullptr;
 
 	_soundEngine->Finalize();
-	delete _soundEngine;
+	//delete _soundEngine;
 	_soundEngine = nullptr;
+
+	// 여기에서 해도 되는지 모르겠다.
+	delete _instance;
+	_instance = nullptr;
 }
 
 flt::Scene* flt::GameEngine::SetScene(Scene* scene)
 {
+	ASSERT(_scenes.find(scene) != _scenes.end(), "Scene is not added");
 	_nextScene = scene;
 	Scene* ret = _currentScene;
 
@@ -135,9 +140,11 @@ flt::GameEngine::GameEngine() :
 	_platform(nullptr),
 	_renderer(nullptr),
 	_physicsEngine(nullptr),
+	_soundEngine(nullptr),
 	_nextScene(nullptr),
 	_currentScene(nullptr),
 	_timer(),
+	_fixedUpdateTimer(),
 	_fixedUpdateElapsedSecond(0.0f)
 {
 

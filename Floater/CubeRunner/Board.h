@@ -33,6 +33,7 @@ public:
 	Board(GameManager* gameManager, int playerIndex, int width, int height, float offset = 4.00f);
 	virtual ~Board();
 
+protected:
 	void OnCreate() override;
 	void OnDestroy() override;
 	void PreUpdate(float deltaTime) override;

@@ -8,8 +8,15 @@ namespace flt
 	{
 	public:
 		Light() = default;
-		Light(const Vector3f& position, const Vector3f& color, float intensity)
-			: position(position), intensity(intensity)
+		Light(const Vector3f& position, const Vector3f& color, float intensity)	: 
+			ambientColor(),
+			diffuseColor(),
+			specularColor(color, 1.0f),
+			attenuation(),
+			position(position), 
+			range(0.0f),
+			direction(),
+			intensity(intensity)
 		{
 		}
 
