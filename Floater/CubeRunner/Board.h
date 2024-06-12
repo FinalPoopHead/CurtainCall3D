@@ -55,7 +55,7 @@ public:
 	bool SetMine(float x, float z);			// position X,Z에 지뢰를 설치한다.
 	void DetonateMine();					// 지뢰를 폭파시킨다.
 	void DetonateAdvantageMine();			// 어드밴티지 지뢰를 폭파시킨다.
-	void OnEndCubeRolling();					// 큐브 1개가 rolling 끝나면 호출할 함수.
+	void OnEndRolling();					// 큐브 1개가 rolling 끝나면 호출할 함수.
 
 	void SetGameOver();
 	void ReduceHPbyCubeFalling();
