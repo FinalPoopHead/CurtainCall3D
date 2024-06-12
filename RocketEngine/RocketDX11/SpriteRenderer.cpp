@@ -52,11 +52,11 @@ namespace Rocket::Core
 			, DirectX::XMFLOAT2(pos.x, pos.y)
 			, nullptr
 			, _color
-			, 0.0f										//회전 각도
-			, DirectX::XMFLOAT2(0.5f, 0.5f)				//  이미지의 원점->0.0f,0.0f이면 좌측상단
+			, 0.0f										// 회전 각도
+			, DirectX::XMFLOAT2(0.0f, 0.0f)				// 이미지의 기준점 0,0 이면 좌측상단 (픽셀값인듯)
 			, DirectX::XMFLOAT2(scale.x, scale.y)		// 이미지 스케일
 			, DirectX::SpriteEffects::SpriteEffects_None
-			, pos.z										// 이미지 depth
+			, pos.z										// 이미지 Layer depth
 		);		
 	}
 
