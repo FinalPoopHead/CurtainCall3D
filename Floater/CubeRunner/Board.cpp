@@ -239,8 +239,10 @@ void Board::GenerateRandomWave()
 
 	for (int i = 0; i < _width; ++i)
 	{
+		if (i == _width / 2) continue;		// TEST 한 줄 비우기 위함
 		for (int j = _height - 1; j > _height - _width - 2; --j)
 		{
+			if (j == _height - _width / 2 - 1) continue;	// TEST 한 줄 비우기 위함
 			int randValue = rand() % 3;
 
 			float x = _tiles[i][j]->tr.GetWorldPosition().x;
