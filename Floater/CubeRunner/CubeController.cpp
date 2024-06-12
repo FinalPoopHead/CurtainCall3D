@@ -121,26 +121,11 @@ void CubeController::Roll(float deltaSecond)
 	}
 }
 
-
 void CubeController::FinishRolling()
 {
 	_targetIndex++;
 	_targetIndex %= 4;
 	_board->OnEndCubeRolling();
-
-	// 	// 정밀한 위치 조정
-	// 	Vector3 finalPosition = transform.position;
-	// 	finalPosition.x = Mathf.Round(finalPosition.x);
-	// 	finalPosition.y = Mathf.Round(finalPosition.y);
-	// 	finalPosition.z = Mathf.Round(finalPosition.z);
-	// 	transform.position = finalPosition;
-	// 
-	// 	// 정밀한 회전 조정
-	// 	Vector3 finalEulerAngles = transform.eulerAngles;
-	// 	finalEulerAngles.x = Mathf.Round(finalEulerAngles.x / 90f) * 90f;
-	// 	finalEulerAngles.y = Mathf.Round(finalEulerAngles.y / 90f) * 90f;
-	// 	finalEulerAngles.z = Mathf.Round(finalEulerAngles.z / 90f) * 90f;
-	// 	transform.eulerAngles = finalEulerAngles;
 }
 
 void CubeController::Fall(float deltaSecond)

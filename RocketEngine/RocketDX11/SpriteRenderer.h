@@ -25,6 +25,8 @@ namespace Rocket::Core
 
 		virtual void SetImage(const std::string& filePath) override;
 		virtual void SetColor(Color color) override;
+		virtual float GetWidth() override { return _imageWidth; }
+		virtual float GetHeight() override { return _imageHeight; }
 
 	public:
 		void Render(DirectX::SpriteBatch* spriteBatch);
