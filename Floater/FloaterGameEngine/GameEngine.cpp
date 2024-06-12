@@ -25,6 +25,11 @@ flt::Platform* flt::GameEngine::GetPlatform()
 	return _platform.get();
 }
 
+void flt::GameEngine::ExitGame()
+{
+	_platform->Exit();
+}
+
 void flt::GameEngine::Initialize()
 {
 	bool isDebug = false;
@@ -93,7 +98,7 @@ void flt::GameEngine::Finalize()
 	}
 	_currentScene = nullptr;
 
-	for (auto& scene : _scenes)
+	for (auto& [sceneName, scene] : _scenes)
 	{
 		delete scene;
 	}
@@ -119,16 +124,33 @@ void flt::GameEngine::Finalize()
 
 flt::Scene* flt::GameEngine::SetScene(Scene* scene)
 {
-	ASSERT(_scenes.find(scene) != _scenes.end(), "Scene is not added");
+	//ASSERT(_scenes.find(scene) != _scenes.end(), "Scene is not added");
 	_nextScene = scene;
 	Scene* ret = _currentScene;
 
 	return ret;
 }
 
-void flt::GameEngine::AddScene(Scene* scene)
+flt::Scene* flt::GameEngine::SetScene(const std::wstring& sceneName)
 {
-	_scenes.insert(scene);
+	auto iter = _scenes.find(sceneName);
+	ASSERT(iter != _scenes.end(), "Scene is not added");
+
+	_nextScene = iter->second;
+	Scene* ret = _currentScene;
+
+	return ret;
+}
+
+bool flt::GameEngine::AddScene(const std::wstring& sceneName, Scene* scene)
+{
+	auto iter = _scenes.find(sceneName);
+	if (iter != _scenes.end())
+	{
+		return false;
+	}
+	_scenes.insert({ sceneName, scene });
+	return true;
 }
 
 flt::Scene* flt::GameEngine::GetCurrentScene()

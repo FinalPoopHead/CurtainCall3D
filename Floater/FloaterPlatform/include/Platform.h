@@ -49,6 +49,8 @@ namespace flt
 		std::wstring GetExePath();
 		std::wstring GetAbsPath(std::wstring relativePath);
 
+		void Exit();
+
 		//virtual void OnResize() {};
 		//virtual void OnFullScreen() {};
 		//virtual void OnClosed() {};

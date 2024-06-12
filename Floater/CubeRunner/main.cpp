@@ -9,9 +9,13 @@ int main(int argc, char* argv[])
 	flt::GameEngine* pGameEngine = flt::GameEngine::Instance();
 	
 	//GameScene* gameScene = flt::CreateScene<GameScene>();
+	//MainMenuScene* mainMenuScene = flt::CreateScene<MainMenuScene>();
 	//SetScene(gameScene);
-	MainMenuScene* mainMenuScene = flt::CreateScene<MainMenuScene>();
-	SetScene(mainMenuScene);
+	//flt::SetScene(mainMenuScene);
+
+	flt::CreateScene<MainMenuScene>();
+	flt::CreateScene<GameScene>();
+	flt::SetScene(L"class MainMenuScene");
 
 	while (pGameEngine->Update())
 	{

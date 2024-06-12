@@ -11,8 +11,9 @@ MenuSelector::MenuSelector(Menu* menu) :
 
 
 	_ui = AddComponent<flt::UIComponent>(true);
-	_ui->SetImage(L"../Resources/Textures/abcd.jpg");
-	_ui->SetSize({ 10.0f, 10.0f });
+	_ui->SetImage(L"../Resources/Sprites/abcd.jpg");
+	_ui->SetSize({ 50.0f, 50.0f });
+	_ui->SetZOrder(0.8f);
 	
 	_selectedItem = _menu->FirstItem();
 
@@ -32,6 +33,13 @@ void MenuSelector::next()
 	MoveSelectedItem();
 }
 
+void MenuSelector::prev()
+{
+	_selectedItem = _menu->PrevItem(_selectedItem);
+
+	MoveSelectedItem();
+}
+
 void MenuSelector::Select(flt::KeyCode keyCode)
 {
 	_selectedItem->Select(keyCode);
@@ -42,6 +50,10 @@ void MenuSelector::Update(float deltaSecond)
 	if (flt::GetKeyDown(flt::KeyCode::right))
 	{
 		next();
+	}
+	if (flt::GetKeyDown(flt::KeyCode::left))
+	{
+		prev();
 	}
 	if(flt::GetKeyDown(flt::KeyCode::enter))
 	{

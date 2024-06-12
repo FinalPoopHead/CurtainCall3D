@@ -497,6 +497,11 @@ std::wstring flt::OsWindows::GetAbsPath(std::wstring relativePath)
 	return std::wstring{};
 }
 
+void flt::OsWindows::Exit()
+{
+	::PostQuitMessage(0);
+}
+
 void flt::OsWindows::UpdateKeyState()
 {
 	for (int i = 0; i < (int)KeyCode::MAX; ++i)

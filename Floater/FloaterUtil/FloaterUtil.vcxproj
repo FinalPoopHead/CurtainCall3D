@@ -161,6 +161,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="include\SparseSet.h" />
+    <ClInclude Include="include\Type.h" />
     <ClInclude Include="include\Vector.h" />
     <ClInclude Include="include\ITester.h" />
     <ClInclude Include="include\FixedSizeMemoryPool.h" />

@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "../FloaterGameEngine/include/EngineMinimal.h"
+#include <functional>
 
 
 class MenuItem : public flt::GameObject
@@ -17,7 +18,10 @@ public:
 	flt::Vector2f GetSize();
 	void Select(flt::KeyCode keyCode);
 
+	void SetSelectFunc(const std::function<void()>& func) { _selectFunc = func; }
+
 private:
 	//flt::RendererComponent* _spriteRenderer;
 	flt::UIComponent* _ui;
+	std::function<void()> _selectFunc;
 };

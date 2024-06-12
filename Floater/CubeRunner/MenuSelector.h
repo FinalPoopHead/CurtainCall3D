@@ -11,6 +11,7 @@ public:
 	MenuSelector(Menu* menu);
 	void SetMenu(Menu* menu);
 	void next();
+	void prev();
 	void Select(flt::KeyCode keyCode);
 
 protected:

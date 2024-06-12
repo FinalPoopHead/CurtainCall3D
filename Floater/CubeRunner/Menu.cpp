@@ -18,7 +18,7 @@ MenuItem* Menu::NextItem(MenuItem* selectedItem)
 	}
 }
 
-MenuItem* Menu::PreviousItem(MenuItem* selectedItem)
+MenuItem* Menu::PrevItem(MenuItem* selectedItem)
 {
 	if (items.front() == selectedItem)
 	{

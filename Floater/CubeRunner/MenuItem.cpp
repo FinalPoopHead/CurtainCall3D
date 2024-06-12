@@ -6,6 +6,7 @@ MenuItem::MenuItem()
 {
 	//_spriteRenderer = AddComponent<flt::RendererComponent>(true);
 	_ui = AddComponent<flt::UIComponent>(true);
+	_ui->SetZOrder(0.4f);
 }
 
 MenuItem::~MenuItem()
@@ -30,6 +31,7 @@ flt::Vector2f MenuItem::GetPosition()
 
 void MenuItem::SetZOrder(float zOrder)
 {
+	ASSERT( zOrder >= 0.2f && zOrder <= 0.8f, "ZOrder must be between 0.2f and 0.8f");
 	_ui->SetZOrder(zOrder);
 }
 
@@ -50,9 +52,8 @@ flt::Vector2f MenuItem::GetSize()
 
 void MenuItem::Select(flt::KeyCode keyCode)
 {
-	static flt::Scene* gameScene = flt::CreateScene<GameScene>();
 	if (keyCode == flt::KeyCode::enter)
 	{
-		flt::SetScene(gameScene);
+		_selectFunc();
 	}
 }
