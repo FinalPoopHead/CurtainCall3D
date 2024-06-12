@@ -125,7 +125,7 @@ void CubeController::FinishRolling()
 {
 	_targetIndex++;
 	_targetIndex %= 4;
-	_board->OnEndCubeRolling();
+	_board->OnEndRolling();
 }
 
 void CubeController::Fall(float deltaSecond)

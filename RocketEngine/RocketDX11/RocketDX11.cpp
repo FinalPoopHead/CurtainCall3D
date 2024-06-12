@@ -847,7 +847,7 @@ namespace Rocket::Core
 
 	void RocketDX11::RenderTexture()
 	{
-		_spriteBatch->Begin();
+		_spriteBatch->Begin(DirectX::DX11::SpriteSortMode_FrontToBack);
 		// 이미지(UI)를 그리기 위한 함수
 		for (auto imageRenderer : _objectManager.GetImageList())
 		{
