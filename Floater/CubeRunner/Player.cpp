@@ -46,30 +46,30 @@ void Player::Update(float deltaSecond)
 	}
 
 	flt::Vector4f pos = tr.GetWorldPosition();
-	flt::Vector4f nextPos{};
+	flt::Vector4f nextPosOffset{};
 
 	flt::KeyData keyData = flt::GetKey(flt::KeyCode::w);
 	if (keyData)
 	{
-		nextPos += tr.WorldForward();
+		nextPosOffset += tr.WorldForward();
 	}
 
 	keyData = flt::GetKey(flt::KeyCode::s);
 	if (keyData)
 	{
-		nextPos += -tr.WorldForward();
+		nextPosOffset += -tr.WorldForward();
 	}
 
 	keyData = flt::GetKey(flt::KeyCode::a);
 	if (keyData)
 	{
-		nextPos += -tr.WorldRight();
+		nextPosOffset += -tr.WorldRight();
 	}
 
 	keyData = flt::GetKey(flt::KeyCode::d);
 	if (keyData)
 	{
-		nextPos += tr.WorldRight();
+		nextPosOffset += tr.WorldRight();
 	}
 
 	keyData = flt::GetKeyDown(flt::KeyCode::j);
@@ -104,53 +104,67 @@ void Player::Update(float deltaSecond)
 		// TODO : 빨리감기해제
 		_board->EndFastForward();
 	}
-	
+
 	flt::GamePadState state;
 	bool isGamePadConnected = flt::GetGamePadState(_padIndex, &state);
 	if (isGamePadConnected)
 	{
-		nextPos.z += state.lStickY;
-		nextPos.x += state.lStickX;
+		nextPosOffset.z += state.lStickY;
+		nextPosOffset.x += state.lStickX;
 
 		if (state.buttons & flt::GamePadState::ButtonFlag::UP)
 		{
-			nextPos.z += 1.0f;
+			nextPosOffset.z += 1.0f;
 		}
 		if (state.buttons & flt::GamePadState::ButtonFlag::DOWN)
 		{
-			nextPos.z -= 1.0f;
+			nextPosOffset.z -= 1.0f;
 		}
 		if (state.buttons & flt::GamePadState::ButtonFlag::LEFT)
 		{
-			nextPos.x -= 1.0f;
+			nextPosOffset.x -= 1.0f;
 		}
 		if (state.buttons & flt::GamePadState::ButtonFlag::RIGHT)
 		{
-			nextPos.x += 1.0f;
+			nextPosOffset.x += 1.0f;
 		}
 	}
 
-	if (nextPos.NormPow() > 1.0f)
+	if (nextPosOffset.NormPow() > 1.0f)
 	{
-		nextPos.Normalize();
+		nextPosOffset.Normalize();
 	}
 
-	nextPos *= _speed * deltaSecond;
-	nextPos += pos;
+	nextPosOffset *= _speed * deltaSecond;
+	flt::Vector4f nextPos = nextPosOffset + pos;
 
 	tr.LookAt(nextPos);
 
 	int tileState = _board->QueryTileState(nextPos.x, pos.z);
+	int nextTileState = _board->QueryNextTileState(nextPos.x, pos.z);
 	int blocked = BLOCKED_TILE;
-	if (tileState == (int)TileStateFlag::None || (tileState & blocked) != 0)
+
+	// 좌 우 이동
+	// 현재 상태에 이동 가능하거나 
+	// 다음 상태에 이동 가능하면 이동 가능
+	if ((tileState == (int)TileStateFlag::None)
+		|| ((tileState & blocked) && (nextTileState & blocked)))
 	{
+		// 이동 불가능할 경우에는 x값을 원래 값으로 되돌린다.
 		nextPos.x = pos.x;
-		
 	}
 
 	tileState = _board->QueryTileState(pos.x, nextPos.z);
-	if (tileState == (int)TileStateFlag::None || (tileState & blocked) != 0)
+	nextTileState = _board->QueryNextTileState(pos.x, nextPos.z);
+
+	// 상 하 이동
+	// 현재 상태에 이동이 가능하거나 
+	// 아래에 내려가는 경우에 한해서 다음 상태에 이동 가능하면 가능
+	if ((tileState == (int)TileStateFlag::None)
+		|| ((tileState & blocked) && (nextTileState & blocked))
+		|| ((tileState & blocked) && !(nextTileState & blocked) && nextPosOffset.z > 0))
 	{
+		// 이동 불가능할 경우에는 z값을 원래 값으로 되돌린다.
 		nextPos.z = pos.z;
 	}
 

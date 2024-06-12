@@ -138,6 +138,7 @@
     <ClCompile Include="AdvantageMine.cpp" />
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ControllerManager.cpp" />
     <ClCompile Include="CubeController.cpp" />
     <ClCompile Include="DarkCube.cpp" />
     <ClCompile Include="DetonatedMine.cpp" />
@@ -159,6 +160,7 @@
     <ClInclude Include="AdvantageMine.h" />
     <ClInclude Include="Board.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="ControllerManager.h" />
     <ClInclude Include="CubeController.h" />
     <ClInclude Include="DarkCube.h" />
     <ClInclude Include="DetonatedMine.h" />

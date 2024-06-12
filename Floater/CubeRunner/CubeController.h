@@ -11,7 +11,7 @@ public:
 
 	void SetBoard(Board* board) { _board = board; }
 
-	virtual void Update(float deltaSecond) override;
+	virtual void PreUpdate(float deltaSecond) override;
 	virtual void OnDisable() override;
 	void StartRolling(float rotateTime);
 	void StartFalling();
