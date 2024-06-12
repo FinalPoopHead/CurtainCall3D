@@ -24,7 +24,7 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _width(width)
 	, _height(height)
 	, _tileSize(offset)
-	, _tileState()
+	, _tileState()	
 	, _tiles()
 	, _cubeControllers()
 	, _advantageCubePool()
@@ -183,6 +183,38 @@ int Board::QueryTileState(float x, float y)
 	return _tileState[tileX][tileY];
 }
 
+int Board::QueryNextTileState(float x, float y)
+{
+	int tileX = 0;
+	int tileY = 0;
+	ConvertToTileIndex(x, y, tileX, tileY);
+
+	if (tileX < 0 || tileX >= _width)
+	{
+		return (int)TileStateFlag::None;
+	}
+	if (tileY < 0 || tileY >= _height)
+	{
+		return (int)TileStateFlag::None;
+	}
+
+	int nextTileY = tileY + 1;
+
+	if (_isRolling)
+	{
+		if (nextTileY >= _height)
+		{
+			return _tileState[tileX][tileY] & ~CUBE;
+		}
+
+		return _tileState[tileX][nextTileY] | (_tileState[tileX][nextTileY] & CUBE);
+	}
+	else
+	{
+		return _tileState[tileX][tileY];
+	}
+}
+
 bool Board::GetCenterPosition(float& x, float& y)
 {
 	float leftX = 0.0f;
@@ -299,17 +331,6 @@ void Board::TickCubesRolling(float rollingTime)
 	for (auto& cubeCtr : _cubeControllers)
 	{
 		cubeCtr->StartRolling(rollingTime);
-	}
-
-	for (int i = 0; i < _width; i++)
-	{
-		for (int j = 0; j < _height; j++)
-		{
-			if (_tileState[i][j] & CUBE)
-			{
-				_tileState[i][j] = (int)_tileState[i][j] | (int)TileStateFlag::CubeMoving;
-			}
-		}
 	}
 
 	_rollFinishCount = _cubeControllers.size();
@@ -587,7 +608,6 @@ void Board::UpdateBoard()
 		for (int j = 0; j < _height; j++)
 		{
 			_tileState[i][j] = _tileState[i][j] & ~CUBE;	// 큐브 타입만 제거
-			_tileState[i][j] = _tileState[i][j] & ~((int)TileStateFlag::CubeMoving);	// 큐브 이동 상태 제거
 
 			if (j + 1 >= _height)
 			{
