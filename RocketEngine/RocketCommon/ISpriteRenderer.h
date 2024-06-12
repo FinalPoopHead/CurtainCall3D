@@ -9,5 +9,7 @@ namespace Rocket::Core
 	public:
 		virtual void SetImage(const std::string& filePath) = 0;
 		virtual void SetColor(Color color) = 0;
+		virtual float GetWidth() = 0;
+		virtual float GetHeight() = 0;
 	};
 }

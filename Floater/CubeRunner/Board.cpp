@@ -14,6 +14,8 @@ constexpr float ROLLINGDELAY = 0.5f;	// 아무것도 하지않고 굴러갈때�
 constexpr float DETONATEDELAY = 2.0f;	// 폭파 후 딜레이
 constexpr int CUBEDAMAGE = 1;
 constexpr int DARKCUBEDAMAGE = 1;
+constexpr float FFDEFAULT = 1.0f;
+constexpr float FFVALUE = 5.0f;
 
 Board::Board(GameManager* gameManager, int playerIndex, int width, int height, float offset /*= 4.00f*/) :
 	flt::GameObject()
@@ -29,10 +31,11 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _darkCubePool()
 	, _normalCubePool()
 	, _isGameOver(false)
-	, _isStageRunning(false)
+	, _isGameStart(false)
+	, _isWaveRunning(false)
 	, _isRolling(false)
-	, _delayRemain(0.0f)
-	, _fastForwardValue(1.0f)
+	, _delayRemain(ROLLINGDELAY)
+	, _fastForwardValue(FFDEFAULT)
 	, _rollFinishCount()
 	, _minePos({ -1,-1 })
 	, _advantageMinePosList()
@@ -82,7 +85,7 @@ void Board::PreUpdate(float deltaTime)
 	/// 업데이트 순서
 	/// 1. 이동이 다 끝나면 타일 상태 업데이트
 	/// 2. 타일상태 업데이트하면서 플레이어와 겹치면 기절시키기
-	/// 3. 플레이어 위치 업데이트해서 타일상태에 기입\
+	/// 3. 플레이어 위치 업데이트해서 타일상태에 기입 TODO
 
 	// TODO : 시간 측정 말고 실제 CubeController가 회전이 끝난것들을 이벤트로 받자.
 	if (_isRolling)
@@ -95,25 +98,37 @@ void Board::PreUpdate(float deltaTime)
 		_delayRemain -= deltaTime;
 		if (_delayRemain <= 0.0f)
 		{
-			if (UpdateDetonate())
+			if (UpdateDetonate())		// 폭파 된 것이 있다면 delay 연장.
 			{
 				_delayRemain = DETONATEDELAY / _fastForwardValue;
 			}
-			else if (_isStageRunning)
+			else if (_isWaveRunning)	// 폭파 된 것이 없다면 구르기 시작.
 			{
 				_isRolling = true;
 				TickCubesRolling(ROLLINGTIME / _fastForwardValue);
 			}
 		}
+		else
+		{
+			return;
+		}
 	}
 
-	if (flt::GetKeyDown(flt::KeyCode::r))
+	if (flt::GetKeyDown(flt::KeyCode::n))
 	{
-		if (!_isStageRunning)
-		{
-			GenerateRandomStage();
-			_isStageRunning = true;
-		}
+		_isGameStart = true;
+	}
+
+	if (_isGameOver || !_isGameStart)
+	{
+		return;
+	}
+
+	if (!_isWaveRunning)
+	{
+		// TODO : 웨이브 클리어 연출 보여주고 웨이브 생성
+		GenerateRandomWave();
+		_isWaveRunning = true;
 	}
 }
 
@@ -212,16 +227,12 @@ void Board::ConvertToTilePosition(int x, int z, float& outX, float& outZ)
 	outZ += pos.z;
 }
 
-void Board::GenerateRandomStage()
+void Board::GenerateRandomWave()
 {
 	if (_isGameOver)
 	{
 		return;
 	}
-
-	std::cout << _normalCubePool.size() << std::endl;
-	std::cout << _darkCubePool.size() << std::endl;
-	std::cout << _advantageCubePool.size() << std::endl;
 
 	for (int i = 0; i < _width; ++i)
 	{
@@ -285,6 +296,17 @@ void Board::TickCubesRolling(float rollingTime)
 		cubeCtr->StartRolling(rollingTime);
 	}
 
+	for (int i = 0; i < _width; i++)
+	{
+		for (int j = 0; j < _height; j++)
+		{
+			if (_tileState[i][j] & CUBE)
+			{
+				_tileState[i][j] = (int)_tileState[i][j] | (int)TileStateFlag::CubeMoving;
+			}
+		}
+	}
+
 	_rollFinishCount = _cubeControllers.size();
 }
 
@@ -320,7 +342,8 @@ void Board::RemoveFromControllerList(CubeController* cubeCtr)
 
 	if (_cubeControllers.empty())
 	{
-		_isStageRunning = false;
+		_isWaveRunning = false;
+		_delayRemain = DETONATEDELAY;
 	}
 }
 
@@ -432,12 +455,12 @@ void Board::ReduceHPbyCubeFalling()
 
 void Board::FastForward()
 {
-	_fastForwardValue = 5.0f;
+	_fastForwardValue = FFVALUE;
 }
 
 void Board::EndFastForward()
 {
-	_fastForwardValue = 1.0f;
+	_fastForwardValue = FFDEFAULT;
 }
 
 void Board::Resize(int newWidth, int newHeight)
@@ -547,16 +570,17 @@ void Board::UpdateBoard()
 	{
 		for (int j = 0; j < _height; j++)
 		{
+			_tileState[i][j] = _tileState[i][j] & ~CUBE;	// 큐브 타입만 제거
+			_tileState[i][j] = _tileState[i][j] & ~((int)TileStateFlag::CubeMoving);	// 큐브 이동 상태 제거
+
 			if (j + 1 >= _height)
 			{
-				_tileState[i][j] = (int)_tileState[i][j] & ~CUBE;
 				_tiles[i][j]->_cube = nullptr;
 				continue;
 			}
 			else
 			{
 				// 1. 큐브 이동
-				_tileState[i][j] = (int)_tileState[i][j] & ~CUBE;		// 큐브 타입만 제거
 				_tileState[i][j] = (int)_tileState[i][j] | ((int)_tileState[i][j + 1] & CUBE);	// 큐브 타입 이동
 				_tiles[i][j]->_cube = _tiles[i][j + 1]->_cube;
 				_tiles[i][j + 1]->_cube = nullptr;

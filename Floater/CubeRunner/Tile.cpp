@@ -18,15 +18,15 @@ Tile::Tile()
 
 	_mine = flt::CreateGameObject<Mine>(false);
 	_mine->tr.SetParent(&tr);
-	_mine->tr.AddWorldPosition(0.0f, 8.0f, 0.0f);
+	_mine->tr.AddWorldPosition(0.0f, 6.0f, 0.0f);
 
 	_advantageMine = flt::CreateGameObject<AdvantageMine>(false);
 	_advantageMine->tr.SetParent(&tr);
-	_advantageMine->tr.AddWorldPosition(0.0f, 8.0f, 0.0f);
+	_advantageMine->tr.AddWorldPosition(0.0f, 6.0f, 0.0f);
 
 	_detonated = flt::CreateGameObject<DetonatedMine>(false);
 	_detonated->tr.SetParent(&tr);
-	_detonated->tr.AddWorldPosition(0.0f, 8.0f, 0.0f);
+	_detonated->tr.AddWorldPosition(0.0f, 6.0f, 0.0f);
 }
 
 Tile::~Tile()
@@ -36,22 +36,22 @@ Tile::~Tile()
 
 void Tile::OnCreate()
 {
-	std::cout << "Tile OnCreate" << std::endl;
+	//std::cout << "Tile OnCreate" << std::endl;
 }
 
 void Tile::OnEnable()
 {
-	std::cout << "Tile OnEnable" << std::endl;
+	//std::cout << "Tile OnEnable" << std::endl;
 }
 
 void Tile::OnDisable()
 {
-	std::cout << "Tile OnDisable" << std::endl;
+	//std::cout << "Tile OnDisable" << std::endl;
 }
 
 void Tile::OnDestroy()
 {
-	std::cout << "Tile OnDestroy" << std::endl;
+	//std::cout << "Tile OnDestroy" << std::endl;
 }
 
 void Tile::EnableMine()

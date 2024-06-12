@@ -89,7 +89,7 @@ void Player::Update(float deltaSecond)
 		_board->DetonateAdvantageMine();
 	}
 
-	keyData = flt::GetKey(flt::KeyCode::l);
+	keyData = flt::GetKeyDown(flt::KeyCode::l);
 	if (keyData)
 	{
 		// TODO : 빨리감기

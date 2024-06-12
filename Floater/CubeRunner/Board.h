@@ -1,4 +1,5 @@
 ﻿#pragma once
+#pragma once
 #include <list>
 #include "../FloaterGameEngine/include/EngineMinimal.h"
 
@@ -48,8 +49,7 @@ public:
 	void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
 	void ConvertToTilePosition(int x, int z, float& outX, float& outZ);
 
-	void GenerateRandomStage();
-	void TickCubesRolling(float rollingTime);			// 일괄적으로 굴리기 시작.
+	void GenerateRandomWave();
 	void BackToPool(flt::GameObject* obj);
 	void RemoveFromControllerList(CubeController* cubeCtr);
 	bool SetMine(float x, float z);			// position X,Z에 지뢰를 설치한다.
@@ -71,6 +71,7 @@ private:
 
 	void UpdateBoard();
 	bool UpdateDetonate();		// 수납된 큐브가 있으면 true 아니면 false
+	void TickCubesRolling(float rollingTime);			// 일괄적으로 굴리기 시작.
 
 private:
 	GameManager* _gameManager;
@@ -88,7 +89,8 @@ private:
 	std::list<NormalCube*> _normalCubePool;										// 노말 큐브 풀
 
 	bool _isGameOver = false;
-	bool _isStageRunning = false;
+	bool _isGameStart = false;
+	bool _isWaveRunning = false;
 	bool _isRolling = false;
 	float _delayRemain;
 	float _fastForwardValue;

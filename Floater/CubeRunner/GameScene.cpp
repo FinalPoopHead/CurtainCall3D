@@ -12,7 +12,7 @@ void GameScene::Initialize()
 	GameManager* gameManager = flt::CreateGameObject<GameManager>(true);
 	int playerIndex = 0;
 
-	Board* board1 = flt::CreateGameObject<Board>(true, gameManager, playerIndex++, 5, 10);
+	Board* board1 = flt::CreateGameObject<Board>(true, gameManager, playerIndex++, 5, 15);
 	board1->tr.SetPosition(0.0f, 0.0f, 0.0f);
 
 	Player* player1 = flt::CreateGameObject<Player>(true, board1);
@@ -20,7 +20,7 @@ void GameScene::Initialize()
 	gameManager->SetBoard(0, board1);
 	gameManager->SetPlayer(0, player1);
 
-// 	Board* board2 = flt::CreateGameObject<Board>(true, gameManager, playerIndex++, 5, 10);
+// 	Board* board2 = flt::CreateGameObject<Board>(true, gameManager, playerIndex++, 5, 15);
 // 	board2->tr.SetPosition(25.0f, 0.0f, 0.0f);
 // 
 // 	Player* player2 = flt::CreateGameObject<Player>(true, board2);
