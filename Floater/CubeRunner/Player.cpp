@@ -46,30 +46,30 @@ void Player::Update(float deltaSecond)
 	}
 
 	flt::Vector4f pos = tr.GetWorldPosition();
-	flt::Vector4f nextPos{};
+	flt::Vector4f nextPosOffset{};
 
 	flt::KeyData keyData = flt::GetKey(flt::KeyCode::w);
 	if (keyData)
 	{
-		nextPos += tr.WorldForward();
+		nextPosOffset += tr.WorldForward();
 	}
 
 	keyData = flt::GetKey(flt::KeyCode::s);
 	if (keyData)
 	{
-		nextPos += -tr.WorldForward();
+		nextPosOffset += -tr.WorldForward();
 	}
 
 	keyData = flt::GetKey(flt::KeyCode::a);
 	if (keyData)
 	{
-		nextPos += -tr.WorldRight();
+		nextPosOffset += -tr.WorldRight();
 	}
 
 	keyData = flt::GetKey(flt::KeyCode::d);
 	if (keyData)
 	{
-		nextPos += tr.WorldRight();
+		nextPosOffset += tr.WorldRight();
 	}
 
 	keyData = flt::GetKeyDown(flt::KeyCode::j);
@@ -107,34 +107,34 @@ void Player::Update(float deltaSecond)
 	bool isGamePadConnected = flt::GetGamePadState(_padIndex, &state);
 	if (isGamePadConnected)
 	{
-		nextPos.z += state.lStickY;
-		nextPos.x += state.lStickX;
+		nextPosOffset.z += state.lStickY;
+		nextPosOffset.x += state.lStickX;
 
 		if (state.buttons & flt::GamePadState::ButtonFlag::UP)
 		{
-			nextPos.z += 1.0f;
+			nextPosOffset.z += 1.0f;
 		}
 		if (state.buttons & flt::GamePadState::ButtonFlag::DOWN)
 		{
-			nextPos.z -= 1.0f;
+			nextPosOffset.z -= 1.0f;
 		}
 		if (state.buttons & flt::GamePadState::ButtonFlag::LEFT)
 		{
-			nextPos.x -= 1.0f;
+			nextPosOffset.x -= 1.0f;
 		}
 		if (state.buttons & flt::GamePadState::ButtonFlag::RIGHT)
 		{
-			nextPos.x += 1.0f;
+			nextPosOffset.x += 1.0f;
 		}
 	}
 
-	if (nextPos.NormPow() > 1.0f)
+	if (nextPosOffset.NormPow() > 1.0f)
 	{
-		nextPos.Normalize();
+		nextPosOffset.Normalize();
 	}
 
-	nextPos *= _speed * deltaSecond;
-	nextPos += pos;
+	nextPosOffset *= _speed * deltaSecond;
+	flt::Vector4f nextPos = nextPosOffset + pos;
 
 	tr.LookAt(nextPos);
 
@@ -143,13 +143,22 @@ void Player::Update(float deltaSecond)
 	if (tileState == (int)TileStateFlag::None || (tileState & blocked) != 0)
 	{
 		nextPos.x = pos.x;
-		
+
+		if (tileState != (int)TileStateFlag::CubeMoving && nextPos.x < 0.0f)
+		{
+			
+		}
 	}
 
 	tileState = _board->QueryTileState(pos.x, nextPos.z);
 	if (tileState == (int)TileStateFlag::None || (tileState & blocked) != 0)
 	{
 		nextPos.z = pos.z;
+
+		if (tileState != (int)TileStateFlag::CubeMoving)
+		{
+			
+		}
 	}
 
 	tr.SetWorldPosition(nextPos);
