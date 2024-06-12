@@ -83,11 +83,14 @@ void Board::OnDestroy()
 void Board::PreUpdate(float deltaTime)
 {
 	/// 업데이트 순서
-	/// 1. 이동이 다 끝나면 타일 상태 업데이트
-	/// 2. 타일상태 업데이트하면서 플레이어와 겹치면 기절시키기
-	/// 3. 플레이어 위치 업데이트해서 타일상태에 기입 TODO
+	/// 1. 이동이 다 끝나면 대기 및 타일 상태 업데이트 (OnEndRolling() 함수)
+	///		a. 타일 상태 업데이트
+	///		b. 큐브 수납 업데이트
+	///			b-1. 수납 큐브 없을 시 ROLLINGDELAY 만큼 대기
+	///			b-2. 수납 큐브 존재 시 DETONATEDELAY 만큼 대기
+	/// 2. 대기 시간 동안 advantageMine 추가 폭파 가능.
+	/// 3. 대기시간이 끝나면 다시 이동 시작.
 
-	// TODO : 시간 측정 말고 실제 CubeController가 회전이 끝난것들을 이벤트로 받자.
 	if (_isRolling)
 	{
 		return;
@@ -428,7 +431,7 @@ void Board::DetonateAdvantageMine()
 	}
 }
 
-void Board::OnEndCubeRolling()
+void Board::OnEndRolling()
 {
 	_rollFinishCount--;
 	if (_rollFinishCount <= 0)

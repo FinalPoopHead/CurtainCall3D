@@ -46,7 +46,7 @@ namespace Rocket::Core
 		Vector3 pos;
 
 		_worldTM.Decompose(scale, quat, pos);
-
+		
 		spriteBatch->Draw(
 			_texture->GetSRV()
 			, DirectX::XMFLOAT2(pos.x, pos.y)
