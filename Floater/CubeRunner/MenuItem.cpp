@@ -18,19 +18,24 @@ void MenuItem::SetSprite(const std::wstring& spriteName)
 	_ui->SetImage(spriteName);
 }
 
-void MenuItem::SetPosition(float pixelX, float pixelY)
+void MenuItem::SetPosition(flt::Vector2f pos)
 {
-	_ui->SetPosition(pixelX, pixelY);
+	_ui->SetPosition(pos);
 }
 
-void MenuItem::SetSize(float pixelWidth, float pixelHeight)
+flt::Vector2f MenuItem::GetPosition()
 {
-	_ui->SetSize(pixelWidth, pixelHeight);
+	return _ui->GetPosition();
 }
 
-void MenuItem::GetSize(float& pixelWidth, float& pixelHeight)
+void MenuItem::SetSize(flt::Vector2f size)
 {
-	_ui->GetSize(pixelWidth, pixelHeight);
+	_ui->SetSize(size);
+}
+
+flt::Vector2f MenuItem::GetSize()
+{
+	return _ui->GetSize();
 }
 
 void MenuItem::Select(flt::KeyCode keyCode)

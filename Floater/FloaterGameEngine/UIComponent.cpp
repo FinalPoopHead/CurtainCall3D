@@ -77,39 +77,39 @@ void flt::UIComponent::SetImage(const std::wstring& filePath)
 	}
 }
 
-void flt::UIComponent::SetPosition(float pixelX, float pixelY)
+void flt::UIComponent::SetPosition(flt::Vector2f pixelPos)
 {
-	_position = { pixelX, pixelY };
-	_gameObject->tr.SetPosition(pixelX - _size.x / 2, pixelY - _size.x / 2, 0.0f);
+	_position = pixelPos;
+	_gameObject->tr.SetPosition(_position.x - _size.x / 2, _position.y - _size.x / 2, 0.0f);
 }
 
-void flt::UIComponent::GetImageSize(float& width, float& height)
+flt::Vector2f flt::UIComponent::GetPosition()
+{
+	return _position;
+}
+
+flt::Vector2f flt::UIComponent::GetImageSize()
 {
 	int w = 0;
 	int h = 0;
 	_image->GetSize(w, h);
 
-	width = static_cast<float>(w);
-	height = static_cast<float>(h);
+	return flt::Vector2f(static_cast<float>(w), static_cast<float>(h));
 }
 
-void flt::UIComponent::GetSize(float& width, float& height)
+
+void flt::UIComponent::SetSize(flt::Vector2f imgSize)
 {
-	width = _size.x;
-	height = _size.y;
+	Vector2f currSize = GetSize();
+
+	_gameObject->tr.SetScale(imgSize.x / currSize.x, imgSize.y / currSize.y, 1.0f);
+
+	_size = imgSize;
+
+	SetPosition(_position);
 }
 
-void flt::UIComponent::SetSize(float width, float height)
+flt::Vector2f flt::UIComponent::GetSize()
 {
-	float currentWidth = 0.0f;
-	float currentHeight = 0.0f;
-
-	GetSize(currentWidth, currentHeight);
-
-	_gameObject->tr.SetScale(width / currentWidth, height / currentHeight, 1.0f);
-
-	_size.x = width;
-	_size.y = height;
-
-	SetPosition(_position.x, _position.y);
+	return _size;
 }

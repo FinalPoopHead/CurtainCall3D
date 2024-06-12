@@ -11,13 +11,14 @@ void MainMenuScene::Initialize()
 
 	MenuItem* item1 = flt::CreateGameObject<MenuItem>(true);
 	item1->SetSprite(L"../Resources/Textures/abcd.jpg");
-	item1->SetSize(100.0f, 100.0f);
+	item1->SetPosition({ 100.0f, 30.0f });
+	item1->SetSize({100.0f, 100.0f});
 	menu->AddItem(item1);
 
 	MenuItem* item2 = flt::CreateGameObject<MenuItem>(true);
 	item2->SetSprite(L"../Resources/Textures/test.jpg");
-	item2->SetPosition(100.0f, 100.0f);
-	item2->SetSize(100.0f, 100.0f);
+	item2->SetPosition({ 300.0f, 500.0f });
+	item2->SetSize({ 100.0f, 100.0f });
 	menu->AddItem(item2);
 
 	MenuSelector* selector = flt::CreateGameObject<MenuSelector>(true, menu);

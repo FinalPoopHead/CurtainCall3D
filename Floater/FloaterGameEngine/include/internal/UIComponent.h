@@ -25,10 +25,11 @@ namespace flt
 
 	public:
 		void SetImage(const std::wstring& filePath);
-		void SetPosition(float pixelX, float pixelY);
-		void GetImageSize(float& width, float& height);
-		void SetSize(float width, float height);
-		void GetSize(float& width, float& height);
+		void SetPosition(flt::Vector2f pixelPos);
+		flt::Vector2f GetPosition();
+		flt::Vector2f GetImageSize();
+		void SetSize(flt::Vector2f imgSize);
+		flt::Vector2f GetSize();
 
 	private:
 		RendererObject* _rendererObject;

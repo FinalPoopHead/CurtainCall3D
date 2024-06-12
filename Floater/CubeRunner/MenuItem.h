@@ -9,9 +9,10 @@ public:
 	~MenuItem();
 
 	void SetSprite(const std::wstring& spriteName);
-	void SetPosition(float pixelX, float pixelY);
-	void SetSize(float pixelWidth, float pixelHeight);
-	void GetSize(float& pixelWidth, float& pixelHeight);
+	void SetPosition(flt::Vector2f pos);
+	flt::Vector2f GetPosition();
+	void SetSize(flt::Vector2f size);
+	flt::Vector2f GetSize();
 	void Select(flt::KeyCode keyCode);
 
 private:

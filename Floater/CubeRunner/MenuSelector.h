@@ -10,13 +10,18 @@ class MenuSelector : public flt::GameObject
 public:
 	MenuSelector(Menu* menu);
 	void SetMenu(Menu* menu);
+	void next();
 	void Select(flt::KeyCode keyCode);
 
 protected:
 	void Update(float deltaSecond) override;
 
 private:
+	void MoveSelectedItem();
+
+private:
 	Menu* _menu;
 	MenuItem* _selectedItem;
+	flt::UIComponent* _ui;
 };
 
