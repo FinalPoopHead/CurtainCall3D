@@ -1054,8 +1054,12 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 
 		case WM_SIZE:
 		{
-			//aptoCore::Graphics::OnResize();
-			//aptoCore::Graphics::Resize(LOWORD(lParam), HIWORD(lParam));
+			int width = LOWORD(lParam);
+			int height = HIWORD(lParam);
+			for (auto& renderer : thisPtr->_rendererMap)
+			{
+				renderer.first->Resize(width, height);
+			}
 			return 0;
 		}
 		break;

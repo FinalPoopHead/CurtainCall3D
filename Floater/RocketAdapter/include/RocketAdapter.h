@@ -26,6 +26,8 @@ namespace flt
 		virtual HOBJECT RegisterObject(RendererObject& renderable);
 		virtual bool DeregisterObject(HOBJECT renderable);
 
+		virtual bool Resize(uint32 width, uint32 height);
+
 
 	private:
 		Rocket::Core::IDX11Renderer* _impl;
