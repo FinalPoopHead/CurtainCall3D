@@ -101,6 +101,12 @@
     <ClInclude Include="FlTween.h">
       <Filter>fltween</Filter>
     </ClInclude>
+    <ClInclude Include="include\internal\UIComponent.h">
+      <Filter>Component\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="Image.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -156,6 +162,12 @@
     </ClCompile>
     <ClCompile Include="FlTween.cpp">
       <Filter>fltween</Filter>
+    </ClCompile>
+    <ClCompile Include="UIComponent.cpp">
+      <Filter>Component\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Image.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

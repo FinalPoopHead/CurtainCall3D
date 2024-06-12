@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="CollisionPair.h" />
     <ClInclude Include="FlTween.h" />
+    <ClInclude Include="Image.h" />
     <ClInclude Include="include\internal\Collider.h" />
     <ClInclude Include="include\internal\BoxColliderComponent.h" />
     <ClInclude Include="include\internal\BuiltinComponent.h" />
@@ -39,6 +40,7 @@
     <ClInclude Include="include\internal\RendererNode.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SoundEngine.h" />
+    <ClInclude Include="include\internal\UIComponent.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
@@ -51,6 +53,7 @@
     <ClCompile Include="FlTween.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="Image.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="RendererNode.cpp" />
@@ -59,6 +62,7 @@
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SoundComponent.cpp" />
     <ClCompile Include="SoundEngine.cpp" />
+    <ClCompile Include="UIComponent.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
