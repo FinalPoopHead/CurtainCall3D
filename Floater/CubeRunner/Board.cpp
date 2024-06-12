@@ -14,6 +14,8 @@ constexpr float ROLLINGDELAY = 0.5f;	// 아무것도 하지않고 굴러갈때�
 constexpr float DETONATEDELAY = 2.0f;	// 폭파 후 딜레이
 constexpr int CUBEDAMAGE = 1;
 constexpr int DARKCUBEDAMAGE = 1;
+constexpr float FFDEFAULT = 1.0f;
+constexpr float FFVALUE = 5.0f;
 
 Board::Board(GameManager* gameManager, int playerIndex, int width, int height, float offset /*= 4.00f*/) :
 	flt::GameObject()
@@ -29,10 +31,11 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _darkCubePool()
 	, _normalCubePool()
 	, _isGameOver(false)
+	, _isGameStart(false)
 	, _isWaveRunning(false)
 	, _isRolling(false)
-	, _delayRemain(0.0f)
-	, _fastForwardValue(1.0f)
+	, _delayRemain(ROLLINGDELAY)
+	, _fastForwardValue(FFDEFAULT)
 	, _rollFinishCount()
 	, _minePos({ -1,-1 })
 	, _advantageMinePosList()
@@ -111,21 +114,21 @@ void Board::PreUpdate(float deltaTime)
 		}
 	}
 
+	if (flt::GetKeyDown(flt::KeyCode::n))
+	{
+		_isGameStart = true;
+	}
+
+	if (_isGameOver || !_isGameStart)
+	{
+		return;
+	}
+
 	if (!_isWaveRunning)
 	{
 		// TODO : 웨이브 클리어 연출 보여주고 웨이브 생성
 		GenerateRandomWave();
 		_isWaveRunning = true;
-	}
-
-	if (flt::GetKeyDown(flt::KeyCode::n))
-	{
-		if (!_isWaveRunning)
-		{
-			GenerateRandomWave();
-			_isWaveRunning = true;
-			_delayRemain = ROLLINGDELAY;
-		}
 	}
 }
 
@@ -302,7 +305,7 @@ void Board::TickCubesRolling(float rollingTime)
 				_tileState[i][j] = (int)_tileState[i][j] | (int)TileStateFlag::CubeMoving;
 			}
 		}
-	}	
+	}
 
 	_rollFinishCount = _cubeControllers.size();
 }
@@ -452,12 +455,12 @@ void Board::ReduceHPbyCubeFalling()
 
 void Board::FastForward()
 {
-	_fastForwardValue = 5.0f;
+	_fastForwardValue = FFVALUE;
 }
 
 void Board::EndFastForward()
 {
-	_fastForwardValue = 1.0f;
+	_fastForwardValue = FFDEFAULT;
 }
 
 void Board::Resize(int newWidth, int newHeight)

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#pragma once
 #include <list>
 #include "../FloaterGameEngine/include/EngineMinimal.h"
 
@@ -88,6 +89,7 @@ private:
 	std::list<NormalCube*> _normalCubePool;										// 노말 큐브 풀
 
 	bool _isGameOver = false;
+	bool _isGameStart = false;
 	bool _isWaveRunning = false;
 	bool _isRolling = false;
 	float _delayRemain;
