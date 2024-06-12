@@ -48,7 +48,7 @@ public:
 	void ConvertToTilePosition(int x, int z, float& outX, float& outZ);
 
 	void GenerateRandomStage();
-	void TickCubesRolling(float RollingTime);			// 일괄적으로 굴리기 시작.
+	void TickCubesRolling(float rollingTime);			// 일괄적으로 굴리기 시작.
 	void BackToPool(flt::GameObject* obj);
 	void RemoveFromControllerList(CubeController* cubeCtr);
 	bool SetMine(float x, float z);		// position X,Z에 지뢰를 설치한다.
@@ -62,7 +62,7 @@ private:
 	void ConvertToTileLocalPosition(int x, int z, float& outX, float& outZ);
 
 	void UpdateBoard();
-	void UpdateDetonate();
+	bool UpdateDetonate();		// 수납된 큐브가 있으면 true 아니면 false
 
 private:
 	GameManager* _gameManager;
@@ -82,9 +82,10 @@ private:
 	bool _isGameOver = false;
 	bool _isStageRunning = false;
 	bool _isRolling = false;
-	bool _justFinishedRolling = false;
 	bool _isDirty = false;
 	float _elapsedTime;
+	float _rollingTime;
+	float _rollingDelay;
 
 	std::pair<int,int> _minePos;
 	std::list<std::pair<int,int>> _advantageMinePosList;

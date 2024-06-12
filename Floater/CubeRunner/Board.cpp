@@ -9,7 +9,9 @@
 #include "GameManager.h"
 
 constexpr int CUBECOUNT = 64;
-constexpr float ROLLINGTIME = 1.5f;
+constexpr float ROLLINGTIME = 1.0f;
+constexpr float ROLLINGDELAY = 0.5f;	// 아무것도 하지않고 굴러갈때의 딜레이
+constexpr float DETONATEDELAY = 2.0f;	// 폭파 후 딜레이
 constexpr int CUBEDAMAGE = 1;
 constexpr int DARKCUBEDAMAGE = 1;
 
@@ -29,9 +31,9 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _isGameOver(false)
 	, _isStageRunning(false)
 	, _isRolling(false)
-	, _justFinishedRolling(false)
 	, _isDirty(false)
 	, _elapsedTime(0.0f)
+	, _rollingTime(ROLLINGTIME)
 	, _minePos({ -1,-1 })
 	, _advantageMinePosList()
 {
@@ -80,19 +82,45 @@ void Board::PreUpdate(float deltaTime)
 	/// 업데이트 순서
 	/// 1. 이동이 다 끝나면 타일 상태 업데이트
 	/// 2. 타일상태 업데이트하면서 플레이어와 겹치면 기절시키기
-	/// 3. 플레이어 위치 업데이트해서 타일상태에 기입
+	/// 3. 플레이어 위치 업데이트해서 타일상태에 기입\
 
-	if (!_isRolling && _justFinishedRolling)
+	// TODO : 시간 측정 말고 실제 CubeController가 회전이 끝난것들을 이벤트로 받자.
+	if (_isRolling)
 	{
-		_justFinishedRolling = false;
-		UpdateBoard();
+		_elapsedTime += deltaTime;
+		if (_elapsedTime >= _rollingTime)		// Rolling 끝
+		{
+			_isRolling = false;
+			_elapsedTime = 0.0f;
+			_rollingDelay = ROLLINGDELAY;
+			UpdateBoard();
+			UpdateDetonate();
+			return;
+		}
+		else
+		{
+			return;
+		}
 	}
 
-	if (!_isRolling && _isDirty)
+	if (!_isRolling)
 	{
-		_isDirty = false;
-		UpdateDetonate();
+		_rollingDelay -= deltaTime;
+		if (_rollingDelay <= 0.0f)
+		{
+			if (UpdateDetonate())
+			{
+				_rollingDelay = DETONATEDELAY;
+			}
+			else if (_isStageRunning)
+			{
+				_isRolling = true;
+				_elapsedTime = 0.0f;
+				TickCubesRolling(_rollingTime);
+			}
+		}
 	}
+
 
 	if (flt::GetKeyDown(flt::KeyCode::r))
 	{
@@ -100,28 +128,6 @@ void Board::PreUpdate(float deltaTime)
 		{
 			GenerateRandomStage();
 			_isStageRunning = true;
-		}
-	}
-
-	if (flt::GetKeyDown(flt::KeyCode::f))
-	{
-		if (!_isRolling && _isStageRunning)
-		{
-			TickCubesRolling(ROLLINGTIME);
-			_isRolling = true;
-			_justFinishedRolling = false;
-			_elapsedTime = 0.0f;
-		}
-	}
-
-	if (_isRolling)
-	{
-		_elapsedTime += deltaTime;
-		if (_elapsedTime >= ROLLINGTIME)
-		{
-			_isRolling = false;
-			_justFinishedRolling = true;
-			_elapsedTime = 0.0f;
 		}
 	}
 }
@@ -287,11 +293,11 @@ void Board::GenerateRandomStage()
 	}
 }
 
-void Board::TickCubesRolling(float RollingTime)
+void Board::TickCubesRolling(float rollingTime)
 {
 	for (auto& cubeCtr : _cubeControllers)
 	{
-		cubeCtr->StartRolling(RollingTime);
+		cubeCtr->StartRolling(rollingTime);
 	}
 }
 
@@ -550,8 +556,10 @@ void Board::UpdateBoard()
 	}
 }
 
-void Board::UpdateDetonate()
+bool Board::UpdateDetonate()
 {
+	bool result = false;
+
 	for (int i = 0; i < _width; i++)
 	{
 		for (int j = 0; j < _height; j++)
@@ -564,7 +572,7 @@ void Board::UpdateDetonate()
 				switch (cubeType)
 				{
 				case TileStateFlag::NormalCube:
-					// NormalCube 수납
+					// NormalCube 수납				
 					BackToPool(_tiles[i][j]->_cube);
 					break;
 				case TileStateFlag::DarkCube:
@@ -580,7 +588,13 @@ void Board::UpdateDetonate()
 					BackToPool(_tiles[i][j]->_cube);\
 					break;
 				default:
+					result = false;
 					break;
+				}
+
+				if ((int)cubeType)
+				{
+					result = true;
 				}
 
 				_tileState[i][j] = (int)_tileState[i][j] & ~((int)TileStateFlag::Detonate);
@@ -597,10 +611,12 @@ void Board::UpdateDetonate()
 		{
 			if (_tileState[i][j] & (int)TileStateFlag::Mine)
 			{
-				return;
+				return result;
 			}
 		}
 	}
 	_minePos.first = -1;
 	_minePos.second = -1;
+
+	return result;
 }

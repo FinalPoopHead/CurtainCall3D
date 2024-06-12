@@ -15,6 +15,7 @@ public:
 	virtual void OnDisable() override;
 	void StartRolling(float rotateTime);
 	void StartFalling();
+	bool IsRolling() { return _isRolling; }
 
 private:
 	void Roll(float deltaSecond);
