@@ -144,22 +144,18 @@ void Player::Update(float deltaSecond)
 	int blocked = BLOCKED_TILE;
 	if (tileState == (int)TileStateFlag::None || (tileState & blocked) != 0)
 	{
-		nextPos.x = pos.x;
-
-		if (tileState != (int)TileStateFlag::CubeMoving && nextPos.x < 0.0f)
+		if (!(tileState & (int)TileStateFlag::CubeMoving))
 		{
-			
+			nextPos.x = pos.x;
 		}
 	}
 
 	tileState = _board->QueryTileState(pos.x, nextPos.z);
 	if (tileState == (int)TileStateFlag::None || (tileState & blocked) != 0)
 	{
-		nextPos.z = pos.z;
-
-		if (tileState != (int)TileStateFlag::CubeMoving)
+		if (!(nextPosOffset.z < 0.0f && (tileState & (int)TileStateFlag::CubeMoving)))
 		{
-			
+			nextPos.z = pos.z;
 		}
 	}
 

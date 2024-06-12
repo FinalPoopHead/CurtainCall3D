@@ -96,6 +96,7 @@
     <ClCompile Include="Menu.cpp">
       <Filter>GameObject\UI</Filter>
     </ClCompile>
+    <ClCompile Include="ControllerManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h">
@@ -152,5 +153,6 @@
     <ClInclude Include="Menu.h">
       <Filter>GameObject\UI</Filter>
     </ClInclude>
+    <ClInclude Include="ControllerManager.h" />
   </ItemGroup>
 </Project>

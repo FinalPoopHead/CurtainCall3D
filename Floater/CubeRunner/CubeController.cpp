@@ -28,7 +28,7 @@ CubeController::~CubeController()
 
 }
 
-void CubeController::Update(float deltaSecond)
+void CubeController::PreUpdate(float deltaSecond)
 {
 	if (_isRolling)
 	{
