@@ -13,7 +13,10 @@ flt::UIComponent::UIComponent() :
 	_hObject(),
 	_isDraw(false),
 	_isRegisted(false),
-	_image(new flt::Image())
+	_image(new flt::Image()),
+	_size(0.0f, 0.0f),
+	_position(0.0f, 0.0f),
+	_zOrder(0.0f)
 {
 }
 
@@ -80,12 +83,23 @@ void flt::UIComponent::SetImage(const std::wstring& filePath)
 void flt::UIComponent::SetPosition(flt::Vector2f pixelPos)
 {
 	_position = pixelPos;
-	_gameObject->tr.SetPosition(_position.x - _size.x / 2, _position.y - _size.x / 2, 0.0f);
+	UpdatePosition();
 }
 
 flt::Vector2f flt::UIComponent::GetPosition()
 {
 	return _position;
+}
+
+void flt::UIComponent::SetZOrder(float zOrder)
+{
+	_zOrder = zOrder;
+	UpdatePosition();
+}
+
+float flt::UIComponent::GetZOrder()
+{
+	return _zOrder;
 }
 
 flt::Vector2f flt::UIComponent::GetImageSize()
@@ -106,10 +120,15 @@ void flt::UIComponent::SetSize(flt::Vector2f imgSize)
 
 	_size = imgSize;
 
-	SetPosition(_position);
+	UpdatePosition();
 }
 
 flt::Vector2f flt::UIComponent::GetSize()
 {
 	return _size;
+}
+
+void flt::UIComponent::UpdatePosition()
+{
+	_gameObject->tr.SetPosition(_position.x - _size.x / 2, _position.y - _size.x / 2, _zOrder);
 }

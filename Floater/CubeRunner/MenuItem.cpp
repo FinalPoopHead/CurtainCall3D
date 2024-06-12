@@ -28,6 +28,16 @@ flt::Vector2f MenuItem::GetPosition()
 	return _ui->GetPosition();
 }
 
+void MenuItem::SetZOrder(float zOrder)
+{
+	_ui->SetZOrder(zOrder);
+}
+
+float MenuItem::GetZOrder()
+{
+	return _ui->GetZOrder();
+}
+
 void MenuItem::SetSize(flt::Vector2f size)
 {
 	_ui->SetSize(size);

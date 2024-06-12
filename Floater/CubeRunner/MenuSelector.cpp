@@ -2,6 +2,7 @@
 #include "Menu.h"
 #include "MenuItem.h"
 #include "../FloaterGameEngine/include/Input.h"
+#include <iostream>
 
 
 MenuSelector::MenuSelector(Menu* menu) :
@@ -46,6 +47,22 @@ void MenuSelector::Update(float deltaSecond)
 	{
 		Select(flt::KeyCode::enter);
 	}
+
+	// 디버그용 코드
+	float zOrder = _selectedItem->GetZOrder();
+	if (flt::GetKey(flt::KeyCode::mouseWheelUp))
+	{
+		zOrder += 0.1f;
+		_selectedItem->SetZOrder(zOrder);
+		std::cout << "ZOrder: " << zOrder + 0.1f << std::endl;
+	}
+	if (flt::GetKey(flt::KeyCode::mouseWheelDown))
+	{
+		zOrder -= 0.1f;
+		_selectedItem->SetZOrder(zOrder);
+		std::cout << "ZOrder: " << zOrder + 0.1f << std::endl;
+	}
+
 
 }
 

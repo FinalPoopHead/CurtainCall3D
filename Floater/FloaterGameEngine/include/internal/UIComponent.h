@@ -27,9 +27,14 @@ namespace flt
 		void SetImage(const std::wstring& filePath);
 		void SetPosition(flt::Vector2f pixelPos);
 		flt::Vector2f GetPosition();
+		void SetZOrder(float zOrder);
+		float GetZOrder();
 		flt::Vector2f GetImageSize();
 		void SetSize(flt::Vector2f imgSize);
 		flt::Vector2f GetSize();
+
+	private:
+		void UpdatePosition();
 
 	private:
 		RendererObject* _rendererObject;
@@ -41,6 +46,7 @@ namespace flt
 		std::unique_ptr<Image> _image;
 		flt::Vector2f _size;
 		flt::Vector2f _position;
+		float _zOrder;
 	};
 }
 
