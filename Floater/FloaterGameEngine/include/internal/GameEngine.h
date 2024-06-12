@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "../../../FloaterUtil/include/Timer.h"
-#include <unordered_set>
+#include <unordered_map>
 #include <memory>
 
 
@@ -32,13 +32,16 @@ namespace flt
 		void Finalize();
 
 		Scene* SetScene(Scene* scene);
-		void AddScene(Scene* scene);
+		Scene* SetScene(const std::wstring& sceneName);
+		bool AddScene(const std::wstring& sceneName, Scene* scene);
 		Scene* GetCurrentScene();
 
 		IRenderer* GetRenderer();
 		PhysicsEngine* GetPhysicsEngine();
 		SoundEngine* GetSoundEngine();
 		Platform* GetPlatform();
+
+		void ExitGame();
 
 	private:
 		void ChangeScene();
@@ -57,7 +60,7 @@ namespace flt
 
 		Scene* _nextScene;
 		Scene* _currentScene;
-		std::unordered_set<Scene*> _scenes;
+		std::unordered_map<std::wstring, Scene*> _scenes;
 		Timer _timer;
 
 		Timer _fixedUpdateTimer;

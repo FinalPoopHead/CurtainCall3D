@@ -57,6 +57,7 @@
     <ClInclude Include="include\Hash.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="include\Type.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConvString.cpp">

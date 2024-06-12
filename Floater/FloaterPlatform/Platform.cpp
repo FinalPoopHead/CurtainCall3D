@@ -105,3 +105,8 @@ std::wstring flt::Platform::GetAbsPath(std::wstring relativePath)
 	std::filesystem::path a = std::filesystem::absolute(b / p);
 	return a;
 }
+
+void flt::Platform::Exit()
+{
+	_pOsImpl->Exit();
+}

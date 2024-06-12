@@ -45,6 +45,8 @@ namespace flt
 		std::wstring GetExePath();
 		std::wstring GetAbsPath(std::wstring relativePath);
 
+		void Exit();
+
 	private:
 		void UpdateKeyState();
 

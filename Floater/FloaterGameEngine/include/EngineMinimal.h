@@ -5,6 +5,8 @@
 #include "../../FloaterPlatform/include/KeyCode.h"
 #include "../../FloaterPlatform/include/GamePad.h"
 
+#include "../../FloaterUtil/include/Type.h"
+
 
 namespace flt
 {
@@ -15,7 +17,7 @@ namespace flt
 		GameEngineWrapper();
 
 		flt::Scene* GetCurrentScene();
-		void AddScene(flt::Scene* scene);
+		bool AddScene(const std::wstring& sceneName, flt::Scene* scene);
 
 		GameEngine* engine;
 	};
@@ -36,9 +38,15 @@ namespace flt
 	T* CreateScene(TArgs&&... args)
 	{
 		T* scene = new T(std::forward<TArgs>(args)...);
-		__impl::g_engine.AddScene(scene);
+		std::wstring sceneName = flt::TypeName<T>().data();
+		sceneName.resize(flt::TypeName<T>().length());
+		__impl::g_engine.AddScene(sceneName, scene);
 		return scene;
 	}
 
 	Scene* SetScene(Scene* scene);
+
+	Scene* SetScene(const std::wstring& sceneName);
+
+	void ExitGame();
 }

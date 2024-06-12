@@ -13,7 +13,10 @@ flt::UIComponent::UIComponent() :
 	_hObject(),
 	_isDraw(false),
 	_isRegisted(false),
-	_image(new flt::Image())
+	_image(new flt::Image()),
+	_size(0.0f, 0.0f),
+	_position(0.0f, 0.0f),
+	_zOrder(0.0f)
 {
 }
 
@@ -77,39 +80,55 @@ void flt::UIComponent::SetImage(const std::wstring& filePath)
 	}
 }
 
-void flt::UIComponent::SetPosition(float pixelX, float pixelY)
+void flt::UIComponent::SetPosition(flt::Vector2f pixelPos)
 {
-	_position = { pixelX, pixelY };
-	_gameObject->tr.SetPosition(pixelX - _size.x / 2, pixelY - _size.x / 2, 0.0f);
+	_position = pixelPos;
+	UpdatePosition();
 }
 
-void flt::UIComponent::GetImageSize(float& width, float& height)
+flt::Vector2f flt::UIComponent::GetPosition()
+{
+	return _position;
+}
+
+void flt::UIComponent::SetZOrder(float zOrder)
+{
+	_zOrder = zOrder;
+	UpdatePosition();
+}
+
+float flt::UIComponent::GetZOrder()
+{
+	return _zOrder;
+}
+
+flt::Vector2f flt::UIComponent::GetImageSize()
 {
 	int w = 0;
 	int h = 0;
 	_image->GetSize(w, h);
 
-	width = static_cast<float>(w);
-	height = static_cast<float>(h);
+	return flt::Vector2f(static_cast<float>(w), static_cast<float>(h));
 }
 
-void flt::UIComponent::GetSize(float& width, float& height)
+
+void flt::UIComponent::SetSize(flt::Vector2f imgSize)
 {
-	width = _size.x;
-	height = _size.y;
+	Vector2f currSize = GetSize();
+
+	_gameObject->tr.SetScale(imgSize.x / currSize.x, imgSize.y / currSize.y, 1.0f);
+
+	_size = imgSize;
+
+	UpdatePosition();
 }
 
-void flt::UIComponent::SetSize(float width, float height)
+flt::Vector2f flt::UIComponent::GetSize()
 {
-	float currentWidth = 0.0f;
-	float currentHeight = 0.0f;
+	return _size;
+}
 
-	GetSize(currentWidth, currentHeight);
-
-	_gameObject->tr.SetScale(width / currentWidth, height / currentHeight, 1.0f);
-
-	_size.x = width;
-	_size.y = height;
-
-	SetPosition(_position.x, _position.y);
+void flt::UIComponent::UpdatePosition()
+{
+	_gameObject->tr.SetPosition(_position.x - _size.x / 2, _position.y - _size.x / 2, _zOrder);
 }

@@ -10,7 +10,7 @@ class Menu : public flt::GameObject
 public:
 	void AddItem(MenuItem* item);
 	MenuItem* NextItem(MenuItem* selectedItem);
-	MenuItem* PreviousItem(MenuItem* selectedItem);
+	MenuItem* PrevItem(MenuItem* selectedItem);
 	MenuItem* FirstItem();
 
 private:
