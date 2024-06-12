@@ -4,6 +4,9 @@
 #include "Board.h"
 
 
+//TEST Include
+#include "MainMenuScene.h"
+
 Player::Player(Board* board)
 	: _board(board)
 	, _isGameOver(false)
@@ -87,27 +90,28 @@ void Player::Update(float deltaSecond)
 	}
 	
 	flt::GamePadState state;
-	if (flt::GetGamePadState(_padIndex, &state))
+	bool isGamePadConnected = flt::GetGamePadState(_padIndex, &state);
+	if (isGamePadConnected)
 	{
 		nextPos.z += state.lStickY;
 		nextPos.x += state.lStickX;
-	}
 
-	if (state.buttons & flt::GamePadState::ButtonFlag::UP)
-	{
-		nextPos.z += 1.0f;
-	}
-	if (state.buttons & flt::GamePadState::ButtonFlag::DOWN)
-	{
-		nextPos.z -= 1.0f;
-	}
-	if (state.buttons & flt::GamePadState::ButtonFlag::LEFT)
-	{
-		nextPos.x -= 1.0f;
-	}
-	if (state.buttons & flt::GamePadState::ButtonFlag::RIGHT)
-	{
-		nextPos.x += 1.0f;
+		if (state.buttons & flt::GamePadState::ButtonFlag::UP)
+		{
+			nextPos.z += 1.0f;
+		}
+		if (state.buttons & flt::GamePadState::ButtonFlag::DOWN)
+		{
+			nextPos.z -= 1.0f;
+		}
+		if (state.buttons & flt::GamePadState::ButtonFlag::LEFT)
+		{
+			nextPos.x -= 1.0f;
+		}
+		if (state.buttons & flt::GamePadState::ButtonFlag::RIGHT)
+		{
+			nextPos.x += 1.0f;
+		}
 	}
 
 	if (nextPos.NormPow() > 1.0f)
@@ -154,41 +158,48 @@ void Player::Update(float deltaSecond)
 		printf("%.3f, %.3f | %d, %d | %.3f, %.3f\n", pos.x, pos.z, tileX, tileZ, x, z);
 	}
 
-	if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
+	if (isGamePadConnected)
 	{
-		printf("A\n");
-	}
-	if (state.buttonsDown & flt::GamePadState::ButtonFlag::B)
-	{
-		printf("B\n");
-	}
-	if (state.buttonsDown & flt::GamePadState::ButtonFlag::X)
-	{
-		printf("X\n");
-	}
-	if (state.buttonsDown & flt::GamePadState::ButtonFlag::Y)
-	{
-		printf("Y\n");
+		if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
+		{
+			printf("A\n");
+		}
+		if (state.buttonsDown & flt::GamePadState::ButtonFlag::B)
+		{
+			printf("B\n");
+		}
+		if (state.buttonsDown & flt::GamePadState::ButtonFlag::X)
+		{
+			printf("X\n");
+		}
+		if (state.buttonsDown & flt::GamePadState::ButtonFlag::Y)
+		{
+			printf("Y\n");
+		}
+
+		if (state.buttonsUp & flt::GamePadState::ButtonFlag::A)
+		{
+			printf("A Up\n");
+		}
+		if (state.buttonsUp & flt::GamePadState::ButtonFlag::B)
+		{
+			printf("B Up\n");
+		}
+		if (state.buttonsUp & flt::GamePadState::ButtonFlag::X)
+		{
+			printf("X Up\n");
+		}
+		if (state.buttonsUp & flt::GamePadState::ButtonFlag::Y)
+		{
+			printf("Y Up\n");
+		}
 	}
 
-	if (state.buttonsUp & flt::GamePadState::ButtonFlag::A)
+	if (flt::GetKeyDown(flt::KeyCode::enter))
 	{
-		printf("A Up\n");
+		static MainMenuScene* scene = flt::CreateScene<MainMenuScene>();
+		flt::SetScene(scene);
 	}
-	if (state.buttonsUp & flt::GamePadState::ButtonFlag::B)
-	{
-		printf("B Up\n");
-	}
-	if (state.buttonsUp & flt::GamePadState::ButtonFlag::X)
-	{
-		printf("X Up\n");
-	}
-	if (state.buttonsUp & flt::GamePadState::ButtonFlag::Y)
-	{
-		printf("Y Up\n");
-	}
-
-
 }
 
 void Player::SetGameOver()

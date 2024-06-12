@@ -2,6 +2,16 @@
 #include "../External/include/fmod/fmod.hpp"
 
 
+flt::Sound::Sound() :
+	_path(L""),
+	_buffer(nullptr),
+	_fSound(nullptr),
+	_channel(nullptr),
+	_category(Category::NONE),
+	_isLoop(false)
+{
+}
+
 void flt::Sound::SetLoop(bool isLoop)
 {
 	_isLoop = isLoop;

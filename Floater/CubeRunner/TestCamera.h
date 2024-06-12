@@ -9,6 +9,7 @@ public:
 	TestCamera(Board* board);
 	virtual ~TestCamera() {};
 
+protected:
 	virtual void Update(float deltaSecond) override;
 
 private:

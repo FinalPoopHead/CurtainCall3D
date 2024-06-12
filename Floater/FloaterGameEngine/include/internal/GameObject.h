@@ -20,6 +20,7 @@ namespace flt
 		GameObject();
 		~GameObject();
 
+	protected:
 		// 씬에 추가되었을 때 비활성화 여부와 상관 없이 호출
 		virtual void OnCreate() {}
 		// 활성화 되었을때 호출

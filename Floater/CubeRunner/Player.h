@@ -9,9 +9,11 @@ public:
 	Player(Board* board);
 	~Player() {}
 
+protected:
 	virtual void OnEnable() override;
 	virtual void Update(float deltaSecond) override;
 
+public:
 	void SetPadIndex(int padIndex) { _padIndex = padIndex; }
 	void SetGameOver();
 

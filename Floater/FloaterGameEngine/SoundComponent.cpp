@@ -20,7 +20,7 @@ int flt::SoundComponent::AddSound(std::wstring path)
 	void* buff;
 	std::fstream file(path);
 	file.seekg(0, file.end);
-	int length = file.tellg();
+	int length = static_cast<int>(file.tellg());
 	file.seekg(0, file.beg);
 	buff = malloc(length);
 	file.read((char*)buff, length);
@@ -38,7 +38,7 @@ int flt::SoundComponent::AddSound(std::wstring path)
 
 	_sounds.push_back(sound);
 
-	return _sounds.size() - 1;
+	return (int)_sounds.size() - 1;
 }
 
 void flt::SoundComponent::Play(int index)

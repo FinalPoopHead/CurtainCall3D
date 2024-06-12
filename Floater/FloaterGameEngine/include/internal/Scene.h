@@ -38,6 +38,9 @@ namespace flt
 		void StartFrame();
 		void EndFrame();
 
+		void StartScene();
+		void EndScene();
+
 
 		std::vector<GameObject*> GetGameObjects() const { return _gameObjects; }
 		std::vector<GameObject*> GetGameObjects(const std::wstring& name) const;
@@ -76,11 +79,6 @@ namespace flt
 		gameObject->_isEnable = isEnabled;
 
 		_gameObjectsToCreate.emplace_back(gameObject);
-		//_gameObjects.emplace_back(gameObject);
-		//if (isEnabled)
-		//{
-		//	_gameObjectsToEnable.emplace_back(gameObject);
-		//}
 
 		return static_cast<T*>(gameObject);
 	}

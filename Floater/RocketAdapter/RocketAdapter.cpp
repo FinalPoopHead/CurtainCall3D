@@ -122,10 +122,6 @@ bool flt::RocketAdapter::Render(float deltaTime)
 			}
 		}
 
-
-
-
-
 		if (rkObj->spriteRenderer)
 		{
 			rkObj->spriteRenderer->SetActive(rkObj->isDraw);
@@ -269,32 +265,7 @@ bool flt::RocketAdapter::DeregisterObject(HOBJECT renderable)
 {
 	RocketObject* rocketObject = (RocketObject*)renderable;
 
-	if (rocketObject->rkModel)
-	{
-		if (0 < rocketObject->rkModel->animations.size())
-		{
-			rocketObject->renderer->Destroy();
-		}
-		else
-		{
-			rocketObject->staticModelRenderer->Destroy();
-		}
-	}
 
-	if (rocketObject->spriteRenderer)
-	{
-		rocketObject->spriteRenderer->Destroy();
-	}
-
-	if (rocketObject->textRenderer)
-	{
-		rocketObject->textRenderer->Destroy();
-	}
-
-	if (rocketObject->camera)
-	{
-		rocketObject->camera->Destroy();
-	}
 
 	auto iter = _objects.find(rocketObject);
 
@@ -303,6 +274,7 @@ bool flt::RocketAdapter::DeregisterObject(HOBJECT renderable)
 		return false;
 	}
 
+	delete rocketObject;
 	_objects.erase(iter);
 	return true;
 }

@@ -18,8 +18,15 @@
 #pragma comment(lib, "../External/lib/x64/release/assimp-vc143-mt.lib")
 #endif
 
+flt::AssimpLoader::~AssimpLoader()
+{
+	ClearPrivateData();
+}
+
 void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene)
 {
+	ClearPrivateData();
+
 	ASSERT(outRawScene, "outRawScene is nullptr");
 
 	Assimp::Importer importer;
@@ -42,7 +49,6 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 	size_t pos = path.find_last_of('\\');
 	std::wstring directory = ToWstring(path.substr(0, pos + 1));
 
-	ClearPrivateData();
 	SetAINodeMapRecursive(assimpScene->mRootNode);
 
 	// 데이터 로드 전 벡터 등 크기 조절
@@ -651,6 +657,7 @@ int flt::AssimpLoader::CalcAINodeCountRecursive(aiNode* pNode)
 void flt::AssimpLoader::ClearPrivateData()
 {
 	_aiNodeMap.clear();
+	// 밖으로 전달할 포인터를 저장하기에 delete하지 않음
 	_RawNodeMap.clear();
 	_boneIndexMap.clear();
 	_skeletonMap.clear();

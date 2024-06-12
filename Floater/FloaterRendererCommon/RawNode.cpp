@@ -19,10 +19,10 @@ flt::RawNode::RawNode(const std::wstring& name) :
 
 flt::RawNode::~RawNode()
 {
-	//delete animation;
-	//delete camera;
-	//delete skeleton;
-	//delete animation;
+	delete skeleton;
+	delete animationClip;
+	delete camera;
+	delete light;
 
 	for (auto& child : children)
 	{

@@ -30,6 +30,12 @@ namespace flt
 			for (int i = 0; i < MAX_TEXTURES; ++i)
 			{
 				textures[i] = new(std::nothrow) RawTexture();
+
+				if (!textures[i])
+				{
+					ASSERT(false, "Failed to allocate memory for RawTexture");
+					continue;
+				}
 			}
 		}
 		RawMaterial(const RawMaterial& other) :
@@ -63,13 +69,7 @@ namespace flt
 			name = other.name;
 			for (int i = 0; i < MAX_TEXTURES; ++i)
 			{
-				textures[i] = new(std::nothrow) RawTexture();
-
-				if (!textures[i])
-				{
-					ASSERT(false, "Failed to allocate memory for RawTexture");
-					continue;
-				}
+				ASSERT(textures[i], "texture is nullptr");
 				textures[i]->name = other.textures[i]->name;
 				textures[i]->path = other.textures[i]->path;
 			}

@@ -11,8 +11,10 @@ public:
 	GameManager();
 	~GameManager();
 
+protected:
 	virtual void PostUpdate(float deltaSecond) override;
 
+public:
 	void SetPlayer(int index, Player* player);	// [0] : player1 , [1] : player2
 	void SetBoard(int index, Board* board);		// [0] : player1 , [1] : player2
 

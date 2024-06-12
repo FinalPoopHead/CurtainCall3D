@@ -2,8 +2,25 @@
 
 namespace flt
 {
-	class bezier
+	class Bezier
 	{
+	public:
+
+	private:
+	};
+
+	class QuadraticBezier : public Bezier
+	{
+	public:
+
+	private:
+	};
+
+	class CubicBezier : public Bezier
+	{
+	public:
+
+	private:
 	};
 }
 

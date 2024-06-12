@@ -20,6 +20,7 @@ namespace flt
 	public:
 		enum Category
 		{
+			NONE,
 			BGM,
 			Effect,
 			Voice,
@@ -34,6 +35,8 @@ namespace flt
 			"Voice",
 			"MASTER"
 		};
+
+		Sound();
 
 		void SetLoop(bool isLoop);
 		bool IsLoop() const;

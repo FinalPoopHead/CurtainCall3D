@@ -13,6 +13,7 @@ namespace flt
 	{
 	public:
 		CameraComponent();
+		~CameraComponent();
 
 		virtual void OnCreate() override;
 		virtual void OnEnable() override;

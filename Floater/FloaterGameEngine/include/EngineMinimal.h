@@ -2,6 +2,9 @@
 #include "./internal/Scene.h"
 #include "./internal/GameObject.h"
 #include "./internal/BuiltinComponent.h"
+#include "../../FloaterPlatform/include/KeyCode.h"
+#include "../../FloaterPlatform/include/GamePad.h"
+
 
 namespace flt
 {

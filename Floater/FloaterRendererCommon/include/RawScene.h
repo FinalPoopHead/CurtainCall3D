@@ -10,7 +10,5 @@ namespace flt
 	struct RawScene
 	{
 		std::vector<RawNode*> nodes;
-		//std::vector<RawMaterial*> materials;
-		//std::vector<RawMesh*> meshes;
 	};
 }

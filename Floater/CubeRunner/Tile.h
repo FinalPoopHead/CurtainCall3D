@@ -7,11 +7,13 @@ public:
 	Tile();
 	virtual ~Tile();
 
+protected:
 	virtual void OnCreate() override;
 	virtual void OnEnable() override;
 	virtual void OnDisable() override;
 	virtual void OnDestroy() override;
 
+public:
 	void EnableMine();
 	void DisableMine();
 

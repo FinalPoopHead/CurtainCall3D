@@ -19,6 +19,8 @@ namespace flt
 	class AssimpLoader
 	{
 	public:
+		~AssimpLoader();
+
 		void Load(const std::wstring& filePath, RawScene* outRawScene);
 
 	private:
