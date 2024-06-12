@@ -1024,6 +1024,19 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 		}
 		break;
 
+		case WM_SETCURSOR:
+		{
+			if (LOWORD(lParam) == HTCLIENT)
+			{
+				// 커서 숨기기
+				//SetCursor(NULL);
+
+				// 커서를 기본으로 변경
+				SetCursor(LoadCursor(NULL, IDC_ARROW));
+			}
+		}
+		break;
+
 		case WM_ACTIVATE:
 		{
 			if (LOWORD(wParam) == WA_INACTIVE)
