@@ -52,10 +52,12 @@ public:
 	void GenerateRandomWave();
 	void BackToPool(flt::GameObject* obj);
 	void RemoveFromControllerList(CubeController* cubeCtr);
-	bool SetMine(float x, float z);			// position X,Z에 지뢰를 설치한다.
+	void SetMine(float x, float z);			// position X,Z에 지뢰를 설치한다.
 	void DetonateMine();					// 지뢰를 폭파시킨다.
 	void DetonateAdvantageMine();			// 어드밴티지 지뢰를 폭파시킨다.
 	void OnEndRolling();					// 큐브 1개가 rolling 끝나면 호출할 함수.
+
+	bool IsMineSet();
 
 	void SetGameOver();
 	void ReduceHPbyCubeFalling();

@@ -239,8 +239,10 @@ void Board::GenerateRandomWave()
 
 	for (int i = 0; i < _width; ++i)
 	{
+		if (i == _width / 2) continue;		// TEST 한 줄 비우기 위함
 		for (int j = _height - 1; j > _height - _width - 2; --j)
 		{
+			if (j == _height - _width / 2 - 1) continue;	// TEST 한 줄 비우기 위함
 			int randValue = rand() % 3;
 
 			float x = _tiles[i][j]->tr.GetWorldPosition().x;
@@ -350,16 +352,16 @@ void Board::RemoveFromControllerList(CubeController* cubeCtr)
 	}
 }
 
-bool Board::SetMine(float x, float z)
+void Board::SetMine(float x, float z)
 {
 	if (_isGameOver)
 	{
-		return false;
+		return;
 	}
 
 	if (_minePos.first != -1 && _minePos.second != -1)
 	{
-		return false;
+		return;
 	}
 
 	int tileX = 0;
@@ -373,7 +375,7 @@ bool Board::SetMine(float x, float z)
 	if (_tileState[tileX][tileZ] & (int)TileStateFlag::AdvantageMine
 		|| _tileState[tileX][tileZ] & (int)TileStateFlag::Mine)
 	{
-		return false;
+		return;
 	}
 
 	_tileState[tileX][tileZ] = (int)_tileState[tileX][tileZ] | (int)TileStateFlag::Mine;
@@ -381,7 +383,6 @@ bool Board::SetMine(float x, float z)
 	_tiles[tileX][tileZ]->EnableMine();
 
 	_minePos = { tileX, tileZ };
-	return true;
 }
 
 void Board::DetonateMine()
@@ -392,6 +393,12 @@ void Board::DetonateMine()
 	}
 
 	auto& [x, y] = _minePos;
+
+	if (x < 0 || x >= _width || y < 0 || y >= _height)
+	{
+		return;
+	}
+
 	_tiles[x][y]->DisableMine();
 	_tiles[x][y]->EnableDetonated();
 	_tileState[x][y] = (int)_tileState[x][y] & ~((int)TileStateFlag::Mine);
@@ -444,6 +451,12 @@ void Board::OnEndRolling()
 			_delayRemain = DETONATEDELAY / _fastForwardValue;
 		}
 	}
+}
+
+bool Board::IsMineSet()
+{
+	auto& [x, y] = _minePos;
+	return x != -1 && y != -1;
 }
 
 void Board::SetGameOver()
@@ -630,8 +643,8 @@ bool Board::UpdateDetonate()
 					_tileState[i][j] = _tileState[i][j] | (int)TileStateFlag::AdvantageMine;
 					_tiles[i][j]->EnableAdvantageMine();
 					_advantageMinePosList.push_back({ i,j });
-					BackToPool(_tiles[i][j]->_cube); \
-						break;
+					BackToPool(_tiles[i][j]->_cube);
+					break;
 				default:
 					break;
 				}

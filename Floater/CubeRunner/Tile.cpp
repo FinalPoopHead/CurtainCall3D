@@ -16,17 +16,19 @@ Tile::Tile()
 	renderer->SetFilePath(filePath);
 	renderer->SetMaterial(0, L"../Resources/Textures/NormalCube.png", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
 
+	float coneHeight = 8.0f;
+
 	_mine = flt::CreateGameObject<Mine>(false);
 	_mine->tr.SetParent(&tr);
-	_mine->tr.AddWorldPosition(0.0f, 6.0f, 0.0f);
+	_mine->tr.AddWorldPosition(0.0f, coneHeight, 0.0f);
 
 	_advantageMine = flt::CreateGameObject<AdvantageMine>(false);
 	_advantageMine->tr.SetParent(&tr);
-	_advantageMine->tr.AddWorldPosition(0.0f, 6.0f, 0.0f);
+	_advantageMine->tr.AddWorldPosition(0.0f, coneHeight, 0.0f);
 
 	_detonated = flt::CreateGameObject<DetonatedMine>(false);
 	_detonated->tr.SetParent(&tr);
-	_detonated->tr.AddWorldPosition(0.0f, 6.0f, 0.0f);
+	_detonated->tr.AddWorldPosition(0.0f, coneHeight, 0.0f);
 }
 
 Tile::~Tile()
