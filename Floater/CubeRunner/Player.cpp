@@ -48,31 +48,31 @@ void Player::Update(float deltaSecond)
 	flt::Vector4f pos = tr.GetWorldPosition();
 	flt::Vector4f nextPos{};
 
-	flt::KeyData keyData = flt::GetKey(flt::KeyCode::i);
+	flt::KeyData keyData = flt::GetKey(flt::KeyCode::w);
 	if (keyData)
 	{
 		nextPos += tr.WorldForward();
 	}
 
-	keyData = flt::GetKey(flt::KeyCode::k);
+	keyData = flt::GetKey(flt::KeyCode::s);
 	if (keyData)
 	{
 		nextPos += -tr.WorldForward();
 	}
 
-	keyData = flt::GetKey(flt::KeyCode::j);
+	keyData = flt::GetKey(flt::KeyCode::a);
 	if (keyData)
 	{
 		nextPos += -tr.WorldRight();
 	}
 
-	keyData = flt::GetKey(flt::KeyCode::l);
+	keyData = flt::GetKey(flt::KeyCode::d);
 	if (keyData)
 	{
 		nextPos += tr.WorldRight();
 	}
 
-	keyData = flt::GetKeyDown(flt::KeyCode::spacebar);
+	keyData = flt::GetKeyDown(flt::KeyCode::j);
 	if (keyData)
 	{
 		bool isSetSuccess = _board->SetMine(pos.x, pos.z);
@@ -83,10 +83,24 @@ void Player::Update(float deltaSecond)
 		}
 	}
 
-	keyData = flt::GetKeyDown(flt::KeyCode::enter);
+	keyData = flt::GetKeyDown(flt::KeyCode::k);
 	if (keyData)
 	{
 		_board->DetonateAdvantageMine();
+	}
+
+	keyData = flt::GetKey(flt::KeyCode::l);
+	if (keyData)
+	{
+		// TODO : 빨리감기
+		_board->FastForward();
+	}
+
+	keyData = flt::GetKeyUp(flt::KeyCode::l);
+	if (keyData)
+	{
+		// TODO : 빨리감기해제
+		_board->EndFastForward();
 	}
 	
 	flt::GamePadState state;

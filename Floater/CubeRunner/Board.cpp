@@ -31,9 +31,9 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _isGameOver(false)
 	, _isStageRunning(false)
 	, _isRolling(false)
-	, _isDirty(false)
-	, _elapsedTime(0.0f)
-	, _rollingTime(ROLLINGTIME)
+	, _delayRemain(0.0f)
+	, _fastForwardValue(1.0f)
+	, _rollFinishCount()
 	, _minePos({ -1,-1 })
 	, _advantageMinePosList()
 {
@@ -87,40 +87,25 @@ void Board::PreUpdate(float deltaTime)
 	// TODO : 시간 측정 말고 실제 CubeController가 회전이 끝난것들을 이벤트로 받자.
 	if (_isRolling)
 	{
-		_elapsedTime += deltaTime;
-		if (_elapsedTime >= _rollingTime)		// Rolling 끝
-		{
-			_isRolling = false;
-			_elapsedTime = 0.0f;
-			_rollingDelay = ROLLINGDELAY;
-			UpdateBoard();
-			UpdateDetonate();
-			return;
-		}
-		else
-		{
-			return;
-		}
+		return;
 	}
 
 	if (!_isRolling)
 	{
-		_rollingDelay -= deltaTime;
-		if (_rollingDelay <= 0.0f)
+		_delayRemain -= deltaTime;
+		if (_delayRemain <= 0.0f)
 		{
 			if (UpdateDetonate())
 			{
-				_rollingDelay = DETONATEDELAY;
+				_delayRemain = DETONATEDELAY / _fastForwardValue;
 			}
 			else if (_isStageRunning)
 			{
 				_isRolling = true;
-				_elapsedTime = 0.0f;
-				TickCubesRolling(_rollingTime);
+				TickCubesRolling(ROLLINGTIME / _fastForwardValue);
 			}
 		}
 	}
-
 
 	if (flt::GetKeyDown(flt::KeyCode::r))
 	{
@@ -299,6 +284,8 @@ void Board::TickCubesRolling(float rollingTime)
 	{
 		cubeCtr->StartRolling(rollingTime);
 	}
+
+	_rollFinishCount = _cubeControllers.size();
 }
 
 void Board::BackToPool(flt::GameObject* obj)
@@ -308,7 +295,6 @@ void Board::BackToPool(flt::GameObject* obj)
 	{
 		auto normalCube = dynamic_cast<NormalCube*>(obj);
 		_normalCubePool.push_back(normalCube);
-		_gameManager->ReduceHP(_playerIndex, CUBEDAMAGE);
 	}
 	else if (temp.compare(typeid(DarkCube).name()) == 0)
 	{
@@ -319,7 +305,6 @@ void Board::BackToPool(flt::GameObject* obj)
 	{
 		auto advantageCube = dynamic_cast<AdvantageCube*>(obj);
 		_advantageCubePool.push_back(advantageCube);
-		_gameManager->ReduceHP(_playerIndex, CUBEDAMAGE);
 	}
 	else
 	{
@@ -351,13 +336,19 @@ bool Board::SetMine(float x, float z)
 		return false;
 	}
 
-	_isDirty = true;
 	int tileX = 0;
 	int tileZ = 0;
 	ConvertToTileIndex(x, z, tileX, tileZ);
 
 	ASSERT(tileX >= 0 && tileX < _width, "Out of Range");
 	ASSERT(tileZ >= 0 && tileZ < _height, "Out of Range");
+
+	// 해당 위치에 이미 지뢰가 설치되어 있다면 설치하지 않는다.
+	if (_tileState[tileX][tileZ] & (int)TileStateFlag::AdvantageMine
+		|| _tileState[tileX][tileZ] & (int)TileStateFlag::Mine)
+	{
+		return false;
+	}
 
 	_tileState[tileX][tileZ] = (int)_tileState[tileX][tileZ] | (int)TileStateFlag::Mine;
 
@@ -374,8 +365,7 @@ void Board::DetonateMine()
 		return;
 	}
 
-	auto&[x,y] = _minePos;
-	_isDirty = true;
+	auto& [x, y] = _minePos;
 	_tiles[x][y]->DisableMine();
 	_tiles[x][y]->EnableDetonated();
 	_tileState[x][y] = (int)_tileState[x][y] & ~((int)TileStateFlag::Mine);
@@ -388,8 +378,6 @@ void Board::DetonateAdvantageMine()
 	{
 		return;
 	}
-
-	_isDirty = true;
 
 	while (!_advantageMinePosList.empty())
 	{
@@ -417,9 +405,39 @@ void Board::DetonateAdvantageMine()
 	}
 }
 
+void Board::OnEndCubeRolling()
+{
+	_rollFinishCount--;
+	if (_rollFinishCount <= 0)
+	{
+		_isRolling = false;
+		_delayRemain = ROLLINGDELAY / _fastForwardValue;
+		UpdateBoard();
+		if (UpdateDetonate())
+		{
+			_delayRemain = DETONATEDELAY / _fastForwardValue;
+		}
+	}
+}
+
 void Board::SetGameOver()
 {
 	_isGameOver = true;
+}
+
+void Board::ReduceHPbyCubeFalling()
+{
+	_gameManager->ReduceHP(_playerIndex, CUBEDAMAGE);
+}
+
+void Board::FastForward()
+{
+	_fastForwardValue = 5.0f;
+}
+
+void Board::EndFastForward()
+{
+	_fastForwardValue = 1.0f;
 }
 
 void Board::Resize(int newWidth, int newHeight)
@@ -585,10 +603,9 @@ bool Board::UpdateDetonate()
 					_tileState[i][j] = _tileState[i][j] | (int)TileStateFlag::AdvantageMine;
 					_tiles[i][j]->EnableAdvantageMine();
 					_advantageMinePosList.push_back({ i,j });
-					BackToPool(_tiles[i][j]->_cube);\
-					break;
+					BackToPool(_tiles[i][j]->_cube); \
+						break;
 				default:
-					result = false;
 					break;
 				}
 

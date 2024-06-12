@@ -2,7 +2,7 @@
 #include "Player.h"
 #include "Board.h"
 
-constexpr int MAXHP = 10;
+constexpr int MAXHP = 10000;
 constexpr int PLAYERCOUNT = 2;
 
 GameManager::GameManager() :
