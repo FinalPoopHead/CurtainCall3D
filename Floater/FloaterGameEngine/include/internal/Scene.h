@@ -34,7 +34,8 @@ namespace flt
 		void PrePhysicsUpdate();
 		void PostPhysicsUpdate();
 		void Update(float deltaSecond);
-		void EndRender();
+		void PreRender();
+		void PostRender();
 		void StartFrame();
 		void EndFrame();
 

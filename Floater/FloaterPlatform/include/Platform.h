@@ -12,6 +12,7 @@
 #include "GamePad.h"
 #include "EnumType.h"
 #include "../FloaterRendererCommon/include/IRenderer.h"
+#include "../FloaterUtil/include/FloaterType.h"
 #include "../FloaterMath/include/Vector2f.h"
 
 

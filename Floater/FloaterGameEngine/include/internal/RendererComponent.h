@@ -22,7 +22,7 @@ namespace flt
 		virtual void OnEnable() override;
 		virtual void OnDisable() override;
 		virtual void Update(float deltaSecond) override;
-		virtual void EndDraw() override;
+		virtual void PostRender() override;
 		//void virtual OnDisable() override;
 		virtual void OnDestroy() override;
 

@@ -13,7 +13,8 @@ void MainMenuScene::Initialize()
 	menu->AddItem(item1);
 
 	item1->SetSprite(L"../Resources/Sprites/abcd.jpg");
-	item1->SetPosition({ 1000.0f, 400.0f });
+	//item1->SetPosition({ 1000.0f, 400.0f });
+	item1->SetOffsetPosition({ 0.75f, 0.65f });
 	item1->SetSize({100.0f, 80.0f});
 
 	item1->SetSelectFunc([]() { flt::SetScene(L"class GameScene"); });
@@ -23,7 +24,8 @@ void MainMenuScene::Initialize()
 	menu->AddItem(item2);
 
 	item2->SetSprite(L"../Resources/Sprites/test.jpg");
-	item2->SetPosition({ 1000.0f, 500.0f });
+	//item2->SetPosition({ 1000.0f, 500.0f });
+	item2->SetOffsetPosition({ 0.75f, 0.8f });
 	item2->SetSize({ 100.0f, 80.0f });
 
 	item2->SetSelectFunc([]() { flt::ExitGame(); });

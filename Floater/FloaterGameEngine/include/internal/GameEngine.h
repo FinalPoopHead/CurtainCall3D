@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "../../../FloaterUtil/include/Timer.h"
+#include "../../../FloaterMath/include/Vector2f.h"
 #include <unordered_map>
 #include <memory>
 
@@ -35,6 +36,8 @@ namespace flt
 		Scene* SetScene(const std::wstring& sceneName);
 		bool AddScene(const std::wstring& sceneName, Scene* scene);
 		Scene* GetCurrentScene();
+
+		Vector2f GetWindowSize();
 
 		IRenderer* GetRenderer();
 		PhysicsEngine* GetPhysicsEngine();
