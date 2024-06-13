@@ -10,6 +10,7 @@
 Player::Player(Board* board)
 	: _board(board)
 	, _isGameOver(false)
+	, _isCrushed(false)
 	, _padIndex(-1)
 	, _speed(10.0f)
 {
@@ -89,18 +90,6 @@ void Player::Update(float deltaSecond)
 	if (keyData)
 	{
 		_board->DetonateAdvantageMine();
-	}
-
-	keyData = flt::GetKeyDown(flt::KeyCode::l);
-	if (keyData)
-	{
-		_board->FastForward();
-	}
-
-	keyData = flt::GetKeyUp(flt::KeyCode::l);
-	if (keyData)
-	{
-		_board->EndFastForward();
 	}
 
 	flt::GamePadState state;

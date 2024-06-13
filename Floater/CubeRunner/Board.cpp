@@ -90,6 +90,18 @@ void Board::PreUpdate(float deltaTime)
 	///			b-2. 수납 큐브 존재 시 DETONATEDELAY 만큼 대기
 	/// 2. 대기 시간 동안 advantageMine 추가 폭파 가능.
 	/// 3. 대기시간이 끝나면 다시 이동 시작.
+	
+	flt::KeyData keyData = flt::GetKeyDown(flt::KeyCode::l);
+	if (keyData)
+	{
+		FastForward();
+	}
+
+	keyData = flt::GetKeyUp(flt::KeyCode::l);
+	if (keyData)
+	{
+		EndFastForward();
+	}
 
 	if (_isRolling)
 	{
@@ -98,17 +110,17 @@ void Board::PreUpdate(float deltaTime)
 
 	if (!_isRolling)
 	{
-		_delayRemain -= deltaTime;
+		_delayRemain -= deltaTime * _fastForwardValue;
 		if (_delayRemain <= 0.0f)
 		{
 			if (UpdateDetonate())		// 폭파 된 것이 있다면 delay 연장.
 			{
-				_delayRemain = DETONATEDELAY / _fastForwardValue;
+				_delayRemain = DETONATEDELAY;
 			}
 			else if (_isWaveRunning)	// 폭파 된 것이 없다면 구르기 시작.
 			{
 				_isRolling = true;
-				TickCubesRolling(ROLLINGTIME / _fastForwardValue);
+				TickCubesRolling(ROLLINGTIME);
 			}
 		}
 		else
@@ -333,7 +345,7 @@ void Board::TickCubesRolling(float rollingTime)
 		cubeCtr->StartRolling(rollingTime);
 	}
 
-	_rollFinishCount = _cubeControllers.size();
+	_rollFinishCount = (int)_cubeControllers.size();
 }
 
 void Board::BackToPool(flt::GameObject* obj)
@@ -465,11 +477,11 @@ void Board::OnEndRolling()
 	if (_rollFinishCount <= 0)
 	{
 		_isRolling = false;
-		_delayRemain = ROLLINGDELAY / _fastForwardValue;
+		_delayRemain = ROLLINGDELAY;
 		UpdateBoard();
 		if (UpdateDetonate())
 		{
-			_delayRemain = DETONATEDELAY / _fastForwardValue;
+			_delayRemain = DETONATEDELAY;
 		}
 	}
 }
