@@ -143,6 +143,8 @@
     <ClCompile Include="DarkCube.cpp" />
     <ClCompile Include="DetonatedMine.cpp" />
     <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="HPSlot.cpp" />
+    <ClCompile Include="HPValue.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="MainMenuScene.cpp" />
@@ -166,6 +168,8 @@
     <ClInclude Include="DetonatedMine.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="GameManager.h" />
+    <ClInclude Include="HPSlot.h" />
+    <ClInclude Include="HPValue.h" />
     <ClInclude Include="MainMenuScene.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="MenuItem.h" />

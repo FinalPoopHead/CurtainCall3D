@@ -20,6 +20,7 @@ public:
 private:
 	Board* _board;
 	bool _isGameOver;
+	bool _isCrushed;
 	int _padIndex;
 	float _speed;
 };

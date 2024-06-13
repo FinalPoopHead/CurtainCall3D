@@ -10,6 +10,7 @@
 Player::Player(Board* board)
 	: _board(board)
 	, _isGameOver(false)
+	, _isCrushed(false)
 	, _padIndex(-1)
 	, _speed(10.0f)
 {
@@ -72,8 +73,11 @@ void Player::Update(float deltaSecond)
 		nextPosOffset += tr.WorldRight();
 	}
 
+	// TODO : 현재 깔린상태가 아니라 내가 갈곳을 못 갈 경우에 _isCrushed를 true로 설정되므로 의도치 않게 동작을 못하게 된다.
+	//			따라서 잠시 취소
+	_isCrushed = false; //임시
 	keyData = flt::GetKeyDown(flt::KeyCode::j);
-	if (keyData)
+	if (keyData && !_isCrushed)
 	{
 		if (!_board->IsMineSet())
 		{
@@ -86,23 +90,9 @@ void Player::Update(float deltaSecond)
 	}
 
 	keyData = flt::GetKeyDown(flt::KeyCode::k);
-	if (keyData)
+	if (keyData && !_isCrushed)
 	{
 		_board->DetonateAdvantageMine();
-	}
-
-	keyData = flt::GetKeyDown(flt::KeyCode::l);
-	if (keyData)
-	{
-		// TODO : 빨리감기
-		_board->FastForward();
-	}
-
-	keyData = flt::GetKeyUp(flt::KeyCode::l);
-	if (keyData)
-	{
-		// TODO : 빨리감기해제
-		_board->EndFastForward();
 	}
 
 	flt::GamePadState state;
@@ -144,6 +134,8 @@ void Player::Update(float deltaSecond)
 	int nextTileState = _board->QueryNextTileState(nextPos.x, pos.z);
 	int blocked = BLOCKED_TILE;
 
+	_isCrushed = false;
+
 	// 좌 우 이동
 	// 현재 상태에 이동 가능하거나 
 	// 다음 상태에 이동 가능하면 이동 가능
@@ -152,6 +144,7 @@ void Player::Update(float deltaSecond)
 	{
 		// 이동 불가능할 경우에는 x값을 원래 값으로 되돌린다.
 		nextPos.x = pos.x;
+		_isCrushed = true;
 	}
 
 	tileState = _board->QueryTileState(pos.x, nextPos.z);
@@ -166,6 +159,7 @@ void Player::Update(float deltaSecond)
 	{
 		// 이동 불가능할 경우에는 z값을 원래 값으로 되돌린다.
 		nextPos.z = pos.z;
+		_isCrushed = true;
 	}
 
 	tr.SetWorldPosition(nextPos);

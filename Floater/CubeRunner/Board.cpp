@@ -15,7 +15,7 @@ constexpr float DETONATEDELAY = 2.0f;	// 폭파 후 딜레이
 constexpr int CUBEDAMAGE = 1;
 constexpr int DARKCUBEDAMAGE = 1;
 constexpr float FFDEFAULT = 1.0f;
-constexpr float FFVALUE = 5.0f;
+constexpr float FFVALUE = 8.0f;
 
 Board::Board(GameManager* gameManager, int playerIndex, int width, int height, float offset /*= 4.00f*/) :
 	flt::GameObject()
@@ -90,6 +90,18 @@ void Board::PreUpdate(float deltaTime)
 	///			b-2. 수납 큐브 존재 시 DETONATEDELAY 만큼 대기
 	/// 2. 대기 시간 동안 advantageMine 추가 폭파 가능.
 	/// 3. 대기시간이 끝나면 다시 이동 시작.
+	
+	flt::KeyData keyData = flt::GetKeyDown(flt::KeyCode::l);
+	if (keyData)
+	{
+		FastForward();
+	}
+
+	keyData = flt::GetKeyUp(flt::KeyCode::l);
+	if (keyData)
+	{
+		EndFastForward();
+	}
 
 	if (_isRolling)
 	{
@@ -98,17 +110,17 @@ void Board::PreUpdate(float deltaTime)
 
 	if (!_isRolling)
 	{
-		_delayRemain -= deltaTime;
+		_delayRemain -= deltaTime * _fastForwardValue;
 		if (_delayRemain <= 0.0f)
 		{
 			if (UpdateDetonate())		// 폭파 된 것이 있다면 delay 연장.
 			{
-				_delayRemain = DETONATEDELAY / _fastForwardValue;
+				_delayRemain = DETONATEDELAY;
 			}
 			else if (_isWaveRunning)	// 폭파 된 것이 없다면 구르기 시작.
 			{
 				_isRolling = true;
-				TickCubesRolling(ROLLINGTIME / _fastForwardValue);
+				TickCubesRolling(ROLLINGTIME);
 			}
 		}
 		else
@@ -333,7 +345,7 @@ void Board::TickCubesRolling(float rollingTime)
 		cubeCtr->StartRolling(rollingTime);
 	}
 
-	_rollFinishCount = _cubeControllers.size();
+	_rollFinishCount = (int)_cubeControllers.size();
 }
 
 void Board::BackToPool(flt::GameObject* obj)
@@ -465,11 +477,11 @@ void Board::OnEndRolling()
 	if (_rollFinishCount <= 0)
 	{
 		_isRolling = false;
-		_delayRemain = ROLLINGDELAY / _fastForwardValue;
+		_delayRemain = ROLLINGDELAY;
 		UpdateBoard();
 		if (UpdateDetonate())
 		{
-			_delayRemain = DETONATEDELAY / _fastForwardValue;
+			_delayRemain = DETONATEDELAY;
 		}
 	}
 }
@@ -637,6 +649,7 @@ void Board::UpdateBoard()
 bool Board::UpdateDetonate()
 {
 	bool result = false;
+	int destroyCount = 0;
 
 	for (int i = 0; i < _width; i++)
 	{
@@ -650,7 +663,8 @@ bool Board::UpdateDetonate()
 				switch (cubeType)
 				{
 				case TileStateFlag::NormalCube:
-					// NormalCube 수납				
+					// NormalCube 수납
+					destroyCount++;
 					BackToPool(_tiles[i][j]->_cube);
 					break;
 				case TileStateFlag::DarkCube:
@@ -663,6 +677,7 @@ bool Board::UpdateDetonate()
 					_tileState[i][j] = _tileState[i][j] | (int)TileStateFlag::AdvantageMine;
 					_tiles[i][j]->EnableAdvantageMine();
 					_advantageMinePosList.push_back({ i,j });
+					destroyCount++;
 					BackToPool(_tiles[i][j]->_cube);
 					break;
 				default:
@@ -681,6 +696,8 @@ bool Board::UpdateDetonate()
 			}
 		}
 	}
+
+	_gameManager->OnCubeDestroy(_playerIndex, destroyCount);
 
 	for (int i = 0; i < _width; i++)
 	{
