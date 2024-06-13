@@ -31,6 +31,8 @@ namespace flt
 		IRenderer* CreateRenderer(RendererType type);
 		void DestroyRenderer(IRenderer* renderer);
 
+		Vector2f GetWindowSize();
+
 		KeyData GetKey(KeyCode code);
 		KeyData GetKeyDown(KeyCode code);
 		KeyData GetKeyUp(KeyCode code);

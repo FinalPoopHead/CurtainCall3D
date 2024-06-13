@@ -278,3 +278,9 @@ bool flt::RocketAdapter::DeregisterObject(HOBJECT renderable)
 	_objects.erase(iter);
 	return true;
 }
+
+bool flt::RocketAdapter::Resize(uint32 width, uint32 height)
+{
+	_impl->OnResize(width, height);
+	return true;
+}

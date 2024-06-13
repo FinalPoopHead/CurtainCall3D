@@ -63,7 +63,7 @@ namespace flt
 
 		virtual bool Test() override;
 	public:
-		bool Resize(unsigned __int32 windowWidth, unsigned __int32 windowHeight);
+		virtual bool Resize(unsigned __int32 windowWidth, unsigned __int32 windowHeight);
 
 	private:
 		bool ForwardRender(float deltaTime);

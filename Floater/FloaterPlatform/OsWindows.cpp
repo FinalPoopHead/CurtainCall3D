@@ -356,6 +356,13 @@ void flt::OsWindows::DestroyRenderer(IRenderer* renderer)
 #endif
 }
 
+flt::Vector2f flt::OsWindows::GetWindowSize()
+{
+	RECT rect;
+	GetClientRect(_hwnd, &rect);
+	return Vector2f{ (float)(rect.right - rect.left), (float)(rect.bottom - rect.top) };
+}
+
 flt::KeyData flt::OsWindows::GetKey(KeyCode code)
 {
 	if (_pKeyStates[(int)code].isStay)
@@ -1024,6 +1031,19 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 		}
 		break;
 
+		case WM_SETCURSOR:
+		{
+			if (LOWORD(lParam) == HTCLIENT)
+			{
+				// 커서 숨기기
+				//SetCursor(NULL);
+
+				// 커서를 기본으로 변경
+				SetCursor(LoadCursor(NULL, IDC_ARROW));
+			}
+		}
+		break;
+
 		case WM_ACTIVATE:
 		{
 			if (LOWORD(wParam) == WA_INACTIVE)
@@ -1041,8 +1061,12 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 
 		case WM_SIZE:
 		{
-			//aptoCore::Graphics::OnResize();
-			//aptoCore::Graphics::Resize(LOWORD(lParam), HIWORD(lParam));
+			int width = LOWORD(lParam);
+			int height = HIWORD(lParam);
+			for (auto& renderer : thisPtr->_rendererMap)
+			{
+				renderer.first->Resize(width, height);
+			}
 			return 0;
 		}
 		break;
