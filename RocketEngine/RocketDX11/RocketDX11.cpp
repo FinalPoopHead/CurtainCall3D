@@ -635,6 +635,12 @@ namespace Rocket::Core
 		{
 			cam->SetAspect((float)backBufferDesc.Width / (float)backBufferDesc.Height);
 		}
+
+		if (Camera::GetMainCamArr()[0] != nullptr && Camera::GetMainCamArr()[1] != nullptr)
+		{
+			Camera::GetMainCamArr()[0]->HalftheAspect();
+			Camera::GetMainCamArr()[1]->HalftheAspect();
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
