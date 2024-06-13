@@ -12,6 +12,8 @@ public:
 	void SetSprite(const std::wstring& spriteName);
 	void SetPosition(flt::Vector2f pos);
 	flt::Vector2f GetPosition();
+	void SetOffsetPosition(flt::Vector2f offsetPos);
+	flt::Vector2f GetOffsetPosition();
 	void SetZOrder(float zOrder);
 	float GetZOrder();
 	void SetSize(flt::Vector2f size);
