@@ -637,6 +637,7 @@ void Board::UpdateBoard()
 bool Board::UpdateDetonate()
 {
 	bool result = false;
+	int destroyCount = 0;
 
 	for (int i = 0; i < _width; i++)
 	{
@@ -650,7 +651,8 @@ bool Board::UpdateDetonate()
 				switch (cubeType)
 				{
 				case TileStateFlag::NormalCube:
-					// NormalCube 수납				
+					// NormalCube 수납
+					destroyCount++;
 					BackToPool(_tiles[i][j]->_cube);
 					break;
 				case TileStateFlag::DarkCube:
@@ -663,6 +665,7 @@ bool Board::UpdateDetonate()
 					_tileState[i][j] = _tileState[i][j] | (int)TileStateFlag::AdvantageMine;
 					_tiles[i][j]->EnableAdvantageMine();
 					_advantageMinePosList.push_back({ i,j });
+					destroyCount++;
 					BackToPool(_tiles[i][j]->_cube);
 					break;
 				default:
@@ -681,6 +684,8 @@ bool Board::UpdateDetonate()
 			}
 		}
 	}
+
+	_gameManager->OnCubeDestroy(_playerIndex, destroyCount);
 
 	for (int i = 0; i < _width; i++)
 	{
