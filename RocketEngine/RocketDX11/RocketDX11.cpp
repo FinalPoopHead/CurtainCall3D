@@ -630,6 +630,11 @@ namespace Rocket::Core
 		// player 2 버퍼
 		_deferredBufferArr[1] = std::make_unique<DeferredBuffers>();
 		_deferredBufferArr[1]->Initialize(_device.Get(), depthBufferDesc.Width / 2, depthBufferDesc.Height, 1000.0f, 0.1f);
+
+		for (auto& cam : _objectManager.GetCameraList())
+		{
+			cam->SetAspect((float)backBufferDesc.Width / (float)backBufferDesc.Height);
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
