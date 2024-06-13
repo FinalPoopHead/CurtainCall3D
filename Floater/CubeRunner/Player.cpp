@@ -73,6 +73,9 @@ void Player::Update(float deltaSecond)
 		nextPosOffset += tr.WorldRight();
 	}
 
+	// TODO : 현재 깔린상태가 아니라 내가 갈곳을 못 갈 경우에 _isCrushed를 true로 설정되므로 의도치 않게 동작을 못하게 된다.
+	//			따라서 잠시 취소
+	_isCrushed = false; //임시
 	keyData = flt::GetKeyDown(flt::KeyCode::j);
 	if (keyData && !_isCrushed)
 	{
