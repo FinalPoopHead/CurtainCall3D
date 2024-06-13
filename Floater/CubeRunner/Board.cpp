@@ -15,7 +15,7 @@ constexpr float DETONATEDELAY = 2.0f;	// 폭파 후 딜레이
 constexpr int CUBEDAMAGE = 1;
 constexpr int DARKCUBEDAMAGE = 1;
 constexpr float FFDEFAULT = 1.0f;
-constexpr float FFVALUE = 5.0f;
+constexpr float FFVALUE = 8.0f;
 
 Board::Board(GameManager* gameManager, int playerIndex, int width, int height, float offset /*= 4.00f*/) :
 	flt::GameObject()
