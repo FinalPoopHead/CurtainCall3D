@@ -51,6 +51,11 @@ void flt::Platform::DestroyRenderer(IRenderer* renderer)
 	_pOsImpl->DestroyRenderer(renderer);
 }
 
+flt::Vector2f flt::Platform::GetWindowSize()
+{
+	return _pOsImpl->GetWindowSize();
+}
+
 flt::KeyData flt::Platform::GetKey(KeyCode code)
 {
 	return _pOsImpl->GetKey(code);

@@ -356,6 +356,13 @@ void flt::OsWindows::DestroyRenderer(IRenderer* renderer)
 #endif
 }
 
+flt::Vector2f flt::OsWindows::GetWindowSize()
+{
+	RECT rect;
+	GetClientRect(_hwnd, &rect);
+	return Vector2f{ (float)(rect.right - rect.left), (float)(rect.bottom - rect.top) };
+}
+
 flt::KeyData flt::OsWindows::GetKey(KeyCode code)
 {
 	if (_pKeyStates[(int)code].isStay)
