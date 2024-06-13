@@ -37,6 +37,9 @@
     <Filter Include="GameObject\UI">
       <UniqueIdentifier>{84ae94a8-11c1-4f39-ae14-a9fb28439183}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObject\UI\Ingame">
+      <UniqueIdentifier>{86af903e-127b-47e7-8045-84aafe7c97eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -97,6 +100,12 @@
       <Filter>GameObject\UI</Filter>
     </ClCompile>
     <ClCompile Include="ControllerManager.cpp" />
+    <ClCompile Include="HPSlot.cpp">
+      <Filter>GameObject\UI\Ingame</Filter>
+    </ClCompile>
+    <ClCompile Include="HPValue.cpp">
+      <Filter>GameObject\UI\Ingame</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h">
@@ -154,5 +163,11 @@
       <Filter>GameObject\UI</Filter>
     </ClInclude>
     <ClInclude Include="ControllerManager.h" />
+    <ClInclude Include="HPSlot.h">
+      <Filter>GameObject\UI\Ingame</Filter>
+    </ClInclude>
+    <ClInclude Include="HPValue.h">
+      <Filter>GameObject\UI\Ingame</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
