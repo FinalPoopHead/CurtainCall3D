@@ -19,6 +19,15 @@ namespace Rocket::Core
 		UpdateProjectionMatrix();
 	}
 
+	Camera::Camera(float width, float height)
+		: _isActive(true)
+		, _nearZ(0.01f), _farZ(1500.0f), _aspect(width / height), _fovY(70.0f),
+		_viewMatrix(), _projectionMatrix()
+		, _boundingFrustum()
+	{
+		UpdateProjectionMatrix();
+	}
+
 	Camera::~Camera()
 	{
 

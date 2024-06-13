@@ -44,10 +44,13 @@ namespace Rocket::Core
 
 	}
 
-	void ResourceManager::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext)
+	void ResourceManager::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float screenWidth, float screenHeight)
 	{
 		_device = device;
 		_deviceContext = deviceContext;
+
+		_screenWidth = screenWidth;
+		_screenHeight = screenHeight;
 
 		std::filesystem::path hlslPath(HLSL_PATH);
 		std::filesystem::directory_iterator itr(hlslPath);

@@ -283,8 +283,8 @@ namespace Rocket::Core
 		_deferredBufferArr[1]->Initialize(_device.Get(), depthBufferDesc.Width / 2, depthBufferDesc.Height, 1000.0f, 0.1f);
 
 		/// DX 초기화 끝났으니 Manager들 초기화해준다.
-		_resourceManager.Initialize(_device.Get(), _deviceContext.Get());
-		_objectManager.Initialize(_device.Get());
+		_resourceManager.Initialize(_device.Get(), _deviceContext.Get(), depthBufferDesc.Width, depthBufferDesc.Height);
+		_objectManager.Initialize(_device.Get(), depthBufferDesc.Width, depthBufferDesc.Height);
 
 		/// LightPass 초기화 (ResourceManager에서 초기화한 셰이더가 필요하기때문에 이 순서)
 		_lightPass = std::make_unique<LightPass>();
@@ -481,17 +481,35 @@ namespace Rocket::Core
 
 	void RocketDX11::OnResize(int _width, int _height)
 	{
+// 		_swapChain->Release();
+// 		_backBuffer->Release();
+// 		_backBufferRTV->Release();
+// 		_backBufferDepthBuffer->Release();
+// 		_backBufferDSV->Release();
+
 		_swapChain.Reset();
 		_backBuffer.Reset();
 		_backBufferRTV.Reset();
 		_backBufferDepthBuffer.Reset();
 		_backBufferDSV.Reset();
 
+		_defaultDepthStencilState.Reset();
+		_cubeMapDepthStencilState.Reset();
+		_defaultBlendState.Reset();
+ 
+ 		_deferredBuffers.reset();
+
 		for (int i = 0; i < 2; i++)
 		{
+// 			_renderTargetTextureArr[i]->Release();
+// 			_renderTargetViewArr[i]->Release();
+// 			_shaderResourceViewArr[i]->Release();
+
 			_renderTargetTextureArr[i].Reset();
 			_renderTargetViewArr[i].Reset();
 			_shaderResourceViewArr[i].Reset();
+
+			_deferredBufferArr[i].reset();
 		}
 
 		_screenWidth = _width;
@@ -641,6 +659,9 @@ namespace Rocket::Core
 			Camera::GetMainCamArr()[0]->HalftheAspect();
 			Camera::GetMainCamArr()[1]->HalftheAspect();
 		}
+
+		_objectManager.SetScreenSize((float)backBufferDesc.Width, (float)backBufferDesc.Height);
+		_resourceManager.SetScreenSize((float)backBufferDesc.Width, (float)backBufferDesc.Height);
 	}
 
 	//////////////////////////////////////////////////////////////////////////

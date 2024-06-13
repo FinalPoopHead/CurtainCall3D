@@ -43,11 +43,13 @@ namespace Rocket::Core
 		};
 
 	public:
-		void Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext);
+		void Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, float screenWidth, float screenHeight);
 		void Finalize();
 
 		/// 앞 단에서 읽은 RawModel을 이용해서 리소스들을 생성하고 저장한다.
 		virtual void LoadModel(const std::string& fileName, const RawModel* rawModel) override;
+		
+		void SetScreenSize(float width, float height) { _screenWidth = width; _screenHeight = height; }
 
 		CubeMesh* GetCubeMesh() const { return _cubeMesh.get(); }
 		Mesh* GetMesh(eMeshType meshType) const;
@@ -85,6 +87,9 @@ namespace Rocket::Core
 	private:
 		ID3D11Device* _device;
 		ID3D11DeviceContext* _deviceContext;
+
+		float _screenWidth;
+		float _screenHeight;
 
 		// 기본 메쉬들
 		std::unique_ptr<CubeMesh> _cubeMesh;

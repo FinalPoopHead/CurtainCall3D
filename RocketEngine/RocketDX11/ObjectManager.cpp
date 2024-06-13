@@ -25,8 +25,11 @@ namespace Rocket::Core
 	{
 	}
 
-	void ObjectManager::Initialize(ID3D11Device* device)
+	void ObjectManager::Initialize(ID3D11Device* device, float screenWidth, float screenHeight)
 	{
+		_screenWidth = screenWidth;
+		_screenHeight = screenHeight;
+
 		_debugText.reset(new TextRenderer());
 		_debugText->SetFont(_resourceManager.GetDefaultFont());
 
@@ -99,7 +102,7 @@ namespace Rocket::Core
 
 	Camera* ObjectManager::CreateCamera()
 	{
-		Camera* temp = new Camera();
+		Camera* temp = new Camera(_screenWidth, _screenHeight);
 		_cameraList.emplace_back(temp);
 
 		return temp;

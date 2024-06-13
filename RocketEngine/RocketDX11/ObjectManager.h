@@ -29,7 +29,7 @@ namespace Rocket::Core
 		ObjectManager();
 
 	public:
-		void Initialize(ID3D11Device* device);
+		void Initialize(ID3D11Device* device, float screenWidth, float screenHeight);
 		void Finalize();
 
 	public:
@@ -42,6 +42,8 @@ namespace Rocket::Core
 		std::vector<DirectionalLight*>& GetDirectionalLightList();
 		CubeMap* GetCubeMap();
 		std::vector<Camera*>& GetCameraList();
+
+		void SetScreenSize(float width, float height) { _screenWidth = width; _screenHeight = height; }
 
 	public:
 		Camera* CreateCamera();
@@ -70,6 +72,9 @@ namespace Rocket::Core
 
 		// TODO : 얘네도 다 unique_ptr로 바꿀까? 아니면 해제를 똑바로 잘 해줄까? 지금은 해제를 수동으로 해주는 방향으로 가자.
 	private:
+		float _screenWidth;
+		float _screenHeight;
+
 		std::unique_ptr<LineRenderer> _lineRenderer;
 
 		std::vector<Camera*> _cameraList;

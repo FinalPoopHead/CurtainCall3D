@@ -17,6 +17,7 @@ namespace Rocket::Core
 	{
 	public:
 		Camera();
+		Camera(float width, float height);
 		~Camera();
 
 	public:
