@@ -32,7 +32,8 @@ namespace flt
 		virtual void PreUpdate(float deltaSecond) {}
 		virtual void Update(float deltaSecond) {}
 		virtual void PostUpdate(float deltaSecond) {}
-		virtual void EndDraw() {}
+		virtual void PreRender() {}
+		virtual void PostRender() {}
 		// 비활성화 되었을때 호출 제거시 활성화 되어있다면 호출
 		virtual void OnDisable() {}
 		// 씬에 제거되었을 때 비활성화 여부와 상관 없이 호출

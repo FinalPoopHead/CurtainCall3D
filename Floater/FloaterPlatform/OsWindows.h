@@ -8,6 +8,7 @@
 #include "../FloaterUtil/include/Timer.h"
 #include "./WinGamePadImpl.h"
 #include "../FloaterUtil/include/FloaterType.h"
+#include "../FloaterMath/include/Vector2f.h"
 
 
 namespace flt

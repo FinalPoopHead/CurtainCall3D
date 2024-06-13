@@ -48,7 +48,7 @@ void flt::RendererComponent::Update(float deltaSecond)
 
 }
 
-void flt::RendererComponent::EndDraw()
+void flt::RendererComponent::PostRender()
 {
 
 }
