@@ -51,7 +51,6 @@ void CubeController::PreUpdate(float deltaSecond)
 
 	if (!_isRolling && IsOutofBoard())
 	{
-		// TODO : 체력 감소 또는 게임 오버 처리 필요.
 		StartFalling();
 	}
 }

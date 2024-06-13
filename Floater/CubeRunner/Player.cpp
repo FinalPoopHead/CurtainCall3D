@@ -94,14 +94,12 @@ void Player::Update(float deltaSecond)
 	keyData = flt::GetKeyDown(flt::KeyCode::l);
 	if (keyData)
 	{
-		// TODO : 빨리감기
 		_board->FastForward();
 	}
 
 	keyData = flt::GetKeyUp(flt::KeyCode::l);
 	if (keyData)
 	{
-		// TODO : 빨리감기해제
 		_board->EndFastForward();
 	}
 
