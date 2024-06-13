@@ -46,7 +46,7 @@ namespace Rocket::Core
 		virtual void SetDebugMode(bool isDebug) override { _isDebugMode = isDebug; }
 
 	private:
-		void InitSplitScreen();
+		void InitSplitScreen(int width, int height);
 		void CreateDepthStencilStates();
 		void FrustumCulling(Camera* cam);
 		void RenderPerCamera(Camera* cam, DeferredBuffers* gBuffer, ID3D11RenderTargetView** renderTargetView);		// 카메라 별로 렌더링 하기 위해

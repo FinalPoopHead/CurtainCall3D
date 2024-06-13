@@ -58,6 +58,7 @@ namespace Rocket::Core
 		Vector3 GetRight() const;
 
 		float GetLengthZ() const { return _farZ - _nearZ; }
+		void HalftheAspect() { SetAspect(_aspect / 2.0f); }
 
 	public:
 		bool FrustumCulling(const DirectX::BoundingBox& boundingBox);

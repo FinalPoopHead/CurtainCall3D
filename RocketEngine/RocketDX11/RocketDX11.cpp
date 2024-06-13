@@ -250,21 +250,21 @@ namespace Rocket::Core
 
 		/// 화면분할에 필요한 것들 초기화
 		{
-			InitSplitScreen();
+			InitSplitScreen(backBufferDesc.Width / 2, backBufferDesc.Height);
 
 			ZeroMemory(&_viewportArr[0], sizeof(D3D11_VIEWPORT));
 			_viewportArr[0].TopLeftX = 0;
 			_viewportArr[0].TopLeftY = 0;
-			_viewportArr[0].Height = (float)backBufferDesc.Height;
 			_viewportArr[0].Width = (float)backBufferDesc.Width / 2;
+			_viewportArr[0].Height = (float)backBufferDesc.Height;
 			_viewportArr[0].MinDepth = 0;
 			_viewportArr[0].MaxDepth = 1;
 
 			ZeroMemory(&_viewportArr[1], sizeof(D3D11_VIEWPORT));
 			_viewportArr[1].TopLeftX = (float)backBufferDesc.Width / 2;
 			_viewportArr[1].TopLeftY = 0;
-			_viewportArr[1].Height = (float)backBufferDesc.Height;
 			_viewportArr[1].Width = (float)backBufferDesc.Width / 2;
+			_viewportArr[1].Height = (float)backBufferDesc.Height;
 			_viewportArr[1].MinDepth = 0;
 			_viewportArr[1].MaxDepth = 1;
 		}
@@ -481,13 +481,166 @@ namespace Rocket::Core
 
 	void RocketDX11::OnResize(int _width, int _height)
 	{
+		_swapChain.Reset();
+		_backBuffer.Reset();
+		_backBufferRTV.Reset();
+		_backBufferDepthBuffer.Reset();
+		_backBufferDSV.Reset();
 
+		for (int i = 0; i < 2; i++)
+		{
+			_renderTargetTextureArr[i].Reset();
+			_renderTargetViewArr[i].Reset();
+			_shaderResourceViewArr[i].Reset();
+		}
+
+		_screenWidth = _width;
+		_screenHeight = _height;
+
+		DXGI_SWAP_CHAIN_DESC swapChainDesc;
+		ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
+
+		swapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
+		swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
+		swapChainDesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		swapChainDesc.SampleDesc.Count = 1;      //multisampling setting	// 나는 4x를 사용하므로 4
+		swapChainDesc.SampleDesc.Quality = 0; // _m4xMsaaQuality - 1;	//vendor-specific flag	// 위에서 받아온 퀄리티 레벨을 넣어준다.	// -1 을 왜해줄까?
+		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swapChainDesc.BufferCount = 1;		// 이걸 2로 하게되면 렌더타겟 뷰를 각각의 버퍼에 대해 가지고 있어야하나?
+		swapChainDesc.OutputWindow = _hWnd;
+		swapChainDesc.Windowed = TRUE; // Sets the initial state of full-screen mode.
+		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;	// 교환효과. DXGI_SWAP_EFFECT_DISCARD는 디스플레이 구동기가 가장 효율적인 제시 방법을 선택하게 함
+		swapChainDesc.Flags = 0;
+
+		// Create the DXGI device object to use in other factories, such as Direct2D.
+		Microsoft::WRL::ComPtr<IDXGIDevice3> dxgiDevice;
+		_device.As(&dxgiDevice);
+
+		// Create swap chain.
+		Microsoft::WRL::ComPtr<IDXGIAdapter> adapter;
+		Microsoft::WRL::ComPtr<IDXGIFactory> factory;
+
+		HRESULT hr = S_OK;
+
+		hr = dxgiDevice->GetAdapter(&adapter);
+		dxgiDevice.Reset();
+
+		if (SUCCEEDED(hr))
+		{
+			adapter->GetParent(IID_PPV_ARGS(&factory));
+
+			hr = factory->CreateSwapChain(
+				_device.Get(),
+				&swapChainDesc,
+				&_swapChain
+			);
+		}
+
+		adapter->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"RocketDX11Adapter") - 1, L"RocketDX11Adapter");
+		factory->SetPrivateData(WKPDID_D3DDebugObjectNameW, sizeof(L"RocketDX11Factory") - 1, L"RocketDX11Factory");
+
+		adapter.Reset();
+		factory.Reset();
+
+		hr = _swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&_backBuffer);
+
+		hr = _device->CreateRenderTargetView(
+			_backBuffer.Get(),
+			nullptr,
+			_backBufferRTV.GetAddressOf()
+		);
+
+		D3D11_TEXTURE2D_DESC backBufferDesc;
+
+		_backBuffer->GetDesc(&backBufferDesc);
+
+		D3D11_TEXTURE2D_DESC depthBufferDesc;
+		ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
+
+		// 깊이 버퍼의 description을 작성합니다.
+		depthBufferDesc.Width = static_cast<UINT>(backBufferDesc.Width);
+		depthBufferDesc.Height = static_cast<UINT>(backBufferDesc.Height);
+		depthBufferDesc.MipLevels = 1;
+		depthBufferDesc.ArraySize = 1;
+		depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depthBufferDesc.SampleDesc.Count = 1;
+		depthBufferDesc.SampleDesc.Quality = 0; // _m4xMsaaQuality - 1;
+		depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		depthBufferDesc.CPUAccessFlags = 0;
+		depthBufferDesc.MiscFlags = 0;
+
+		HR(_device->CreateTexture2D(&depthBufferDesc, nullptr, &_backBufferDepthBuffer));
+
+		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+		ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
+
+		// 깊이-스텐실 뷰의 description을 작성합니다.
+		depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		depthStencilViewDesc.Texture2D.MipSlice = 0;
+
+		HR(_device->CreateDepthStencilView(_backBufferDepthBuffer.Get(), &depthStencilViewDesc, &_backBufferDSV));
+		//HR(_device->CreateDepthStencilView(_depthStencilBuffer.Get(), NULL, &_depthStencilView));
+
+		CreateDepthStencilStates();
+
+		//BlendState Creation
+		CD3D11_BLEND_DESC tBlendDesc(D3D11_DEFAULT);
+		HR(_device->CreateBlendState(&tBlendDesc, _defaultBlendState.GetAddressOf()));
+
+		ZeroMemory(&_viewport, sizeof(D3D11_VIEWPORT));
+		_viewport.Height = (float)backBufferDesc.Height;
+		_viewport.Width = (float)backBufferDesc.Width;
+		_viewport.MinDepth = 0;
+		_viewport.MaxDepth = 1;
+
+		/// 화면분할에 필요한 것들 초기화
+		{
+			InitSplitScreen(backBufferDesc.Width / 2, backBufferDesc.Height);
+
+			ZeroMemory(&_viewportArr[0], sizeof(D3D11_VIEWPORT));
+			_viewportArr[0].TopLeftX = 0;
+			_viewportArr[0].TopLeftY = 0;
+			_viewportArr[0].Width = (float)backBufferDesc.Width / 2;
+			_viewportArr[0].Height = (float)backBufferDesc.Height;
+			_viewportArr[0].MinDepth = 0;
+			_viewportArr[0].MaxDepth = 1;
+
+			ZeroMemory(&_viewportArr[1], sizeof(D3D11_VIEWPORT));
+			_viewportArr[1].TopLeftX = (float)backBufferDesc.Width / 2;
+			_viewportArr[1].TopLeftY = 0;
+			_viewportArr[1].Width = (float)backBufferDesc.Width / 2;
+			_viewportArr[1].Height = (float)backBufferDesc.Height;
+			_viewportArr[1].MinDepth = 0;
+			_viewportArr[1].MaxDepth = 1;
+		}
+
+		/// 기본 viewPort로 설정해준다.
+		_deviceContext->RSSetViewports(1, &_viewport);
+
+		/// deferredBuffers 초기화
+		_deferredBuffers = std::make_unique<DeferredBuffers>();
+		_deferredBuffers->Initialize(_device.Get(), depthBufferDesc.Width, depthBufferDesc.Height, 1000.0f, 0.1f);
+		// player 1 버퍼
+		_deferredBufferArr[0] = std::make_unique<DeferredBuffers>();
+		_deferredBufferArr[0]->Initialize(_device.Get(), depthBufferDesc.Width / 2, depthBufferDesc.Height, 1000.0f, 0.1f);
+		// player 2 버퍼
+		_deferredBufferArr[1] = std::make_unique<DeferredBuffers>();
+		_deferredBufferArr[1]->Initialize(_device.Get(), depthBufferDesc.Width / 2, depthBufferDesc.Height, 1000.0f, 0.1f);
+
+		for (auto& cam : _objectManager.GetCameraList())
+		{
+			cam->SetAspect((float)backBufferDesc.Width / (float)backBufferDesc.Height);
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	/// private function
-	void RocketDX11::InitSplitScreen()
-	{
+	void RocketDX11::InitSplitScreen(int width, int height)
+{
 		UINT m4xMsaaQuality;
 		HR(_device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, 4, &m4xMsaaQuality));
 
@@ -495,8 +648,8 @@ namespace Rocket::Core
 		D3D11_TEXTURE2D_DESC textureDesc;
 		ZeroMemory(&textureDesc, sizeof(textureDesc));
 
-		textureDesc.Width = _screenWidth / 2;
-		textureDesc.Height = _screenHeight;
+		textureDesc.Width = width;
+		textureDesc.Height = height;
 		textureDesc.MipLevels = 1;
 		textureDesc.ArraySize = 1;
 		textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;

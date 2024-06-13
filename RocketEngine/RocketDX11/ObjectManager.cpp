@@ -334,4 +334,10 @@ namespace Rocket::Core
 			delete directionalLight;
 		}
 	}
+
+	std::vector<Camera*>& ObjectManager::GetCameraList()
+	{
+		return _cameraList;
+	}
+
 }

@@ -41,6 +41,7 @@ namespace Rocket::Core
 		LineRenderer* GetLineRenderer();
 		std::vector<DirectionalLight*>& GetDirectionalLightList();
 		CubeMap* GetCubeMap();
+		std::vector<Camera*>& GetCameraList();
 
 	public:
 		Camera* CreateCamera();

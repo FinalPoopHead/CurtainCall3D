@@ -155,8 +155,8 @@ namespace Rocket::Core
 		{
 			_mainCamera[1] = this;
 
-			_mainCamera[0]->SetAspect(8.0f / 9.0f);
-			_mainCamera[1]->SetAspect(8.0f / 9.0f);
+			_mainCamera[0]->HalftheAspect();
+			_mainCamera[1]->HalftheAspect();
 		}
 	}
 
