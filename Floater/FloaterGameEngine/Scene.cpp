@@ -378,7 +378,7 @@ void flt::Scene::Update(float deltaSecond)
 	}
 }
 
-void flt::Scene::EndRender()
+void flt::Scene::PreRender()
 {
 	for (auto& object : _gameObjects)
 	{
@@ -386,6 +386,8 @@ void flt::Scene::EndRender()
 		{
 			continue;
 		}
+
+		object->PreRender();
 
 		for (auto& component : object->_components)
 		{
@@ -398,7 +400,34 @@ void flt::Scene::EndRender()
 				continue;
 			}
 
-			component->EndDraw();
+			component->PreRender();
+		}
+	}
+}
+
+void flt::Scene::PostRender()
+{
+	for (auto& object : _gameObjects)
+	{
+		if (!object->_isEnable)
+		{
+			continue;
+		}
+
+		object->PostRender();
+
+		for (auto& component : object->_components)
+		{
+			if (component == nullptr)
+			{
+				continue;
+			}
+			if (!component->_isEnable)
+			{
+				continue;
+			}
+
+			component->PostRender();
 		}
 	}
 }

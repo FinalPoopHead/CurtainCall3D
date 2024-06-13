@@ -7,16 +7,17 @@
 
 #include <filesystem>
 
-flt::UIComponent::UIComponent() :
-	_rendererObject(new RendererObject{ _isDraw }),
-	_renderer(*GameEngine::Instance()->GetRenderer()),
-	_hObject(),
-	_isDraw(false),
-	_isRegisted(false),
-	_image(new flt::Image()),
-	_size(0.0f, 0.0f),
-	_position(0.0f, 0.0f),
-	_zOrder(0.0f)
+flt::UIComponent::UIComponent()
+	: _rendererObject(new RendererObject{ _isDraw })
+	, _renderer(*GameEngine::Instance()->GetRenderer())
+	, _hObject()
+	, _isDraw(false)
+	, _isRegisted(false)
+	, _isOffsetMode(false)
+	, _image(new flt::Image())
+	, _size(0.0f, 0.0f)
+	, _position(0.0f, 0.0f)
+	, _zOrder(0.0f)
 {
 }
 
@@ -39,6 +40,18 @@ void flt::UIComponent::OnCreate()
 void flt::UIComponent::OnEnable()
 {
 	_isDraw = true;
+}
+
+void flt::UIComponent::PreRender()
+{
+	if (_isOffsetMode)
+	{
+		flt::Vector2f windowSize = GameEngine::Instance()->GetWindowSize();
+		_position.x = _offsetPosition.x * windowSize.x;
+		_position.y = _offsetPosition.y * windowSize.y;
+
+		UpdatePosition();
+	}
 }
 
 void flt::UIComponent::OnDisable()
@@ -82,6 +95,7 @@ void flt::UIComponent::SetImage(const std::wstring& filePath)
 
 void flt::UIComponent::SetPosition(flt::Vector2f pixelPos)
 {
+	_isOffsetMode = false;
 	_position = pixelPos;
 	UpdatePosition();
 }
@@ -89,6 +103,25 @@ void flt::UIComponent::SetPosition(flt::Vector2f pixelPos)
 flt::Vector2f flt::UIComponent::GetPosition()
 {
 	return _position;
+}
+
+void flt::UIComponent::SetOffsetPosition(flt::Vector2f offsetPos)
+{
+	_isOffsetMode = true;
+	ASSERT(offsetPos.x >= 0.0f && offsetPos.x <= 1.0f, "Offset x is out of range");
+	ASSERT(offsetPos.y >= 0.0f && offsetPos.y <= 1.0f, "Offset y is out of range");
+
+	_offsetPosition = offsetPos;
+}
+
+flt::Vector2f flt::UIComponent::GetOffsetPosition()
+{
+	return _offsetPosition;
+}
+
+bool flt::UIComponent::IsOffsetMode()
+{
+	return _isOffsetMode;
 }
 
 void flt::UIComponent::SetZOrder(float zOrder)

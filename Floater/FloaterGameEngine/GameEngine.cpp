@@ -82,8 +82,9 @@ bool flt::GameEngine::Update()
 
 	_currentScene->Update(deltaSecond);
 
+	_currentScene->PreRender();
 	_renderer->Render(deltaSecond);
-	_currentScene->EndRender();
+	_currentScene->PostRender();
 
 	_currentScene->EndFrame();
 
@@ -156,6 +157,11 @@ bool flt::GameEngine::AddScene(const std::wstring& sceneName, Scene* scene)
 flt::Scene* flt::GameEngine::GetCurrentScene()
 {
 	return _currentScene;
+}
+
+flt::Vector2f flt::GameEngine::GetWindowSize()
+{
+	return _platform->GetWindowSize();
 }
 
 flt::GameEngine::GameEngine() :

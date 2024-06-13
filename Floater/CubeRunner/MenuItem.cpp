@@ -29,6 +29,16 @@ flt::Vector2f MenuItem::GetPosition()
 	return _ui->GetPosition();
 }
 
+void MenuItem::SetOffsetPosition(flt::Vector2f offsetPos)
+{
+	_ui->SetOffsetPosition(offsetPos);
+}
+
+flt::Vector2f MenuItem::GetOffsetPosition()
+{
+	return _ui->GetOffsetPosition();
+}
+
 void MenuItem::SetZOrder(float zOrder)
 {
 	ASSERT( zOrder >= 0.2f && zOrder <= 0.8f, "ZOrder must be between 0.2f and 0.8f");

@@ -18,7 +18,7 @@ namespace flt
 		virtual void OnCreate() override;
 		virtual void OnEnable() override;
 		virtual void Update(float deltaSecond) override;
-		virtual void EndDraw() override;
+		virtual void PostRender() override;
 		virtual void OnDestroy() override;
 
 	private:

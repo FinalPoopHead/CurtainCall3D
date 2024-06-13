@@ -20,6 +20,7 @@ namespace flt
 	protected:
 		virtual void OnCreate() override;
 		virtual void OnEnable() override;
+		virtual void PreRender() override;
 		virtual void OnDisable() override;
 		virtual void OnDestroy() override;
 
@@ -27,6 +28,9 @@ namespace flt
 		void SetImage(const std::wstring& filePath);
 		void SetPosition(flt::Vector2f pixelPos);
 		flt::Vector2f GetPosition();
+		void SetOffsetPosition(flt::Vector2f offsetPos);
+		flt::Vector2f GetOffsetPosition();
+		bool IsOffsetMode();
 		void SetZOrder(float zOrder);
 		float GetZOrder();
 		flt::Vector2f GetImageSize();
@@ -43,9 +47,12 @@ namespace flt
 		bool _isDraw;
 		bool _isRegisted;
 
+		bool _isOffsetMode;
+
 		std::unique_ptr<Image> _image;
 		flt::Vector2f _size;
 		flt::Vector2f _position;
+		flt::Vector2f _offsetPosition;
 		float _zOrder;
 	};
 }

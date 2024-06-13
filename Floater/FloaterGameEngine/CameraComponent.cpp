@@ -39,7 +39,7 @@ void flt::CameraComponent::Update(float deltaSecond)
 	_isDraw = true;
 }
 
-void flt::CameraComponent::EndDraw()
+void flt::CameraComponent::PostRender()
 {
 	_isDraw = false;
 }

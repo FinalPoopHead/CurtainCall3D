@@ -3,9 +3,10 @@
 
 namespace flt::__impl
 {
-	GameEngineWrapper g_engine;
+	GameEngineWrapper g_engineWrapper;
 }
 
+static flt::GameEngine* g_engine = flt::GameEngine::Instance();
 
 flt::GameEngineWrapper::GameEngineWrapper() : engine(GameEngine::Instance())
 {
@@ -24,18 +25,26 @@ bool flt::GameEngineWrapper::AddScene(const std::wstring& sceneName, flt::Scene*
 
 flt::Scene* flt::SetScene(Scene* scene)
 {
-	GameEngine* engine = GameEngine::Instance();
-	return engine->SetScene(scene);
+	//GameEngine* engine = GameEngine::Instance();
+	return g_engine->SetScene(scene);
+}
+
+flt::Vector2f flt::GetWindowSize()
+{
+	//GameEngine* engine = GameEngine::Instance();
+	return g_engine->GetWindowSize();
 }
 
 flt::Scene* flt::SetScene(const std::wstring& sceneName)
 {
-	GameEngine* engine = GameEngine::Instance();
-	return engine->SetScene(sceneName);
+	//GameEngine* engine = GameEngine::Instance();
+	return g_engine->SetScene(sceneName);
 }
+
+
 
 void flt::ExitGame()
 {
-	GameEngine* engine = GameEngine::Instance();
-	engine->ExitGame();
+	//GameEngine* engine = GameEngine::Instance();
+	g_engine->ExitGame();
 }
