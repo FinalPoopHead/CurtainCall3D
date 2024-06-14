@@ -61,6 +61,8 @@ namespace Rocket::Core
 			fullPath = TEXTURE_PATH + filePath;
 		}
 
+		_textureName = filePath;
+
 		std::wstring wFileName(fullPath.begin(), fullPath.end());
 		std::string extension = fullPath.substr(fullPath.find_last_of(".") + 1);
 

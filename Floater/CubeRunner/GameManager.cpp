@@ -1,20 +1,24 @@
 ﻿#include "GameManager.h"
 #include "Player.h"
 #include "Board.h"
+#include "SpriteObject.h"
 
 constexpr int MAXHP = 10000;
-constexpr int PLAYERCOUNT = 2;
+constexpr int MAXPLAYERCOUNT = 2;
 constexpr int CUBESCORE = 100;
 
 GameManager::GameManager() :
-	_players(std::vector<Player*>(PLAYERCOUNT))
-	, _boards(std::vector<Board*>(PLAYERCOUNT))
-	, _isGameOver(std::vector<bool>(PLAYERCOUNT))
-	, _playerHP(std::vector<int>(PLAYERCOUNT))
-	, _gameTime(std::vector<float>(PLAYERCOUNT))
-	, _playerScore(std::vector<int>(PLAYERCOUNT))
+	_players(std::vector<Player*>(MAXPLAYERCOUNT))
+	, _boards(std::vector<Board*>(MAXPLAYERCOUNT))
+	, _playerHPSlots(std::vector<std::vector<SpriteObject*>>(MAXPLAYERCOUNT))
+	, _playerHPValues(std::vector<std::vector<SpriteObject*>>(MAXPLAYERCOUNT))
+	, _currentPlayerCount(0)
+	, _isGameOver(std::vector<bool>(MAXPLAYERCOUNT))
+	, _playerHP(std::vector<int>(MAXPLAYERCOUNT))
+	, _gameTime(std::vector<float>(MAXPLAYERCOUNT))
+	, _playerScore(std::vector<int>(MAXPLAYERCOUNT))
 {
-	for (int i = 0; i < PLAYERCOUNT; i++)
+	for (int i = 0; i < MAXPLAYERCOUNT; i++)
 	{
 		_isGameOver[i] = false;
 		_playerHP[i] = 0;
@@ -30,7 +34,7 @@ GameManager::~GameManager()
 
 void GameManager::PostUpdate(float deltaSecond)
 {
-	for (int i = 0; i < PLAYERCOUNT; i++)
+	for (int i = 0; i < MAXPLAYERCOUNT; i++)
 	{
 		_gameTime[i] += deltaSecond;
 
@@ -44,25 +48,36 @@ void GameManager::PostUpdate(float deltaSecond)
 
 void GameManager::SetPlayer(int index, Player* player)
 {
-	if (index < 0 || index >= PLAYERCOUNT)
+	if (index < 0 || index >= MAXPLAYERCOUNT)
 	{
 		ASSERT(false, "Player index 오류");
 		return;
 	}
 
+	IncreasePlayerCount();
 	_players[index] = player;
 	_playerHP[index] = MAXHP;
 }
 
 void GameManager::SetBoard(int index, Board* board)
 {
-	if (index < 0 || index >= PLAYERCOUNT)
+	if (index < 0 || index >= MAXPLAYERCOUNT)
 	{
 		ASSERT(false, "Board index 오류");
 		return;
 	}
 
 	_boards[index] = board;
+}
+
+void GameManager::AddPlayerHPSlot(int index, SpriteObject* hpSlot)
+{
+	_playerHPSlots[index].push_back(hpSlot);
+}
+
+void GameManager::AddPlayerHPValue(int index, SpriteObject* hpValue)
+{
+	_playerHPValues[index].push_back(hpValue);
 }
 
 void GameManager::ReduceHP(int index, int damage)
@@ -86,8 +101,8 @@ void GameManager::OnCubeDestroy(int playerIndex, int count)
 {
 	// TODO : 파괴된 갯수 대로 콤보 계산
 	// TODO : 콤보 UI 출력
-	
-	if (playerIndex < 0 || playerIndex >= PLAYERCOUNT)
+
+	if (playerIndex < 0 || playerIndex >= MAXPLAYERCOUNT)
 	{
 		return;
 	}
@@ -117,5 +132,33 @@ void GameManager::OnCubeDestroy(int playerIndex, int count)
 	else
 	{
 		_playerScore[playerIndex] += count * CUBESCORE * 8;
+	}
+}
+
+void GameManager::IncreasePlayerCount()
+{
+	_currentPlayerCount++;
+
+	if (_currentPlayerCount >= MAXPLAYERCOUNT)
+	{
+		// TODO : UI 배치 적절히 나눠야 함
+		for (int i = 0; i < MAXPLAYERCOUNT; i++)
+		{
+			float offSetBase = 0.0f;
+
+			for (auto& hpSlot : _playerHPSlots[i])
+			{
+				auto originOffset = hpSlot->GetOffsetPosition();
+				hpSlot->SetOffsetPosition({ offSetBase + originOffset.x / 2, originOffset.y });
+			}
+
+			for (auto& hpValue : _playerHPValues[i])
+			{
+				auto originOffset = hpValue->GetOffsetPosition();
+				hpValue->SetOffsetPosition({ offSetBase + originOffset.x / 2, originOffset.y });
+			}
+
+			offSetBase += 0.5f;
+		}
 	}
 }

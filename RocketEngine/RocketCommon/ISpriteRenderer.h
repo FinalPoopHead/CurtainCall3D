@@ -11,5 +11,6 @@ namespace Rocket::Core
 		virtual void SetColor(Color color) = 0;
 		virtual float GetWidth() = 0;
 		virtual float GetHeight() = 0;
+		virtual void SetTargetCameraIndex(int cameraIndex) = 0;
 	};
 }

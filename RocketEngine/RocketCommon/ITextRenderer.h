@@ -13,5 +13,6 @@ namespace Rocket::Core
 		virtual Color GetColor() = 0;
 		virtual void SetText(const std::string& str) = 0;
 		virtual void SetColor(Color color) = 0;
+		virtual void SetTargetCameraIndex(int cameraIndex) = 0;
 	};
 }

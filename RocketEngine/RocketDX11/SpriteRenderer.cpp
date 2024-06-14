@@ -15,6 +15,7 @@ namespace Rocket::Core
 		, _imageWidth()
 		, _imageHeight()
 		, _texture()
+		, _targetCameraIndex(0)
 	{
 		_color = DirectX::Colors::White;
 	}
@@ -83,4 +84,10 @@ namespace Rocket::Core
 	{
 		ObjectManager::Instance().DestroySpriteRenderer(this);
 	}
+
+	void SpriteRenderer::SetTargetCameraIndex(int cameraIndex)
+	{
+		_targetCameraIndex = cameraIndex;
+	}
+
 }

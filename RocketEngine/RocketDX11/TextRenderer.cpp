@@ -9,6 +9,7 @@ namespace Rocket::Core
 		, _text("Default Text")
 		, _color(DirectX::Colors::White)
 		, _worldTM(Matrix::Identity)
+		, _targetCameraIndex(0)
 	{
 
 	}
@@ -72,6 +73,11 @@ namespace Rocket::Core
 	void TextRenderer::Destroy()
 	{
 		ObjectManager::Instance().DestroyTextRenderer(this);
+	}
+
+	void TextRenderer::SetTargetCameraIndex(int cameraIndex)
+	{
+		_targetCameraIndex = cameraIndex;
 	}
 
 }

@@ -100,10 +100,7 @@
       <Filter>GameObject\UI</Filter>
     </ClCompile>
     <ClCompile Include="ControllerManager.cpp" />
-    <ClCompile Include="HPSlot.cpp">
-      <Filter>GameObject\UI\Ingame</Filter>
-    </ClCompile>
-    <ClCompile Include="HPValue.cpp">
+    <ClCompile Include="SpriteObject.cpp">
       <Filter>GameObject\UI\Ingame</Filter>
     </ClCompile>
   </ItemGroup>
@@ -163,10 +160,7 @@
       <Filter>GameObject\UI</Filter>
     </ClInclude>
     <ClInclude Include="ControllerManager.h" />
-    <ClInclude Include="HPSlot.h">
-      <Filter>GameObject\UI\Ingame</Filter>
-    </ClInclude>
-    <ClInclude Include="HPValue.h">
+    <ClInclude Include="SpriteObject.h">
       <Filter>GameObject\UI\Ingame</Filter>
     </ClInclude>
   </ItemGroup>

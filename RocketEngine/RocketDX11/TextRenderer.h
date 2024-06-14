@@ -29,11 +29,13 @@ namespace Rocket::Core
 		virtual void SetWorldTM(const Matrix& worldTM) override;
 		virtual void SetText(const std::string& str) override;
 		virtual void SetColor(Color color) override;
+		virtual void SetTargetCameraIndex(int cameraIndex) override;
 
 public:
 		void Render(DirectX::SpriteBatch* spriteBatch);
 		void SetFont(DirectX::SpriteFont* font);
 		void Append(const std::string& str);
+		int GetTargetCameraIndex() { return _targetCameraIndex; }
 
 		// 리소스매니저에서 unique_ptr로 관리.
 		DirectX::SpriteFont* _font;
@@ -44,5 +46,6 @@ public:
 		std::string _text;
 		Color _color;
 		Matrix _worldTM;
+		int _targetCameraIndex;
 	};
 }

@@ -28,6 +28,7 @@ namespace Rocket::Core
 		ID3D11ShaderResourceView** GetAddressOfSRV();
 
 	private:
+		std::string _textureName;
 		ComPtr<ID3D11Resource> _texture;
 		ComPtr<ID3D11ShaderResourceView> _textureSRV;
 	};
