@@ -122,6 +122,9 @@ void flt::Image::LoadPng()
 			uint32 height;
 			imgFile.read(reinterpret_cast<char*>(&width), sizeof(uint32));
 			imgFile.read(reinterpret_cast<char*>(&height), sizeof(uint32));
+			width = (width >> 24) | ((width & 0xff0000) >> 8) | ((width & 0xff00) << 8) | (width << 24);
+			height = (height >> 24) | ((height & 0xff0000) >> 8) | ((height & 0xff00) << 8) | (height << 24);
+
 			_width = width;
 			_height = height;
 			break;
