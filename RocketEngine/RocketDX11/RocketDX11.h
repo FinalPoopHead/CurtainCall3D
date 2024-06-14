@@ -49,7 +49,7 @@ namespace Rocket::Core
 		void InitSplitScreen(int width, int height);
 		void CreateDepthStencilStates();
 		void FrustumCulling(Camera* cam);
-		void RenderPerCamera(Camera* cam, DeferredBuffers* gBuffer, ID3D11RenderTargetView** renderTargetView);		// 카메라 별로 렌더링 하기 위해
+		void RenderPerCamera(Camera* cam, DeferredBuffers* gBuffer, ID3D11RenderTargetView** renderTargetView, int cameraIndex = 0);		// 카메라 별로 렌더링 하기 위해, cameraIndex : -1 -> 카메라와 관계없이 화면에 그림
 
 		void BeginRender(float r = 0.1f, float g = 0.1f, float b = 0.1f, float a = 0.1f);
 		void EndRender();
@@ -58,9 +58,9 @@ namespace Rocket::Core
 		void RenderMesh();
 		void RenderHelperObject(Camera* cam);
 		void RenderCubeMap(Camera* cam);
-		void RenderText();
+		void RenderText(int cameraIndex = 0);		// cameraIndex : -1 -> 카메라와 관계없이 화면에 그림
 		void RenderLine();
-		void RenderTexture();
+		void RenderTexture(int cameraIndex = 0);	// cameraIndex : -1 -> 카메라와 관계없이 화면에 그림
 		void RenderDebug();
 
 		/// Initialize Member

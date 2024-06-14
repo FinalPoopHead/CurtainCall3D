@@ -465,7 +465,7 @@ namespace Rocket::Core
 			{
 				auto mainCam = Camera::GetMainCamera(i);
 
-				RenderPerCamera(mainCam, _deferredBufferArr[i].get(), _renderTargetViewArr[i].GetAddressOf());
+				RenderPerCamera(mainCam, _deferredBufferArr[i].get(), _renderTargetViewArr[i].GetAddressOf(), i);
 				// TODO : 그려진 텍스쳐를 맞는 뷰포트를 이용해 백버퍼에 쓴다.
 				_deviceContext->OMSetRenderTargets(1, _backBufferRTV.GetAddressOf(), nullptr);
 				_deviceContext->RSSetViewports(1, &_viewportArr[i]);
@@ -475,6 +475,11 @@ namespace Rocket::Core
 				_renderList.reserve(512);
 			}
 		}
+
+		_deviceContext->OMSetRenderTargets(1, _backBufferRTV.GetAddressOf(), nullptr);
+		_deviceContext->RSSetViewports(1, &_viewport);
+		RenderText(-1);
+		RenderTexture(-1);
 
 		EndRender();
 	}
@@ -819,7 +824,7 @@ namespace Rocket::Core
 		}
 	}
 
-	void RocketDX11::RenderPerCamera(Camera* cam, DeferredBuffers* gBuffer, ID3D11RenderTargetView** renderTargetView)
+	void RocketDX11::RenderPerCamera(Camera* cam, DeferredBuffers* gBuffer, ID3D11RenderTargetView** renderTargetView, int cameraIndex /*= 0*/)
 	{
 		for (auto& light : _objectManager.GetDirectionalLightList())
 		{
@@ -852,8 +857,8 @@ namespace Rocket::Core
 		_deviceContext->OMSetRenderTargets(1, renderTargetView, nullptr);
 
 		//	RenderLine();
-		RenderText();
-		RenderTexture();
+		RenderText(cameraIndex);
+		RenderTexture(cameraIndex);
 
 		if (_isDebugMode)
 		{
@@ -988,11 +993,16 @@ namespace Rocket::Core
 		_deviceContext->OMSetDepthStencilState(_defaultDepthStencilState.Get(), 0);
 	}
 
-	void RocketDX11::RenderText()
-	{
+	void RocketDX11::RenderText(int cameraIndex /*= 0*/)
+{
 		_spriteBatch->Begin();
 		for (auto textRenderer : _objectManager.GetTextList())
 		{
+			if (textRenderer->GetTargetCameraIndex() != cameraIndex)
+			{
+				continue;
+			}
+
 			textRenderer->Render(_spriteBatch);
 		}
 		_spriteBatch->End();
@@ -1025,12 +1035,17 @@ namespace Rocket::Core
 		}
 	}
 
-	void RocketDX11::RenderTexture()
-	{
+	void RocketDX11::RenderTexture(int cameraIndex /*= 0*/)
+{
 		_spriteBatch->Begin(DirectX::DX11::SpriteSortMode_FrontToBack);
 		// 이미지(UI)를 그리기 위한 함수
 		for (auto imageRenderer : _objectManager.GetImageList())
 		{
+			if (imageRenderer->GetTargetCameraIndex() != cameraIndex)
+			{
+				continue;
+			}
+
 			imageRenderer->Render(_spriteBatch);
 		}
 		_spriteBatch->End();

@@ -27,9 +27,11 @@ namespace Rocket::Core
 		virtual void SetColor(Color color) override;
 		virtual float GetWidth() override { return _imageWidth; }
 		virtual float GetHeight() override { return _imageHeight; }
+		virtual void SetTargetCameraIndex(int cameraIndex) override;
 
 	public:
 		void Render(DirectX::SpriteBatch* spriteBatch);
+		int GetTargetCameraIndex() { return _targetCameraIndex; }
 
 	private:
 		bool _isActive;
@@ -42,5 +44,6 @@ namespace Rocket::Core
 		float _imageHeight;
 
 		Texture* _texture;		// Resource Manager에서 unique_ptr로 관리 중.
+		int _targetCameraIndex;
 	};
 }
