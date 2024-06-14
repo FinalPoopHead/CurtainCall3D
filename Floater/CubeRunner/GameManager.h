@@ -18,7 +18,8 @@ protected:
 	/// [0] : player1 , [1] : player2
 public:
 	void SetPlayer(int index, Player* player);
-	void SetBoard(int index, Board* board);	
+	void SetBoard(int index, Board* board);
+	void AddPlayerHPPanel(int index, SpriteObject* hpPanel);
 	void AddPlayerHPSlot(int index, SpriteObject* hpSlot);
 	void AddPlayerHPValue(int index, SpriteObject* hpValue);
 
@@ -34,6 +35,7 @@ private:
 	std::vector<Player*> _players;
 	std::vector<Board*> _boards;
 	// TODO : 체력 UI, 시간 UI, 점수 UI, 게임오버 UI, 콤보 UI 등등 추가 필요
+	std::vector<SpriteObject*> _playerHPPanel;
 	std::vector<std::vector<SpriteObject*>> _playerHPSlots;
 	std::vector<std::vector<SpriteObject*>> _playerHPValues;
 
