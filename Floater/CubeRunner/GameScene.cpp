@@ -32,6 +32,9 @@ void GameScene::Initialize()
 	hpValue->SetSize({ 64.0f,64.0f });
 	hpValue->SetZOrder(0.3f);
 
+	// TODO : 여기다가 상위 객체 하나 두고 그녀석의 OffsetTransform을 부여하고
+	//			나머지 녀석들은 그녀석 아래로 두고 절대적인 위치로 들고있어야 될거같은데?
+
 	gameManager->SetBoard(0, board1);
 	gameManager->SetPlayer(0, player1);
 	gameManager->AddPlayerHPSlot(0, hpSlot);
