@@ -6,6 +6,7 @@
 #include "GameManager.h"
 #include "Camera.h"
 #include "GameManager.h"
+#include "SpriteObject.h"
 
 void GameScene::Initialize()
 {
@@ -16,6 +17,18 @@ void GameScene::Initialize()
 	board1->tr.SetPosition(0.0f, 0.0f, 0.0f);
 
 	Player* player1 = flt::CreateGameObject<Player>(true, board1);
+
+	SpriteObject* hpSlot = flt::CreateGameObject<SpriteObject>(true);
+	hpSlot->SetSprite(L"../Resources/Sprites/HPSlot.png");
+	hpSlot->SetOffsetPosition({ 0.9f, 0.9f });
+	hpSlot->SetSize({ 50.0f,50.0f });
+	hpSlot->SetZOrder(0.2f);
+
+	SpriteObject* hpValue = flt::CreateGameObject<SpriteObject>(true);
+	hpValue->SetSprite(L"../Resources/Sprites/HPValue.png");
+	hpValue->SetOffsetPosition({ 0.9f, 0.9f });
+	hpValue->SetSize({ 50.0f,50.0f });
+	hpValue->SetZOrder(0.3f);
 
 	gameManager->SetBoard(0, board1);
 	gameManager->SetPlayer(0, player1);
