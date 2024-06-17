@@ -35,6 +35,7 @@
     <ClInclude Include="include\RendererObject.h" />
     <ClInclude Include="include\Resource.h" />
     <ClInclude Include="include\ResourceMgr.h" />
+    <ClInclude Include="include\Text.h" />
     <ClInclude Include="include\Transform.h" />
     <ClInclude Include="include\RawMesh.h" />
     <ClInclude Include="include\RawAnimation.h" />

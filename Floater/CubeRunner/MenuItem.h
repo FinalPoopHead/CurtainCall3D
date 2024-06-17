@@ -18,6 +18,13 @@ public:
 	float GetZOrder();
 	void SetSize(flt::Vector2f size);
 	flt::Vector2f GetSize();
+
+	void SetText(const std::wstring& text);
+	void SetFont(const std::wstring& fontPath);
+	void SetFontSize(int fontSize);
+	void SetTextColor(flt::Vector4f color);
+	void SetTextColor(float r, float g, float b);
+
 	void Select(flt::KeyCode keyCode);
 
 	void SetSelectFunc(const std::function<void()>& func) { _selectFunc = func; }

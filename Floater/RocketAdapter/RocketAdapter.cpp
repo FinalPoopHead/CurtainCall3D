@@ -243,16 +243,19 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 		}
 	}
 
-	if (renderable.imgName != L"")
+	if (renderable.imgPath != L"")
 	{
 		rocketObject->spriteRenderer = factory->CreateSpriteRenderer();
-		rocketObject->spriteRenderer->SetImage(ToString(renderable.imgName));
+		rocketObject->spriteRenderer->SetImage(ToString(renderable.imgPath));
 	}
 
-	if (renderable.text != L"")
+	if (renderable.text.data != L"")
 	{
 		rocketObject->textRenderer = factory->CreateTextRenderer();
-		rocketObject->textRenderer->SetText(ToString(renderable.text));
+		rocketObject->textRenderer->SetText(ToString(renderable.text.data));
+
+		rocketObject->textRenderer->SetFontwithPath(ToString(renderable.text.font));
+		rocketObject->textRenderer->SetColor({ renderable.text.color.r, renderable.text.color.g, renderable.text.color.b, renderable.text.color.a });
 	}
 
 	Rocket::Core::ReleaseFactory(factory);

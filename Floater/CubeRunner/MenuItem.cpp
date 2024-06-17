@@ -59,6 +59,31 @@ flt::Vector2f MenuItem::GetSize()
 	return _ui->GetSize();
 }
 
+void MenuItem::SetText(const std::wstring& text)
+{
+	_ui->SetText(text);
+}
+
+void MenuItem::SetFont(const std::wstring& fontPath)
+{
+	_ui->SetFont(fontPath);
+}
+
+void MenuItem::SetFontSize(int fontSize)
+{
+	_ui->SetFontSize(fontSize);
+}
+
+void MenuItem::SetTextColor(flt::Vector4f color)
+{
+	_ui->SetTextColor(color);
+}
+
+void MenuItem::SetTextColor(float r, float g, float b)
+{
+	_ui->SetTextColor(r, g, b);
+}
+
 void MenuItem::Select(flt::KeyCode keyCode)
 {
 	if (keyCode == flt::KeyCode::enter)
