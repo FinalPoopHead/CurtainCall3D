@@ -24,7 +24,7 @@ void TestScene::Initialize()
 
 	flt::GameObject* tObject3 = flt::CreateGameObject<flt::GameObject>(true);
 	flt::RendererComponent* tRenderer = tObject3->AddComponent<flt::RendererComponent>(true);
-	tRenderer->SetImage(L"..\\Resources\\abcd.jpg");
+	tRenderer->SetImage(L"..\\Resources\\Sprites\\abcd.jpg");
 	tObject3->tr.SetPosition(0.0f, 0.0f, 0.0f);
 }
  

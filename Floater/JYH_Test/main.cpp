@@ -8,11 +8,22 @@
 #include <iostream>
 #include <filesystem>
 
+#include "../FloaterMath/include/Bezier.h"
+
 
 int main(int argc, char* argv[])
 {
 	setlocale(LC_ALL, ".UTF8");
 	std::cout << std::boolalpha;
+
+	flt::Bezier bezier;
+	bezier.AddControlPoint({0.1f, 0.9f});
+
+	auto p = bezier.Evaluate(0.1f);
+
+	float x = bezier(p.y);
+
+
 
 	std::filesystem::path path = std::filesystem::current_path();
 

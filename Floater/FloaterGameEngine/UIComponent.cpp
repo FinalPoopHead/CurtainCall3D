@@ -165,6 +165,12 @@ flt::Vector2f flt::UIComponent::GetSize()
 void flt::UIComponent::SetText(const std::wstring& text)
 {
 	_rendererObject->text.data = text;
+
+	if (_isRegisted)
+	{
+		_renderer.DeregisterObject(_hObject);
+		_hObject = _renderer.RegisterObject(*_rendererObject);
+	}
 }
 
 void flt::UIComponent::SetFont(const std::wstring& fontPath)
@@ -173,6 +179,11 @@ void flt::UIComponent::SetFont(const std::wstring& fontPath)
 	ASSERT(std::filesystem::exists(p), "File not found");
 
 	_rendererObject->text.font = fontPath;
+	if (_isRegisted)
+	{
+		_renderer.DeregisterObject(_hObject);
+		_hObject = _renderer.RegisterObject(*_rendererObject);
+	}
 }
 
 void flt::UIComponent::SetFontSize(int fontSize)
@@ -183,6 +194,11 @@ void flt::UIComponent::SetFontSize(int fontSize)
 void flt::UIComponent::SetTextColor(flt::Vector4f color)
 {
 	_rendererObject->text.color = color;
+	if (_isRegisted)
+	{
+		_renderer.DeregisterObject(_hObject);
+		_hObject = _renderer.RegisterObject(*_rendererObject);
+	}
 }
 
 void flt::UIComponent::SetTextColor(float r, float g, float b)
