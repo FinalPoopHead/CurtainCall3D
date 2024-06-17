@@ -173,7 +173,7 @@ void GameScene::Initialize()
 
 	TextObject* p2Time = flt::CreateGameObject<TextObject>(true);
 	p2Time->SetOffsetPosition(TIMEPANEL_OFFSETPOS);
-	p2Time->SetText(L"00:02");
+	p2Time->SetText(L"00:00");
 	p2Time->SetFont(fontPath);
 	p2Time->SetTextColor(TimeTextColor);
 

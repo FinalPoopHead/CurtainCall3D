@@ -95,13 +95,12 @@ void GameManager::PostUpdate(float deltaSecond)
 
 	for (int i = 0; i < MAXPLAYERCOUNT; i++)
 	{
-		_gameTime[i] += deltaSecond;
-
-		if (_isGameOver[i] && _boards[i] && _players[i])
+		if (_isGameOver[i])
 		{
-			_players[i]->SetGameOver();
-			_boards[i]->SetGameOver();
+			continue;
 		}
+
+		AddPlayTime(i, deltaSecond);
 	}
 }
 
@@ -185,6 +184,8 @@ void GameManager::ReduceHP(int index, int damage)
 	{
 		_playerHP[index] = 0;
 		_isGameOver[index] = true;
+		_players[index]->SetGameOver();
+		_boards[index]->SetGameOver();
 	}
 }
 
@@ -298,4 +299,35 @@ void GameManager::PrintComboText(int index, int count, int score)
 		_liveComboTexts.push_back(scoreText);
 		_comboTextPool.pop_front();
 	}
+}
+
+void GameManager::AddPlayTime(int index, float time)
+{
+	_gameTime[index] += time;
+
+	int gameTime = static_cast<int>(_gameTime[index]);
+	
+	std::wstring timestr;
+
+	if (gameTime / 60 <= 9)
+	{
+		timestr = L"0" + std::to_wstring(gameTime / 60);
+	}
+	else
+	{
+		timestr = std::to_wstring(gameTime / 60);
+	}
+
+	timestr += L":";
+
+	if (gameTime % 60 <= 9)
+	{
+		timestr += L"0" + std::to_wstring(gameTime % 60);
+	}
+	else
+	{
+		timestr += std::to_wstring(gameTime % 60);
+	}
+
+	_playTimeText[index]->SetText(timestr);
 }

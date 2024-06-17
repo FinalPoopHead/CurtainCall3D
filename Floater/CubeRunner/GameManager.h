@@ -36,6 +36,7 @@ private:
 	void IncreasePlayerCount();
 	void AddScore(int index, int score);
 	void PrintComboText(int index, int count, int score);
+	void AddPlayTime(int index, float time);
 
 	/// 컨트롤 하는 게임 오브젝트들
 private:
