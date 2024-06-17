@@ -42,7 +42,7 @@
     <ClInclude Include="Ease.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Bezier.h">
+    <ClInclude Include="include\Bezier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
