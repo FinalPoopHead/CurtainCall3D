@@ -60,6 +60,7 @@ namespace Rocket::Core
 		Material* GetDefaultMaterial() const { return _defaultMaterial.get(); }		
 		VertexShader* GetVertexShader(const std::string& name);
 		PixelShader* GetPixelShader(const std::string& name);
+		DirectX::SpriteFont* GetFont(const std::string& filePath, bool isFullPath = true);
 		DirectX::SpriteFont* GetDefaultFont() const;
 
 		DirectX::DX11::GeometricPrimitive* GetCubePrimitive() { return _cubePrimitive.get(); }
@@ -103,6 +104,7 @@ namespace Rocket::Core
 
 		// 기본 폰트 들고있음
 		std::unique_ptr<DirectX::SpriteFont> _defaultFont;
+		std::unordered_map<std::string, std::unique_ptr<DirectX::SpriteFont>> _fonts;
 
 		// DXTK Primitive
 		std::unique_ptr<DirectX::DX11::GeometricPrimitive> _cubePrimitive;

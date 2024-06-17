@@ -10,6 +10,7 @@ constexpr int CUBESCORE = 100;
 GameManager::GameManager() :
 	_players(std::vector<Player*>(MAXPLAYERCOUNT))
 	, _boards(std::vector<Board*>(MAXPLAYERCOUNT))
+	, _playerHPPanel(std::vector<SpriteObject*>(MAXPLAYERCOUNT))
 	, _playerHPSlots(std::vector<std::vector<SpriteObject*>>(MAXPLAYERCOUNT))
 	, _playerHPValues(std::vector<std::vector<SpriteObject*>>(MAXPLAYERCOUNT))
 	, _currentPlayerCount(0)
@@ -68,6 +69,11 @@ void GameManager::SetBoard(int index, Board* board)
 	}
 
 	_boards[index] = board;
+}
+
+void GameManager::AddPlayerHPPanel(int index, SpriteObject* hpPanel)
+{
+	_playerHPPanel[index] = hpPanel;
 }
 
 void GameManager::AddPlayerHPSlot(int index, SpriteObject* hpSlot)
@@ -141,24 +147,19 @@ void GameManager::IncreasePlayerCount()
 
 	if (_currentPlayerCount >= MAXPLAYERCOUNT)
 	{
+		constexpr float offSetDelta = 0.5f;
 		// TODO : UI 배치 적절히 나눠야 함
+		// TODO : 이거 왜 동작 안하냐.
 		for (int i = 0; i < MAXPLAYERCOUNT; i++)
 		{
-			float offSetBase = 0.0f;
-
-			for (auto& hpSlot : _playerHPSlots[i])
+			float offSetBase = offSetDelta * i;
+			if (_playerHPPanel[i] == nullptr)
 			{
-				auto originOffset = hpSlot->GetOffsetPosition();
-				hpSlot->SetOffsetPosition({ offSetBase + originOffset.x / 2, originOffset.y });
+				continue;
 			}
 
-			for (auto& hpValue : _playerHPValues[i])
-			{
-				auto originOffset = hpValue->GetOffsetPosition();
-				hpValue->SetOffsetPosition({ offSetBase + originOffset.x / 2, originOffset.y });
-			}
-
-			offSetBase += 0.5f;
+			auto originOffset = _playerHPPanel[i]->GetOffsetPosition();
+			_playerHPPanel[i]->SetOffsetPosition({ offSetBase + originOffset.x / 2, originOffset.y });
 		}
 	}
 }

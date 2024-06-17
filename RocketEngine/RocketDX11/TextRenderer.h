@@ -27,6 +27,7 @@ namespace Rocket::Core
 		virtual Color GetColor() override;
 
 		virtual void SetWorldTM(const Matrix& worldTM) override;
+		virtual void SetFontwithPath(const std::string& fontPath) override;
 		virtual void SetText(const std::string& str) override;
 		virtual void SetColor(Color color) override;
 		virtual void SetTargetCameraIndex(int cameraIndex) override;
