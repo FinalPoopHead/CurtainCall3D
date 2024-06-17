@@ -87,7 +87,10 @@ void CubeController::StartFalling()
 	_isFalling = true;
 	_fallSpeed = STARTFALLSPEED;
 	_board->RemoveFromControllerList(this);
-	_board->ReduceHPbyCubeFalling();
+	if (_cubeType != eCUBETYPE::DARK)
+	{
+		_board->ReduceHPbyCubeFalling();
+	}
 }
 
 void CubeController::Roll(float deltaSecond)
