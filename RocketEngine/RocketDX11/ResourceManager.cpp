@@ -249,10 +249,6 @@ namespace Rocket::Core
 			{
 				fullPath = filePath.substr(slashIndex + 1, filePath.length() - slashIndex);
 			}
-			else
-			{
-				fullPath = filePath;
-			}
 		}
 
 		if (_textures.find(fullPath) == _textures.end())
@@ -515,4 +511,31 @@ namespace Rocket::Core
 
 		delete node;
 	}
+
+	DirectX::SpriteFont* ResourceManager::GetFont(const std::string& filePath, bool isFullPath /*= true*/)
+	{
+		std::string fullPath = filePath;
+		std::wstring wFullPath = std::wstring(filePath.begin(), filePath.end());
+
+		if (!isFullPath)
+		{
+			/// 경로 제외하기 위한 로직
+			size_t slashIndex = filePath.find_last_of("/\\");
+			if (slashIndex != std::string::npos)
+			{
+				fullPath = filePath.substr(slashIndex + 1, filePath.length() - slashIndex);
+				wFullPath = std::wstring(fullPath.begin(), fullPath.end());
+				wFullPath = FONT_PATH + wFullPath;
+			}
+		}
+
+		if (_fonts.find(fullPath) == _fonts.end())
+		{
+			std::unique_ptr<DirectX::SpriteFont> font = std::make_unique<DirectX::SpriteFont>(_device, wFullPath.c_str());
+			_fonts.insert({ fullPath, std::move(font) });
+		}
+		
+		return _fonts.at(fullPath).get();
+	}
+
 }

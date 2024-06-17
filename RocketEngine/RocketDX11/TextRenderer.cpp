@@ -1,5 +1,6 @@
 ﻿#include "TextRenderer.h"
 #include "ObjectManager.h"
+#include "ResourceManager.h"
 
 namespace Rocket::Core
 {
@@ -63,6 +64,11 @@ namespace Rocket::Core
 	void TextRenderer::SetFont(DirectX::SpriteFont* font)
 	{
 		_font = font;
+	}
+
+	void TextRenderer::SetFontwithPath(const std::string& fontPath)
+	{
+		_font = ResourceManager::Instance().GetFont(fontPath);
 	}
 
 	void TextRenderer::Append(const std::string& str)
