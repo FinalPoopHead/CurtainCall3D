@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "Component.h"
 #include "../../../FloaterUtil/include/FloaterType.h"
-#include "../../../FloaterMath/include/Vector2f.h"
+#include "../../../FloaterMath/include/floaterMath.h"
 #include <string>
 #include <memory>
 
@@ -36,6 +36,12 @@ namespace flt
 		flt::Vector2f GetImageSize();
 		void SetSize(flt::Vector2f imgSize);
 		flt::Vector2f GetSize();
+
+		void SetText(const std::wstring& text);
+		void SetFont(const std::wstring& fontPath);
+		void SetFontSize(int fontSize);
+		void SetTextColor(flt::Vector4f color);
+		void SetTextColor(float r, float g, float b);
 
 	private:
 		void UpdatePosition();

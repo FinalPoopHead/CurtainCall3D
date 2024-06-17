@@ -15,6 +15,7 @@ namespace flt
 			handle(NULL),
 			type(GamePadType::UNKNOWN),
 			state(),
+			vibration(),
 			deadZone(),
 			isConnected(false) {}
 
@@ -23,6 +24,7 @@ namespace flt
 		HANDLE handle;
 		GamePadType type;
 		GamePadState state;
+		GamePadVibration vibration;
 		GamePadDeadZone deadZone;
 		bool isConnected;
 	};

@@ -30,6 +30,14 @@ void MainMenuScene::Initialize()
 
 	item2->SetSelectFunc([]() { flt::ExitGame(); });
 
+	MenuItem* item3 = flt::CreateGameObject<MenuItem>(true);
+	menu->AddItem(item3);
+
+	item3->SetText(L"Test");
+	item3->SetFont(L"../Resources/Fonts/NotoSansKR.spritefont");
+	item3->SetTextColor(1.0f, 0.0f, 0.0f);
+	item3->SetOffsetPosition({ 0.75f, 0.5f });
+
 
 	MenuSelector* selector = flt::CreateGameObject<MenuSelector>(true, menu);
 

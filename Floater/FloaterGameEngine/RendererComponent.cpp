@@ -67,7 +67,17 @@ void flt::RendererComponent::OnDestroy()
 
 void flt::RendererComponent::SetText(const std::wstring& text)
 {
-	_rendererObject->text = text;
+	_rendererObject->text.data = text;
+}
+
+void flt::RendererComponent::SetFont(const std::wstring& path)
+{
+	_rendererObject->text.font = path;
+}
+
+void flt::RendererComponent::SetTextSize(uint32 size)
+{
+	_rendererObject->text.size = size;
 }
 
 void flt::RendererComponent::SetImage(const std::wstring& path)
@@ -75,7 +85,7 @@ void flt::RendererComponent::SetImage(const std::wstring& path)
 	std::filesystem::path p(path);
 	ASSERT(std::filesystem::exists(p), "File not found");
 	std::wstring absPath = std::filesystem::absolute(p);
-	_rendererObject->imgName = path;
+	_rendererObject->imgPath = path;
 
 	if (_isRegisted)
 	{

@@ -28,6 +28,8 @@ namespace flt
 
 	public:
 		void SetText(const std::wstring& text);
+		void SetFont(const std::wstring& path);
+		void SetTextSize(uint32 size);
 		void SetImage(const std::wstring& path);
 		void SetFilePath(const std::wstring& path);
 		void SetMaterial(uint32 meshIndex, const std::wstring& path, RawMaterial::TextureType type);

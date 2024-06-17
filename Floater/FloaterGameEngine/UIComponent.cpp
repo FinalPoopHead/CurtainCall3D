@@ -46,6 +46,7 @@ void flt::UIComponent::PreRender()
 {
 	if (_isOffsetMode)
 	{
+		ASSERT(!_gameObject->tr.GetParent(), "Offset 모드는 계층구조의 자식이면 안됨");
 		flt::Vector2f windowSize = GameEngine::Instance()->GetWindowSize();
 		_position.x = _offsetPosition.x * windowSize.x;
 		_position.y = _offsetPosition.y * windowSize.y;
@@ -76,7 +77,7 @@ void flt::UIComponent::SetImage(const std::wstring& filePath)
 	std::filesystem::path p(filePath);
 	ASSERT(std::filesystem::exists(p), "File not found");
 	std::wstring absPath = std::filesystem::absolute(p);
-	_rendererObject->imgName = filePath;
+	_rendererObject->imgPath = filePath;
 
 	_image->Set(filePath);
 
@@ -159,6 +160,34 @@ void flt::UIComponent::SetSize(flt::Vector2f imgSize)
 flt::Vector2f flt::UIComponent::GetSize()
 {
 	return _size;
+}
+
+void flt::UIComponent::SetText(const std::wstring& text)
+{
+	_rendererObject->text.data = text;
+}
+
+void flt::UIComponent::SetFont(const std::wstring& fontPath)
+{
+	std::filesystem::path p(fontPath);
+	ASSERT(std::filesystem::exists(p), "File not found");
+
+	_rendererObject->text.font = fontPath;
+}
+
+void flt::UIComponent::SetFontSize(int fontSize)
+{
+	_rendererObject->text.size = fontSize;
+}
+
+void flt::UIComponent::SetTextColor(flt::Vector4f color)
+{
+	_rendererObject->text.color = color;
+}
+
+void flt::UIComponent::SetTextColor(float r, float g, float b)
+{
+	SetTextColor({ r, g, b, 1.0f });
 }
 
 void flt::UIComponent::UpdatePosition()

@@ -25,6 +25,7 @@ flt::Platform* flt::GameEngine::GetPlatform()
 	return _platform.get();
 }
 
+
 void flt::GameEngine::ExitGame()
 {
 	_platform->Exit();
@@ -59,13 +60,13 @@ bool flt::GameEngine::Update()
 
 	_timer.Update();
 	float deltaSecond = (float)_timer.GetDeltaSeconds();
-	bool closeWindow = _platform->Update();
+	bool closeWindow = _platform->Update(deltaSecond);
 
 	_currentScene->StartFrame();
 
 	constexpr float fixedUpdateInterval = 0.02f;
 	_fixedUpdateElapsedSecond += deltaSecond;
-	// 너무 한번에 물리 루프를 돌지 않게 임시 루프
+	// 너무 한번에 물리 루프를 돌지 않게 제한
 	// 추후 물리 루프 1회에 들어가는 시간을 계산해서 루프 횟수 등을 조절 할 생각.
 	if (_fixedUpdateElapsedSecond > 0.07f)
 	{

@@ -58,8 +58,6 @@ namespace flt
 		std::unique_ptr<SoundEngine> _soundEngine;
 
 		IRenderer* _renderer;
-		//PhysicsEngine* _physicsEngine;
-		//SoundEngine* _soundEngine;
 
 		Scene* _nextScene;
 		Scene* _currentScene;

@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include "RawNode.h"
 #include "AnimState.h"
-#include "../FloaterUtil/include/FloaterType.h"
+#include "Text.h"
+#include "../../FloaterUtil/include/FloaterType.h"
 #include <vector>
 #include <string>
 
@@ -19,8 +20,8 @@ namespace flt
 			node(nullptr),
 			camera(nullptr),
 			animState(),
-			imgName(L""),
-			text(L""),
+			imgPath(L""),
+			text(),
 			name(L"") {}
 
 		~RendererObject();
@@ -38,8 +39,8 @@ namespace flt
 		std::vector<RawMaterial> materials;
 		Camera* camera;
 		AnimState animState;
-		std::wstring imgName;
-		std::wstring text;
+		std::wstring imgPath;
+		Text text;
 		std::wstring name;
 	};
 }
