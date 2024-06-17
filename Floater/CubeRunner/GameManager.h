@@ -34,6 +34,8 @@ public:
 
 private:
 	void IncreasePlayerCount();
+	void AddScore(int index, int score);
+	void PrintComboText(int index, int count, int score);
 
 	/// 컨트롤 하는 게임 오브젝트들
 private:
@@ -58,4 +60,6 @@ private:
 	std::vector<int> _playerHP;	
 	std::vector<float> _gameTime;
 	std::vector<int> _playerScore;
+
+	std::vector<flt::Vector2f> _comboTextPos;		// 플레이어 별 콤보 텍스트 위치
 };
