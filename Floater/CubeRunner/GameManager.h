@@ -58,6 +58,7 @@ private:
 	int _currentPlayerCount;		// 플레이어 수
 	std::vector<bool> _isGameOver;
 	std::vector<int> _playerHP;	
+	std::vector<int> _playerMaxHP;
 	std::vector<float> _gameTime;
 	std::vector<int> _playerScore;
 

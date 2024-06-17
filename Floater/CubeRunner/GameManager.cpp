@@ -26,6 +26,7 @@ GameManager::GameManager() :
 	, _currentPlayerCount(0)
 	, _isGameOver(std::vector<bool>(MAXPLAYERCOUNT))
 	, _playerHP(std::vector<int>(MAXPLAYERCOUNT))
+	, _playerMaxHP(std::vector<int>(MAXPLAYERCOUNT))
 	, _gameTime(std::vector<float>(MAXPLAYERCOUNT))
 	, _playerScore(std::vector<int>(MAXPLAYERCOUNT))
 	, _comboTextPos(std::vector<flt::Vector2f>(MAXPLAYERCOUNT))
@@ -115,6 +116,7 @@ void GameManager::SetPlayer(int index, Player* player)
 	IncreasePlayerCount();
 	_players[index] = player;
 	_playerHP[index] = MAXHP;
+	_playerMaxHP[index] = MAXHP;
 }
 
 void GameManager::SetBoard(int index, Board* board)
@@ -174,18 +176,9 @@ void GameManager::ReduceHP(int index, int damage)
 
 	_playerHP[index] -= damage;
 
-	for (auto& hpValue : _playerHPValues[index])
+	for (int i = 0; i < _playerMaxHP[index] - _playerHP[index]; i++)
 	{
-		if (hpValue->isEnable())
-		{
-			hpValue->Disable();	// TODO : DISABLE 처리가 후처리되기때문에 그거 잘 체크해야함
-			damage--;
-
-			if (damage <= 0)
-			{
-				break;
-			}
-		}
+		_playerHPValues[index][i]->Disable();
 	}
 
 	if (_playerHP[index] <= 0)
