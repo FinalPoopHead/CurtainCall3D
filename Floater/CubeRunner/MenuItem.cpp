@@ -4,7 +4,6 @@
 
 MenuItem::MenuItem()
 {
-	//_spriteRenderer = AddComponent<flt::RendererComponent>(true);
 	_ui = AddComponent<flt::UIComponent>(true);
 	_ui->SetZOrder(0.4f);
 }

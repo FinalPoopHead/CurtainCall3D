@@ -135,11 +135,12 @@ namespace Rocket::Core
 
 	Rocket::Core::SpriteRenderer* ObjectManager::CreateImage()
 	{
-		SpriteRenderer* temp = new SpriteRenderer();
-		temp->SetImage(TEXTURE_PATH + "test.jpg");
-		_spriteList.emplace_back(temp);
+		SpriteRenderer* spriteRenderer = new SpriteRenderer();
+		spriteRenderer->SetImage(TEXTURE_PATH + "test.jpg");
+		spriteRenderer->SetTargetCameraIndex(-1); // TODO : CubeRunner에 맞게 임시로 -1로 세팅.
+		_spriteList.emplace_back(spriteRenderer);
 
-		return temp;
+		return spriteRenderer;
 	}
 
 	std::vector<SpriteRenderer*>& ObjectManager::GetImageList()
@@ -156,6 +157,7 @@ namespace Rocket::Core
 	{
 		TextRenderer* textRenderer = new TextRenderer();
 		textRenderer->SetFont(ResourceManager::Instance().GetDefaultFont());
+		textRenderer->SetTargetCameraIndex(-1); // TODO : CubeRunner에 맞게 임시로 -1로 세팅.
 		_textList.emplace_back(textRenderer);
 		return textRenderer;
 	}
