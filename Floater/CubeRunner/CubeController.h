@@ -1,6 +1,13 @@
 ﻿#pragma once
 #include "../FloaterGameEngine/include/EngineMinimal.h"
 
+enum class eCUBETYPE
+{
+	NORMAL,
+	ADVANTAGE,
+	DARK
+};
+
 class Board;
 
 class CubeController : public flt::Component<CubeController>
@@ -10,6 +17,7 @@ public:
 	~CubeController();
 
 	void SetBoard(Board* board) { _board = board; }
+	void SetCubeType(eCUBETYPE type) { this->_cubeType = type; }
 
 	virtual void PreUpdate(float deltaSecond) override;
 	virtual void OnDisable() override;
@@ -34,5 +42,6 @@ private:
 	float _currentAngle;	// 현재 회전 각도
 	flt::Vector3f _rotatePivot;	// 회전 중심
 	float _fallSpeed;		// 떨어지는 속도
+	eCUBETYPE _cubeType;
 };
 

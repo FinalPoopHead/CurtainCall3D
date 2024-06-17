@@ -103,6 +103,9 @@
     <ClCompile Include="SpriteObject.cpp">
       <Filter>GameObject\UI\Ingame</Filter>
     </ClCompile>
+    <ClCompile Include="TextObject.cpp">
+      <Filter>GameObject\UI\Ingame</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h">
@@ -161,6 +164,9 @@
     </ClInclude>
     <ClInclude Include="ControllerManager.h" />
     <ClInclude Include="SpriteObject.h">
+      <Filter>GameObject\UI\Ingame</Filter>
+    </ClInclude>
+    <ClInclude Include="TextObject.h">
       <Filter>GameObject\UI\Ingame</Filter>
     </ClInclude>
   </ItemGroup>

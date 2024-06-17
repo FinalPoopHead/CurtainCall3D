@@ -53,7 +53,29 @@ namespace Rocket::Core
 		}
 
 		std::wstring wstr(_text.begin(), _text.end());
-		_font->DrawString(spriteBatch, wstr.c_str(), DirectX::XMFLOAT2(_worldTM.m[3][0], _worldTM.m[3][1]), _color);
+
+		Vector2 pos = Vector2(_worldTM.m[3][0], _worldTM.m[3][1]);
+
+		// TODO : 240617 현재 임시로 텍스트의 중앙이 좌표점이 되게끔 설정해놨음.
+		Vector2 origin = _font->MeasureString(wstr.c_str());
+		origin /= 2.0f;
+		origin = { 0.0f,0.0f };	// TODO : 240617 임시로 좌측상단으로 롤백함.
+
+		// TODO : 240617 현재 임시로 테두리 모드를 기본으로 그리게 해놨음.
+		float borderSize = 1.0f;
+		_font->DrawString(spriteBatch, wstr.c_str(), pos + Vector2(borderSize, borderSize), DirectX::Colors::Black, 0.0f, origin);
+		_font->DrawString(spriteBatch, wstr.c_str(), pos + Vector2(-borderSize, borderSize), DirectX::Colors::Black, 0.0f, origin);
+		_font->DrawString(spriteBatch, wstr.c_str(), pos + Vector2(-borderSize, -borderSize), DirectX::Colors::Black, 0.0f, origin);
+		_font->DrawString(spriteBatch, wstr.c_str(), pos + Vector2(borderSize, -borderSize), DirectX::Colors::Black, 0.0f, origin);
+
+		_font->DrawString(
+			spriteBatch
+			, wstr.c_str()
+			, pos
+			, _color
+			, 0.0f
+			, origin
+		);
 	}
 
 	Color TextRenderer::GetColor()
