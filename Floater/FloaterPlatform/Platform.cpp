@@ -36,9 +36,9 @@ bool flt::Platform::Finalize()
 	return _pOsImpl->Finalize();
 }
 
-bool flt::Platform::Update()
+bool flt::Platform::Update(float deltaSeconds)
 {
-	return _pOsImpl->Update();
+	return _pOsImpl->Update(deltaSeconds);
 }
 
 flt::IRenderer* flt::Platform::CreateRenderer(RendererType type)
@@ -71,14 +71,19 @@ flt::KeyData flt::Platform::GetKeyUp(KeyCode code)
 	return _pOsImpl->GetKeyUp(code);
 }
 
+bool flt::Platform::GamePadConnected(int padIndex)
+{
+	return _pOsImpl->GamePadConnected(padIndex);
+}
+
 bool flt::Platform::GetGamePadState(int padIndex, GamePadState* outState)
 {
 	return _pOsImpl->GetGamePadState(padIndex, outState);
 }
 
-bool flt::Platform::SetGamePadVibration(int padIndex, float leftMotor, float rightMotor)
+bool flt::Platform::SetGamePadVibration(int padIndex, bool isRightMoter, float moterPower, float time)
 {
-	return _pOsImpl->SetGamePadVibration(padIndex, leftMotor, rightMotor);
+	return _pOsImpl->SetGamePadVibration(padIndex, isRightMoter, moterPower, time);
 }
 
 bool flt::Platform::SetGamePadAnalogDeadZone(int padIndex, GamePadDeadZone* deadZone)

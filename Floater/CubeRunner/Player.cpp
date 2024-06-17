@@ -186,10 +186,12 @@ void Player::Update(float deltaSecond)
 	{
 		if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
 		{
+			flt::SetGamePadVibration(_padIndex, true, 1.0f, 1.0f);
 			printf("A\n");
 		}
 		if (state.buttonsDown & flt::GamePadState::ButtonFlag::B)
 		{
+			flt::SetGamePadVibration(_padIndex, false, 1.0f, 1.0f);
 			printf("B\n");
 		}
 		if (state.buttonsDown & flt::GamePadState::ButtonFlag::X)

@@ -46,6 +46,7 @@ void flt::UIComponent::PreRender()
 {
 	if (_isOffsetMode)
 	{
+		ASSERT(!_gameObject->tr.GetParent(), "Offset 모드는 계층구조의 자식이면 안됨");
 		flt::Vector2f windowSize = GameEngine::Instance()->GetWindowSize();
 		_position.x = _offsetPosition.x * windowSize.x;
 		_position.y = _offsetPosition.y * windowSize.y;

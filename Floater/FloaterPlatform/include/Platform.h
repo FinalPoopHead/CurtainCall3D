@@ -32,7 +32,7 @@ namespace flt
 	public:
 		bool Initialize(int pixelWidth, int pixelHeight, std::wstring title, std::wstring imgPath);
 		bool Finalize();
-		bool Update();
+		bool Update(float deltaSeconds);
 
 		IRenderer* CreateRenderer(RendererType type);
 		void DestroyRenderer(IRenderer* renderer);
@@ -43,8 +43,10 @@ namespace flt
 		KeyData GetKeyDown(KeyCode code);
 		KeyData GetKeyUp(KeyCode code);
 
+		bool GamePadConnected(int padIndex);
 		bool GetGamePadState(int padIndex, GamePadState* outState);
-		bool SetGamePadVibration(int padIndex, float leftMotor, float rightMotor);
+		bool SetGamePadVibration(int padIndex, bool isRightMoter, float moterPower, float time);
+
 		bool SetGamePadAnalogDeadZone(int padIndex, GamePadDeadZone* deadZone);
 		std::vector<int> GetGamePadIndexList();
 

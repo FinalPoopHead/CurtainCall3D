@@ -253,21 +253,9 @@ bool flt::OsWindows::Finalize()
 	return true;
 }
 
-bool flt::OsWindows::Update()
+bool flt::OsWindows::Update(float deltaSeconds)
 {
-	// 한 프레임 내에 up, down이 있을 경우에도 한번은 키입력 처리를 위해
 	UpdateKeyState();
-
-	// 마찬가지로 게임패드 버튼들 초기화
-	//for (int i = 0; i < 16; ++i)
-	//{
-	//	if (_pGamePads[i] == nullptr)
-	//	{
-	//		continue;
-	//	}
-
-	//	Xbox::Clear(_pGamePads[i]);
-	//}
 
 	// 윈도우 메세지 처리
 	MSG msg;
@@ -294,6 +282,8 @@ bool flt::OsWindows::Update()
 
 		flt::Xbox::Get(&_pGamePads[i]);
 	}
+
+	UpdateGamePadVibration(deltaSeconds);
 
 	return true;
 }
@@ -399,6 +389,11 @@ flt::KeyData flt::OsWindows::GetKeyUp(KeyCode code)
 	return keydata;
 }
 
+bool flt::OsWindows::GamePadConnected(int padIndex)
+{
+	return _pGamePads[padIndex].isConnected;
+}
+
 bool flt::OsWindows::GetGamePadState(int padIndex, GamePadState* outState)
 {
 	ASSERT(outState, "outState가 nullptr입니다.");
@@ -418,8 +413,12 @@ bool flt::OsWindows::GetGamePadState(int padIndex, GamePadState* outState)
 	return true;
 }
 
+// MoterPower : 0 ~ 1
 bool flt::OsWindows::SetGamePadVibration(int padIndex, float leftMotor, float rightMotor)
 {
+	ASSERT(leftMotor >= 0.0f && leftMotor <= 1.0f, "leftMotor 범위가 잘못되었습니다.");
+	ASSERT(rightMotor >= 0.0f && rightMotor <= 1.0f, "rightMotor 범위가 잘못되었습니다.");
+
 	if (padIndex < 0 || padIndex >= 16)
 	{
 		return false;
@@ -429,11 +428,43 @@ bool flt::OsWindows::SetGamePadVibration(int padIndex, float leftMotor, float ri
 	{
 		return false;
 	}
-	
+
 	leftMotor = std::clamp(leftMotor, 0.0f, 1.0f);
 	rightMotor = std::clamp(rightMotor, 0.0f, 1.0f);
 
 	Xbox::Set(&_pGamePads[padIndex], (BYTE)(leftMotor * 255), (BYTE)(rightMotor * 255));
+	return true;
+}
+
+// MoterPower : 0 ~ 1
+bool flt::OsWindows::SetGamePadVibration(int padIndex, bool isRightMoter, float moterPower, float time)
+{
+	ASSERT(time > 0.0f, "time이 0보다 작습니다.");
+	ASSERT(moterPower >= 0.0f && moterPower <= 1.0f, "moterPower 범위가 잘못되었습니다.");
+
+	if (padIndex < 0 || padIndex >= 16)
+	{
+		return false;
+	}
+
+	if (_pGamePads[padIndex].isConnected == false)
+	{
+		return false;
+	}
+
+	moterPower = std::clamp(moterPower, 0.0f, 1.0f);
+
+	if (isRightMoter)
+	{
+		_pGamePads[padIndex].vibration.rightMotorPower = (BYTE)(moterPower * 255);
+		_pGamePads[padIndex].vibration.rightMotorTime = time;
+	}
+	else
+	{
+		_pGamePads[padIndex].vibration.leftMotorPower = (BYTE)(moterPower * 255);
+		_pGamePads[padIndex].vibration.leftMotorTime = time;
+	}
+
 	return true;
 }
 
@@ -494,7 +525,7 @@ void flt::OsWindows::ShowCursor(bool isShow)
 
 std::wstring flt::OsWindows::GetExePath()
 {
-	return _exePath;  
+	return _exePath;
 }
 
 std::wstring flt::OsWindows::GetAbsPath(std::wstring relativePath)
@@ -550,6 +581,43 @@ void flt::OsWindows::UpdateKeyState()
 	_pKeyDatas[(int)KeyCode::mouseWheelDown].y = 0;
 }
 
+void flt::OsWindows::UpdateGamePadVibration(float deltaSeconds)
+{
+	for (auto& pad : _pGamePads)
+	{
+		if (pad.isConnected == false)
+		{
+			continue;
+		}
+
+		if (pad.vibration.leftMotorPower <= 0 && pad.vibration.rightMotorPower <= 0)
+		{
+			continue;
+		}
+
+		if (pad.vibration.leftMotorTime > 0.0f)
+		{
+			pad.vibration.leftMotorTime -= deltaSeconds;
+			if (pad.vibration.leftMotorTime <= 0.0f)
+			{
+				pad.vibration.leftMotorPower = 0;
+				pad.vibration.leftMotorTime = 0.0f;
+			}
+		}
+		if (pad.vibration.rightMotorTime > 0.0f)
+		{
+			pad.vibration.rightMotorTime -= deltaSeconds;
+			if (pad.vibration.rightMotorTime <= 0.0f)
+			{
+				pad.vibration.rightMotorPower = 0;
+				pad.vibration.rightMotorTime = 0.0f;
+			}
+		}
+
+		Xbox::Set(&pad, pad.vibration.leftMotorPower, pad.vibration.rightMotorPower);
+	}
+}
+
 void flt::OsWindows::HandleKeyboardRawData(const RAWKEYBOARD& data)
 {
 	auto code = _keyCodeMap[data.VKey];
@@ -557,15 +625,15 @@ void flt::OsWindows::HandleKeyboardRawData(const RAWKEYBOARD& data)
 	keyData.keyTime = _keyTimer.GetLabTimeMicroSeconds();
 	keyData.x = 0;
 	keyData.y = 0;
-	
+
 	// 확장키의경우 flag로 RI_KEY_E0 가 오는데 이때 KeyUp인지 Down인지 구분이 안됨.
 	// 이경우에는 Message 값으로 판단을 해야하는데 확장 키가 아닐 경우에도 Message가 오기 때문에
 	// 항상 Message로 판단.
 	// SYS가 붙은경우 ALT와 함께 눌린 키를 의미함.
 	//SetKeyState((KeyCode)code, keyData, data.Flags & RI_KEY_MAKE, data.Flags & RI_KEY_BREAK);
-	SetKeyState((KeyCode)code, 
-		keyData, 
-		data.Message == WM_KEYDOWN || data.Message == WM_SYSKEYDOWN, 
+	SetKeyState((KeyCode)code,
+		keyData,
+		data.Message == WM_KEYDOWN || data.Message == WM_SYSKEYDOWN,
 		data.Message == WM_KEYUP || data.Message == WM_SYSKEYUP
 	);
 }
@@ -1141,7 +1209,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 					ASSERT(hash == 0, "해시값이 0이면 처음 연결되는것으로 세팅되어있음.");
 
 					WinGamePad* emptyGamePad = thisPtr->FindEmptyGamePad(hash);
-					
+
 
 					if (emptyGamePad == nullptr)
 					{

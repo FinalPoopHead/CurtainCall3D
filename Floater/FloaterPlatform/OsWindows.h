@@ -15,7 +15,7 @@ namespace flt
 {
 	class IRenderer;
 	struct GamePadState;
-	struct WinGamePad;
+	//struct WinGamePad;
 	struct KeyState;
 
 	class OsWindows
@@ -27,7 +27,7 @@ namespace flt
 		virtual ~OsWindows();
 		bool Initialize(int windowWidth, int windowHeight, const std::wstring& title, const std::wstring& imgPath);
 		bool Finalize();
-		bool Update();
+		bool Update(float deltaSeconds);
 
 		IRenderer* CreateRenderer(RendererType type);
 		void DestroyRenderer(IRenderer* renderer);
@@ -37,8 +37,10 @@ namespace flt
 		KeyData GetKey(KeyCode code);
 		KeyData GetKeyDown(KeyCode code);
 		KeyData GetKeyUp(KeyCode code);
+		bool GamePadConnected(int padIndex);
 		bool GetGamePadState(int padIndex, GamePadState* outState);
-		bool SetGamePadVibration(int padIndex, float leftMotor, float rightMotor);
+		[[deprecated("Use bool SetGamePadVibration(int padIndex, bool isRightMoter, float moterPower, float time)")]] bool SetGamePadVibration(int padIndex, float leftMotor, float rightMotor);
+		bool SetGamePadVibration(int padIndex, bool isRightMoter, float moterPower, float time);
 		bool SetGamePadAnalogDeadZone(int padIndex, GamePadDeadZone* deadZone);
 		std::vector<int> GetGamePadIndexList();
 
@@ -52,6 +54,7 @@ namespace flt
 
 	private:
 		void UpdateKeyState();
+		void UpdateGamePadVibration(float deltaSeconds);
 
 		void HandleKeyboardRawData(const RAWKEYBOARD& data);
 		void HandleMouseRawData(const RAWMOUSE& data);

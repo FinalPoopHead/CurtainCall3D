@@ -57,4 +57,12 @@ namespace flt
 		float lTrigger;
 		float rTrigger;
 	};
+
+	struct GamePadVibration
+	{
+		float leftMotorPower;
+		float leftMotorTime;
+		float rightMotorPower;
+		float rightMotorTime;
+	};
 }
