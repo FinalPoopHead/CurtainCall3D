@@ -1,11 +1,16 @@
 ﻿#include "GameManager.h"
+#include "../FloaterGameEngine/include/Input.h"
+
 #include "Player.h"
 #include "Board.h"
 #include "SpriteObject.h"
+#include "TextObject.h"
 
 constexpr int MAXHP = 10000;
 constexpr int MAXPLAYERCOUNT = 2;
 constexpr int CUBESCORE = 100;
+constexpr int COMBOTEXTCOUNT = 20;
+constexpr float COMBOTEXTSPEED = 0.2f;
 
 GameManager::GameManager() :
 	_players(std::vector<Player*>(MAXPLAYERCOUNT))
@@ -13,6 +18,10 @@ GameManager::GameManager() :
 	, _playerHPPanel(std::vector<SpriteObject*>(MAXPLAYERCOUNT))
 	, _playerHPSlots(std::vector<std::vector<SpriteObject*>>(MAXPLAYERCOUNT))
 	, _playerHPValues(std::vector<std::vector<SpriteObject*>>(MAXPLAYERCOUNT))
+	, _playTimeText(std::vector<TextObject*>(MAXPLAYERCOUNT))
+	, _playerScoreText(std::vector<TextObject*>(MAXPLAYERCOUNT))
+	, _comboTextPool()
+	, _liveComboTexts()
 	, _currentPlayerCount(0)
 	, _isGameOver(std::vector<bool>(MAXPLAYERCOUNT))
 	, _playerHP(std::vector<int>(MAXPLAYERCOUNT))
@@ -26,6 +35,19 @@ GameManager::GameManager() :
 		_gameTime[i] = 0.0f;
 		_playerScore[i] = 0;
 	}
+
+	std::wstring fontPath = L"../Resources/Fonts/LineSeedSansKR_KoreanCompatible_25.spritefont";
+	flt::Vector4f fontColor = { 1.0f,1.0f,1.0f,1.0f };
+
+	// Create comboTextPool
+	for (int i = 0; i < COMBOTEXTCOUNT; i++)
+	{
+		TextObject* comboText = flt::CreateGameObject<TextObject>(false);
+		comboText->SetFont(fontPath);
+		comboText->SetText(L"default text");
+		comboText->SetTextColor(fontColor);
+		_comboTextPool.push_back(comboText);
+	}
 }
 
 GameManager::~GameManager()
@@ -33,8 +55,41 @@ GameManager::~GameManager()
 
 }
 
+void GameManager::Update(float deltaSecond)
+{
+	flt::KeyData keyData = flt::GetKeyDown(flt::KeyCode::c);
+	if (keyData && !_comboTextPool.empty())
+	{
+		auto& comboText = _comboTextPool.front();
+		comboText->Enable();
+		comboText->SetText(L"Combo 10");
+		comboText->SetOffsetPosition({ 0.15f,0.85f });
+		_liveComboTexts.push_back(comboText);
+		_comboTextPool.pop_front();
+	}
+
+	for (auto& comboText : _liveComboTexts)
+	{
+		auto originOffset = comboText->GetOffsetPosition();
+		comboText->SetOffsetPosition({ originOffset.x, originOffset.y - COMBOTEXTSPEED * deltaSecond });
+	}
+}
+
 void GameManager::PostUpdate(float deltaSecond)
 {
+	if (!_liveComboTexts.empty())
+	{
+		auto& comboText = _liveComboTexts.front();
+		auto offsetPos = comboText->GetOffsetPosition();
+
+		if (offsetPos.y <= 0.15f)
+		{
+			comboText->Disable();
+			_comboTextPool.push_back(comboText);
+			_liveComboTexts.pop_front();
+		}
+	}
+
 	for (int i = 0; i < MAXPLAYERCOUNT; i++)
 	{
 		_gameTime[i] += deltaSecond;
@@ -84,6 +139,28 @@ void GameManager::AddPlayerHPSlot(int index, SpriteObject* hpSlot)
 void GameManager::AddPlayerHPValue(int index, SpriteObject* hpValue)
 {
 	_playerHPValues[index].push_back(hpValue);
+}
+
+void GameManager::AddPlayTimeText(int index, TextObject* playTimeText)
+{
+	if (index < 0 || index >= MAXPLAYERCOUNT)
+	{
+		ASSERT(false, "playTime index 오류");
+		return;
+	}
+
+	_playTimeText[index] = playTimeText;
+}
+
+void GameManager::AddPlayerScoreText(int index, TextObject* playerScoreText)
+{
+	if (index < 0 || index >= MAXPLAYERCOUNT)
+	{
+		ASSERT(false, "playerScoreText index 오류");
+		return;
+	}
+
+	_playerScoreText[index] = playerScoreText;
 }
 
 void GameManager::ReduceHP(int index, int damage)
@@ -153,13 +230,24 @@ void GameManager::IncreasePlayerCount()
 		for (int i = 0; i < MAXPLAYERCOUNT; i++)
 		{
 			float offSetBase = offSetDelta * i;
-			if (_playerHPPanel[i] == nullptr)
+
+			if (_playerHPPanel[i] != nullptr)
 			{
-				continue;
+				auto originOffset = _playerHPPanel[i]->GetOffsetPosition();
+				_playerHPPanel[i]->SetOffsetPosition({ offSetBase + originOffset.x / MAXPLAYERCOUNT, originOffset.y });
 			}
 
-			auto originOffset = _playerHPPanel[i]->GetOffsetPosition();
-			_playerHPPanel[i]->SetOffsetPosition({ offSetBase + originOffset.x / 2, originOffset.y });
+			if (_playTimeText[i] != nullptr)
+			{
+				auto originOffset = _playTimeText[i]->GetOffsetPosition();
+				_playTimeText[i]->SetOffsetPosition({ offSetBase + originOffset.x / MAXPLAYERCOUNT, originOffset.y });
+			}
+
+			if (_playerScoreText[i] != nullptr)
+			{
+				auto originOffset = _playerScoreText[i]->GetOffsetPosition();
+				_playerScoreText[i]->SetOffsetPosition({ offSetBase + originOffset.x / MAXPLAYERCOUNT, originOffset.y });
+			}
 		}
 	}
 }
