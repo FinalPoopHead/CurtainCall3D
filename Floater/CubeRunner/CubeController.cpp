@@ -14,11 +14,7 @@ constexpr double REMOVESCALE = 0.98;
 
 CubeController::CubeController()
 	: _board(nullptr)
-	,_status(eCUBESTATUS::NONE)
-	, _isRolling(false)
-	, _isFalling(false)
-	, _isRemoving(false)
-	, _isRising(false)
+	, _status(eCUBESTATUS::NONE)
 	, _targetIndex(0)
 	, _rotateSpeed(0.0f)
 	, _removeSpeed(0.0f)
@@ -39,38 +35,31 @@ CubeController::~CubeController()
 
 void CubeController::PreUpdate(float deltaSecond)
 {
-	if (_isRising)
+	switch (_status)
 	{
-		Rising(deltaSecond * _board->GetFFValue());
-		return;
-	}
-
-	if (_isRolling)
-	{
+	case eCUBESTATUS::ROLLING:
 		Roll(deltaSecond * _board->GetFFValue());
-		return;
-	}
 
-	if (_isFalling)
-	{
+		break;
+	case eCUBESTATUS::FALLING:
 		Fall(deltaSecond * _board->GetFFValue());
 		if (IsFallEnough())
 		{
 			_board->BackToPool(_gameObject);
-
-			_isFalling = false;
-			_isRolling = false;
+			_status = eCUBESTATUS::NONE;
 		}
-		return;
-	}
-
-	if (_isRemoving)
-	{
+		break;
+	case eCUBESTATUS::REMOVING:
 		Removing(deltaSecond * _board->GetFFValue());
-		return;
+
+		break;
+	case eCUBESTATUS::RISING:
+		Rising(deltaSecond * _board->GetFFValue());
+
+		break;
 	}
 
-	if (!_isRolling && IsOutofBoard())
+	if (_status != eCUBESTATUS::ROLLING && IsOutofBoard())
 	{
 		StartFalling();
 	}
@@ -83,12 +72,13 @@ void CubeController::OnDisable()
 
 void CubeController::StartRolling(float rotateTime)
 {
-	if (_isRolling || _isFalling)
+	if (_status == eCUBESTATUS::ROLLING
+		|| _status == eCUBESTATUS::FALLING)
 	{
 		return;
 	}
 
-	_isRolling = true;
+	_status = eCUBESTATUS::ROLLING;
 
 	flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
 	_rotatePivot = { pos.x, pos.y - PIVOTSIZE, pos.z - PIVOTSIZE };
@@ -100,12 +90,14 @@ void CubeController::StartRolling(float rotateTime)
 
 void CubeController::StartFalling()
 {
-	if (_isFalling || _isRolling)
+	if (_status == eCUBESTATUS::ROLLING
+		|| _status == eCUBESTATUS::FALLING)
 	{
 		return;
 	}
 
-	_isFalling = true;
+	_status = eCUBESTATUS::FALLING;
+
 	_fallSpeed = STARTFALLSPEED;
 	_board->RemoveFromControllerList(this);
 	if (_cubeType != eCUBETYPE::DARK)
@@ -119,9 +111,7 @@ void CubeController::StartRemoving(float removeTime)
 	_gameObject->tr.SetScale(REMOVESCALE, REMOVESCALE, REMOVESCALE);
 	_removeSpeed = 1.0f / removeTime;
 
-	_isRolling = false;
-	_isFalling = false;
-	_isRemoving = true;
+	_status = eCUBESTATUS::REMOVING;
 	_board->RemoveFromControllerList(this);
 }
 
@@ -131,10 +121,7 @@ void CubeController::StartRising(float riseTime, float delay)
 	_riseDelay = delay;
 	_elapsedTime = 0.0f;
 
-	_isRolling = false;
-	_isFalling = false;
-	_isRemoving = false;
-	_isRising = true;
+	_status = eCUBESTATUS::RISING;
 }
 
 void CubeController::Roll(float deltaSecond)
@@ -149,7 +136,7 @@ void CubeController::Roll(float deltaSecond)
 	if (_currentAngle + deltaAngle >= TARGETANGLE[_targetIndex])
 	{
 		deltaAngle = TARGETANGLE[_targetIndex] - _currentAngle;
-		_isRolling = false;
+		_status = eCUBESTATUS::NONE;
 	}
 	_currentAngle += deltaAngle;
 
@@ -161,7 +148,7 @@ void CubeController::Roll(float deltaSecond)
 
 	_gameObject->tr.AddWorldPosition(-dir);
 
-	if (!_isRolling)
+	if (_status != eCUBESTATUS::ROLLING)
 	{
 		FinishRolling();
 	}
@@ -217,13 +204,13 @@ void CubeController::Removing(float deltaSecond)
 	{
 		_board->RemoveFromControllerList(this);
 		_board->BackToPool(_gameObject);
-		_isRemoving = false;
+		_status = eCUBESTATUS::NONE;
 	}
 }
 
 void CubeController::Rising(float deltaSecond)
 {
-	if(_elapsedTime <= _riseDelay)
+	if (_elapsedTime <= _riseDelay)
 	{
 		_elapsedTime += deltaSecond;
 	}
@@ -234,7 +221,7 @@ void CubeController::Rising(float deltaSecond)
 
 		if (pos.y >= 4.0f)	// 타일 높이보다 같거나 커지면 제거
 		{
-			_isRising = false;
+			_status = eCUBESTATUS::NONE;
 			_board->OnEndRising();
 			_gameObject->tr.SetScale(1.0, 1.0, 1.0);
 		}
