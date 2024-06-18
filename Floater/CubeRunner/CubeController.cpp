@@ -9,13 +9,17 @@ constexpr float TARGETANGLE[4] = { 90.0f, 180.0f, 270.0f, 360.0f };	// 회전 �
 constexpr float GRAVITY = 9.8f;
 constexpr float STARTFALLSPEED = 15.0f;
 constexpr float FALLHEIGHT = -50.0f;
+constexpr float REMOVEDISTANCE = 4.0f;
+constexpr double REMOVESCALE = 0.99;
 
 CubeController::CubeController()
 	: _board(nullptr)
 	, _isRolling(false)
 	, _isFalling(false)
+	, _isRemoving(false)
 	, _targetIndex(0)
 	, _rotateSpeed(0.0f)
+	, _removeSpeed(0.0f)
 	, _currentAngle(0.0f)
 	, _rotatePivot(0.0f, 0.0f, 0.0f)
 	, _fallSpeed(0.0f)
@@ -36,16 +40,22 @@ void CubeController::PreUpdate(float deltaSecond)
 		return;
 	}
 
-	if(_isFalling)
+	if (_isFalling)
 	{
 		Fall(deltaSecond * _board->GetFFValue());
-		if(IsFallEnough())
+		if (IsFallEnough())
 		{
 			_board->BackToPool(_gameObject);
 
 			_isFalling = false;
 			_isRolling = false;
 		}
+		return;
+	}
+
+	if (_isRemoving)
+	{
+		Removing(deltaSecond * _board->GetFFValue());
 		return;
 	}
 
@@ -93,10 +103,21 @@ void CubeController::StartFalling()
 	}
 }
 
+void CubeController::StartRemoving(float removeTime)
+{
+	_gameObject->tr.SetScale(REMOVESCALE, REMOVESCALE, REMOVESCALE);
+	_removeSpeed = 1.0f / removeTime;
+
+	_isRolling = false;
+	_isFalling = false;
+	_isRemoving = true;
+	_board->RemoveFromControllerList(this);
+}
+
 void CubeController::Roll(float deltaSecond)
 {
 	flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
-	flt::Vector4f pivot = {_rotatePivot.x, _rotatePivot.y, _rotatePivot.z, 1.0f};
+	flt::Vector4f pivot = { _rotatePivot.x, _rotatePivot.y, _rotatePivot.z, 1.0f };
 	flt::Vector4f dir = pivot - pos;
 
 	_gameObject->tr.AddWorldPosition(dir);
@@ -133,16 +154,15 @@ void CubeController::FinishRolling()
 void CubeController::Fall(float deltaSecond)
 {
 	_fallSpeed += GRAVITY * deltaSecond;
-	flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
-	_gameObject->tr.AddWorldPosition( 0.0f, -_fallSpeed * deltaSecond, 0.0f);
+	_gameObject->tr.AddWorldPosition(0.0f, -_fallSpeed * deltaSecond, 0.0f);
 }
 
 bool CubeController::IsOutofBoard()
 {
 	auto pos = _gameObject->tr.GetWorldPosition();
-	auto state = _board->QueryTileState(pos.x,pos.z);
+	auto state = _board->QueryTileState(pos.x, pos.z);
 
-	if(state == (int)TileStateFlag::None)
+	if (state == (int)TileStateFlag::None)
 	{
 		return true;
 	}
@@ -161,5 +181,19 @@ bool CubeController::IsFallEnough()
 	else
 	{
 		return false;
+	}
+}
+
+void CubeController::Removing(float deltaSecond)
+{
+	_gameObject->tr.AddWorldPosition(0.0f, -_removeSpeed * REMOVEDISTANCE * deltaSecond, 0.0f);
+
+	flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
+
+	if (pos.y <= 0.0f)	// 타일 높이보다 갖거나 작아지면 제거
+	{
+		_board->RemoveFromControllerList(this);
+		_board->BackToPool(_gameObject);
+		_isRemoving = false;
 	}
 }
