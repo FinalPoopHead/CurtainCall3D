@@ -154,6 +154,7 @@
     <ClCompile Include="NormalCube.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="TestCamera.cpp" />
+    <ClCompile Include="TextObject.cpp" />
     <ClCompile Include="Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -176,6 +177,7 @@
     <ClInclude Include="NormalCube.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="TestCamera.h" />
+    <ClInclude Include="TextObject.h" />
     <ClInclude Include="Tile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -495,6 +495,11 @@ namespace Rocket::Core
 		{
 			iter.second.reset();
 		}
+
+		for (auto& iter : _fonts)
+		{
+			iter.second.reset();
+		}
 	}
 
 	void ResourceManager::DeleteNodeRecur(Node* node)

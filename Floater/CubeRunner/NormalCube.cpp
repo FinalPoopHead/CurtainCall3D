@@ -8,7 +8,8 @@ NormalCube::NormalCube()
 	renderer->SetFilePath(filePath);
 	renderer->SetMaterial(0, L"../Resources/Textures/NormalCube.png", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
 
-	AddComponent<CubeController>(true);
+	const auto& cubeCtr = AddComponent<CubeController>(true);
+	cubeCtr->SetCubeType(eCUBETYPE::NORMAL);
 }
 
 NormalCube::~NormalCube()
