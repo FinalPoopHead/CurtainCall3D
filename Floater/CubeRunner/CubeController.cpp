@@ -9,17 +9,22 @@ constexpr float TARGETANGLE[4] = { 90.0f, 180.0f, 270.0f, 360.0f };	// 회전 �
 constexpr float GRAVITY = 9.8f;
 constexpr float STARTFALLSPEED = 15.0f;
 constexpr float FALLHEIGHT = -50.0f;
-constexpr float REMOVEDISTANCE = 4.0f;
-constexpr double REMOVESCALE = 0.99;
+constexpr float DISTANCE = 4.0f;
+constexpr double REMOVESCALE = 0.98;
 
 CubeController::CubeController()
 	: _board(nullptr)
+	,_status(eCUBESTATUS::NONE)
 	, _isRolling(false)
 	, _isFalling(false)
 	, _isRemoving(false)
+	, _isRising(false)
 	, _targetIndex(0)
 	, _rotateSpeed(0.0f)
 	, _removeSpeed(0.0f)
+	, _riseSpeed(0.0f)
+	, _riseDelay(0.0f)
+	, _elapsedTime(0.0f)
 	, _currentAngle(0.0f)
 	, _rotatePivot(0.0f, 0.0f, 0.0f)
 	, _fallSpeed(0.0f)
@@ -34,6 +39,12 @@ CubeController::~CubeController()
 
 void CubeController::PreUpdate(float deltaSecond)
 {
+	if (_isRising)
+	{
+		Rising(deltaSecond * _board->GetFFValue());
+		return;
+	}
+
 	if (_isRolling)
 	{
 		Roll(deltaSecond * _board->GetFFValue());
@@ -114,6 +125,18 @@ void CubeController::StartRemoving(float removeTime)
 	_board->RemoveFromControllerList(this);
 }
 
+void CubeController::StartRising(float riseTime, float delay)
+{
+	_riseSpeed = 1.0f / riseTime;
+	_riseDelay = delay;
+	_elapsedTime = 0.0f;
+
+	_isRolling = false;
+	_isFalling = false;
+	_isRemoving = false;
+	_isRising = true;
+}
+
 void CubeController::Roll(float deltaSecond)
 {
 	flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
@@ -186,14 +209,34 @@ bool CubeController::IsFallEnough()
 
 void CubeController::Removing(float deltaSecond)
 {
-	_gameObject->tr.AddWorldPosition(0.0f, -_removeSpeed * REMOVEDISTANCE * deltaSecond, 0.0f);
+	_gameObject->tr.AddWorldPosition(0.0f, -_removeSpeed * DISTANCE * deltaSecond, 0.0f);
 
 	flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
 
-	if (pos.y <= 0.0f)	// 타일 높이보다 갖거나 작아지면 제거
+	if (pos.y <= 0.0f)	// 타일 높이보다 같거나 작아지면 제거
 	{
 		_board->RemoveFromControllerList(this);
 		_board->BackToPool(_gameObject);
 		_isRemoving = false;
+	}
+}
+
+void CubeController::Rising(float deltaSecond)
+{
+	if(_elapsedTime <= _riseDelay)
+	{
+		_elapsedTime += deltaSecond;
+	}
+	else
+	{
+		_gameObject->tr.AddWorldPosition(0.0f, _riseSpeed * DISTANCE * deltaSecond, 0.0f);
+		flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
+
+		if (pos.y >= 4.0f)	// 타일 높이보다 같거나 커지면 제거
+		{
+			_isRising = false;
+			_board->OnEndRising();
+			_gameObject->tr.SetScale(1.0, 1.0, 1.0);
+		}
 	}
 }
