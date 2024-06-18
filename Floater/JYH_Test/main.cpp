@@ -9,6 +9,8 @@
 #include <filesystem>
 
 #include "../FloaterMath/include/Bezier.h"
+#include "../FloaterMath/include/floaterMath.h"
+#include "../FloaterUtil/include/Log.h"
 
 
 int main(int argc, char* argv[])
@@ -16,14 +18,15 @@ int main(int argc, char* argv[])
 	setlocale(LC_ALL, ".UTF8");
 	std::cout << std::boolalpha;
 
-	flt::Bezier bezier;
-	bezier.AddControlPoint({0.1f, 0.9f});
+	flt::info(L"Hello World!");
 
-	auto p = bezier.Evaluate(0.1f);
+	int i = 0;
 
-	float x = bezier(p.y);
-
-
+	//std::wstring kString = L"한글 테스트";
+	//auto format = std::format(kStringView, i);
+	//std::wcout << format << "\n";
+	constexpr std::wstring_view kStringView = L"한글 테스트";
+	flt::info(kStringView);
 
 	std::filesystem::path path = std::filesystem::current_path();
 

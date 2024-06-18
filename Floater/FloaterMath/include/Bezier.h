@@ -10,6 +10,13 @@ namespace flt
 	class  Bezier
 	{
 	public:
+		__declspec(dllexport) static Bezier Linear();
+		__declspec(dllexport) static Bezier Ease();
+		__declspec(dllexport) static Bezier EaseIn();
+		__declspec(dllexport) static Bezier EaseOut();
+		__declspec(dllexport) static Bezier EaseInOut();
+
+	public:
 		__declspec(dllexport) Bezier();
 		__declspec(dllexport) ~Bezier() {}
 
@@ -22,6 +29,7 @@ namespace flt
 		static std::array<std::array<float, 16>, 16> s_binomialCoefficients;
 		static float binomialCoefficient(int n, int k);
 
+	private:
 		float CalcX(float t) const;
 		float CalcY(float t) const;
 		float CalcYPrime(float t) const;

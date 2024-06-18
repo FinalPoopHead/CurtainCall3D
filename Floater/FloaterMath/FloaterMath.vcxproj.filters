@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\floaterMath.h">
+    <ClInclude Include="include\FloaterMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Common.h">

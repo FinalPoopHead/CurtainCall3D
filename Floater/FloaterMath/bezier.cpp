@@ -1,6 +1,45 @@
 ﻿#include "./include/bezier.h"
 #include "../FloaterUtil/include/FloaterMacro.h"
 
+flt::Bezier flt::Bezier::Linear()
+{
+	return Bezier();
+}
+
+flt::Bezier flt::Bezier::Ease()
+{
+	Bezier bezier;
+	bezier.AddControlPoint({0.25f, 0.1f});
+	bezier.AddControlPoint({0.25f, 1.0f});
+
+	return bezier;
+}
+
+flt::Bezier flt::Bezier::EaseIn()
+{
+	Bezier bezier;
+	bezier.AddControlPoint({0.42f, 0.0f});
+
+	return bezier;
+}
+
+flt::Bezier flt::Bezier::EaseOut()
+{
+	Bezier bezier;
+	bezier.AddControlPoint({0.58f, 1.0f});
+
+	return bezier;
+}
+
+flt::Bezier flt::Bezier::EaseInOut()
+{
+	Bezier bezier;
+	bezier.AddControlPoint({0.42f, 0.0f});
+	bezier.AddControlPoint({0.58f, 1.0f});
+
+	return bezier;
+}
+
 flt::Bezier::Bezier() 
 	: _controlPoints { {0.0f, 0.0f}, {1.0f, 1.0f} }
 {
@@ -38,7 +77,8 @@ float flt::Bezier::operator()(float y) const
 		float calcYPrime = CalcYPrime(t);
 		float nextT = t - (calcY - y) / calcYPrime;
 
-		float epsilon = std::max(std::fabsf(nextT), std::fabsf(t)) * flt::FLOAT_EPSILON;
+		//float epsilon = std::max(std::fabsf(nextT), std::fabsf(t)) * flt::FLOAT_EPSILON;
+		float epsilon = flt::FLOAT_EPSILON;
 		if(std::fabsf(nextT - t) < epsilon)
 		{
 			t = nextT;
@@ -104,5 +144,12 @@ float flt::Bezier::CalcY(float t) const
 float flt::Bezier::CalcYPrime(float t) const
 {
 	float yPrime = 0.0;
-	return yPrime;
+	int n = (int)_controlPoints.size() - 1;
+	for(int i = 0; i < n; ++i)
+	{
+		float term = _controlPoints[i+1].y - _controlPoints[i].y;
+		yPrime += binomialCoefficient(n - 1, i) * std::powf(1.0f - t, (float)(n - i - 1)) * std::powf(t, (float)i) * term;
+	}
+
+	return yPrime * (float)n;
 }
