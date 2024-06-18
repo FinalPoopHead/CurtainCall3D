@@ -49,7 +49,7 @@ public:
 	void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
 	void ConvertToTilePosition(int x, int z, float& outX, float& outZ);
 
-	void GenerateRandomWave();
+	void GenerateRandomWave();		// 임시로 랜덤 생성 용
 	void BackToPool(flt::GameObject* obj);
 	void RemoveFromControllerList(CubeController* cubeCtr);
 	void SetMine(float x, float z);			// position X,Z에 지뢰를 설치한다.

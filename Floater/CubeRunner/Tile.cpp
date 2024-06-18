@@ -18,17 +18,17 @@ Tile::Tile()
 
 	float coneHeight = 8.0f;
 
-	_mine = flt::CreateGameObject<Mine>(false);
+	_mine = flt::CreateGameObject<Mine>(true);
 	_mine->tr.SetParent(&tr);
-	_mine->tr.AddWorldPosition(0.0f, coneHeight, 0.0f);
+	_mine->Disable();
 
-	_advantageMine = flt::CreateGameObject<AdvantageMine>(false);
+	_advantageMine = flt::CreateGameObject<AdvantageMine>(true);
 	_advantageMine->tr.SetParent(&tr);
-	_advantageMine->tr.AddWorldPosition(0.0f, coneHeight, 0.0f);
+	_advantageMine->Disable();
 
-	_detonated = flt::CreateGameObject<DetonatedMine>(false);
+	_detonated = flt::CreateGameObject<DetonatedMine>(true);
 	_detonated->tr.SetParent(&tr);
-	_detonated->tr.AddWorldPosition(0.0f, coneHeight, 0.0f);
+	_detonated->Disable();
 }
 
 Tile::~Tile()

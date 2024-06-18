@@ -1,16 +1,46 @@
 ﻿#include "Mine.h"
 
-Mine::Mine()
+Mine::Mine() :
+	_plane(flt::CreateGameObject<flt::GameObject>(true))
+	, _cone(flt::CreateGameObject<flt::GameObject>(true))
 {
-	// TODO : 임시로 Blender Cone FBX 넣어둠.
-	std::wstring filePath = L"..\\Resources\\Models\\Cone.fbx";
+	std::wstring planePath = L"..\\Resources\\Models\\cube.fbx";
+	std::wstring conePath = L"..\\Resources\\Models\\Cone.fbx";
+	std::wstring texturePath = L"..\\Resources\\Textures\\Rob02_Normal.dds";	// TODO : 텍스쳐는 임시임.
 
-	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>(true);
-	renderer->SetFilePath(filePath);
-	renderer->SetMaterial(0, L"../Resources/Textures/Rob02_Normal.dds", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
+	float planeHeight = 2.01f;
+	float coneHeight = 8.0f;
+
+	_plane->tr.SetParent(&tr);
+	_plane->tr.AddWorldPosition(0.0f, planeHeight, 0.0f);
+
+	_cone->tr.SetParent(&tr);
+	_cone->tr.AddWorldPosition(0.0f, coneHeight, 0.0f);
+
+	auto planeRenderer = _plane->AddComponent<flt::RendererComponent>(true);
+	planeRenderer->SetFilePath(planePath);
+	planeRenderer->SetMaterial(0, texturePath, flt::RawMaterial::TextureType::ALBEDO_OPACITY);
+
+	auto coneRenderer = _cone->AddComponent<flt::RendererComponent>(true);
+	coneRenderer->SetFilePath(conePath);
+	coneRenderer->SetMaterial(0, texturePath, flt::RawMaterial::TextureType::ALBEDO_OPACITY);
+
+	_plane->tr.SetScale(1.0f, 0.01f, 1.0f);
 }
 
 Mine::~Mine()
 {
 
+}
+
+void Mine::OnEnable()
+{
+	_plane->Enable();
+	_cone->Enable();
+}
+
+void Mine::OnDisable()
+{
+	_plane->Disable();
+	_cone->Disable();
 }
