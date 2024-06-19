@@ -8,7 +8,7 @@ Mine::Mine() :
 	std::wstring conePath = L"..\\Resources\\Models\\Cone.fbx";
 	std::wstring texturePath = L"..\\Resources\\Textures\\Rob02_Normal.dds";	// TODO : 텍스쳐는 임시임.
 
-	float planeHeight = 2.01f;
+	float planeHeight = 2.05f;
 	float coneHeight = 8.0f;
 
 	_plane->tr.SetParent(&tr);

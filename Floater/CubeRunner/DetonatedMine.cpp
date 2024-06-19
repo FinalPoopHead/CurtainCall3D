@@ -8,7 +8,7 @@ DetonatedMine::DetonatedMine() :
 	std::wstring conePath = L"..\\Resources\\Models\\Cone.fbx";
 	std::wstring texturePath = L"..\\Resources\\Textures\\T_WEP_Basic_009_D.png";	// TODO : 텍스쳐는 임시임.
 
-	float planeHeight = 2.01f;
+	float planeHeight = 2.05f;
 	float coneHeight = 8.0f;
 
 	_plane->tr.SetParent(&tr);
