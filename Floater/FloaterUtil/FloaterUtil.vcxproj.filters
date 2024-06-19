@@ -10,6 +10,12 @@
     <Filter Include="Test">
       <UniqueIdentifier>{2b44496f-4b1c-4535-9e7e-3b2105e15481}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Logger">
+      <UniqueIdentifier>{c37fa869-5d48-467f-889d-f3db97a9cf3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reflection">
+      <UniqueIdentifier>{774da497-9270-482e-b0d2-ab630721d6f8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Allocator.h">
@@ -57,7 +63,27 @@
     <ClInclude Include="include\Hash.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="include\Type.h" />
+    <ClInclude Include="include\Log.h">
+      <Filter>Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Type.h">
+      <Filter>Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PatternFormatter.h">
+      <Filter>Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LogFormatter.h">
+      <Filter>Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LogSink.h">
+      <Filter>Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LogFilter.h">
+      <Filter>Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LogContext.h">
+      <Filter>Logger</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConvString.cpp">

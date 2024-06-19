@@ -155,6 +155,12 @@
     <ClInclude Include="include\ConvString.h" />
     <ClInclude Include="include\FloaterType.h" />
     <ClInclude Include="include\FloaterMacro.h" />
+    <ClInclude Include="include\Log.h" />
+    <ClInclude Include="include\LogContext.h" />
+    <ClInclude Include="include\LogFilter.h" />
+    <ClInclude Include="include\LogFormatter.h" />
+    <ClInclude Include="include\LogSink.h" />
+    <ClInclude Include="include\PatternFormatter.h" />
     <ClInclude Include="include\Timer.h" />
     <ClInclude Include="include\RBTree.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
