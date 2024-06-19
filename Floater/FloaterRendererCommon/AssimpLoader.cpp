@@ -46,6 +46,14 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 
 	std::string path = ToString(filePath);
 	const aiScene* assimpScene = importer.ReadFile(path, flags);
+
+	if (!assimpScene || assimpScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !assimpScene->mRootNode)
+	{
+		std::cout << "\tERROR::ASSIMP: " << importer.GetErrorString() << std::endl;
+		ASSERT(false, "assimp load fail");
+		return;
+	}
+
 	size_t pos = path.find_last_of('\\');
 	std::wstring directory = ToWstring(path.substr(0, pos + 1));
 

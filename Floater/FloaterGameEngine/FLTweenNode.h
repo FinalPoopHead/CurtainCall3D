@@ -18,6 +18,13 @@ namespace flt
 		void SetEase(std::function<float(float)> ease);
 		void SetDuration(float duration);
 
+		void SetOnComplete(std::function<void()> onComplete);
+		void SetOnStart(std::function<void()> onStart);
+		void SetOnPlay(std::function<void()> onPlay);
+		void SetOnUpdate(std::function<void(float)> onUpdate);
+		void SetOnPause(std::function<void()> onPause);
+
+
 
 	private:
 		void Update(float deltaSeconds);
