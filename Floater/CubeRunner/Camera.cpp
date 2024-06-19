@@ -9,10 +9,10 @@ Camera::Camera(Player* player, Board* board) :
 	_player(player),
 	_board(board),
 	_height(10.0f),
-	_playHeight(30.0f),
+	_playHeight(40.0f),
 	_lookZOffset(0.0f),
 	_posZOffsest(-10.0f),
-	_playerDistance(25.0f),
+	_playerDistance(35.0f),
 	_lookDegree(40.0f),
 	_movSpeed(1.5f),
 	_rotSpeed(15.0f)

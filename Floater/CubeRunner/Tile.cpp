@@ -10,25 +10,27 @@ Tile::Tile()
 	, _advantageMine(nullptr)
 	, _detonated(nullptr)
 {
-	std::wstring filePath = L"..\\Resources\\Models\\cube.fbx";
+	std::wstring filePath = L"..\\Resources\\Models\\BrickBlock.fbx";
 
 	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>(true);
 	renderer->SetFilePath(filePath);
-	renderer->SetMaterial(0, L"../Resources/Textures/NormalCube.png", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
+	renderer->SetMaterial(0, L"../Resources/Textures/Concrete 1-diffuse.png", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
+	renderer->SetMaterial(0, L"../Resources/Textures/Concrete 1-normal.png", flt::RawMaterial::TextureType::NORMAL);
+	renderer->SetMaterial(0, L"../Resources/Textures/Concrete 1-specular.png", flt::RawMaterial::TextureType::METALLIC);
 
 	float coneHeight = 8.0f;
 
-	_mine = flt::CreateGameObject<Mine>(false);
+	_mine = flt::CreateGameObject<Mine>(true);
 	_mine->tr.SetParent(&tr);
-	_mine->tr.AddWorldPosition(0.0f, coneHeight, 0.0f);
+	_mine->Disable();
 
-	_advantageMine = flt::CreateGameObject<AdvantageMine>(false);
+	_advantageMine = flt::CreateGameObject<AdvantageMine>(true);
 	_advantageMine->tr.SetParent(&tr);
-	_advantageMine->tr.AddWorldPosition(0.0f, coneHeight, 0.0f);
+	_advantageMine->Disable();
 
-	_detonated = flt::CreateGameObject<DetonatedMine>(false);
+	_detonated = flt::CreateGameObject<DetonatedMine>(true);
 	_detonated->tr.SetParent(&tr);
-	_detonated->tr.AddWorldPosition(0.0f, coneHeight, 0.0f);
+	_detonated->Disable();
 }
 
 Tile::~Tile()
