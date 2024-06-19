@@ -53,5 +53,5 @@ namespace flt
 	};
 
 	template <typename... Args>
-	info(std::wstring_view fmt, Args&&...args) -> info<Args...>;
+	info(std::wstring_view, Args&&...) -> info<Args...>;
 }

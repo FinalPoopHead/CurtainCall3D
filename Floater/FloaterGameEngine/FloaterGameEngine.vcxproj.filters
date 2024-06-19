@@ -98,7 +98,7 @@
     <ClInclude Include="Sound.h">
       <Filter>Sound</Filter>
     </ClInclude>
-    <ClInclude Include="FlTween.h">
+    <ClInclude Include="FLTween.h">
       <Filter>fltween</Filter>
     </ClInclude>
     <ClInclude Include="include\internal\UIComponent.h">
@@ -106,6 +106,9 @@
     </ClInclude>
     <ClInclude Include="Image.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FLTweenNode.h">
+      <Filter>fltween</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -160,7 +163,7 @@
     <ClCompile Include="Sound.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="FlTween.cpp">
+    <ClCompile Include="FLTween.cpp">
       <Filter>fltween</Filter>
     </ClCompile>
     <ClCompile Include="UIComponent.cpp">
@@ -168,6 +171,9 @@
     </ClCompile>
     <ClCompile Include="Image.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="FLTweenNode.cpp">
+      <Filter>fltween</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

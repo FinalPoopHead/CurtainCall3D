@@ -4,20 +4,18 @@
 
 namespace flt
 {
-	class FlTween
+	class FLTweenNode;
+	
+	class FLTween
 	{
 	public:
-		FlTween(std::function<float(float)> ease, float duration);
-		~FlTween();
+		FLTween();
+		~FLTween();
 
-		void update(float deltaSeconds);
-		float getProgress() const;
-		bool isFinished() const;
+		void Update(float deltaSeconds);
 
 	private:
-		std::function<float(float)> _ease;
-		float _duration;
-		float _elapsed;
-		bool _isFinished;
+		FLTweenNode* _head;
+		FLTweenNode* _current;
 	};
 }

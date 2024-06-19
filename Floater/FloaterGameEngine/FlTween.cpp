@@ -1,11 +1,16 @@
-﻿#include "FlTween.h"
+﻿#include "FLTween.h"
+#include "FLTweenNode.h"
 
-void flt::FlTween::update(float deltaSeconds)
+
+void flt::FLTween::Update(float deltaSeconds)
 {
-	_elapsed += deltaSeconds;
-	if (_elapsed >= _duration)
+	if (_current)
 	{
-		_elapsed = _duration;
-		_isFinished = true;
+		_current->Update(deltaSeconds);
+
+		if(_current->IsFinished())
+		{
+			_current = _current->Next();
+		}
 	}
 }

@@ -18,15 +18,13 @@ int main(int argc, char* argv[])
 	setlocale(LC_ALL, ".UTF8");
 	std::cout << std::boolalpha;
 
-	flt::info(L"Hello World!");
+	flt::info(L"Hello {}!", L"World");
 
-	int i = 0;
+	std::wstring_view kStringView = L"한글 테스트";
+	//flt::info(kStringView);
 
-	//std::wstring kString = L"한글 테스트";
-	//auto format = std::format(kStringView, i);
-	//std::wcout << format << "\n";
-	constexpr std::wstring_view kStringView = L"한글 테스트";
-	flt::info(kStringView);
+	flt::info{kStringView};
+
 
 	std::filesystem::path path = std::filesystem::current_path();
 

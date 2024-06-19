@@ -20,7 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CollisionPair.h" />
-    <ClInclude Include="FlTween.h" />
+    <ClInclude Include="FLTween.h" />
+    <ClInclude Include="FLTweenNode.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="include\internal\Collider.h" />
     <ClInclude Include="include\internal\BoxColliderComponent.h" />
@@ -50,7 +51,8 @@
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="EngineMinimal.cpp" />
     <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="FlTween.cpp" />
+    <ClCompile Include="FLTween.cpp" />
+    <ClCompile Include="FLTweenNode.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Image.cpp" />
