@@ -153,6 +153,7 @@ void Board::PreUpdate(float deltaTime)
 	{
 		// TODO : 웨이브 클리어 연출 보여주고 웨이브 생성
 		GenerateRandomWave();
+		UpdateBoard();
 		_isWaveRunning = true;
 	}
 }
@@ -220,11 +221,11 @@ int Board::QueryNextTileState(float x, float y)
 		return (int)TileStateFlag::None;
 	}
 
-	int nextTileY = tileY + 1;
+	int nextTileY = tileY - 1;
 
 	if (_isRolling)
 	{
-		if (nextTileY >= _height)
+		if (nextTileY < 0)
 		{
 			return _tileState[tileX][tileY] & ~CUBE;
 		}
@@ -255,6 +256,7 @@ bool Board::GetCenterPosition(float& x, float& y)
 
 void Board::ConvertToTileIndex(float x, float z, int& outX, int& outZ)
 {
+	z = -z;
 	flt::Vector4f pos = this->tr.GetWorldPosition();
 	x -= pos.x;
 	z -= pos.z;
@@ -293,11 +295,11 @@ void Board::GenerateRandomWave()
 
 	for (int i = 0; i < _width; ++i)
 	{
-		int temp = _height - 1;
+		int delayCount = 0;
 		if (i == _width / 2) continue;		// TEST 한 줄 비우기 위함
-		for (int j = _height - 1; j > _height - _width - 2; --j)
+		for (int j = 0; j < _width; ++j)
 		{
-			if (j == _height - _width / 2 - 1) continue;	// TEST 한 줄 비우기 위함
+			if (j == _width / 2) continue;	// TEST 한 줄 비우기 위함
 			int randValue = rand() % 3;
 
 			float x = _tiles[i][j]->tr.GetWorldPosition().x;
@@ -314,7 +316,7 @@ void Board::GenerateRandomWave()
 				}
 				cube = _normalCubePool.front();
 				_normalCubePool.pop_front();
-				_tileState[i][j] = _tileState[i][j] | (int)TileStateFlag::NormalCube;
+				//_tileState[i][j] = _tileState[i][j] | (int)TileStateFlag::NormalCube;
 				break;
 			case 1:
 				if (_darkCubePool.empty())
@@ -323,7 +325,7 @@ void Board::GenerateRandomWave()
 				}
 				cube = _darkCubePool.front();
 				_darkCubePool.pop_front();
-				_tileState[i][j] = _tileState[i][j] | (int)TileStateFlag::DarkCube;
+				//_tileState[i][j] = _tileState[i][j] | (int)TileStateFlag::DarkCube;
 				break;
 			case 2:
 				if (_advantageCubePool.empty())
@@ -332,7 +334,7 @@ void Board::GenerateRandomWave()
 				}
 				cube = _advantageCubePool.front();
 				_advantageCubePool.pop_front();
-				_tileState[i][j] = _tileState[i][j] | (int)TileStateFlag::AdvantageCube;
+				//_tileState[i][j] = _tileState[i][j] | (int)TileStateFlag::AdvantageCube;
 				break;
 			default:
 				ASSERT(false, "Invalid Random Value");
@@ -341,18 +343,19 @@ void Board::GenerateRandomWave()
 
 			auto cubeCtr = cube->GetComponent<CubeController>();
 			_cubeControllers.push_back(cubeCtr);
-			cubeCtr->StartRising(CUBERISINGTIME, CUBERISINGDELAY * (temp-j));
+			cubeCtr->StartRising(CUBERISINGTIME, CUBERISINGDELAY * delayCount);
 
-// 			cube->tr.SetPosition(x, 4.0f, z);
-// 			cube->tr.SetScale(1.0, 1.0, 1.0);
+			// 			cube->tr.SetPosition(x, 4.0f, z);
+			// 			cube->tr.SetScale(1.0, 1.0, 1.0);
 			cube->tr.SetPosition(x, 0.0f, z);
 			cube->tr.SetScale(RISINGSCALE, RISINGSCALE, RISINGSCALE);
 			cube->Enable();
 			_tiles[i][j]->_cube = cube;
 			_nowRisingCount++;
+			delayCount++;
 		}
 
-		temp++;
+		delayCount = 0;
 	}
 }
 
@@ -633,45 +636,47 @@ void Board::ConvertToTileLocalPosition(int x, int z, float& outX, float& outZ)
 	outZ = (float)z;
 
 	outX *= _tileSize;
-	outZ *= _tileSize;
+	outZ *= -_tileSize;
 }
 
 void Board::UpdateBoard()
 {
-	// 1. 큐브 이동 처리
-	// 2. Player 깔렸는지 확인
-	// 3. 폭파 상태 처리
-
-	bool isPlayerCrushed = false;
-
 	for (int i = 0; i < _width; i++)
 	{
 		for (int j = 0; j < _height; j++)
 		{
 			_tileState[i][j] = _tileState[i][j] & ~CUBE;	// 큐브 타입만 제거
-
-			if (j + 1 >= _height)
-			{
-				_tiles[i][j]->_cube = nullptr;
-				continue;
-			}
-			else
-			{
-				// 1. 큐브 이동
-				_tileState[i][j] = (int)_tileState[i][j] | ((int)_tileState[i][j + 1] & CUBE);	// 큐브 타입 이동
-				_tiles[i][j]->_cube = _tiles[i][j + 1]->_cube;
-				_tiles[i][j + 1]->_cube = nullptr;
-
-				// 2. Check Player Crushed
-				if ((int)_tileState[i][j] & (int)TileStateFlag::Player)
-				{
-					if ((int)_tileState[i][j] & CUBE)
-					{
-						isPlayerCrushed = true;
-					}
-				}
-			}
+			_tiles[i][j]->_cube = nullptr;
 		}
+	}
+
+	for (auto& cubeCtr : _cubeControllers)
+	{
+		auto pos = cubeCtr->GetPosition();
+		int x = 0;
+		int z = 0;
+		ConvertToTileIndex(pos.x, pos.z, x, z);
+
+		TileStateFlag state = TileStateFlag::None;
+
+		switch (cubeCtr->GetCubeType())
+		{
+		case eCUBETYPE::NORMAL:
+			state = TileStateFlag::NormalCube;
+			break;
+		case eCUBETYPE::DARK:
+			state = TileStateFlag::DarkCube;
+			break;
+		case eCUBETYPE::ADVANTAGE:
+			state = TileStateFlag::AdvantageCube;
+			break;
+
+		default:
+			break;
+		}
+
+		AddTileState(pos.x, pos.z, state);
+		_tiles[x][z]->_cube = cubeCtr->GetGameObject();
 	}
 }
 

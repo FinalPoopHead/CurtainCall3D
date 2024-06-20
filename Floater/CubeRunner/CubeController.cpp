@@ -58,11 +58,6 @@ void CubeController::PreUpdate(float deltaSecond)
 
 		break;
 	}
-
-	if (_status != eCUBESTATUS::ROLLING && IsOutofBoard())
-	{
-		StartFalling();
-	}
 }
 
 void CubeController::OnDisable()
@@ -156,6 +151,11 @@ void CubeController::Roll(float deltaSecond)
 
 void CubeController::FinishRolling()
 {
+	if (IsOutofBoard())
+	{
+		StartFalling();
+	}
+
 	_targetIndex++;
 	_targetIndex %= 4;
 	_board->OnEndRolling();

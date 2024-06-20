@@ -25,7 +25,7 @@ Player::Player(Board* board)
 	float x = 0.0f;
 	float z = 0.0f;
 
-	_board->ConvertToTilePosition(2, 0, x, z);
+	_board->ConvertToTilePosition(2, 5, x, z);
 	tr.SetPosition(x, 2.0f, z);
 }
 
@@ -68,9 +68,6 @@ void Player::Update(float deltaSecond)
 		nextPosOffset += tr.WorldRight();
 	}
 
-	// TODO : 현재 깔린상태가 아니라 내가 갈곳을 못 갈 경우에 _isCrushed를 true로 설정되므로 의도치 않게 동작을 못하게 된다.
-	//			따라서 잠시 취소
-	_isCrushed = false; //임시
 	keyData = flt::GetKeyDown(flt::KeyCode::j);
 	if (keyData && !_isCrushed)
 	{
@@ -129,8 +126,6 @@ void Player::Update(float deltaSecond)
 	int nextTileState = _board->QueryNextTileState(nextPos.x, pos.z);
 	int blocked = BLOCKED_TILE;
 
-	_isCrushed = false;
-
 	// 좌 우 이동
 	// 현재 상태에 이동 가능하거나 
 	// 다음 상태에 이동 가능하면 이동 가능
@@ -140,7 +135,6 @@ void Player::Update(float deltaSecond)
 		// 이동 불가능할 경우에는 x값을 원래 값으로 되돌린다.
 		//nextPos.x = pos.x;
 		nextPosOffset.x = 0.0f;
-		_isCrushed = true;
 	}
 
 	tileState = _board->QueryTileState(pos.x, nextPos.z);
@@ -156,7 +150,6 @@ void Player::Update(float deltaSecond)
 		// 이동 불가능할 경우에는 z값을 원래 값으로 되돌린다.
 		//nextPos.z = pos.z;
 		nextPosOffset.z = 0.0f;
-		_isCrushed = true;
 	}
 
 	if (nextPosOffset.NormPow() > 0)
@@ -170,6 +163,15 @@ void Player::Update(float deltaSecond)
 	nextPos = nextPosOffset + pos;
 	tr.SetWorldPosition(nextPos);
 
+	// 현재 움직일 수 없는 상태면 crushed 된 상태다.
+	_isCrushed = false;
+	tileState = _board->QueryTileState(pos.x, pos.z);
+	nextTileState = _board->QueryNextTileState(pos.x, pos.z);
+	if ((tileState == (int)TileStateFlag::None)
+		|| (tileState & blocked) && (nextTileState & blocked))
+	{
+		_isCrushed = true;
+	}
 
 	// 디버그용 코드
 	keyData = flt::GetKey(flt::KeyCode::mouseLButton);
