@@ -4,10 +4,12 @@
 
 namespace flt
 {
+	class FLTweenNode;
 	class FLTweenNode
 	{
 		friend class FLTween;
 	public:
+		FLTweenNode();
 		FLTweenNode(std::function<float(float)> ease, float duration);
 		~FLTweenNode() {}
 
@@ -15,6 +17,7 @@ namespace flt
 		FLTweenNode* Next();
 		void Append(FLTweenNode* next);
 
+		void SetTarget(float* target);
 		void SetDelay(float delaySecond);
 		void SetEase(std::function<float(float)> ease);
 		void SetDuration(float duration);
@@ -32,10 +35,20 @@ namespace flt
 
 	private:
 		std::function<float(float)> _ease;
+		float* _target;
 		float _delay;
 		float _duration;
 		float _elapsed;
+		float _from;
+		float _to;
+
 		bool _isFinished;
+
+		std::function<void()> _onComplete;
+		std::function<void()> _onStart;
+		std::function<void()> _onPlay;
+		std::function<void(float)> _onUpdate;
+		std::function<void()> _onPause;
 
 		FLTweenNode* _next;
 	};

@@ -2,30 +2,24 @@
 #include "../FloaterGameEngine/include/Input.h"
 #include "Camera.h"
 #include "Board.h"
+#include "PlayerModel.h"
 
 
 //TEST Include
 #include "MainMenuScene.h"
 
 Player::Player(Board* board)
-	: _board(board)
+	: _model(nullptr)
+	, _board(board)
 	, _isGameOver(false)
 	, _isCrushed(false)
 	, _padIndex(-1)
 	, _speed(10.0f)
+	, _renderer(nullptr)
 {
-	//AddComponent<flt::CameraComponent>(true);
-	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>(true);
-
-	std::wstring filePath = L"..\\Resources\\Models\\Rob02.fbx";
-	renderer->SetFilePath(filePath);
-	renderer->SetMaterial(0, L"..\\Resources\\Textures\\Rob02Yellow_AlbedoTransparency.png", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
-	renderer->SetMaterial(0, L"..\\Resources\\Textures\\Rob02_Normal.dds", flt::RawMaterial::TextureType::NORMAL);
-	renderer->SetMaterial(0, L"..\\Resources\\Textures\\Rob02White_MetallicSmoothness.dds", flt::RawMaterial::TextureType::METALLIC);
-	renderer->SetMaterial(0, L"..\\Resources\\Textures\\Rob02White_Roughness.png", flt::RawMaterial::TextureType::ROUGHNESS);
-	//renderer->SetFilePath(L"../Resources/Models/cube.fbx");
-
-	renderer->PlayAnimation(0, true);
+	_model = flt::CreateGameObject<PlayerModel>(true);
+	tr.AddChild(&_model->tr);
+	_model->tr.SetRotation(0.0f, 180.0f, 0.0f);
 
 	Camera* camera = flt::CreateGameObject<Camera>(true, this, _board);
 
@@ -145,7 +139,8 @@ void Player::Update(float deltaSecond)
 		|| ((tileState & blocked) && (nextTileState & blocked)))
 	{
 		// 이동 불가능할 경우에는 x값을 원래 값으로 되돌린다.
-		nextPos.x = pos.x;
+		//nextPos.x = pos.x;
+		nextPosOffset.x = 0.0f;
 		_isCrushed = true;
 	}
 
@@ -160,10 +155,20 @@ void Player::Update(float deltaSecond)
 		|| ((tileState & blocked) && !(nextTileState & blocked) && nextPosOffset.z > 0))
 	{
 		// 이동 불가능할 경우에는 z값을 원래 값으로 되돌린다.
-		nextPos.z = pos.z;
+		//nextPos.z = pos.z;
+		nextPosOffset.z = 0.0f;
 		_isCrushed = true;
 	}
 
+	if (nextPosOffset.NormPow() > 0)
+	{
+		_model->PlayWalk();
+	}
+	else
+	{
+		_model->PlayIdle();
+	}
+	nextPos = nextPosOffset + pos;
 	tr.SetWorldPosition(nextPos);
 
 

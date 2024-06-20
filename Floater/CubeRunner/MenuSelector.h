@@ -15,6 +15,7 @@ public:
 	void Select(flt::KeyCode keyCode);
 
 protected:
+	void OnEnable() override;
 	void Update(float deltaSecond) override;
 
 private:

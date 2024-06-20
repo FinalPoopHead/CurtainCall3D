@@ -14,10 +14,6 @@ MenuSelector::MenuSelector(Menu* menu) :
 	_ui->SetImage(L"../Resources/Sprites/abcd.jpg");
 	_ui->SetSize({ 50.0f, 50.0f });
 	_ui->SetZOrder(0.8f);
-	
-	_selectedItem = _menu->FirstItem();
-
-	MoveSelectedItem();
 }
 
 void MenuSelector::SetMenu(Menu* menu)
@@ -36,7 +32,6 @@ void MenuSelector::next()
 void MenuSelector::prev()
 {
 	_selectedItem = _menu->PrevItem(_selectedItem);
-
 	MoveSelectedItem();
 }
 
@@ -45,13 +40,19 @@ void MenuSelector::Select(flt::KeyCode keyCode)
 	_selectedItem->Select(keyCode);
 }
 
+void MenuSelector::OnEnable()
+{
+	_selectedItem = _menu->FirstItem();
+	MoveSelectedItem();
+}
+
 void MenuSelector::Update(float deltaSecond)
 {
-	if (flt::GetKeyDown(flt::KeyCode::right))
+	if (flt::GetKeyDown(flt::KeyCode::right) || flt::GetKeyDown(flt::KeyCode::down))
 	{
 		next();
 	}
-	if (flt::GetKeyDown(flt::KeyCode::left))
+	if (flt::GetKeyDown(flt::KeyCode::left) || flt::GetKeyDown(flt::KeyCode::up))
 	{
 		prev();
 	}
@@ -59,23 +60,6 @@ void MenuSelector::Update(float deltaSecond)
 	{
 		Select(flt::KeyCode::enter);
 	}
-
-	// 디버그용 코드
-	float zOrder = _selectedItem->GetZOrder();
-	if (flt::GetKey(flt::KeyCode::mouseWheelUp))
-	{
-		zOrder += 0.1f;
-		_selectedItem->SetZOrder(zOrder);
-		std::cout << "ZOrder: " << zOrder + 0.1f << std::endl;
-	}
-	if (flt::GetKey(flt::KeyCode::mouseWheelDown))
-	{
-		zOrder -= 0.1f;
-		_selectedItem->SetZOrder(zOrder);
-		std::cout << "ZOrder: " << zOrder + 0.1f << std::endl;
-	}
-
-
 }
 
 void MenuSelector::MoveSelectedItem()
@@ -85,7 +69,7 @@ void MenuSelector::MoveSelectedItem()
 
 	pos.x -= size.x / 2;
 
-	const float offset = 10.0f;
+	const float offset = 30.0f;
 	pos.x -= offset;
 
 	_ui->SetPosition(pos);

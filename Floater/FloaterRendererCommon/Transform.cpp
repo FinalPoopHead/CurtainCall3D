@@ -127,7 +127,7 @@ void flt::Transform::SetRotation(float degreeX, float degreeY, float degreeZ, Qu
 {
 	MakeDirtyRecursive();
 
-	_rotation.SetEuler(degreeX, degreeY, degreeY, order);
+	_rotation.SetEuler(degreeX, degreeY, degreeZ, order);
 }
 
 void flt::Transform::SetWorldRotation(const Quaternion& q)

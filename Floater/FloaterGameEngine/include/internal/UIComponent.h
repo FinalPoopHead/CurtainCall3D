@@ -44,7 +44,8 @@ namespace flt
 		void SetTextColor(float r, float g, float b);
 
 	private:
-		void UpdatePosition();
+		void UpdateGameObjectPosition();
+		void SetPositionUseOffset();
 
 	private:
 		RendererObject* _rendererObject;

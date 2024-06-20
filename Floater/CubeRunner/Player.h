@@ -2,6 +2,7 @@
 #include "../FloaterGameEngine/include/EngineMinimal.h"
 
 class Board;
+class PlayerModel;
 
 class Player : public flt::GameObject
 {
@@ -18,9 +19,12 @@ public:
 	void SetGameOver();
 
 private:
+	PlayerModel* _model;
 	Board* _board;
 	bool _isGameOver;
 	bool _isCrushed;
 	int _padIndex;
 	float _speed;
+
+	flt::RendererComponent* _renderer;
 };
