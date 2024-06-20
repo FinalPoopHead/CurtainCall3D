@@ -213,14 +213,6 @@ void flt::AssimpLoader::Load(const std::wstring& filePath, RawScene* outRawScene
 		}
 	}
 
-	if (!assimpScene || assimpScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !assimpScene->mRootNode)
-	{
-		auto errorStr = importer.GetErrorString();
-		ASSERT(false, errorStr);
-
-		return;
-	}
-
 	// 본 데이터 세팅
 	for (unsigned int i = 0; i < assimpScene->mNumMeshes; ++i)
 	{

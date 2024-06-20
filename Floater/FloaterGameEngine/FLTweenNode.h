@@ -15,6 +15,7 @@ namespace flt
 		FLTweenNode* Next();
 		void Append(FLTweenNode* next);
 
+		void SetDelay(float delaySecond);
 		void SetEase(std::function<float(float)> ease);
 		void SetDuration(float duration);
 
@@ -31,6 +32,7 @@ namespace flt
 
 	private:
 		std::function<float(float)> _ease;
+		float _delay;
 		float _duration;
 		float _elapsed;
 		bool _isFinished;
