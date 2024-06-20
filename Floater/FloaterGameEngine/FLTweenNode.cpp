@@ -11,8 +11,16 @@ void flt::FLTweenNode::Update(float deltaSeconds)
 	}
 }
 
-flt::FLTweenNode::FLTweenNode(std::function<float(float)> ease, float duration) : 
-	_ease(ease), _delay(0), _duration(duration), _elapsed(0), _isFinished(false), _next(nullptr)
+flt::FLTweenNode::FLTweenNode() : FLTweenNode(nullptr, 0.0f)
+{
+
+}
+
+flt::FLTweenNode::FLTweenNode(std::function<float(float)> ease, float duration) :
+	_ease(ease), _target(nullptr), _delay(0.0f), _duration(duration), _elapsed(0.0f), _from(0.0f), _to(0.0f)
+	, _isFinished(false)
+	, _onComplete(), _onStart(), _onPlay(), _onUpdate(), _onPause()
+	, _next(nullptr)
 {
 
 }
@@ -36,11 +44,6 @@ void flt::FLTweenNode::Append(FLTweenNode* next)
 	}
 
 	last->_next = next;
-}
-
-void flt::FLTweenNode::SetDelay(float delaySecond)
-{
-	_delay = delaySecond;
 }
 
 void flt::FLTweenNode::SetEase(std::function<float(float)> ease)
