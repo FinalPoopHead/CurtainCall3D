@@ -103,6 +103,18 @@ void CubeController::StartFalling()
 
 void CubeController::StartRemoving(float removeTime)
 {
+	switch (_status)
+	{
+	case eCUBESTATUS::ROLLING:
+		_board->OnEndRolling();
+		break;
+	case eCUBESTATUS::RISING:
+		_board->OnEndRising();
+		break;
+	default:
+		break;
+	}
+
 	_gameObject->tr.SetScale(REMOVESCALE, REMOVESCALE, REMOVESCALE);
 	_removeSpeed = 1.0f / removeTime;
 
