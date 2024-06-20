@@ -14,15 +14,16 @@ namespace flt
 	struct RendererObject
 	{
 		RendererObject(const bool& isDraw) : RendererObject(nullptr, isDraw) {}
-		RendererObject(Transform* transform, const bool& isDraw) :
-			transform(transform),
-			isDraw(isDraw),
-			node(nullptr),
-			camera(nullptr),
-			animState(),
-			imgPath(L""),
-			text(),
-			name(L"") {}
+		RendererObject(Transform* transform, const bool& isDraw)
+			: transform(transform)
+			, isDraw(isDraw)
+			, node(nullptr)
+			, camera(nullptr)
+			, animState()
+			, imgPath(L"")
+			, text()
+			, name(L"")
+			, useRootMotion(false) {}
 
 		~RendererObject();
 
@@ -42,5 +43,6 @@ namespace flt
 		std::wstring imgPath;
 		Text text;
 		std::wstring name;
+		bool useRootMotion;
 	};
 }
