@@ -25,6 +25,4 @@ private:
 	bool _isCrushed;
 	int _padIndex;
 	float _speed;
-
-	flt::RendererComponent* _renderer;
 };

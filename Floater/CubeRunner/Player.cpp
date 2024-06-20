@@ -15,7 +15,6 @@ Player::Player(Board* board)
 	, _isCrushed(false)
 	, _padIndex(-1)
 	, _speed(10.0f)
-	, _renderer(nullptr)
 {
 	_model = flt::CreateGameObject<PlayerModel>(true);
 	tr.AddChild(&_model->tr);
