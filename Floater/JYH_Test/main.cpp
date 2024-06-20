@@ -12,6 +12,7 @@
 #include "../FloaterMath/include/floaterMath.h"
 #include "../FloaterUtil/include/Log.h"
 
+//void Func(flt::info info);
 
 int main(int argc, char* argv[])
 {
@@ -21,9 +22,12 @@ int main(int argc, char* argv[])
 	flt::info(L"Hello {}!", L"World");
 
 	std::wstring_view kStringView = L"한글 테스트";
-	//flt::info(kStringView);
 
-	flt::info{kStringView};
+	//flt::info(kStringView); // flt::info kStringView;
+	flt::info((std::wstring_view)kStringView); // flt::info kStringView;
+	flt::info{ kStringView }; // flt::info kStringView;
+	//Func(flt::info(kStringView));
+
 
 
 	std::filesystem::path path = std::filesystem::current_path();
