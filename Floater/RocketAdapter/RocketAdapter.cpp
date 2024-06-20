@@ -95,7 +95,7 @@ bool flt::RocketAdapter::Render(float deltaTime)
 
 		if (rendererObject->animState.index != -1)
 		{
-			if (!(animState.index == rendererObject->animState.index && animState.isPlaying == rendererObject->animState.isPlaying))
+ 			if (!(animState.index == rendererObject->animState.index && animState.isPlaying == rendererObject->animState.isPlaying))
 			{
 				animState = rendererObject->animState;
 
@@ -260,7 +260,7 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 
 	Rocket::Core::ReleaseFactory(factory);
 
-	_objects.insert({ rocketObject, {&renderable, AnimState{renderable.animState}} });
+	_objects.insert({ rocketObject, {&renderable, AnimState{}} });
 	return (HOBJECT)rocketObject;
 }
 

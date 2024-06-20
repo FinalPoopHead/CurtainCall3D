@@ -12,7 +12,7 @@ void flt::FLTweenNode::Update(float deltaSeconds)
 }
 
 flt::FLTweenNode::FLTweenNode(std::function<float(float)> ease, float duration) : 
-	_ease(ease), _duration(duration), _elapsed(0), _isFinished(false), _next(nullptr)
+	_ease(ease), _delay(0), _duration(duration), _elapsed(0), _isFinished(false), _next(nullptr)
 {
 
 }
@@ -36,6 +36,11 @@ void flt::FLTweenNode::Append(FLTweenNode* next)
 	}
 
 	last->_next = next;
+}
+
+void flt::FLTweenNode::SetDelay(float delaySecond)
+{
+	_delay = delaySecond;
 }
 
 void flt::FLTweenNode::SetEase(std::function<float(float)> ease)

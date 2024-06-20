@@ -25,6 +25,8 @@ Player::Player(Board* board)
 	renderer->SetMaterial(0, L"..\\Resources\\Textures\\Rob02White_Roughness.png", flt::RawMaterial::TextureType::ROUGHNESS);
 	//renderer->SetFilePath(L"../Resources/Models/cube.fbx");
 
+	renderer->PlayAnimation(0, true);
+
 	Camera* camera = flt::CreateGameObject<Camera>(true, this, _board);
 
 	float x = 0.0f;
