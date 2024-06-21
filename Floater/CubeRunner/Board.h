@@ -77,6 +77,7 @@ private:
 	bool UpdateDetonate();		// 수납된 큐브가 있으면 true 아니면 false
 	void TickCubesRolling(float rollingTime);			// 일괄적으로 굴리기 시작.
 	void AddRow();
+	void OnEndWave();
 
 private:
 	GameManager* _gameManager;
@@ -96,13 +97,13 @@ private:
 	bool _isGameOver = false;
 	bool _isGameStart = false;
 	bool _isWaveRunning = false;
-	bool _isRolling = false;
 	float _delayRemain;
 	float _fastForwardValue;
 	int _nowRollingCount;
 	int _nowRisingCount;
 
 	int _detonatedDarkCubeCount;
+	int _remainCubeCount;
 	int _nowAddTileCount;
 
 	std::pair<int, int> _minePos;

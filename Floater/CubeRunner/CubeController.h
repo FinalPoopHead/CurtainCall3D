@@ -30,7 +30,7 @@ public:
 
 	virtual void PreUpdate(float deltaSecond) override;
 	virtual void OnDisable() override;
-	void StartRolling(float rotateTime);
+	bool StartRolling(float rotateTime);
 	void StartFalling();
 	void StartRemoving(float removeTime);
 	void StartRising(float riseTime, float delay);
