@@ -43,6 +43,7 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _fastForwardValue(FFDEFAULT)
 	, _nowRollingCount(0)
 	, _nowRisingCount(0)
+	, _nowFallingTileCount()
 	, _detonatedDarkCubeCount()
 	, _remainCubeCount()
 	, _nowAddTileCount()
@@ -91,15 +92,14 @@ void Board::OnDestroy()
 
 void Board::PreUpdate(float deltaTime)
 {
-	/// 업데이트 순서
-	/// 1. 이동이 다 끝나면 대기 및 타일 상태 업데이트 (OnEndRolling() 함수)
-	///		a. 타일 상태 업데이트
-	///		b. 큐브 수납 업데이트
-	///			b-1. 수납 큐브 없을 시 ROLLINGDELAY 만큼 대기
-	///			b-2. 수납 큐브 존재 시 DETONATEDELAY 만큼 대기
-	/// 2. 대기 시간 동안 advantageMine 추가 폭파 가능.
-	/// 3. 대기시간이 끝나면 다시 이동 시작.
+	std::cout << _playerIndex << " Board : ";
+	for (int i = 0; i < _width; i++)
+	{
+		std::cout << _tileState[i][_height - 1] << " ";
+	}
+	std::cout << std::endl;
 
+	// TODO : FastForward를 플레이어 별로 나눠줘야 함
 	flt::KeyData keyData = flt::GetKeyDown(flt::KeyCode::l);
 	if (keyData)
 	{
@@ -112,7 +112,8 @@ void Board::PreUpdate(float deltaTime)
 		EndFastForward();
 	}
 
-	keyData = flt::GetKeyDown(flt::KeyCode::p);	// TODO : 치트키 테스트 중 블랙큐브 빼고 전부 파괴
+	// TODO : 치트키. 블랙큐브 빼고 전부 제거
+	keyData = flt::GetKeyDown(flt::KeyCode::p);
 	if(keyData)
 	{
 		for (int i = 0; i < _width; i++)
@@ -430,7 +431,7 @@ void Board::AddRow()
 		x += tr.GetWorldPosition().x;
 		z += tr.GetWorldPosition().z;
 
-		tile->StartAddMoving(TILEADDTIME, { x,0.0f,z });
+		tile->StartAddRow(TILEADDTIME, { x,0.0f,z });
 	}
 }
 
@@ -607,6 +608,47 @@ void Board::OnEndRowAdd()
 		_nowAddTileCount = 0;
 		Resize(_width, _height + 1);
 	}
+}
+
+void Board::OnStartTileFall(int x, int z)
+{
+	//SetTileState(x, z, TileStateFlag::None);
+	_tileState[x][z] = (int)TileStateFlag::None;
+	// TODO : Player가 위에 있었으면 게임오버 해야함
+}
+
+void Board::OnEndTileFall()
+{
+	// TODO : 이거 근데 여러 줄이 한번에 사라질때 처리가 필요하다.
+	_nowFallingTileCount--;
+
+	if (_nowFallingTileCount <= 0)
+	{
+		_nowFallingTileCount = 0;
+		Resize(_width, _height - 1);
+	}
+}
+
+void Board::DestroyRow()
+{
+	float delay = 0.5f;
+	float delayDelta = 0.2f;
+
+	for (int i = 0; i < _width; i++)
+	{
+		// TODO : Tile 떨어뜨려라.
+		//			Tile은 자기 머리위에 있는 Cube 떨어뜨려라.
+		if(_minePos.first == i && _minePos.second == _height-1)
+		{
+			_minePos.first = -1;
+			_minePos.second = -1;
+		}
+
+		_tiles[i][_height-1]->StartFall(delay + delayDelta * i);
+		_nowFallingTileCount++;
+	}
+
+	//Resize(_width, _height - 1);
 }
 
 bool Board::IsMineSet()
@@ -805,6 +847,7 @@ bool Board::UpdateDetonate()
 					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemoving(CUBEREMOVETIME);
 					_detonatedDarkCubeCount++;
 					// TODO : 스테이지 한 줄 삭제
+					DestroyRow();
 					break;
 				case TileStateFlag::AdvantageCube:
 					// AdvantageCube 수납 및 AdvantageMine 설치

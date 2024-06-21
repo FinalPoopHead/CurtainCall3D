@@ -58,6 +58,10 @@ public:
 	void OnEndRolling();					// 큐브 1개가 rolling 끝나면 호출할 함수.
 	void OnEndRising();						// 큐브 1개가 rising 끝나면 호출할 함수.
 	void OnEndRowAdd();
+	void OnStartTileFall(int x, int z);		// x,z index의 타일이 떨어지기 시작함.
+	void OnEndTileFall();
+
+	void DestroyRow();
 
 	bool IsMineSet();
 
@@ -101,6 +105,7 @@ private:
 	float _fastForwardValue;
 	int _nowRollingCount;
 	int _nowRisingCount;
+	int _nowFallingTileCount;
 
 	int _detonatedDarkCubeCount;
 	int _remainCubeCount;

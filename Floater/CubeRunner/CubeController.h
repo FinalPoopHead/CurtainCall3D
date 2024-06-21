@@ -31,7 +31,7 @@ public:
 	virtual void PreUpdate(float deltaSecond) override;
 	virtual void OnDisable() override;
 	bool StartRolling(float rotateTime);
-	void StartFalling();
+	void StartFalling(bool withDamage = true);
 	void StartRemoving(float removeTime);
 	void StartRising(float riseTime, float delay);
 	bool IsRolling() { return _status == eCUBESTATUS::ROLLING; }
