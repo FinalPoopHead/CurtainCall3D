@@ -49,7 +49,7 @@ public:
 	void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
 	void ConvertToTilePosition(int x, int z, float& outX, float& outZ);
 
-	void GenerateRandomWave();		// 임시로 랜덤 생성 용
+	void _TEST_GenerateRandomWave();		// 임시로 랜덤 생성 용
 	void BackToPool(flt::GameObject* obj);
 	void RemoveFromControllerList(CubeController* cubeCtr);
 	void SetMine(float x, float z);			// position X,Z에 지뢰를 설치한다.
@@ -57,6 +57,11 @@ public:
 	void DetonateAdvantageMine();			// 어드밴티지 지뢰를 폭파시킨다.
 	void OnEndRolling();					// 큐브 1개가 rolling 끝나면 호출할 함수.
 	void OnEndRising();						// 큐브 1개가 rising 끝나면 호출할 함수.
+	void OnEndRowAdd();
+	void OnStartTileFall(int x, int z);		// x,z index의 타일이 떨어지기 시작함.
+	void OnEndTileFall();
+
+	void DestroyRow();
 
 	bool IsMineSet();
 
@@ -75,6 +80,8 @@ private:
 	void UpdateBoard();
 	bool UpdateDetonate();		// 수납된 큐브가 있으면 true 아니면 false
 	void TickCubesRolling(float rollingTime);			// 일괄적으로 굴리기 시작.
+	void AddRow();
+	void OnEndWave();
 
 private:
 	GameManager* _gameManager;
@@ -94,11 +101,15 @@ private:
 	bool _isGameOver = false;
 	bool _isGameStart = false;
 	bool _isWaveRunning = false;
-	bool _isRolling = false;
 	float _delayRemain;
 	float _fastForwardValue;
 	int _nowRollingCount;
 	int _nowRisingCount;
+	int _nowFallingTileCount;
+
+	int _detonatedDarkCubeCount;
+	int _remainCubeCount;
+	int _nowAddTileCount;
 
 	std::pair<int, int> _minePos;
 	std::list<std::pair<int, int>> _advantageMinePosList;
