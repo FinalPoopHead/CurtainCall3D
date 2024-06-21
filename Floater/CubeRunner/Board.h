@@ -57,7 +57,7 @@ public:
 	void DetonateAdvantageMine();			// 어드밴티지 지뢰를 폭파시킨다.
 	void OnEndRolling();					// 큐브 1개가 rolling 끝나면 호출할 함수.
 	void OnEndRising();						// 큐브 1개가 rising 끝나면 호출할 함수.
-	void OnEndTileAdd();
+	void OnEndRowAdd();
 
 	bool IsMineSet();
 
@@ -76,6 +76,7 @@ private:
 	void UpdateBoard();
 	bool UpdateDetonate();		// 수납된 큐브가 있으면 true 아니면 false
 	void TickCubesRolling(float rollingTime);			// 일괄적으로 굴리기 시작.
+	void AddRow();
 
 private:
 	GameManager* _gameManager;

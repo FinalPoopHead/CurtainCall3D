@@ -37,5 +37,6 @@ public:
 	bool _isMoving;						// 이동중인지
 	float _movingTime;					// 이동시간
 	float _elapsedTime;
+	flt::Vector3f _startPos;			// 시작 위치
 	flt::Vector3f _targetPos;			// 이동할 위치
 };

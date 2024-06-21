@@ -24,6 +24,7 @@ CubeController::CubeController()
 	, _currentAngle(0.0f)
 	, _rotatePivot(0.0f, 0.0f, 0.0f)
 	, _fallSpeed(0.0f)
+	, _cubeType(eCUBETYPE::NORMAL)
 {
 
 }
@@ -163,14 +164,14 @@ void CubeController::Roll(float deltaSecond)
 
 void CubeController::FinishRolling()
 {
+	_targetIndex++;
+	_targetIndex %= 4;
+	_board->OnEndRolling();
+
 	if (IsOutofBoard())
 	{
 		StartFalling();
 	}
-
-	_targetIndex++;
-	_targetIndex %= 4;
-	_board->OnEndRolling();
 }
 
 void CubeController::Fall(float deltaSecond)

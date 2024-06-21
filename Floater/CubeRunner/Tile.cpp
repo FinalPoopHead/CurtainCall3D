@@ -14,6 +14,7 @@ Tile::Tile(Board* board)
 	, _isMoving(false)
 	, _movingTime(0.0f)
 	, _elapsedTime(0.0f)
+	, _startPos()
 	, _targetPos()
 {
 	std::wstring filePath = L"..\\Resources\\Models\\BrickBlock.fbx";
@@ -80,13 +81,12 @@ void Tile::Update(float deltaSecond)
 	}
 
 	auto pos = tr.GetWorldPosition();
-	flt::Vector3f curPosition = { pos.x,pos.y,pos.z };
-	curPosition = flt::Vector3f::Lerp(curPosition, _targetPos, _elapsedTime/_movingTime);
+	auto curPosition = flt::Vector3f::Lerp(_startPos, _targetPos, _elapsedTime/_movingTime);
 	tr.SetWorldPosition(curPosition.x, curPosition.y, curPosition.z);
 
 	if (_elapsedTime >= _movingTime)
 	{
-		_board->OnEndTileAdd();
+		_board->OnEndRowAdd();
 		Destroy();
 	}
 }
@@ -126,5 +126,9 @@ void Tile::StartAddMoving(float movingTime, flt::Vector3f targetPos)
 	_isMoving = true;
 	_elapsedTime = 0.0f;
 	_movingTime = movingTime;
+	auto pos = tr.GetWorldPosition();
+	_startPos.x = pos.x;
+	_startPos.y = pos.y;
+	_startPos.z = pos.z;
 	_targetPos = targetPos;
 }
