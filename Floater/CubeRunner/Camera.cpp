@@ -5,17 +5,19 @@
 #include "../FloaterGameEngine/include/Input.h"
 
 
-Camera::Camera(Player* player, Board* board) :
-	_player(player),
-	_board(board),
-	_height(10.0f),
-	_playHeight(40.0f),
-	_lookZOffset(0.0f),
-	_posZOffsest(-10.0f),
-	_playerDistance(35.0f),
-	_lookDegree(40.0f),
-	_movSpeed(1.5f),
-	_rotSpeed(15.0f)
+Camera::Camera(Player* player, Board* board) 
+	: _player(player)
+	, _board(board)
+	, _height(10.0f)
+	, _playHeight(40.0f)
+	, _lookZOffset(0.0f)
+	, _posZOffsest(-10.0f)
+	, _playerDistance(35.0f)
+	, _lookDegree(40.0f)
+	, _movSpeed(1.5f)
+	, _rotSpeed(15.0f)
+	, _isMoving(true)
+	, _isPlayerLook(true)
 {
 	AddComponent<flt::CameraComponent>(true);
 
@@ -26,21 +28,25 @@ Camera::Camera(Player* player, Board* board) :
 	tr.SetRotation(_currRotation);
 }
 
+void Camera::TracePlayer()
+{
+	_isPlayerLook = true;
+}
+
 void Camera::PostUpdate(float deltaSecond)
 {
 	//flt::Vector3f targetPosition = CalcTargetPosition();
 	//tr.SetPosition(targetPosition);
 	//_currPosition = targetPosition;
 
-	_currPosition = flt::Vector3f::Lerp(_currPosition, CalcTargetPosition(), std::clamp(deltaSecond * _movSpeed, 0.0f, 1.0f) );
-	tr.SetPosition(_currPosition);
-
-	_currRotation = flt::Quaternion::Slerp(_currRotation, CalcTargetRotation(), std::clamp(deltaSecond * _rotSpeed, 0.0f, 1.0f));
-	
-	tr.SetRotation(_currRotation);
-	tr.AddLocalRotation({ 1.0f, 0.0f, 0.0f }, flt::DegToRad(_lookDegree));
-
-
+	if (_isMoving)
+	{
+		UpdateCameraMove(deltaSecond);
+	}
+	else if (CheckCameraMove())
+	{
+		StartCameraMove();
+	}
 
 	/*flt::KeyData keyData = GetKey(flt::KeyCode::lAlt);
 	if (keyData)
@@ -159,4 +165,29 @@ flt::Vector3f Camera::CalcTargetPosition()
 	positionDir.y = _playHeight;
 
 	return positionDir;
+}
+
+bool Camera::CheckCameraMove()
+{
+	return true;
+}
+
+void Camera::StartCameraMove()
+{
+	_isMoving = true;
+}
+
+void Camera::UpdateCameraMove(float deltaSecond)
+{
+	if (_isPlayerLook)
+	{
+		_currPosition = flt::Vector3f::Lerp(_currPosition, CalcTargetPosition(), std::clamp(deltaSecond * _movSpeed, 0.0f, 1.0f));
+		tr.SetPosition(_currPosition);
+
+		_currRotation = flt::Quaternion::Slerp(_currRotation, CalcTargetRotation(), std::clamp(deltaSecond * _rotSpeed, 0.0f, 1.0f));
+
+		tr.SetRotation(_currRotation);
+		tr.AddLocalRotation({ 1.0f, 0.0f, 0.0f }, flt::DegToRad(_lookDegree));
+	}
+
 }
