@@ -10,7 +10,7 @@ constexpr float GRAVITY = 9.8f;
 constexpr float STARTFALLSPEED = 20.0f;
 constexpr float FALLHEIGHT = -16.0f;
 constexpr float DISTANCE = 4.0f;
-constexpr double REMOVESCALE = 0.98;
+constexpr double OVERLAPSCALE = 0.98;
 
 CubeController::CubeController()
 	: _board(nullptr)
@@ -111,7 +111,7 @@ void CubeController::StartRemoving(float removeTime)
 		break;
 	}
 
-	_gameObject->tr.SetScale(REMOVESCALE, REMOVESCALE, REMOVESCALE);
+	_gameObject->tr.SetScale(OVERLAPSCALE, OVERLAPSCALE, OVERLAPSCALE);
 	_removeSpeed = 1.0f / removeTime;
 
 	_status = eCUBESTATUS::REMOVING;
@@ -123,6 +123,9 @@ void CubeController::StartRising(float riseTime, float delay)
 	_riseSpeed = 1.0f / riseTime;
 	_riseDelay = delay;
 	_elapsedTime = 0.0f;
+
+	_gameObject->tr.SetScale(OVERLAPSCALE, OVERLAPSCALE, OVERLAPSCALE);
+	_gameObject->tr.SetWorldRotation({ 0.0f,0.0f,0.0f,1.0f });
 
 	_status = eCUBESTATUS::RISING;
 }

@@ -17,7 +17,6 @@ constexpr float TILEADDTIME = 2.0f;
 constexpr float CUBEREMOVETIME = 0.5f;
 constexpr float CUBERISINGTIME = 1.0f;
 constexpr float CUBERISINGDELAY = 0.3f;
-constexpr double RISINGSCALE = 0.98;
 constexpr int CUBEDAMAGE = 1;
 constexpr int DARKCUBEDAMAGE = 1;
 constexpr float FFDEFAULT = 1.0f;
@@ -92,13 +91,6 @@ void Board::OnDestroy()
 
 void Board::PreUpdate(float deltaTime)
 {
-	std::cout << _playerIndex << " Board : ";
-	for (int i = 0; i < _width; i++)
-	{
-		std::cout << _tileState[i][_height - 1] << " ";
-	}
-	std::cout << std::endl;
-
 	// TODO : FastForward를 플레이어 별로 나눠줘야 함
 	flt::KeyData keyData = flt::GetKeyDown(flt::KeyCode::l);
 	if (keyData)
@@ -385,8 +377,6 @@ void Board::_TEST_GenerateRandomWave()
 			cubeCtr->StartRising(CUBERISINGTIME, CUBERISINGDELAY * delayCount);
 
 			cube->tr.SetPosition(x, 0.0f, z);
-			cube->tr.SetScale(RISINGSCALE, RISINGSCALE, RISINGSCALE);
-			cube->tr.SetWorldRotation({ 0.0f,0.0f,0.0f,1.0f });
 			cube->Enable();
 			_tiles[i][j]->_cube = cube;
 			_nowRisingCount++;
