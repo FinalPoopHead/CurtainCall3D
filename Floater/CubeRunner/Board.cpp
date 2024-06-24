@@ -13,6 +13,7 @@ constexpr int CUBECOUNT = 64;
 constexpr float ROLLINGTIME = 1.0f;
 constexpr float ROLLINGDELAY = 0.5f;	// 아무것도 하지않고 굴러갈때의 딜레이
 constexpr float DETONATEDELAY = 2.0f;	// 폭파 후 딜레이
+constexpr float FALLTILEDELAY = 5.0f;	// 타일 삭제 딜레이
 constexpr float ADDTILEDELAY = 5.0f;	// 타일 추가 딜레이
 constexpr float TILEADDTIME = 2.0f;
 constexpr float CUBEREMOVETIME = 0.5f;
@@ -20,6 +21,7 @@ constexpr float CUBERISINGTIME = 1.0f;
 constexpr float CUBERISINGDELAY = 0.3f;
 constexpr int CUBEDAMAGE = 1;
 constexpr int DARKCUBEDAMAGE = 1;
+constexpr float SLOWVALUE = 0.5f;
 constexpr float FFDEFAULT = 1.0f;
 constexpr float FFVALUE = 8.0f;
 
@@ -43,9 +45,9 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _fastForwardValue(FFDEFAULT)
 	, _nowRollingCount(0)
 	, _nowRisingCount(0)
-	, _nowFallingTileCount()
 	, _isPerfect(true)
 	, _nowAddTileCount()
+	, _destroyRowCount()
 	, _minePos({ -1,-1 })
 	, _advantageMinePosList()
 {
@@ -112,9 +114,22 @@ void Board::PreUpdate(float deltaTime)
 		EndFastForward();
 	}
 
+	// TODO : 슬로우모드임
+	keyData = flt::GetKeyDown(flt::KeyCode::o);
+	if (keyData)
+	{
+		_fastForwardValue = SLOWVALUE;
+	}
+
+	keyData = flt::GetKeyUp(flt::KeyCode::o);
+	if (keyData)
+	{
+		EndFastForward();
+	}
+
 	// TODO : 치트키. 블랙큐브 빼고 전부 제거
 	keyData = flt::GetKeyDown(flt::KeyCode::p);
-	if(keyData)
+	if (keyData)
 	{
 		for (int i = 0; i < _width; i++)
 		{
@@ -472,12 +487,12 @@ void Board::ReturnTileToPool(Tile* tile)
 	tile->DisableAdvantageMine();
 	tile->DisableDetonated();
 	tile->DisableMine();
-	
+
 	auto pos = tile->tr.GetLocalPosition();
 	int x = 0;
 	int z = 0;
 	ConvertToTileIndex(pos.x, pos.z, x, z);
-	if(_minePos.first == x && _minePos.second == z)
+	if (_minePos.first == x && _minePos.second == z)
 	{
 		_minePos.first = -1;
 		_minePos.second = -1;
@@ -517,7 +532,7 @@ void Board::RemoveFromControllerList(CubeController* cubeCtr)
 {
 	auto removeCount = _cubeControllers.remove(cubeCtr);
 
-	if(removeCount == 0)
+	if (removeCount == 0)
 	{
 		return;
 	}
@@ -653,43 +668,46 @@ void Board::OnEndRowAdd()
 
 void Board::OnStartTileFall(int x, int z)
 {
-	//SetTileState(x, z, TileStateFlag::None);
 	_tileState[x][z] = (int)TileStateFlag::NONE;
 	// TODO : Player가 위에 있었으면 게임오버 해야함
 }
 
-void Board::OnEndTileFall()
+void Board::OnEndTileFall(int x, int z)
 {
-	// TODO : 이거 근데 여러 줄이 한번에 사라질때 처리가 필요하다.
-	_nowFallingTileCount--;
+	_fallingTileCount[z]--;
 
-	if (_nowFallingTileCount <= 0)
+	if (_fallingTileCount[z] <= 0)
 	{
-		_nowFallingTileCount = 0;
-		Resize(_width, _height - 1);
+		_fallingTileCount[z] = 0;
+		Resize(_width, _height - _destroyRowCount);
+		_destroyRowCount--;
 	}
 }
 
 void Board::DestroyRow()
 {
-	float delay = 0.5f;
-	float delayDelta = 0.2f;
+	_destroyRowCount++;
+
+	float delay = 0.3f;
+	int destroyHeight =	_height - _destroyRowCount;
+	_fallingTileCount[destroyHeight] = 0;
 
 	for (int i = 0; i < _width; i++)
 	{
-		// TODO : Tile 떨어뜨려라.
-		//			Tile은 자기 머리위에 있는 Cube 떨어뜨려라.
-		if(_minePos.first == i && _minePos.second == _height-1)
+		int randValue = rand() % 2;
+		float delayDelta = (float)randValue / 10.0f + 0.08f;
+
+		if (_minePos.first == i && _minePos.second == _height - 1)
 		{
 			_minePos.first = -1;
 			_minePos.second = -1;
 		}
 
-		_tiles[i][_height-1]->StartFall(delay + delayDelta * i);
-		_nowFallingTileCount++;
+		_tiles[i][destroyHeight]->StartFall(delay + delayDelta * i, i, destroyHeight);
+		_fallingTileCount[destroyHeight]++;
 	}
 
-	//Resize(_width, _height - 1);
+	_delayRemain = FALLTILEDELAY;
 }
 
 bool Board::IsMineSet()
@@ -881,11 +899,9 @@ bool Board::UpdateDetonate()
 					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemoving(CUBEREMOVETIME);
 					break;
 				case TileStateFlag::DARKCUBE:
-					// DarkCube 수납 및 체력 감소 -> 스테이지 한 줄 삭제
-					_gameManager->ReduceHP(_playerIndex, DARKCUBEDAMAGE);
+					// DarkCube 수납 및 스테이지 한 줄 삭제
 					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemoving(CUBEREMOVETIME);
 					_isPerfect = false;
-					// TODO : 스테이지 한 줄 삭제
 					DestroyRow();
 					break;
 				case TileStateFlag::ADVANTAGECUBE:

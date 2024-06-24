@@ -45,9 +45,9 @@ private:
 	
 	// UI들
 	// TODO : 체력 UI, 시간 UI, 점수 UI, 게임오버 UI, 콤보 UI 등등 추가 필요
-	std::vector<SpriteObject*> _playerHPPanel;
-	std::vector<std::vector<SpriteObject*>> _playerHPSlots;
-	std::vector<std::vector<SpriteObject*>> _playerHPValues;
+	std::vector<SpriteObject*> _fallCountPanel;
+	std::vector<std::vector<SpriteObject*>> _fallCountSlot;
+	std::vector<std::vector<SpriteObject*>> _fallCountRed;
 	std::vector<TextObject*> _playTimeText;
 	std::vector<TextObject*> _playerScoreText;
 	std::list<TextObject*> _comboTextPool;
@@ -58,8 +58,8 @@ private:
 private:
 	int _currentPlayerCount;		// 플레이어 수
 	std::vector<bool> _isGameOver;
-	std::vector<int> _playerHP;	
-	std::vector<int> _playerMaxHP;
+	std::vector<int> _fallCount;	
+	std::vector<int> _fallCountMax;
 	std::vector<float> _gameTime;
 	std::vector<int> _playerScore;
 

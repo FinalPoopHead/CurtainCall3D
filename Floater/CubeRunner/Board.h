@@ -1,6 +1,7 @@
 ﻿#pragma once
 #pragma once
 #include <list>
+#include <unordered_map>
 #include "../FloaterGameEngine/include/EngineMinimal.h"
 
 
@@ -59,7 +60,7 @@ public:
 	void OnEndRising();						// 큐브 1개가 rising 끝나면 호출할 함수.
 	void OnEndRowAdd();
 	void OnStartTileFall(int x, int z);		// x,z index의 타일이 떨어지기 시작함.
-	void OnEndTileFall();
+	void OnEndTileFall(int x, int z);
 
 	void DestroyRow();		// TODO : player1이 player2의 보드를 박살냈을때의 예외처리 필요.
 
@@ -110,11 +111,12 @@ private:
 	float _fastForwardValue;
 	int _nowRollingCount;
 	int _nowRisingCount;
-	int _nowFallingTileCount;
 
 	bool _isPerfect;
 	int _nowAddTileCount;
+	int _destroyRowCount;
 
 	std::pair<int, int> _minePos;
 	std::list<std::pair<int, int>> _advantageMinePosList;
+	std::unordered_map<int,int> _fallingTileCount;	// key는 heightIndex
 };

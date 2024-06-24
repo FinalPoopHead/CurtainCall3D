@@ -6,7 +6,7 @@
 #include "SpriteObject.h"
 #include "TextObject.h"
 
-constexpr int MAXHP = 3;		// TODO : 현재 UI 개수에 맞게 3개로만 해뒀음.
+constexpr int MAXHP = 3;			// TODO : 현재 UI 개수에 맞게 3개로만 해뒀음.
 constexpr int MAXPLAYERCOUNT = 2;
 constexpr int CUBESCORE = 100;
 constexpr int COMBOTEXTCOUNT = 20;
@@ -16,17 +16,17 @@ constexpr flt::Vector2f COMBOTEXTPOSITION = { 0.05f,0.85f };
 GameManager::GameManager() :
 	_players(std::vector<Player*>(MAXPLAYERCOUNT))
 	, _boards(std::vector<Board*>(MAXPLAYERCOUNT))
-	, _playerHPPanel(std::vector<SpriteObject*>(MAXPLAYERCOUNT))
-	, _playerHPSlots(std::vector<std::vector<SpriteObject*>>(MAXPLAYERCOUNT))
-	, _playerHPValues(std::vector<std::vector<SpriteObject*>>(MAXPLAYERCOUNT))
+	, _fallCountPanel(std::vector<SpriteObject*>(MAXPLAYERCOUNT))
+	, _fallCountSlot(std::vector<std::vector<SpriteObject*>>(MAXPLAYERCOUNT))
+	, _fallCountRed(std::vector<std::vector<SpriteObject*>>(MAXPLAYERCOUNT))
 	, _playTimeText(std::vector<TextObject*>(MAXPLAYERCOUNT))
 	, _playerScoreText(std::vector<TextObject*>(MAXPLAYERCOUNT))
 	, _comboTextPool()
 	, _liveComboTexts()
 	, _currentPlayerCount(0)
 	, _isGameOver(std::vector<bool>(MAXPLAYERCOUNT))
-	, _playerHP(std::vector<int>(MAXPLAYERCOUNT))
-	, _playerMaxHP(std::vector<int>(MAXPLAYERCOUNT))
+	, _fallCount(std::vector<int>(MAXPLAYERCOUNT))
+	, _fallCountMax(std::vector<int>(MAXPLAYERCOUNT))
 	, _gameTime(std::vector<float>(MAXPLAYERCOUNT))
 	, _playerScore(std::vector<int>(MAXPLAYERCOUNT))
 	, _comboTextPos(std::vector<flt::Vector2f>(MAXPLAYERCOUNT))
@@ -34,7 +34,7 @@ GameManager::GameManager() :
 	for (int i = 0; i < MAXPLAYERCOUNT; i++)
 	{
 		_isGameOver[i] = false;
-		_playerHP[i] = 0;
+		_fallCount[i] = 0;
 		_gameTime[i] = 0.0f;
 		_playerScore[i] = 0;
 		_comboTextPos[i] = COMBOTEXTPOSITION;
@@ -114,8 +114,8 @@ void GameManager::SetPlayer(int index, Player* player)
 
 	IncreasePlayerCount();
 	_players[index] = player;
-	_playerHP[index] = MAXHP;
-	_playerMaxHP[index] = MAXHP;
+	_fallCount[index] = 0;
+	_fallCountMax[index] = MAXHP;
 }
 
 void GameManager::SetBoard(int index, Board* board)
@@ -131,17 +131,17 @@ void GameManager::SetBoard(int index, Board* board)
 
 void GameManager::AddPlayerHPPanel(int index, SpriteObject* hpPanel)
 {
-	_playerHPPanel[index] = hpPanel;
+	_fallCountPanel[index] = hpPanel;
 }
 
 void GameManager::AddPlayerHPSlot(int index, SpriteObject* hpSlot)
 {
-	_playerHPSlots[index].push_back(hpSlot);
+	_fallCountSlot[index].push_back(hpSlot);
 }
 
 void GameManager::AddPlayerHPValue(int index, SpriteObject* hpValue)
 {
-	_playerHPValues[index].push_back(hpValue);
+	_fallCountRed[index].push_back(hpValue);
 }
 
 void GameManager::AddPlayTimeText(int index, TextObject* playTimeText)
@@ -173,19 +173,21 @@ void GameManager::ReduceHP(int index, int damage)
 		return;
 	}
 
-	_playerHP[index] -= damage;
+	_fallCount[index] += damage;
 
-	for (int i = 0; i < _playerMaxHP[index] - _playerHP[index]; i++)
+	if(_fallCount[index] > _fallCountMax[index])
 	{
-		_playerHPValues[index][i]->Disable();
+		_fallCount[index] = 0;
+		_boards[index]->DestroyRow();
+		for (int i = 0; i < _fallCountMax[index]; i++)
+		{
+			_fallCountRed[index][i]->Disable();
+		}
 	}
 
-	if (_playerHP[index] <= 0)
+	for (int i = _fallCountMax[index] - 1; i >= _fallCountMax[index] - _fallCount[index]; i--)
 	{
-		_playerHP[index] = 0;
-		_isGameOver[index] = true;
-		_players[index]->SetGameOver();
-		_boards[index]->SetGameOver();
+		_fallCountRed[index][i]->Enable();
 	}
 }
 
@@ -248,10 +250,10 @@ void GameManager::IncreasePlayerCount()
 		{
 			float offSetBase = offSetDelta * i;
 
-			if (_playerHPPanel[i] != nullptr)
+			if (_fallCountPanel[i] != nullptr)
 			{
-				auto originOffset = _playerHPPanel[i]->GetOffsetPosition();
-				_playerHPPanel[i]->SetOffsetPosition({ offSetBase + originOffset.x / MAXPLAYERCOUNT, originOffset.y });
+				auto originOffset = _fallCountPanel[i]->GetOffsetPosition();
+				_fallCountPanel[i]->SetOffsetPosition({ offSetBase + originOffset.x / MAXPLAYERCOUNT, originOffset.y });
 			}
 
 			if (_playTimeText[i] != nullptr)
