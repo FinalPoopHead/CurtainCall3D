@@ -31,6 +31,7 @@ namespace flt
 		void SetFilePath(const std::wstring& path);
 		void SetMaterial(uint32 meshIndex, const std::wstring& path, RawMaterial::TextureType type);
 		std::vector<std::wstring> GetAnimaionList() const;
+		void SetCastShadow(bool isCast);
 
 		//void PlayAnimation(const std::wstring& name);
 		void PlayAnimation(uint32 index, bool isLoop);

@@ -24,6 +24,7 @@ AdvantageMine::AdvantageMine() :
 	auto coneRenderer = _cone->AddComponent<flt::RendererComponent>(true);
 	coneRenderer->SetFilePath(conePath);
 	coneRenderer->SetMaterial(0, texturePath, flt::RawMaterial::TextureType::ALBEDO_OPACITY);
+	coneRenderer->SetCastShadow(false);
 
 	_plane->tr.SetScale(1.0f, 0.01f, 1.0f);
 }
