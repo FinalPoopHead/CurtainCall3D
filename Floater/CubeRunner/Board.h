@@ -61,7 +61,7 @@ public:
 	void OnStartTileFall(int x, int z);		// x,z index의 타일이 떨어지기 시작함.
 	void OnEndTileFall();
 
-	void DestroyRow();
+	void DestroyRow();		// TODO : player1이 player2의 보드를 박살냈을때의 예외처리 필요.
 
 	bool IsMineSet();
 
