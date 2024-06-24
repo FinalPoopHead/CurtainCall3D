@@ -194,6 +194,9 @@ void GameScene::Initialize()
 	gameManager->AddPlayerScoreText(1, p2Score);
 	gameManager->SetBoard(1, board2);
 	gameManager->SetPlayer(1, player2);
+
+	player1->SetAlbedoPath(L"..\\Resources\\Textures\\Rob02Red_AlbedoTransparency.png");
+	player2->SetAlbedoPath(L"..\\Resources\\Textures\\Rob02Blue_AlbedoTransparency.png");
 }
 
 void GameScene::Finalize()

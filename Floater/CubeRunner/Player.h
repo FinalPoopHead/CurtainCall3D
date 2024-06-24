@@ -17,6 +17,7 @@ protected:
 public:
 	void SetPadIndex(int padIndex) { _padIndex = padIndex; }
 	void SetGameOver();
+	void SetAlbedoPath(std::wstring path);
 
 private:
 	PlayerModel* _model;

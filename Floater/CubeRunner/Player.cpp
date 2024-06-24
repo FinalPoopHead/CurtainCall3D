@@ -36,6 +36,12 @@ void Player::OnEnable()
 
 void Player::Update(float deltaSecond)
 {
+	if (flt::GetKeyDown(flt::KeyCode::backspace))
+	{
+		static MainMenuScene* scene = flt::CreateScene<MainMenuScene>();
+		flt::SetScene(scene);
+	}
+
 	if (_isGameOver)
 	{
 		return;
@@ -228,16 +234,15 @@ void Player::Update(float deltaSecond)
 			printf("Y Up\n");
 		}
 	}
-
-	if (flt::GetKeyDown(flt::KeyCode::enter))
-	{
-		static MainMenuScene* scene = flt::CreateScene<MainMenuScene>();
-		flt::SetScene(scene);
-	}
 }
 
 void Player::SetGameOver()
 {
 	_isGameOver = true;
+}
+
+void Player::SetAlbedoPath(std::wstring path)
+{
+	_model->SetAledoPath(path);
 }
 
