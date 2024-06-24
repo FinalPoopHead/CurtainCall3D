@@ -112,8 +112,7 @@ private:
 	int _nowRisingCount;
 	int _nowFallingTileCount;
 
-	int _detonatedDarkCubeCount;
-	int _remainCubeCount;
+	bool _isPerfect;
 	int _nowAddTileCount;
 
 	std::pair<int, int> _minePos;

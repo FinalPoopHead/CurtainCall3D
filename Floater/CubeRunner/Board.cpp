@@ -44,8 +44,7 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _nowRollingCount(0)
 	, _nowRisingCount(0)
 	, _nowFallingTileCount()
-	, _detonatedDarkCubeCount()
-	, _remainCubeCount()
+	, _isPerfect(true)
 	, _nowAddTileCount()
 	, _minePos({ -1,-1 })
 	, _advantageMinePosList()
@@ -130,14 +129,12 @@ void Board::PreUpdate(float deltaTime)
 					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemoving(CUBEREMOVETIME);
 					_tiles[i][j]->_cube = nullptr;
 					_tileState[i][j] = (int)_tileState[i][j] & ~CUBE;
-					_remainCubeCount--;
 					break;
 				case TileStateFlag::ADVANTAGECUBE:
 					// AdvantageCube 수납
 					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemoving(CUBEREMOVETIME);
 					_tiles[i][j]->_cube = nullptr;
 					_tileState[i][j] = (int)_tileState[i][j] & ~CUBE;
-					_remainCubeCount--;
 					break;
 				default:
 					break;
@@ -331,8 +328,7 @@ void Board::_TEST_GenerateRandomWave()
 		return;
 	}
 
-	_detonatedDarkCubeCount = 0;
-	_remainCubeCount = 0;
+	_isPerfect = true;
 
 	int _TEST_darkCount = 3;
 
@@ -359,7 +355,6 @@ void Board::_TEST_GenerateRandomWave()
 				}
 				cube = _normalCubePool.front();
 				_normalCubePool.pop_front();
-				_remainCubeCount++;
 				break;
 			case 1:
 				if (_TEST_darkCount <= 0)
@@ -382,7 +377,6 @@ void Board::_TEST_GenerateRandomWave()
 				}
 				cube = _advantageCubePool.front();
 				_advantageCubePool.pop_front();
-				_remainCubeCount++;
 				break;
 			default:
 				ASSERT(false, "Invalid Random Value");
@@ -446,7 +440,7 @@ void Board::OnEndWave()
 	_isWaveRunning = false;
 	_delayRemain = DETONATEDELAY;
 
-	if (_detonatedDarkCubeCount == 0 && _remainCubeCount == 0)	// 다크큐브를 건드리지 않고 클리어 한다면
+	if (_isPerfect)
 	{
 		AddRow();
 	}
@@ -712,6 +706,7 @@ void Board::SetGameOver()
 void Board::ReduceHPbyCubeFalling()
 {
 	_gameManager->ReduceHP(_playerIndex, CUBEDAMAGE);
+	_isPerfect = false;
 	// TODO : 에너지 다 깎이면 한 줄 삭제하고 체력 다시 채워줘야함.
 }
 
@@ -884,13 +879,12 @@ bool Board::UpdateDetonate()
 					// NormalCube 수납
 					destroyCount++;
 					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemoving(CUBEREMOVETIME);
-					_remainCubeCount--;
 					break;
 				case TileStateFlag::DARKCUBE:
 					// DarkCube 수납 및 체력 감소 -> 스테이지 한 줄 삭제
 					_gameManager->ReduceHP(_playerIndex, DARKCUBEDAMAGE);
 					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemoving(CUBEREMOVETIME);
-					_detonatedDarkCubeCount++;
+					_isPerfect = false;
 					// TODO : 스테이지 한 줄 삭제
 					DestroyRow();
 					break;
@@ -901,7 +895,6 @@ bool Board::UpdateDetonate()
 					_advantageMinePosList.push_back({ i,j });
 					destroyCount++;
 					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemoving(CUBEREMOVETIME);
-					_remainCubeCount--;
 					break;
 				default:
 					break;
