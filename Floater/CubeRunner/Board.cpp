@@ -325,13 +325,15 @@ void Board::_TEST_GenerateRandomWave()
 	_detonatedDarkCubeCount = 0;
 	_remainCubeCount = 0;
 
+	int _TEST_darkCount = 3;
+
 	for (int i = 0; i < _width; ++i)
 	{
 		int delayCount = 0;
-		if (i == _width / 2) continue;		// TEST 한 줄 비우기 위함
+		//if (i == _width / 2) continue;		// TEST 한 줄 비우기 위함
 		for (int j = 0; j < _width; ++j)
 		{
-			if (j == _width / 2) continue;	// TEST 한 줄 비우기 위함
+			//if (j == _width / 2) continue;	// TEST 한 줄 비우기 위함
 			int randValue = rand() % 3;
 
 			float x = _tiles[i][j]->tr.GetWorldPosition().x;
@@ -351,6 +353,12 @@ void Board::_TEST_GenerateRandomWave()
 				_remainCubeCount++;
 				break;
 			case 1:
+				if (_TEST_darkCount <= 0)
+				{
+					--j;
+					continue;
+				}
+				_TEST_darkCount--;
 				if (_darkCubePool.empty())
 				{
 					ASSERT(false, "DarkCubePool is Empty");
