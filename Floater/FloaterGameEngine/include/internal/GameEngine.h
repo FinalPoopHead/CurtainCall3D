@@ -38,6 +38,7 @@ namespace flt
 		Scene* GetCurrentScene();
 
 		Vector2f GetWindowSize();
+		void SetWindowTitle(const std::wstring& title);
 
 		IRenderer* GetRenderer();
 		PhysicsEngine* GetPhysicsEngine();

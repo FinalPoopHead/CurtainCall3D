@@ -56,6 +56,11 @@ flt::Vector2f flt::Platform::GetWindowSize()
 	return _pOsImpl->GetWindowSize();
 }
 
+void flt::Platform::SetWindowTitle(const std::wstring& title)
+{
+	_pOsImpl->SetWindowTitle(title);
+}
+
 flt::KeyData flt::Platform::GetKey(KeyCode code)
 {
 	return _pOsImpl->GetKey(code);

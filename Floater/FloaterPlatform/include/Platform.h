@@ -38,6 +38,7 @@ namespace flt
 		void DestroyRenderer(IRenderer* renderer);
 
 		Vector2f GetWindowSize();
+		void SetWindowTitle(const std::wstring& title);
 
 		KeyData GetKey(KeyCode code);
 		KeyData GetKeyDown(KeyCode code);

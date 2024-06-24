@@ -353,6 +353,16 @@ flt::Vector2f flt::OsWindows::GetWindowSize()
 	return Vector2f{ (float)(rect.right - rect.left), (float)(rect.bottom - rect.top) };
 }
 
+void flt::OsWindows::SetWindowTitle(const std::wstring& title)
+{
+	BOOL ret = SetWindowText(_hwnd, title.c_str());
+	if (ret == 0)
+	{
+		ASSERT(false, "타이틀 변경 실패");
+		DWORD error = GetLastError();
+	}
+}
+
 flt::KeyData flt::OsWindows::GetKey(KeyCode code)
 {
 	if (_pKeyStates[(int)code].isStay)
