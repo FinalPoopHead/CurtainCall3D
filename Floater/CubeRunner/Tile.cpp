@@ -9,7 +9,7 @@
 
 constexpr float GRAVITY = 9.8f;
 constexpr float STARTFALLSPEED = 20.0f;
-constexpr float FALLHEIGHT = -16.0f;
+constexpr float FALLHEIGHT = -32.0f;
 
 Tile::Tile(Board* board)
 	: _board(board)

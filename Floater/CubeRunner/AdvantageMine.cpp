@@ -6,7 +6,7 @@ AdvantageMine::AdvantageMine() :
 {
 	std::wstring planePath = L"..\\Resources\\Models\\cube.fbx";
 	std::wstring conePath = L"..\\Resources\\Models\\Cone.fbx";
-	std::wstring texturePath = L"..\\Resources\\Textures\\AdvantageCube.png";	// TODO : 텍스쳐는 임시임.
+	std::wstring texturePath = L"..\\Resources\\Textures\\AdvantageMine.png";	// TODO : 텍스쳐는 임시임.
 
 	float planeHeight = 2.05f;
 	float coneHeight = 8.0f;
@@ -24,6 +24,7 @@ AdvantageMine::AdvantageMine() :
 	auto coneRenderer = _cone->AddComponent<flt::RendererComponent>(true);
 	coneRenderer->SetFilePath(conePath);
 	coneRenderer->SetMaterial(0, texturePath, flt::RawMaterial::TextureType::ALBEDO_OPACITY);
+	coneRenderer->SetCastShadow(false);
 
 	_plane->tr.SetScale(1.0f, 0.01f, 1.0f);
 }

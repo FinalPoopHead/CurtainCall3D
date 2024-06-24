@@ -25,7 +25,9 @@ namespace flt
 			, imgPath(L"")
 			, text()
 			, name(L"")
-			, useRootMotion(false) {}
+			, useRootMotion(false)
+			, isCastShadow(true)
+		{}
 
 		~RendererObject();
 
@@ -43,5 +45,6 @@ namespace flt
 		Text text;
 		std::wstring name;
 		bool useRootMotion;
+		bool isCastShadow;
 	};
 }

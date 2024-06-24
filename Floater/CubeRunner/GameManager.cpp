@@ -303,6 +303,11 @@ void GameManager::PrintComboText(int index, int count, int score)
 
 void GameManager::AddPlayTime(int index, float time)
 {
+	if (_players[index] == nullptr)
+	{
+		return;
+	}
+
 	_gameTime[index] += time;
 
 	int gameTime = static_cast<int>(_gameTime[index]);

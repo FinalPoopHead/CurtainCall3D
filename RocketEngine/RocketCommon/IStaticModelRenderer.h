@@ -27,6 +27,7 @@ namespace Rocket::Core
 		virtual void LoadRoughnessTexture(std::string fileName) = 0;
 		virtual void LoadAOTexture(std::string fileName) = 0;
 		virtual void BindTransform(RocketTransform* transform) = 0;
+		virtual void SetCastShadow(bool isCast) = 0;						// false라면 Shadow를 그리지 않는다.
 
 		// 임시
 		virtual void SetMetallic(float metallic) = 0;

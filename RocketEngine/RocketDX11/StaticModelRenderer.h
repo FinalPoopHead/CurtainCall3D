@@ -44,6 +44,7 @@ namespace Rocket::Core
 		virtual void LoadRoughnessTexture(std::string fileName) override;
 		virtual void LoadAOTexture(std::string fileName) override;
 		virtual void BindTransform(RocketTransform* transform) override;
+		virtual void SetCastShadow(bool isCast) override;
 
 		// 임시
 		virtual void SetMetallic(float metallic) override;
@@ -69,5 +70,6 @@ namespace Rocket::Core
 		Material* _material;
 		bool _isActive;
 		DirectX::BoundingBox _boundingBox;		// frustumCulling 용
+		bool _isCastShadow;
 	};
 }
