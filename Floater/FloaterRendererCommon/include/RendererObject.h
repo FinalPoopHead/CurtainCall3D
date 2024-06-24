@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "RawNode.h"
+#include "Light.h"
 #include "AnimState.h"
 #include "Text.h"
 #include "../../FloaterUtil/include/FloaterType.h"
@@ -19,6 +20,7 @@ namespace flt
 			, isDraw(isDraw)
 			, node(nullptr)
 			, camera(nullptr)
+			, light(nullptr)
 			, animState()
 			, imgPath(L"")
 			, text()
@@ -30,15 +32,12 @@ namespace flt
 		void SetRawNode(RawNode* rawNode);
 		void SetMaterial(uint32 meshIndex, const std::wstring& path, RawMaterial::TextureType type);
 
-		// transform
-		// model
-		// material, texture
-		// shader
 		Transform* transform;
 		const bool& isDraw;
 		RawNode* node;
 		std::vector<RawMaterial> materials;
 		Camera* camera;
+		Light* light;
 		AnimState animState;
 		std::wstring imgPath;
 		Text text;

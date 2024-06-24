@@ -31,6 +31,30 @@ Camera::Camera(Player* player, Board* board)
 void Camera::TracePlayer()
 {
 	_isPlayerLook = true;
+	_isTweenMove = false;
+	_isTweenRotate = false;
+}
+
+void Camera::TweenMove(flt::Vector3f targetPos, float time, std::function<float(float)> ease)
+{
+	_isPlayerLook = false;
+	_isTweenMove = true;
+	_startPosition = (flt::Vector3f)tr.GetLocalPosition();
+	_targetPosition = targetPos;
+	_moveTime = time;
+	_moveTimeElapsed = 0.0f;
+	_moveEase = ease;
+}
+
+void Camera::TweenRotate(flt::Quaternion targetRot, float time, std::function<float(float)> ease)
+{
+	_isPlayerLook = false;
+	_isTweenRotate = true;
+	_startRotation = tr.GetLocalRotation();
+	_targetRotation = targetRot;
+	_rotateTime = time;
+	_rotateTimeElapsed = 0.0f;
+	_rotateEase = ease;
 }
 
 void Camera::PostUpdate(float deltaSecond)
@@ -38,6 +62,19 @@ void Camera::PostUpdate(float deltaSecond)
 	//flt::Vector3f targetPosition = CalcTargetPosition();
 	//tr.SetPosition(targetPosition);
 	//_currPosition = targetPosition;
+	if(flt::GetKeyDown(flt::KeyCode::mouseLButton))
+	{
+		if (_isPlayerLook)
+		{
+			TweenMove({ 0.0f, 0.0f, 0.0f }, 1.0f);
+			TweenRotate({ 0.0f, 0.0f, 0.0f, 1.0f }, 1.0f);
+		}
+		else
+		{
+			TracePlayer();
+		}
+	}
+
 
 	if (_isMoving)
 	{
@@ -47,94 +84,6 @@ void Camera::PostUpdate(float deltaSecond)
 	{
 		StartCameraMove();
 	}
-
-	/*flt::KeyData keyData = GetKey(flt::KeyCode::lAlt);
-	if (keyData)
-	{
-		keyData = GetKey(flt::KeyCode::mouseWheelUp);
-		if (keyData)
-		{
-			_rotSpeed += 1.0f * deltaSecond * keyData.x;
-			std::cout << "rotSpeed : " << _rotSpeed << std::endl;
-		}
-
-		keyData = GetKey(flt::KeyCode::mouseWheelDown);
-		if (keyData)
-		{
-			_rotSpeed += 1.0f * deltaSecond * keyData.x;
-			std::cout << "rotSpeed : " << _rotSpeed << std::endl;
-		}
-	}
-	else if (GetKey(flt::KeyCode::lCtrl))
-	{
-		keyData = GetKey(flt::KeyCode::mouseWheelUp);
-		if (keyData)
-		{
-			_movSpeed += 1.0f * deltaSecond * keyData.x;
-			std::cout << "movSpeed : " << _movSpeed << std::endl;
-		}
-
-		keyData = GetKey(flt::KeyCode::mouseWheelDown);
-		if (keyData)
-		{
-			_movSpeed += 1.0f * deltaSecond * keyData.x;
-			std::cout << "movSpeed : " << _movSpeed << std::endl;
-		}
-	}
-	else
-	{
-
-	}*/
-
-	/*flt::KeyData keyData = GetKey(flt::KeyCode::lAlt);
-	if (keyData)
-	{
-		keyData = GetKey(flt::KeyCode::mouseWheelUp);
-		if (keyData)
-		{
-			_playHeight += 0.5f;
-			std::cout << "_playHeight : " << _playHeight << std::endl;
-		}
-
-		keyData = GetKey(flt::KeyCode::mouseWheelDown);
-		if (keyData)
-		{
-			_playHeight -= 0.5f;
-			std::cout << "_playHeight : " << _playHeight << std::endl;
-		}
-	}
-	else if (GetKey(flt::KeyCode::lCtrl))
-	{
-		keyData = GetKey(flt::KeyCode::mouseWheelUp);
-		if (keyData)
-		{
-			_lookDegree += 1.0f;
-			std::cout << "_lookDegree : " << _lookDegree << std::endl;
-		}
-
-		keyData = GetKey(flt::KeyCode::mouseWheelDown);
-		if (keyData)
-		{
-			_lookDegree -= 1.0f;
-			std::cout << "_lookDegree : " << _lookDegree << std::endl;
-		}
-	}
-	else if (GetKey(flt::KeyCode::spacebar))
-	{
-		keyData = GetKey(flt::KeyCode::mouseWheelUp);
-		if (keyData)
-		{
-			_playerDistance += 1.0f;
-			std::cout << "_playerDistance : " << _playerDistance << std::endl;
-		}
-
-		keyData = GetKey(flt::KeyCode::mouseWheelDown);
-		if (keyData)
-		{
-			_playerDistance -= 1.0f;
-			std::cout << "_playerDistance : " << _playerDistance << std::endl;
-		}
-	}*/
 }
 
 flt::Quaternion Camera::CalcTargetRotation()
@@ -189,5 +138,31 @@ void Camera::UpdateCameraMove(float deltaSecond)
 		tr.SetRotation(_currRotation);
 		tr.AddLocalRotation({ 1.0f, 0.0f, 0.0f }, flt::DegToRad(_lookDegree));
 	}
-
+	else
+	{
+		if (_isTweenMove)
+		{
+			_moveTimeElapsed += deltaSecond;
+			float t = _moveEase(_moveTimeElapsed / _moveTime);
+			if (t >= 1.0f)
+			{
+				t = 1.0f;
+				_isTweenMove = false;
+			}
+			flt::Vector3f pos = flt::Vector3f::Lerp(_startPosition, _targetPosition, t);
+			tr.SetPosition(pos);
+		}
+		if (_isTweenRotate)
+		{
+			_rotateTimeElapsed += deltaSecond;
+			float t = _rotateEase(_rotateTimeElapsed / _rotateTime);
+			if (t >= 1.0f)
+			{
+				t = 1.0f;
+				_isTweenRotate = false;
+			}
+			flt::Quaternion rot = flt::Quaternion::Slerp(_startRotation, _targetRotation, t);
+			tr.SetRotation(rot);
+		}
+	}
 }

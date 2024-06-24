@@ -34,6 +34,7 @@
     <ClInclude Include="include\internal\GameObject.h" />
     <ClInclude Include="ID.h" />
     <ClInclude Include="include\Input.h" />
+    <ClInclude Include="include\internal\DirectionalLight.h" />
     <ClInclude Include="include\internal\Scene.h" />
     <ClInclude Include="include\internal\RendererComponent.h" />
     <ClInclude Include="PhysicsEngine.h" />
@@ -49,6 +50,7 @@
     <ClCompile Include="CameraComponent.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="EngineMinimal.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="FLTween.cpp" />

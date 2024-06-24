@@ -16,6 +16,7 @@
 #include "./RocketCommon/ITextRenderer.h"
 #include "./RocketCommon/ISpriteRenderer.h"
 #include "./RocketCommon/ILineRenderer.h"
+#include "./RocketCommon/IDirectionalLight.h"
 
 #include "./RocketCommon/IResourceManager.h"
 #include "./RocketCommon/RawModelStruct.h"
@@ -95,7 +96,7 @@ bool flt::RocketAdapter::Render(float deltaTime)
 
 		if (rendererObject->animState.index != -1)
 		{
- 			if (!(animState.index == rendererObject->animState.index && animState.isPlaying == rendererObject->animState.isPlaying))
+			if (!(animState.index == rendererObject->animState.index && animState.isPlaying == rendererObject->animState.isPlaying))
 			{
 				animState = rendererObject->animState;
 
@@ -240,6 +241,38 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 					rocketObject->staticModelRenderer->LoadNormalTexture(ToString(renderable.materials[0].textures[RawMaterial::TextureType::NORMAL]->path));
 				}
 			}
+		}
+	}
+
+	if (renderable.light != nullptr)
+	{
+		switch (renderable.light->type)
+		{
+			case Light::Type::none:
+				break;
+			case Light::Type::directional:
+			{
+				Rocket::Core::IDirectionalLight* d = factory->CreateDirectionalLight();
+				Light& light = *renderable.light;
+				rocketObject->directionalLight = d;
+				d->BindTransform(&rocketObject->rocketTransform);
+				d->SetDiffuseColor({ light.diffuseColor.r, light.diffuseColor.g, light.diffuseColor.b});
+				d->SetSpecularColor({ light.specularColor.r, light.specularColor.g, light.specularColor.b});
+				d->SetAmbientColor({ light.ambientColor.r, light.ambientColor.g, light.ambientColor.b});
+			}
+			break;
+			case Light::Type::point:
+			{
+				ASSERT(false, "Not implemented");
+			}
+			break;
+			case Light::Type::spot:
+			{
+				ASSERT(false, "Not implemented");
+			}
+			break;
+			default:
+				break;
 		}
 	}
 

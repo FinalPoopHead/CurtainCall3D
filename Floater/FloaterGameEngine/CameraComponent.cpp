@@ -17,7 +17,6 @@ flt::CameraComponent::CameraComponent() :
 flt::CameraComponent::~CameraComponent()
 {
 	delete _rendererObject;
-	_rendererObject = nullptr;
 }
 
 void flt::CameraComponent::OnCreate()
