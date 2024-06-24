@@ -15,6 +15,7 @@ namespace Rocket::Core
 		, _material(nullptr)
 		, _isActive(true)
 		, _boundingBox()
+		, _isCastShadow(true)
 	{
 
 	}
@@ -301,6 +302,11 @@ namespace Rocket::Core
 			return;
 		}
 
+		if (!_isCastShadow)
+		{
+			return;
+		}
+
 		// Shader deviceContext 이용해 연결.
 		deviceContext->VSSetShader(vs->GetVertexShader(), nullptr, 0);
 		//deviceContext->PSSetShader(ps->GetPixelShader(), nullptr, 0);
@@ -375,6 +381,11 @@ namespace Rocket::Core
 	void StaticModelRenderer::Destroy()
 	{
 		ObjectManager::Instance().DestroyStaticModelRenderer(this);
+	}
+
+	void StaticModelRenderer::SetCastShadow(bool isCast)
+	{
+		_isCastShadow = isCast;
 	}
 
 }
