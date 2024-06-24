@@ -8,7 +8,7 @@ flt::FLTweenNode::FLTweenNode() :
 }
 
 flt::FLTweenNode::FLTweenNode(std::function<float(float)> ease, float duration) :
-	_ease(ease), _target(nullptr), _delay(0.0f), _duration(duration), _elapsed(0.0f), _from(0.0f), _to(0.0f)
+	_ease(ease), _delay(0.0f), _duration(duration), _elapsed(0.0f)
 	, _isFinished(false)
 	, _onComplete(), _onStart(), _onPlay(), _onUpdate(), _onPause()
 	, _next(nullptr)

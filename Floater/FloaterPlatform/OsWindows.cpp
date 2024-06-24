@@ -453,7 +453,6 @@ bool flt::OsWindows::SetGamePadVibration(int padIndex, bool isRightMoter, float 
 	}
 
 	moterPower = std::clamp(moterPower, 0.0f, 1.0f);
-
 	if (isRightMoter)
 	{
 		_pGamePads[padIndex].vibration.rightMotorPower = (BYTE)(moterPower * 255);
