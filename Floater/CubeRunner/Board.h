@@ -13,19 +13,19 @@ class GameManager;
 
 enum class TileStateFlag
 {
-	None = 0x0000
-	, Tile = 0x0001
-	, Player = 0x0002
-	, Mine = 0x0004
-	, AdvantageMine = 0x0008
-	, Detonate = 0x0010
-	, NormalCube = 0x0100
-	, DarkCube = 0x0200
-	, AdvantageCube = 0x0400
+	NONE = 0x0000
+	, TILE = 0x0001
+	, PLAYER = 0x0002
+	, MINE = 0x0004
+	, ADVANTAGEMINE = 0x0008
+	, DETONATE = 0x0010
+	, NORMALCUBE = 0x0100
+	, DARKCUBE = 0x0200
+	, ADVANTAGECUBE = 0x0400
 };
 
-#define BLOCKED_TILE ((int)TileStateFlag::NormalCube | (int)TileStateFlag::DarkCube | (int)TileStateFlag::AdvantageCube)
-#define CUBE ((int)TileStateFlag::NormalCube | (int)TileStateFlag::DarkCube | (int)TileStateFlag::AdvantageCube)
+#define BLOCKED_TILE ((int)TileStateFlag::NORMALCUBE | (int)TileStateFlag::DARKCUBE | (int)TileStateFlag::ADVANTAGECUBE)
+#define CUBE ((int)TileStateFlag::NORMALCUBE | (int)TileStateFlag::DARKCUBE | (int)TileStateFlag::ADVANTAGECUBE)
 
 class Board : public flt::GameObject
 {
@@ -83,12 +83,17 @@ private:
 	void AddRow();
 	void OnEndWave();
 
+	Tile* GetTileFromPool();
+	void ReturnTileToPool(Tile* tile);
+
 private:
 	GameManager* _gameManager;
 	int _playerIndex;
 	int _width;
 	int _height;
 	float _tileSize;
+
+	std::list<Tile*> _tilePool;
 
 	std::vector<std::vector<int>> _tileState;
 	std::vector<std::vector<Tile*>> _tiles;

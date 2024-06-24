@@ -135,7 +135,7 @@ void Player::Update(float deltaSecond)
 	// 좌 우 이동
 	// 현재 상태에 이동 가능하거나 
 	// 다음 상태에 이동 가능하면 이동 가능
-	if ((tileState == (int)TileStateFlag::None)
+	if ((tileState == (int)TileStateFlag::NONE)
 		|| ((tileState & blocked) && (nextTileState & blocked)))
 	{
 		// 이동 불가능할 경우에는 x값을 원래 값으로 되돌린다.
@@ -149,7 +149,7 @@ void Player::Update(float deltaSecond)
 	// 상 하 이동
 	// 현재 상태에 이동이 가능하거나 
 	// 아래에 내려가는 경우에 한해서 다음 상태에 이동 가능하면 가능
-	if ((tileState == (int)TileStateFlag::None)
+	if ((tileState == (int)TileStateFlag::NONE)
 		|| ((tileState & blocked) && (nextTileState & blocked))
 		|| ((tileState & blocked) && !(nextTileState & blocked) && nextPosOffset.z > 0))
 	{
@@ -173,7 +173,7 @@ void Player::Update(float deltaSecond)
 	_isCrushed = false;
 	tileState = _board->QueryTileState(pos.x, pos.z);
 	nextTileState = _board->QueryNextTileState(pos.x, pos.z);
-	if ((tileState == (int)TileStateFlag::None)
+	if ((tileState == (int)TileStateFlag::NONE)
 		|| (tileState & blocked) && (nextTileState & blocked))
 	{
 		_isCrushed = true;
