@@ -84,6 +84,9 @@
     <ClInclude Include="include\LogContext.h">
       <Filter>Logger</Filter>
     </ClInclude>
+    <ClInclude Include="LogFormatObject.h">
+      <Filter>Logger</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConvString.cpp">
@@ -100,6 +103,9 @@
     </ClCompile>
     <ClCompile Include="TesterFixedSizeMemoryPool.cpp">
       <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="LogFormatObject.cpp">
+      <Filter>Logger</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

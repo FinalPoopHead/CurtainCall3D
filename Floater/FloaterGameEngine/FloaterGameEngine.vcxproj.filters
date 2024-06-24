@@ -98,7 +98,7 @@
     <ClInclude Include="Sound.h">
       <Filter>Sound</Filter>
     </ClInclude>
-    <ClInclude Include="FLTween.h">
+    <ClInclude Include="include\FLTween.h">
       <Filter>fltween</Filter>
     </ClInclude>
     <ClInclude Include="include\internal\UIComponent.h">
@@ -107,7 +107,7 @@
     <ClInclude Include="Image.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="FLTweenNode.h">
+    <ClInclude Include="include\FLTweenNode.h">
       <Filter>fltween</Filter>
     </ClInclude>
   </ItemGroup>

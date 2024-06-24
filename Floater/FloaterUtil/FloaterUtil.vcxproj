@@ -171,6 +171,7 @@
     <ClInclude Include="include\Vector.h" />
     <ClInclude Include="include\ITester.h" />
     <ClInclude Include="include\FixedSizeMemoryPool.h" />
+    <ClInclude Include="LogFormatObject.h" />
     <ClInclude Include="TesterFixedSizeMemoryPool.h" />
     <ClInclude Include="TesterRBTree.h" />
     <ClInclude Include="include\UUID.h" />
@@ -178,6 +179,7 @@
   <ItemGroup>
     <ClCompile Include="ConvString.cpp" />
     <ClCompile Include="FixedSizeMemoryPool.cpp" />
+    <ClCompile Include="LogFormatObject.cpp" />
     <ClCompile Include="TesterFixedSizeMemoryPool.cpp" />
     <ClCompile Include="TesterRBTree.cpp" />
     <ClCompile Include="Timer.cpp" />

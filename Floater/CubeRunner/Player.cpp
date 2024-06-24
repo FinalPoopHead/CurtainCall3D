@@ -240,4 +240,3 @@ void Player::SetGameOver()
 {
 	_isGameOver = true;
 }
-
