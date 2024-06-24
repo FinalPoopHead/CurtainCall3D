@@ -4,3 +4,4 @@
 #include "RendererComponent.h"
 #include "SoundComponent.h"
 #include "UIComponent.h"
+#include "DirectionalLight.h"

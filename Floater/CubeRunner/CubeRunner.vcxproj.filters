@@ -109,6 +109,9 @@
     <ClCompile Include="PlayerModel.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>GameObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h">
@@ -173,6 +176,9 @@
       <Filter>GameObject\UI\Ingame</Filter>
     </ClInclude>
     <ClInclude Include="PlayerModel.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
       <Filter>GameObject</Filter>
     </ClInclude>
   </ItemGroup>

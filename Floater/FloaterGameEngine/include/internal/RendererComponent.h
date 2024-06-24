@@ -21,9 +21,6 @@ namespace flt
 		virtual void OnCreate() override;
 		virtual void OnEnable() override;
 		virtual void OnDisable() override;
-		virtual void Update(float deltaSecond) override;
-		virtual void PostRender() override;
-		//void virtual OnDisable() override;
 		virtual void OnDestroy() override;
 
 	public:

@@ -60,9 +60,9 @@ namespace flt
 
 	struct GamePadVibration
 	{
-		float leftMotorPower;
 		float leftMotorTime;
-		float rightMotorPower;
 		float rightMotorTime;
+		unsigned char rightMotorPower;
+		unsigned char leftMotorPower;
 	};
 }

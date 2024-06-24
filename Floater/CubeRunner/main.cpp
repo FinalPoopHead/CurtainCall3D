@@ -7,7 +7,7 @@
 int main(int argc, char* argv[])
 {
 	flt::GameEngine* pGameEngine = flt::GameEngine::Instance();
-	
+	pGameEngine->SetWindowTitle(L"Cube Runner");
 	//GameScene* gameScene = flt::CreateScene<GameScene>();
 	//MainMenuScene* mainMenuScene = flt::CreateScene<MainMenuScene>();
 	//SetScene(gameScene);

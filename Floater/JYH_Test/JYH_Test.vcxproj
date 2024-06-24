@@ -111,6 +111,7 @@
       <OpenMPSupport>true</OpenMPSupport>
       <AssemblerOutput>All</AssemblerOutput>
       <AdditionalIncludeDirectories>..\..\assimpInc;..\..\eigen-3.4.0;..\..\DirectXTex\Inc;..\..\ZeldaGraphics\header</AdditionalIncludeDirectories>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -38,7 +38,8 @@ void flt::GameEngine::Initialize()
 	isDebug = true;
 #endif
 	_platform = std::make_unique<Platform>(isDebug);
-	_platform->Initialize(1280, 720, L"name", L"");
+	bool ret = _platform->Initialize(1280, 720, L"", L"");
+	ASSERT(ret, "Platform Initialize failed");
 	_renderer = _platform->CreateRenderer(RendererType::ROCKET_DX11);
 	//_renderer = _platform->CreateRenderer(RendererType::DX11);
 	_physicsEngine = std::make_unique<PhysicsEngine>();
@@ -163,6 +164,11 @@ flt::Scene* flt::GameEngine::GetCurrentScene()
 flt::Vector2f flt::GameEngine::GetWindowSize()
 {
 	return _platform->GetWindowSize();
+}
+
+void flt::GameEngine::SetWindowTitle(const std::wstring& title)
+{
+	_platform->SetWindowTitle(title);
 }
 
 flt::GameEngine::GameEngine() :

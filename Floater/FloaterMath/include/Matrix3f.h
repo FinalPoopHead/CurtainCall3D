@@ -77,7 +77,7 @@ namespace flt
 			e[2][2] -= rhs.e[2][2];
 			return *this;
 		}
-		Matrix3f operator-(const Matrix3f& rhs) const noexcept
+		[[nodiscard]] Matrix3f operator-(const Matrix3f& rhs) const noexcept
 		{
 			return Matrix3f(*this) -= rhs;
 		}
@@ -92,7 +92,7 @@ namespace flt
 			}
 			return *this = temp;
 		}
-		Matrix3f operator*(const Matrix3f& rhs) const noexcept
+		[[nodiscard]] Matrix3f operator*(const Matrix3f& rhs) const noexcept
 		{
 			return Matrix3f(*this) *= rhs;
 		}
@@ -109,7 +109,7 @@ namespace flt
 			e[2][2] *= rhs;
 			return *this;
 		}
-		Matrix3f operator*(float rhs) const noexcept
+		[[nodiscard]] Matrix3f operator*(float rhs) const noexcept
 		{
 			return Matrix3f(*this) *= rhs;
 		}
@@ -131,7 +131,7 @@ namespace flt
 			return Matrix3f(*this) /= rhs;
 		}
 
-		float Determinant() const
+		[[nodiscard]] float Determinant() const
 		{
 			float det
 				= (e[0][0] * e[1][1] * e[2][2])
@@ -143,7 +143,7 @@ namespace flt
 
 			return det;
 		}
-		Matrix3f Transpose() const
+		[[nodiscard]] Matrix3f Transpose() const
 		{
 			return Matrix3f
 			{
@@ -152,7 +152,7 @@ namespace flt
 				e[0][2], e[1][2], e[2][2]
 			};
 		}
-		Matrix3f Inverse() const
+		[[nodiscard]] Matrix3f Inverse() const
 		{
 			float det = Determinant();
 			float epsilon = FLOAT_EPSILON;
@@ -178,7 +178,7 @@ namespace flt
 			};
 		}
 
-		static Matrix3f Identity() noexcept
+		static [[nodiscard]] Matrix3f Identity() noexcept
 		{
 			return Matrix3f{ 1.0f, 0.0f, 0.0f,
 							 0.0f, 1.0f, 0.0f,

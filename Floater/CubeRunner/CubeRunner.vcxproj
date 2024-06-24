@@ -105,6 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,6 +143,7 @@
     <ClCompile Include="CubeController.cpp" />
     <ClCompile Include="DarkCube.cpp" />
     <ClCompile Include="DetonatedMine.cpp" />
+    <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="PlayerModel.cpp" />
     <ClCompile Include="SpriteObject.cpp" />
@@ -167,6 +169,7 @@
     <ClInclude Include="CubeController.h" />
     <ClInclude Include="DarkCube.h" />
     <ClInclude Include="DetonatedMine.h" />
+    <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="PlayerModel.h" />

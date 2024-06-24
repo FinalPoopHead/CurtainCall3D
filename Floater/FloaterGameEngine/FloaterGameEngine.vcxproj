@@ -20,8 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CollisionPair.h" />
-    <ClInclude Include="FLTween.h" />
-    <ClInclude Include="FLTweenNode.h" />
+    <ClInclude Include="include\FLTween.h" />
+    <ClInclude Include="include\FLTweenNode.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="include\internal\Collider.h" />
     <ClInclude Include="include\internal\BoxColliderComponent.h" />
@@ -34,6 +34,7 @@
     <ClInclude Include="include\internal\GameObject.h" />
     <ClInclude Include="ID.h" />
     <ClInclude Include="include\Input.h" />
+    <ClInclude Include="include\internal\DirectionalLight.h" />
     <ClInclude Include="include\internal\Scene.h" />
     <ClInclude Include="include\internal\RendererComponent.h" />
     <ClInclude Include="PhysicsEngine.h" />
@@ -49,6 +50,7 @@
     <ClCompile Include="CameraComponent.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="EngineMinimal.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="FLTween.cpp" />
@@ -177,6 +179,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)..\External\include\physx\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

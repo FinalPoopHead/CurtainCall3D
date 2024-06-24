@@ -4,17 +4,17 @@
 #include "./include/internal/Scene.h"
 #include "./include/internal/GameEngine.h"
 #include "../FloaterRendererCommon/include/RawSkeleton.h"
-//#include "../FloaterRendererCommon/include/RawNode.h"
 #include <filesystem>
 
 
-flt::RendererComponent::RendererComponent() :
-	_rendererObject(new RendererObject{ _isDraw }),
-	_renderer(*GameEngine::Instance()->GetRenderer()), 
-	_hObject(), 
-	_isDraw(false),
-	_isRegisted(false)
+flt::RendererComponent::RendererComponent()
+	: _rendererObject(new RendererObject{ _isDraw })
+	, _renderer(*GameEngine::Instance()->GetRenderer())
+	, _hObject()
+	, _isDraw(false)
+	, _isRegisted(false)
 {
+
 }
 
 flt::RendererComponent::~RendererComponent()
@@ -41,16 +41,6 @@ void flt::RendererComponent::OnEnable()
 void flt::RendererComponent::OnDisable()
 {
 	_isDraw = false;
-}
-
-void flt::RendererComponent::Update(float deltaSecond)
-{
-
-}
-
-void flt::RendererComponent::PostRender()
-{
-
 }
 
 void flt::RendererComponent::OnDestroy()

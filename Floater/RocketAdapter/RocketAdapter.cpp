@@ -16,6 +16,7 @@
 #include "./RocketCommon/ITextRenderer.h"
 #include "./RocketCommon/ISpriteRenderer.h"
 #include "./RocketCommon/ILineRenderer.h"
+#include "./RocketCommon/IDirectionalLight.h"
 
 #include "./RocketCommon/IResourceManager.h"
 #include "./RocketCommon/RawModelStruct.h"
@@ -69,6 +70,11 @@ bool flt::RocketAdapter::Render(float deltaTime)
 			}
 		}
 
+		if (rkObj->lightTransform)
+		{
+			rkObj->lightTransform->SetRotation({rkObj->lightRotation->x, rkObj->lightRotation->y, rkObj->lightRotation->z, rkObj->lightRotation->w});
+		}
+
 		Transform temp;
 		temp.SetMatrix(rkObj->transform->GetWorldMatrix4f());
 
@@ -95,7 +101,7 @@ bool flt::RocketAdapter::Render(float deltaTime)
 
 		if (rendererObject->animState.index != -1)
 		{
- 			if (!(animState.index == rendererObject->animState.index && animState.isPlaying == rendererObject->animState.isPlaying))
+			if (!(animState.index == rendererObject->animState.index && animState.isPlaying == rendererObject->animState.isPlaying))
 			{
 				animState = rendererObject->animState;
 
@@ -243,6 +249,41 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 		}
 	}
 
+	if (renderable.light != nullptr)
+	{
+		switch (renderable.light->type)
+		{
+			case Light::Type::none:
+				break;
+			case Light::Type::directional:
+			{
+				Rocket::Core::IDirectionalLight* d = factory->CreateDirectionalLight();
+				Light& light = *renderable.light;
+				rocketObject->directionalLight = d;
+				d->SetDiffuseColor({ light.diffuseColor.r, light.diffuseColor.g, light.diffuseColor.b});
+				d->SetSpecularColor({ light.specularColor.r, light.specularColor.g, light.specularColor.b});
+				d->SetAmbientColor({ light.ambientColor.r, light.ambientColor.g, light.ambientColor.b});
+				
+				rocketObject->lightTransform = new Rocket::Core::RocketTransform();
+				rocketObject->lightRotation = &light.direction;
+				d->BindTransform(rocketObject->lightTransform);
+			}
+			break;
+			case Light::Type::point:
+			{
+				ASSERT(false, "Not implemented");
+			}
+			break;
+			case Light::Type::spot:
+			{
+				ASSERT(false, "Not implemented");
+			}
+			break;
+			default:
+				break;
+		}
+	}
+
 	if (renderable.imgPath != L"")
 	{
 		rocketObject->spriteRenderer = factory->CreateSpriteRenderer();
@@ -267,8 +308,6 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 bool flt::RocketAdapter::DeregisterObject(HOBJECT renderable)
 {
 	RocketObject* rocketObject = (RocketObject*)renderable;
-
-
 
 	auto iter = _objects.find(rocketObject);
 

@@ -11,6 +11,7 @@ namespace Rocket
 		class IStaticModelRenderer;
 		class ISpriteRenderer;
 		class ITextRenderer;
+		class IDirectionalLight;
 		struct RawModel;
 		struct RawNode;
 	}
@@ -20,17 +21,20 @@ namespace flt
 {
 	struct RocketObject
 	{
-		RocketObject(const bool& isDraw) :
-			rocketTransform(),
-			transform(nullptr),
-			camera(nullptr),
-			renderer(nullptr),
-			staticModelRenderer(nullptr),
-			spriteRenderer(nullptr),
-			textRenderer(nullptr),
-			rkModel(nullptr),
-			isRegisted(false),
-			isDraw(isDraw) {}
+		RocketObject(const bool& isDraw)
+			: rocketTransform()
+			, transform(nullptr)
+			, camera(nullptr)
+			, renderer(nullptr)
+			, staticModelRenderer(nullptr)
+			, spriteRenderer(nullptr)
+			, textRenderer(nullptr)
+			, rkModel(nullptr)
+			, directionalLight(nullptr)
+			, lightTransform(nullptr)
+			, lightRotation(nullptr)
+			, isRegisted(false)
+			, isDraw(isDraw) {}
 
 		~RocketObject();
 
@@ -45,6 +49,9 @@ namespace flt
 		Rocket::Core::ISpriteRenderer* spriteRenderer;
 		Rocket::Core::ITextRenderer* textRenderer;
 		Rocket::Core::RawModel* rkModel;
+		Rocket::Core::IDirectionalLight* directionalLight;
+		Rocket::Core::RocketTransform* lightTransform;
+		Quaternion* lightRotation;
 
 		bool isRegisted;
 		const bool& isDraw;
