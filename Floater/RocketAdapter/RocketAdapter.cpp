@@ -70,6 +70,11 @@ bool flt::RocketAdapter::Render(float deltaTime)
 			}
 		}
 
+		if (rkObj->lightTransform)
+		{
+			rkObj->lightTransform->SetRotation({rkObj->lightRotation->x, rkObj->lightRotation->y, rkObj->lightRotation->z, rkObj->lightRotation->w});
+		}
+
 		Transform temp;
 		temp.SetMatrix(rkObj->transform->GetWorldMatrix4f());
 
@@ -255,10 +260,13 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 				Rocket::Core::IDirectionalLight* d = factory->CreateDirectionalLight();
 				Light& light = *renderable.light;
 				rocketObject->directionalLight = d;
-				d->BindTransform(&rocketObject->rocketTransform);
 				d->SetDiffuseColor({ light.diffuseColor.r, light.diffuseColor.g, light.diffuseColor.b});
 				d->SetSpecularColor({ light.specularColor.r, light.specularColor.g, light.specularColor.b});
 				d->SetAmbientColor({ light.ambientColor.r, light.ambientColor.g, light.ambientColor.b});
+				
+				rocketObject->lightTransform = new Rocket::Core::RocketTransform();
+				rocketObject->lightRotation = &light.direction;
+				d->BindTransform(rocketObject->lightTransform);
 			}
 			break;
 			case Light::Type::point:
@@ -300,8 +308,6 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 bool flt::RocketAdapter::DeregisterObject(HOBJECT renderable)
 {
 	RocketObject* rocketObject = (RocketObject*)renderable;
-
-
 
 	auto iter = _objects.find(rocketObject);
 

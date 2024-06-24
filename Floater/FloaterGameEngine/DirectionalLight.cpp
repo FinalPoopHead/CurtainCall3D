@@ -17,7 +17,8 @@ flt::DirectionalLight::DirectionalLight()
 	, _isDraw(false)
 	, _isRegisted(true)
 {
-
+	_rendererObject->light = new Light();
+	_rendererObject->light->type = Light::Type::directional;
 }
 
 flt::DirectionalLight::~DirectionalLight()
@@ -27,7 +28,7 @@ flt::DirectionalLight::~DirectionalLight()
 
 void flt::DirectionalLight::SetDirection(flt::Vector3f dir)
 {
-	_direction = dir;
+	_rendererObject->light->direction = Quaternion{dir};
 }
 
 void flt::DirectionalLight::SetDiffuseColor(flt::Vector3f color)
@@ -53,10 +54,6 @@ void flt::DirectionalLight::SetIntensity(float intensity)
 void flt::DirectionalLight::OnCreate()
 {
 	_rendererObject->transform = &_gameObject->transform;
-	_rendererObject->light = new Light();
-	_rendererObject->light->type = Light::Type::directional;
-
-
 	if (!_hObject)
 	{
 		_hObject = _renderer.RegisterObject(*_rendererObject);

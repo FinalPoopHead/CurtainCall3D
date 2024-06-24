@@ -31,6 +31,8 @@ namespace flt
 			, textRenderer(nullptr)
 			, rkModel(nullptr)
 			, directionalLight(nullptr)
+			, lightTransform(nullptr)
+			, lightRotation(nullptr)
 			, isRegisted(false)
 			, isDraw(isDraw) {}
 
@@ -48,6 +50,8 @@ namespace flt
 		Rocket::Core::ITextRenderer* textRenderer;
 		Rocket::Core::RawModel* rkModel;
 		Rocket::Core::IDirectionalLight* directionalLight;
+		Rocket::Core::RocketTransform* lightTransform;
+		Quaternion* lightRotation;
 
 		bool isRegisted;
 		const bool& isDraw;

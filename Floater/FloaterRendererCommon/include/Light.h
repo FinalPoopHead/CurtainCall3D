@@ -37,7 +37,7 @@ namespace flt
 		Vector3f attenuation;
 		Vector3f position;
 		float range;
-		Vector3f direction;
+		Quaternion direction;
 		float intensity;
 	};
 }

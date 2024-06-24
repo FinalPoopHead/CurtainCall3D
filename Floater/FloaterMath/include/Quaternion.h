@@ -38,12 +38,12 @@ namespace flt
 		void SetEuler(const Vector3f& euler, AxisOrder order = AxisOrder::YXZ) noexcept;
 		void SetAxisAngle(const Vector3f& axis, float radian) noexcept;
 
-		Vector3f GetEuler() const noexcept;
-		Vector4f GetAxisAngle() const noexcept;
+		[[nodiscard]] Vector3f GetEuler() const noexcept;
+		[[nodiscard]] Vector4f GetAxisAngle() const noexcept;
 
 		void Look(Vector3f direction, Vector3f up = Vector3f(0.0f, 1.0f, 0.0f)) noexcept;
 
-		static Quaternion Slerp(Quaternion q1, Quaternion q2, float t) noexcept
+		static [[nodiscard]] Quaternion Slerp(Quaternion q1, Quaternion q2, float t) noexcept
 		{
 			float dot = q1.Dot(q2);
 
@@ -73,12 +73,12 @@ namespace flt
 			return q1 * s0 + q2 * s1;
 		}
 
-		Quaternion Conjugate() const noexcept
+		[[nodiscard]] Quaternion Conjugate() const noexcept
 		{
 			return Quaternion(-x, -y, -z, w);
 		}
 
-		Quaternion Inverse() const noexcept
+		[[nodiscard]] Quaternion Inverse() const noexcept
 		{
 			float normPow = NormPow();
 			if (normPow < flt::FLOAT_EPSILON)

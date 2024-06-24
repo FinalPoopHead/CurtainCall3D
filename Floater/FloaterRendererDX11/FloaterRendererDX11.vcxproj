@@ -272,6 +272,7 @@
       <OpenMPSupport>true</OpenMPSupport>
       <AssemblerOutput>All</AssemblerOutput>
       <AdditionalIncludeDirectories>$(ProjectDir)..\External\include;$(ProjectDir)..\FloaterMath\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -22,11 +22,11 @@ namespace flt
 
 		//operator Vector4f() const noexcept;
 
-		bool operator==(const Vector3f& rhs) const noexcept;
+		[[nodiscard]] bool operator==(const Vector3f& rhs) const noexcept;
 
 		// 두 수중 큰 값 * epsilon 값보다 차이가 적다면 같은것으로 간주.
 		// x, y, z 우선순위로 비교.
-		std::partial_ordering operator<=>(const Vector3f& rhs) const noexcept
+		[[nodiscard]] std::partial_ordering operator<=>(const Vector3f& rhs) const noexcept
 		{
 			std::partial_ordering order = std::partial_ordering::unordered;
 
@@ -102,38 +102,38 @@ namespace flt
 			z /= rhs;
 			return *this;
 		}
-		constexpr Vector3f operator+(const Vector3f& rhs) const noexcept
+		constexpr [[nodiscard]] Vector3f operator+(const Vector3f& rhs) const noexcept
 		{
 			return Vector3f(*this) += rhs;
 		}
-		constexpr Vector3f operator-(const Vector3f& rhs) const noexcept
+		constexpr [[nodiscard]] Vector3f operator-(const Vector3f& rhs) const noexcept
 		{
 			return Vector3f(*this) -= rhs;
 		}
-		constexpr Vector3f operator*(const float rhs) const noexcept
+		constexpr [[nodiscard]] Vector3f operator*(const float rhs) const noexcept
 		{
 			return Vector3f(*this) *= rhs;
 		}
-		constexpr Vector3f operator/(const float rhs) const noexcept
+		constexpr [[nodiscard]] Vector3f operator/(const float rhs) const noexcept
 		{
 			return Vector3f(*this) /= rhs;
 		}
 		constexpr Vector3f& operator*=(const Matrix3f& rhs) noexcept;
-		constexpr Vector3f operator*(const Matrix3f& rhs) const noexcept
+		constexpr [[nodiscard]] Vector3f operator*(const Matrix3f& rhs) const noexcept
 		{
 			return Vector3f(*this) *= rhs;
 		}
-		constexpr Vector3f operator-() const noexcept
+		constexpr [[nodiscard]] Vector3f operator-() const noexcept
 		{
 			return Vector3f(-x, -y, -z);
 		}
 
-		float Norm() const noexcept
+		[[nodiscard]] float Norm() const noexcept
 		{
 			return sqrtf(x * x + y * y + z * z);
 		}
 
-		float NormPow() const noexcept
+		[[nodiscard]] float NormPow() const noexcept
 		{
 			return x * x + y * y + z * z;
 		}
@@ -150,17 +150,17 @@ namespace flt
 			return *this;
 		}
 
-		Vector3f Normalized() const noexcept
+		[[nodiscard]] Vector3f Normalized() const noexcept
 		{
 			return Vector3f(*this).Normalize();
 		}
 
-		float Dot(const Vector3f& rhs) const noexcept
+		[[nodiscard]] float Dot(const Vector3f& rhs) const noexcept
 		{
 			return x * rhs.x + y * rhs.y + z * rhs.z;
 		}
 
-		Vector3f Cross(const Vector3f& rhs) const noexcept
+		[[nodiscard]] Vector3f Cross(const Vector3f& rhs) const noexcept
 		{
 			return Vector3f(y * rhs.z - z * rhs.y,
 				z * rhs.x - x * rhs.z,
@@ -175,11 +175,16 @@ namespace flt
 			struct { float r, g, b; };
 		};
 
-		static Vector3f Lerp(const Vector3f& v0, const Vector3f& v1, float t) noexcept;
+		static [[nodiscard]] Vector3f Lerp(const Vector3f& v0, const Vector3f& v1, float t) noexcept;
 
-		static Vector3f Zero() noexcept
+		static constexpr [[nodiscard]] Vector3f Zero() noexcept
 		{
 			return Vector3f(0.0f, 0.0f, 0.0f);
+		}
+
+		static constexpr [[nodiscard]] Vector3f Up() noexcept
+		{
+			return Vector3f(0.0f, 1.0f, 0.0f);
 		}
 	};
 

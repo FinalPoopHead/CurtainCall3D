@@ -1,4 +1,5 @@
 ﻿#include "GameScene.h"
+#include "DirectionalLight.h"
 #include "Board.h"
 #include "Player.h"
 #include "TestCamera.h"
@@ -30,6 +31,8 @@ void GameScene::Initialize()
 
 	GameManager* gameManager = flt::CreateGameObject<GameManager>(true);
 	int playerIndex = 0;
+
+	DirectionalLight* light = flt::CreateGameObject<DirectionalLight>(true);
 
 	///	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///	//////////////////////////////////////////		player 1	//////////////////////////////////////////////

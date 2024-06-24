@@ -29,12 +29,12 @@ namespace flt
 		constexpr Matrix4f& operator=(Matrix4f&&) noexcept = default;
 		~Matrix4f() noexcept = default;
 
-		bool operator==(const Matrix4f& rhs) const noexcept
+		[[nodiscard]] bool operator==(const Matrix4f& rhs) const noexcept
 		{
 			return v[0] == rhs.v[0] && v[1] == rhs.v[1] && v[2] == rhs.v[2] && v[3] == rhs.v[3];
 		}
 
-		std::partial_ordering operator<=>(const Matrix4f& rhs) const noexcept
+		[[nodiscard]] std::partial_ordering operator<=>(const Matrix4f& rhs) const noexcept
 		{
 			std::partial_ordering order = std::partial_ordering::unordered;
 
@@ -83,7 +83,7 @@ namespace flt
 			//v[3].m = _mm_add_ps(v[3].m, rhs.v[3].m);
 			//return *this;
 		}
-		Matrix4f operator+(const Matrix4f& rhs) const
+		[[nodiscard]] Matrix4f operator+(const Matrix4f& rhs) const
 		{
 			Matrix4f temp = *this;
 			temp += rhs;
@@ -98,7 +98,7 @@ namespace flt
 			v[3] -= rhs.v[3];
 			return *this;
 		}
-		Matrix4f operator-(const Matrix4f& rhs) const
+		[[nodiscard]] Matrix4f operator-(const Matrix4f& rhs) const
 		{
 			Matrix4f temp = *this;
 			temp -= rhs;
@@ -107,7 +107,7 @@ namespace flt
 
 #ifdef _DEBUG
 		Matrix4f& operator*=(const Matrix4f& rhs) noexcept;
-		Matrix4f operator*(const Matrix4f& rhs) const noexcept;
+		[[nodiscard]] Matrix4f operator*(const Matrix4f& rhs) const noexcept;
 #else
 		Matrix4f& operator*=(const Matrix4f& rhs) noexcept
 		{
@@ -248,7 +248,7 @@ namespace flt
 
 			return *this;*/
 		}
-		Matrix4f operator*(const Matrix4f& rhs) const noexcept
+		[[nodiscard]] Matrix4f operator*(const Matrix4f& rhs) const noexcept
 		{
 			Matrix4f result;
 			__m128 xxxx = _mm_broadcast_ss(this->e[0] + 0);
@@ -315,7 +315,7 @@ namespace flt
 			v[3] *= rhs;
 			return *this;
 		}
-		Matrix4f operator*(float rhs) const noexcept
+		[[nodiscard]] Matrix4f operator*(float rhs) const noexcept
 		{
 			Matrix4f temp = *this;
 			temp *= rhs;
@@ -329,14 +329,14 @@ namespace flt
 			v[3] /= rhs;
 			return *this;
 		}
-		Matrix4f operator/(float rhs) const noexcept
+		[[nodiscard]] Matrix4f operator/(float rhs) const noexcept
 		{
 			Matrix4f temp = *this;
 			temp /= rhs;
 			return temp;
 		}
 
-		float Determinant()  const noexcept
+		[[nodiscard]] float Determinant()  const noexcept
 		{
 			float det
 				= (e[0][3] * e[1][2] * e[2][1] * e[3][0])
@@ -366,7 +366,7 @@ namespace flt
 
 			return det;
 		}
-		float Determinant3x3() const
+		[[nodiscard]] float Determinant3x3() const
 		{
 			float det
 				= (e[0][0] * e[1][1] * e[2][2])
@@ -378,7 +378,7 @@ namespace flt
 
 			return det;
 		}
-		Matrix4f Transpose()  const noexcept
+		[[nodiscard]] Matrix4f Transpose()  const noexcept
 		{
 			return Matrix4f
 			{
@@ -388,7 +388,7 @@ namespace flt
 				e[0][3], e[1][3], e[2][3], e[3][3]
 			};
 		}
-		Matrix4f Inverse() const noexcept
+		[[nodiscard]] Matrix4f Inverse() const noexcept
 		{
 			float det = this->Determinant();
 
@@ -431,7 +431,7 @@ namespace flt
 
 			return metrix;
 		}
-		static Matrix4f Identity() noexcept
+		static [[nodiscard]] Matrix4f Identity() noexcept
 		{
 			Matrix4f temp
 			{
@@ -444,7 +444,7 @@ namespace flt
 			return temp;
 		}
 
-		static Matrix4f Zero() noexcept
+		static [[nodiscard]] Matrix4f Zero() noexcept
 		{
 			Matrix4f temp
 			{

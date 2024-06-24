@@ -341,14 +341,14 @@ namespace Rocket::Core
 			deviceContext->VSSetConstantBuffers(bufferNumber, 1, vs->GetAddressOfConstantBuffer(bufferNumber));
 
 			// NodeTransform 세팅
-			bufferNumber = 1;
-			HR(deviceContext->Map(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-			NodeBufferType* nodeTRBufferDataPtr = (NodeBufferType*)mappedResource.pData;
-
-			SetNodeBuffer(_model->rootNode, nodeTRBufferDataPtr);
-
-			deviceContext->Unmap(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0);
-			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
+// 			bufferNumber = 1;
+// 			HR(deviceContext->Map(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+// 			NodeBufferType* nodeTRBufferDataPtr = (NodeBufferType*)mappedResource.pData;
+// 
+// 			SetNodeBuffer(_model->rootNode, nodeTRBufferDataPtr);
+// 
+// 			deviceContext->Unmap(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0);
+// 			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
 		}
 
 		// 렌더스테이트 ShadowMap용으로 사용

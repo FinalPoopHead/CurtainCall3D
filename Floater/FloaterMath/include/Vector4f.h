@@ -23,7 +23,7 @@ namespace flt
 		constexpr Vector4f& operator=(const Vector4f&) noexcept = default;
 		~Vector4f() noexcept = default;
 
-		bool isSimiller(const Vector4f& rhs, float epsilon = FLOAT_EPSILON) const noexcept
+		[[nodiscard]] bool isSimiller(const Vector4f& rhs, float epsilon = FLOAT_EPSILON) const noexcept
 		{
 			float eps = std::fmaxf(epsilon * fmaxf(fabsf(x), fabsf(rhs.x)), epsilon);
 			bool ret = fabsf(x - rhs.x) <= eps;
@@ -40,7 +40,7 @@ namespace flt
 			return ret;
 		}
 
-		bool operator==(const Vector4f& rhs) const noexcept
+		[[nodiscard]] bool operator==(const Vector4f& rhs) const noexcept
 		{
 			float eps = std::fmaxf(FLOAT_EPSILON * fmaxf(fabsf(x), fabsf(rhs.x)), FLOAT_EPSILON);
 			bool ret = fabsf(x - rhs.x) <= eps;
@@ -56,7 +56,7 @@ namespace flt
 
 			return ret;
 		}
-		std::partial_ordering operator<=>(const Vector4f& rhs) const noexcept
+		[[nodiscard]] std::partial_ordering operator<=>(const Vector4f& rhs) const noexcept
 		{
 			std::partial_ordering order = std::partial_ordering::unordered;
 
@@ -117,8 +117,8 @@ namespace flt
 			return order;
 		}
 
-		explicit operator Vector3f() const noexcept;
-		explicit operator __m128() const noexcept;
+		explicit [[nodiscard]] operator Vector3f() const noexcept;
+		explicit [[nodiscard]] operator __m128() const noexcept;
 
 		Vector4f& operator+=(const Vector4f& rhs) noexcept
 		{
@@ -153,41 +153,41 @@ namespace flt
 			m = _mm_div_ps(m, _mm_set1_ps(rhs));
 			return *this;
 		}
-		Vector4f operator+(const Vector4f& rhs) const noexcept
+		[[nodiscard]] Vector4f operator+(const Vector4f& rhs) const noexcept
 		{
 			return Vector4f(*this) += rhs;
 		}
-		Vector4f operator-(const Vector4f& rhs) const noexcept
+		[[nodiscard]] Vector4f operator-(const Vector4f& rhs) const noexcept
 		{
 			return Vector4f(*this) -= rhs;
 		}
-		Vector4f operator*(const Vector4f& rhs) const noexcept
+		[[nodiscard]] Vector4f operator*(const Vector4f& rhs) const noexcept
 		{
 			return Vector4f(*this) *= rhs;
 		}
-		Vector4f operator*(const Matrix4f& rhs) const noexcept
+		[[nodiscard]] Vector4f operator*(const Matrix4f& rhs) const noexcept
 		{
 			return Vector4f(*this) *= rhs;
 		}
-		Vector4f operator*(const float rhs) const noexcept
+		[[nodiscard]] Vector4f operator*(const float rhs) const noexcept
 		{
 			return Vector4f(*this) *= rhs;
 		}
-		Vector4f operator/(const float rhs) const noexcept
+		[[nodiscard]] Vector4f operator/(const float rhs) const noexcept
 		{
 			return Vector4f(*this) /= rhs;
 		}
-		Vector4f operator-() const noexcept
+		[[nodiscard]] Vector4f operator-() const noexcept
 		{
 			return Vector4f(-x, -y, -z, -w);
 		}
 
-		float Norm() const noexcept
+		[[nodiscard]] float Norm() const noexcept
 		{
 			return sqrt(x * x + y * y + z * z + w * w);
 		}
 
-		float NormPow() const noexcept
+		[[nodiscard]] float NormPow() const noexcept
 		{
 			return x * x + y * y + z * z + w * w;
 		}
@@ -202,11 +202,11 @@ namespace flt
 
 			return *this /= norm;
 		}
-		Vector4f Normalized() const noexcept
+		[[nodiscard]] Vector4f Normalized() const noexcept
 		{
 			return Vector4f(*this).Normalize();
 		}
-		float Vector3Norm() const noexcept
+		[[nodiscard]] float Vector3Norm() const noexcept
 		{
 			return sqrt(x * x + y * y + z * z);
 		}
@@ -224,11 +224,11 @@ namespace flt
 			this->w = tmp;
 			return *this;
 		}
-		Vector4f Vector3Normalized() const noexcept
+		[[nodiscard]] Vector4f Vector3Normalized() const noexcept
 		{
 			return Vector4f(*this).Vector3Normalize();
 		}
-		constexpr Vector4f Vector3Cross(const Vector4f& rhs) const noexcept
+		constexpr [[nodiscard]] Vector4f Vector3Cross(const Vector4f& rhs) const noexcept
 		{
 			return Vector4f(
 				y * rhs.z - z * rhs.y,
@@ -237,13 +237,13 @@ namespace flt
 				0.0f
 			);
 		}
-		float Vector3Dot(const Vector4f& rhs) const noexcept
+		[[nodiscard]] float Vector3Dot(const Vector4f& rhs) const noexcept
 		{
 			return _mm_cvtss_f32(_mm_dp_ps(m, rhs.m, 0x71));
 			//__m128 tmp = _mm_mul_ps(m, rhs.m);
 			//return tmp.m128_f32[0] + tmp.m128_f32[1] + tmp.m128_f32[2];
 		}
-		float Dot(const Vector4f& rhs) const noexcept
+		[[nodiscard]] float Dot(const Vector4f& rhs) const noexcept
 		{
 			return _mm_cvtss_f32(_mm_dp_ps(m, rhs.m, 0xff));
 		}

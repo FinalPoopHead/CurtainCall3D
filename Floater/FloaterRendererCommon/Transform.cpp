@@ -371,11 +371,21 @@ void flt::Transform::LookAt(Vector4f target)
 	// target을 바라보도록 회전
 	Vector4f wantLook = target - _position;
 	wantLook.Vector3Normalize();
+	if (wantLook.NormPow() == 0.0f)
+	{
+		return;
+	}
+
 	Vector4f currLook = Vector4f(0.f, 0.f, 1.f, 1.f) * GetLocalMatrix4f() - _position;
 	currLook.Vector3Normalize();
 	Vector4f axis = currLook.Vector3Cross(wantLook);
 
 	axis.Vector3Normalize();
+
+	if (axis.NormPow() == 0.0f)
+	{
+		axis = Vector4f(0.f, 1.f, 0.f, 0.f);
+	}
 
 	float dot = wantLook.Vector3Dot(currLook);
 

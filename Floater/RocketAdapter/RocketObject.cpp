@@ -6,6 +6,7 @@
 #include "./RocketCommon/ISpriteRenderer.h"
 #include "./RocketCommon/ILineRenderer.h"
 #include "./RocketCommon/ICamera.h"
+#include "./RocketCommon/IDirectionalLight.h"
 #include "./RocketCommon/RawModelStruct.h"
 
 
@@ -64,6 +65,12 @@ flt::RocketObject::~RocketObject()
 	if (textRenderer)
 	{
 		textRenderer->Destroy();
+	}
+
+	if (directionalLight)
+	{
+		directionalLight->Destroy();
+		delete lightTransform;
 	}
 }
 

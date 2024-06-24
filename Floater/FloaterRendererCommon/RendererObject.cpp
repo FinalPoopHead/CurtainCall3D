@@ -4,8 +4,8 @@
 
 flt::RendererObject::~RendererObject()
 {
-	delete camera;
-	delete light;
+	//delete camera;
+	//delete light;
 }
 
 void flt::RendererObject::SetRawNode(RawNode* rawNode)

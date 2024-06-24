@@ -30,25 +30,25 @@ namespace flt
 		~Platform();
 
 	public:
-		bool Initialize(int pixelWidth, int pixelHeight, std::wstring title, std::wstring imgPath);
-		bool Finalize();
-		bool Update(float deltaSeconds);
+		[[nodiscard]] bool Initialize(int pixelWidth, int pixelHeight, std::wstring title, std::wstring imgPath);
+		[[nodiscard]] bool Finalize();
+		[[nodiscard]] bool Update(float deltaSeconds);
 
-		IRenderer* CreateRenderer(RendererType type);
+		[[nodiscard]] IRenderer* CreateRenderer(RendererType type);
 		void DestroyRenderer(IRenderer* renderer);
 
-		Vector2f GetWindowSize();
+		[[nodiscard]] Vector2f GetWindowSize();
 		void SetWindowTitle(const std::wstring& title);
 
-		KeyData GetKey(KeyCode code);
-		KeyData GetKeyDown(KeyCode code);
-		KeyData GetKeyUp(KeyCode code);
+		[[nodiscard]] KeyData GetKey(KeyCode code);
+		[[nodiscard]] KeyData GetKeyDown(KeyCode code);
+		[[nodiscard]] KeyData GetKeyUp(KeyCode code);
 
-		bool GamePadConnected(int padIndex);
-		bool GetGamePadState(int padIndex, GamePadState* outState);
-		bool SetGamePadVibration(int padIndex, bool isRightMoter, float moterPower, float time);
+		[[nodiscard]] bool GamePadConnected(int padIndex);
+		[[nodiscard]] bool GetGamePadState(int padIndex, GamePadState* outState);
+		[[nodiscard]] bool SetGamePadVibration(int padIndex, bool isRightMoter, float moterPower, float time);
 
-		bool SetGamePadAnalogDeadZone(int padIndex, GamePadDeadZone* deadZone);
+		[[nodiscard]] bool SetGamePadAnalogDeadZone(int padIndex, GamePadDeadZone* deadZone);
 		std::vector<int> GetGamePadIndexList();
 
 		void ShowCursor(bool isShow);
