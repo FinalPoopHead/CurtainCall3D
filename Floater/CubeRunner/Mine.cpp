@@ -6,7 +6,7 @@ Mine::Mine() :
 {
 	std::wstring planePath = L"..\\Resources\\Models\\cube.fbx";
 	std::wstring conePath = L"..\\Resources\\Models\\Cone.fbx";
-	std::wstring texturePath = L"..\\Resources\\Textures\\Rob02_Normal.dds";	// TODO : 텍스쳐는 임시임.
+	std::wstring texturePath = L"..\\Resources\\Textures\\Mine.png";	// TODO : 텍스쳐는 임시임.
 
 	float planeHeight = 2.05f;
 	float coneHeight = 8.0f;

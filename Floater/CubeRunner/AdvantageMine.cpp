@@ -6,7 +6,7 @@ AdvantageMine::AdvantageMine() :
 {
 	std::wstring planePath = L"..\\Resources\\Models\\cube.fbx";
 	std::wstring conePath = L"..\\Resources\\Models\\Cone.fbx";
-	std::wstring texturePath = L"..\\Resources\\Textures\\AdvantageCube.png";	// TODO : 텍스쳐는 임시임.
+	std::wstring texturePath = L"..\\Resources\\Textures\\AdvantageMine.png";	// TODO : 텍스쳐는 임시임.
 
 	float planeHeight = 2.05f;
 	float coneHeight = 8.0f;
