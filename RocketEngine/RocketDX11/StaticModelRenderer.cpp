@@ -341,14 +341,14 @@ namespace Rocket::Core
 			deviceContext->VSSetConstantBuffers(bufferNumber, 1, vs->GetAddressOfConstantBuffer(bufferNumber));
 
 			// NodeTransform 세팅
-			bufferNumber = 1;
-			HR(deviceContext->Map(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-			NodeBufferType* nodeTRBufferDataPtr = (NodeBufferType*)mappedResource.pData;
-
-			SetNodeBuffer(_model->rootNode, nodeTRBufferDataPtr);
-
-			deviceContext->Unmap(_material->GetVertexShader()->GetConstantBuffer(bufferNumber), 0);
-			deviceContext->VSSetConstantBuffers(bufferNumber, 1, _material->GetVertexShader()->GetAddressOfConstantBuffer(bufferNumber));
+// 			bufferNumber = 1;
+// 			HR(deviceContext->Map(vs->GetConstantBuffer(bufferNumber), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+// 			NodeBufferType* nodeTRBufferDataPtr = (NodeBufferType*)mappedResource.pData;
+// 
+// 			SetNodeBuffer(_model->rootNode, nodeTRBufferDataPtr);
+// 
+// 			deviceContext->Unmap(vs->GetConstantBuffer(bufferNumber), 0);
+// 			deviceContext->VSSetConstantBuffers(bufferNumber, 1, vs->GetAddressOfConstantBuffer(bufferNumber));
 		}
 
 		// 렌더스테이트 ShadowMap용으로 사용
@@ -367,27 +367,6 @@ namespace Rocket::Core
 		{
 			deviceContext->IASetVertexBuffers(0, 1, mesh->GetAddressOfVertexBuffer(), &stride, &offset);
 			deviceContext->IASetIndexBuffer(mesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
-
-			if (_material->GetBaseColorTexture())
-			{
-				deviceContext->PSSetShaderResources(0, 1, _material->GetBaseColorTexture()->GetAddressOfSRV());
-			}
-			if (_material->GetNormalTexture())
-			{
-				deviceContext->PSSetShaderResources(1, 1, _material->GetNormalTexture()->GetAddressOfSRV());
-			}
-			if (_material->GetMetallicTexture())
-			{
-				deviceContext->PSSetShaderResources(2, 1, _material->GetMetallicTexture()->GetAddressOfSRV());
-			}
-			if (_material->GetRoughnessTexture())
-			{
-				deviceContext->PSSetShaderResources(3, 1, _material->GetRoughnessTexture()->GetAddressOfSRV());
-			}
-			if (_material->GetAOTexture())
-			{
-				deviceContext->PSSetShaderResources(4, 1, _material->GetAOTexture()->GetAddressOfSRV());
-			}
 
 			deviceContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
 		}
