@@ -1,14 +1,30 @@
 ﻿#include <iostream>
 #include "Tile.h"
+#include "Board.h"
 #include "Mine.h"
 #include "AdvantageMine.h"
 #include "DetonatedMine.h"
 
-Tile::Tile()
-	: _cube(nullptr)
+#include "CubeController.h"
+
+constexpr float GRAVITY = 9.8f;
+constexpr float STARTFALLSPEED = 20.0f;
+constexpr float FALLHEIGHT = -16.0f;
+
+Tile::Tile(Board* board)
+	: _board(board)
+	, _cube(nullptr)
 	, _mine(nullptr)
 	, _advantageMine(nullptr)
 	, _detonated(nullptr)
+	, _isMoving(false)
+	, _isFalling(false)
+	, _movingTime(0.0f)
+	, _elapsedTime(0.0f)
+	, _startPos()
+	, _targetPos()
+	, _fallDelay()
+	, _fallSpeed()
 {
 	std::wstring filePath = L"..\\Resources\\Models\\BrickBlock.fbx";
 
@@ -58,6 +74,36 @@ void Tile::OnDestroy()
 	//std::cout << "Tile OnDestroy" << std::endl;
 }
 
+void Tile::PreUpdate(float deltaSecond)
+{
+	if (_isMoving)
+	{
+		_elapsedTime += deltaSecond * _board->GetFFValue();
+
+		if (_elapsedTime >= _movingTime)
+		{
+			_isMoving = false;
+			_elapsedTime = _movingTime;
+		}
+
+		auto pos = tr.GetWorldPosition();
+		auto curPosition = flt::Vector3f::Lerp(_startPos, _targetPos, _elapsedTime / _movingTime);
+		tr.SetWorldPosition(curPosition.x, curPosition.y, curPosition.z);
+
+		if (_elapsedTime >= _movingTime)
+		{
+			_isMoving = false;
+			_board->OnEndRowAdd();
+			Destroy();
+		}
+	}
+
+	if (_isFalling)
+	{
+		Fall(deltaSecond * _board->GetFFValue());
+	}
+}
+
 void Tile::EnableMine()
 {
 	_mine->Enable();
@@ -86,4 +132,59 @@ void Tile::EnableAdvantageMine()
 void Tile::DisableAdvantageMine()
 {
 	_advantageMine->Disable();
+}
+
+void Tile::StartAddRow(float movingTime, flt::Vector3f targetPos)
+{
+	_isMoving = true;
+	_elapsedTime = 0.0f;
+	_movingTime = movingTime;
+	auto pos = tr.GetWorldPosition();
+	_startPos.x = pos.x;
+	_startPos.y = pos.y;
+	_startPos.z = pos.z;
+	_targetPos = targetPos;
+}
+
+void Tile::StartFall(float delay)
+{
+	DisableMine();
+	DisableAdvantageMine();
+	DisableDetonated();
+
+	_fallSpeed = STARTFALLSPEED;
+	_fallDelay = delay;
+	_isFalling = true;
+}
+
+void Tile::Fall(float deltaSecond)
+{
+	if (_fallDelay > 0.0f)
+	{
+		_fallDelay -= deltaSecond;
+		if (_fallDelay <= 0.0f)
+		{
+			auto pos = tr.GetWorldPosition();
+			int x;
+			int z;
+			_board->ConvertToTileIndex(pos.x, pos.z, x, z);
+			_board->OnStartTileFall(x,z);
+
+			if(_cube != nullptr)
+			{
+				auto cubeCtr = _cube->GetComponent<CubeController>();
+				cubeCtr->StartFalling(false);
+			}
+		}
+		return;
+	}
+
+	_fallSpeed += GRAVITY * deltaSecond;
+	tr.AddLocalPosition(0.0f, -_fallSpeed * deltaSecond, 0.0f);
+
+	if (tr.GetWorldPosition().y <= FALLHEIGHT)
+	{
+		_isFalling = false;
+		_board->OnEndTileFall();
+	}
 }

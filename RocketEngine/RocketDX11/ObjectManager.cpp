@@ -50,8 +50,8 @@ namespace Rocket::Core
 		_cubeMap->SetShader(_resourceManager.GetVertexShader("CubeMapVS"), _resourceManager.GetPixelShader("CubeMapPS")); // Forward
 		_cubeMap->SetIBLGenShader(_resourceManager.GetPixelShader("IrradianceMapPS"), _resourceManager.GetPixelShader("PrefilteredMapPS"), _resourceManager.GetPixelShader("BRDF2DLUTPS"));
 		// cubeMap->SetShader(_resourceManager.GetVertexShader("DeferredCubeMapVS"), _resourceManager.GetPixelShader("DeferredCubeMapPS")); // Deferred
-		//_cubeMap->LoadTexture("CloudCubeMap.dds");
-		_cubeMap->LoadTexture("UndertheSea.dds");
+		_cubeMap->LoadTexture("AnotherPlanet.dds");
+		//_cubeMap->LoadTexture("UndertheSea.dds");
 	}
 
 	void ObjectManager::Finalize()

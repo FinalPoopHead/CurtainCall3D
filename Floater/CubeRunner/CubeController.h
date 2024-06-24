@@ -30,11 +30,14 @@ public:
 
 	virtual void PreUpdate(float deltaSecond) override;
 	virtual void OnDisable() override;
-	void StartRolling(float rotateTime);
-	void StartFalling();
+	bool StartRolling(float rotateTime);
+	void StartFalling(bool withDamage = true);
 	void StartRemoving(float removeTime);
 	void StartRising(float riseTime, float delay);
 	bool IsRolling() { return _status == eCUBESTATUS::ROLLING; }
+	flt::Vector4f GetPosition() { return _gameObject->tr.GetWorldPosition(); }
+	eCUBETYPE GetCubeType() { return _cubeType; }
+	flt::GameObject* GetGameObject() { return _gameObject; }
 
 private:
 	void Roll(float deltaSecond);
