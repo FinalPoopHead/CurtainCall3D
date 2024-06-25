@@ -47,9 +47,8 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _nowRisingCount(0)
 	, _isPerfect(true)
 	, _nowAddTileCount()
-	, _destroyRowCount()
+	, _nextDestroyRow()
 	, _minePos({ -1,-1 })
-	, _advantageMinePosList()
 {
 
 }
@@ -76,6 +75,7 @@ void Board::OnCreate()
 	_height = 0;
 
 	Resize(width, height);
+	_nextDestroyRow = height - 1;
 
 	// Create CubePool
 	for (int i = 0; i < CUBECOUNT; i++)
@@ -603,29 +603,33 @@ void Board::DetonateAdvantageMine()
 		return;
 	}
 
-	while (!_advantageMinePosList.empty())
+	for (int i = 0; i < _width; i++)
 	{
-		auto& [x, y] = _advantageMinePosList.front();
-		_tileState[x][y] = (int)_tileState[x][y] & ~((int)TileStateFlag::ADVANTAGEMINE);
-		_tiles[x][y]->DisableAdvantageMine();
-
-		for (int m = -1; m <= 1; m++)
+		for (int j = 0; j < _height; j++)
 		{
-			for (int n = -1; n <= 1; n++)
+			if (_tileState[i][j] & (int)TileStateFlag::ADVANTAGEMINE)
 			{
-				int nextX = x + m;
-				int nextY = y + n;
-				if (nextX < 0 || nextX >= _width || nextY < 0 || nextY >= _height)
+				_tileState[i][j] = _tileState[i][j] & ~((int)TileStateFlag::ADVANTAGEMINE);
+				_tiles[i][j]->DisableAdvantageMine();
+
+				for (int m = -1; m <= 1; m++)
 				{
-					continue;
+					for (int n = -1; n <= 1; n++)
+					{
+						int nextX = i + m;
+						int nextY = j + n;
+						if (nextX < 0 || nextX >= _width || nextY < 0 || nextY >= _height)
+						{
+							continue;
+						}
+
+						_tileState[nextX][nextY] = _tileState[nextX][nextY] | (int)TileStateFlag::DETONATE;
+						_tiles[nextX][nextY]->EnableDetonated();
+					}
 				}
-
-				_tileState[nextX][nextY] = _tileState[nextX][nextY] | (int)TileStateFlag::DETONATE;
-				_tiles[nextX][nextY]->EnableDetonated();
 			}
-		}
 
-		_advantageMinePosList.pop_front();
+		}
 	}
 }
 
@@ -679,35 +683,30 @@ void Board::OnEndTileFall(int x, int z)
 	if (_fallingTileCount[z] <= 0)
 	{
 		_fallingTileCount[z] = 0;
-		Resize(_width, _height - _destroyRowCount);
-		_destroyRowCount--;
+		Resize(_width, z);
 	}
 }
 
 void Board::DestroyRow()
 {
-	_destroyRowCount++;
+	_delayRemain = FALLTILEDELAY;
+	_fallingTileCount[_nextDestroyRow] = 0;
 
 	float delay = 0.3f;
-	int destroyHeight =	_height - _destroyRowCount;
-	_fallingTileCount[destroyHeight] = 0;
+	float delayDelta = 0.1f;
 
 	for (int i = 0; i < _width; i++)
 	{
-		int randValue = rand() % 2;
-		float delayDelta = (float)randValue / 10.0f + 0.08f;
-
-		if (_minePos.first == i && _minePos.second == _height - 1)
+		if (_minePos.first == i && _minePos.second == _nextDestroyRow)
 		{
 			_minePos.first = -1;
 			_minePos.second = -1;
 		}
 
-		_tiles[i][destroyHeight]->StartFall(delay + delayDelta * i, i, destroyHeight);
-		_fallingTileCount[destroyHeight]++;
+		_tiles[i][_nextDestroyRow]->StartFall(delay + delayDelta * i, i, _nextDestroyRow);
+		_fallingTileCount[_nextDestroyRow]++;
 	}
-
-	_delayRemain = FALLTILEDELAY;
+	_nextDestroyRow--;
 }
 
 bool Board::IsMineSet()
@@ -740,17 +739,6 @@ void Board::EndFastForward()
 
 void Board::Resize(int newWidth, int newHeight)
 {
-	_tileState.resize(newWidth);
-
-	for (int i = 0; i < newWidth; ++i)
-	{
-		_tileState[i].resize(newHeight);
-		for (int j = 0; j < newHeight; ++j)
-		{
-			_tileState[i][j] = (int)TileStateFlag::TILE;
-		}
-	}
-
 	// 타일 높이가 변화시 먼저 처리
 	if (newHeight < _height)
 	{
@@ -810,11 +798,17 @@ void Board::Resize(int newWidth, int newHeight)
 		}
 	}
 
+	_tileState.resize(newWidth);
+
 	for (int i = 0; i < newWidth; ++i)
 	{
+		_tileState[i].resize(newHeight);
 		for (int j = 0; j < newHeight; ++j)
 		{
-			_tileState[i][j] = (int)TileStateFlag::TILE;
+			if (_tileState[i][j] == (int)TileStateFlag::NONE)
+			{
+				_tileState[i][j] = (int)TileStateFlag::TILE;
+			}
 		}
 	}
 
@@ -908,7 +902,6 @@ bool Board::UpdateDetonate()
 					// AdvantageCube 수납 및 AdvantageMine 설치
 					_tileState[i][j] = _tileState[i][j] | (int)TileStateFlag::ADVANTAGEMINE;
 					_tiles[i][j]->EnableAdvantageMine();
-					_advantageMinePosList.push_back({ i,j });
 					destroyCount++;
 					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemoving(CUBEREMOVETIME);
 					break;

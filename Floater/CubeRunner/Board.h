@@ -114,9 +114,8 @@ private:
 
 	bool _isPerfect;
 	int _nowAddTileCount;
-	int _destroyRowCount;
+	int _nextDestroyRow;
 
 	std::pair<int, int> _minePos;
-	std::list<std::pair<int, int>> _advantageMinePosList;
 	std::unordered_map<int,int> _fallingTileCount;	// key는 heightIndex
 };

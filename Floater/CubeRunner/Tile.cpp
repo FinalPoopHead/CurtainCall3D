@@ -174,7 +174,7 @@ void Tile::Fall(float deltaSecond)
 			if(_cube != nullptr)
 			{
 				auto cubeCtr = _cube->GetComponent<CubeController>();
-				cubeCtr->StartFalling(false);
+				cubeCtr->StartFalling();
 			}
 		}
 		return;
