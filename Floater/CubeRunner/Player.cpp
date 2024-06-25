@@ -25,7 +25,7 @@ Player::Player(Board* board)
 	float x = 0.0f;
 	float z = 0.0f;
 
-	_board->ConvertToTilePosition(2, 5, x, z);
+	_board->GetCenterPosition(x, z);
 	tr.SetPosition(x, 2.0f, z);
 }
 
