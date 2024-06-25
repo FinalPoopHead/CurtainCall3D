@@ -938,7 +938,7 @@ bool Board::UpdateDetonate()
 		}
 	}
 
-	_gameManager->OnCubeDestroy(_playerIndex, destroyCount);
+	_gameManager->IncreaseScore(_playerIndex, destroyCount);
 
 	for (int i = 0; i < _width; i++)
 	{

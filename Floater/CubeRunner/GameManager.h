@@ -20,17 +20,12 @@ protected:
 
 	/// [0] : player1 , [1] : player2
 public:
-	void SetPlayer(int index, Player* player);
-	void SetBoard(int index, Board* board);
-	void AddPlayerHPPanel(int index, SpriteObject* hpPanel);
-	void AddPlayerHPSlot(int index, SpriteObject* hpSlot);
-	void AddPlayerHPValue(int index, SpriteObject* hpValue);
-	void AddPlayTimeText(int index, TextObject* playTimeText);
-	void AddPlayerScoreText(int index, TextObject* playerScoreText);
+	void CreateUI(int index, int width);
+	void SetBoardAndPlayer(int index, Board* board, Player* player);
 
 	void ReduceHP(int index, int damage = 1);
 
-	void OnCubeDestroy(int playerIndex, int count);	// Cube가 수납될 때 Board 객체가 호출하는 이벤트 함수
+	void IncreaseScore(int playerIndex, int count);	// Cube가 수납될 때 Board 객체가 호출하는 이벤트 함수
 
 private:
 	void IncreasePlayerCount();
