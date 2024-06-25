@@ -13,6 +13,7 @@ constexpr int CUBECOUNT = 64;
 constexpr float ROLLINGTIME = 1.0f;
 constexpr float ROLLINGDELAY = 0.5f;	// 아무것도 하지않고 굴러갈때의 딜레이
 constexpr float DETONATEDELAY = 2.0f;	// 폭파 후 딜레이
+constexpr float FALLTILEDELAY = 2.0f;	// 타일 삭제 딜레이
 constexpr float ADDTILEDELAY = 5.0f;	// 타일 추가 딜레이
 constexpr float TILEADDTIME = 2.0f;
 constexpr float CUBEREMOVETIME = 0.5f;
@@ -20,6 +21,7 @@ constexpr float CUBERISINGTIME = 1.0f;
 constexpr float CUBERISINGDELAY = 0.3f;
 constexpr int CUBEDAMAGE = 1;
 constexpr int DARKCUBEDAMAGE = 1;
+constexpr float SLOWVALUE = 0.5f;
 constexpr float FFDEFAULT = 1.0f;
 constexpr float FFVALUE = 8.0f;
 
@@ -39,15 +41,17 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _isGameOver(false)
 	, _isGameStart(false)
 	, _isWaveRunning(false)
+	, _isAttacked(false)
 	, _delayRemain(ROLLINGDELAY)
 	, _fastForwardValue(FFDEFAULT)
 	, _nowRollingCount(0)
 	, _nowRisingCount(0)
 	, _nowFallingTileCount()
+	, _damageCount()
 	, _isPerfect(true)
 	, _nowAddTileCount()
+	, _nextDestroyRow()
 	, _minePos({ -1,-1 })
-	, _advantageMinePosList()
 {
 
 }
@@ -74,6 +78,7 @@ void Board::OnCreate()
 	_height = 0;
 
 	Resize(width, height);
+	_nextDestroyRow = height - 1;
 
 	// Create CubePool
 	for (int i = 0; i < CUBECOUNT; i++)
@@ -97,7 +102,7 @@ void Board::OnDestroy()
 	Resize(0, 0);
 }
 
-void Board::PreUpdate(float deltaTime)
+void Board::PreUpdate(float deltaSecond)
 {
 	// TODO : FastForward를 플레이어 별로 나눠줘야 함
 	flt::KeyData keyData = flt::GetKeyDown(flt::KeyCode::l);
@@ -112,9 +117,22 @@ void Board::PreUpdate(float deltaTime)
 		EndFastForward();
 	}
 
+	// TODO : 슬로우모드임
+	keyData = flt::GetKeyDown(flt::KeyCode::o);
+	if (keyData)
+	{
+		_fastForwardValue = SLOWVALUE;
+	}
+
+	keyData = flt::GetKeyUp(flt::KeyCode::o);
+	if (keyData)
+	{
+		EndFastForward();
+	}
+
 	// TODO : 치트키. 블랙큐브 빼고 전부 제거
 	keyData = flt::GetKeyDown(flt::KeyCode::p);
-	if(keyData)
+	if (keyData)
 	{
 		for (int i = 0; i < _width; i++)
 		{
@@ -153,9 +171,25 @@ void Board::PreUpdate(float deltaTime)
 		return;
 	}
 
+	if (_nowFallingTileCount > 0)
+	{
+		return;
+	}
+
+	if (_nowAddTileCount > 0)
+	{
+		return;
+	}
+
+	if (_isAttacked)
+	{
+		_isAttacked = false;
+		DestroyRow();
+	}
+
 	if (_nowRollingCount == 0)
 	{
-		_delayRemain -= deltaTime * _fastForwardValue;
+		_delayRemain -= deltaSecond * _fastForwardValue;
 		if (_delayRemain <= 0.0f)
 		{
 			bool isCubeDetonated = UpdateDetonate();
@@ -190,6 +224,15 @@ void Board::PreUpdate(float deltaTime)
 		// TODO : 웨이브 클리어 연출 보여주고 웨이브 생성
 		_TEST_GenerateRandomWave();
 		_isWaveRunning = true;
+	}
+}
+
+void Board::PostUpdate(float deltaSeoncd)
+{
+	if (_damageCount > 0)
+	{
+		_gameManager->ReduceHP(_playerIndex, _damageCount);
+		_damageCount = 0;
 	}
 }
 
@@ -411,14 +454,12 @@ void Board::TickCubesRolling(float rollingTime)
 
 void Board::AddRow()
 {
-	// TODO : perfect 클리어 ! 맨 끝에 추가 row 부착.
-			//			부착연출 끝나면 Resize함수 호출하면 되겠다.
 	_nowAddTileCount = _width;
 	_delayRemain = ADDTILEDELAY;
+	_nextDestroyRow++;
 
 	for (int i = 0; i < _width; i++)
 	{
-		// TODO : 생성하지말고 pool 두고 갖다쓰자
 		Tile* tile = GetTileFromPool();
 
 		float x = 0.0f;
@@ -439,10 +480,14 @@ void Board::OnEndWave()
 {
 	_isWaveRunning = false;
 	_delayRemain = DETONATEDELAY;
+	
 
 	if (_isPerfect)
 	{
 		AddRow();
+		// TODO : 상대방 공격하는게 되긴 하는데.. 좀 요상하다 ㅋㅋㅋㅋ
+		//			Board 코드도 조금바꿔서 행동에 우선순위를 정해주고 큐에 담아서 처리하는 식으로 해야될듯..
+		// _gameManager->AttackAnotherPlayer(_playerIndex);
 	}
 }
 
@@ -472,12 +517,12 @@ void Board::ReturnTileToPool(Tile* tile)
 	tile->DisableAdvantageMine();
 	tile->DisableDetonated();
 	tile->DisableMine();
-	
+
 	auto pos = tile->tr.GetLocalPosition();
 	int x = 0;
 	int z = 0;
 	ConvertToTileIndex(pos.x, pos.z, x, z);
-	if(_minePos.first == x && _minePos.second == z)
+	if (_minePos.first == x && _minePos.second == z)
 	{
 		_minePos.first = -1;
 		_minePos.second = -1;
@@ -517,7 +562,7 @@ void Board::RemoveFromControllerList(CubeController* cubeCtr)
 {
 	auto removeCount = _cubeControllers.remove(cubeCtr);
 
-	if(removeCount == 0)
+	if (removeCount == 0)
 	{
 		return;
 	}
@@ -588,29 +633,33 @@ void Board::DetonateAdvantageMine()
 		return;
 	}
 
-	while (!_advantageMinePosList.empty())
+	for (int i = 0; i < _width; i++)
 	{
-		auto& [x, y] = _advantageMinePosList.front();
-		_tileState[x][y] = (int)_tileState[x][y] & ~((int)TileStateFlag::ADVANTAGEMINE);
-		_tiles[x][y]->DisableAdvantageMine();
-
-		for (int m = -1; m <= 1; m++)
+		for (int j = 0; j < _height; j++)
 		{
-			for (int n = -1; n <= 1; n++)
+			if (_tileState[i][j] & (int)TileStateFlag::ADVANTAGEMINE)
 			{
-				int nextX = x + m;
-				int nextY = y + n;
-				if (nextX < 0 || nextX >= _width || nextY < 0 || nextY >= _height)
+				_tileState[i][j] = _tileState[i][j] & ~((int)TileStateFlag::ADVANTAGEMINE);
+				_tiles[i][j]->DisableAdvantageMine();
+
+				for (int m = -1; m <= 1; m++)
 				{
-					continue;
+					for (int n = -1; n <= 1; n++)
+					{
+						int nextX = i + m;
+						int nextY = j + n;
+						if (nextX < 0 || nextX >= _width || nextY < 0 || nextY >= _height)
+						{
+							continue;
+						}
+
+						_tileState[nextX][nextY] = _tileState[nextX][nextY] | (int)TileStateFlag::DETONATE;
+						_tiles[nextX][nextY]->EnableDetonated();
+					}
 				}
-
-				_tileState[nextX][nextY] = _tileState[nextX][nextY] | (int)TileStateFlag::DETONATE;
-				_tiles[nextX][nextY]->EnableDetonated();
 			}
-		}
 
-		_advantageMinePosList.pop_front();
+		}
 	}
 }
 
@@ -653,43 +702,48 @@ void Board::OnEndRowAdd()
 
 void Board::OnStartTileFall(int x, int z)
 {
-	//SetTileState(x, z, TileStateFlag::None);
 	_tileState[x][z] = (int)TileStateFlag::NONE;
 	// TODO : Player가 위에 있었으면 게임오버 해야함
 }
 
-void Board::OnEndTileFall()
+void Board::OnEndTileFall(int x, int z)
 {
-	// TODO : 이거 근데 여러 줄이 한번에 사라질때 처리가 필요하다.
+	_fallingTileCount[z]--;
 	_nowFallingTileCount--;
 
-	if (_nowFallingTileCount <= 0)
+	if (_fallingTileCount[z] <= 0)
 	{
-		_nowFallingTileCount = 0;
-		Resize(_width, _height - 1);
+		_fallingTileCount[z] = 0;
+		Resize(_width, z);
 	}
 }
 
 void Board::DestroyRow()
 {
-	float delay = 0.5f;
-	float delayDelta = 0.2f;
+	_delayRemain = FALLTILEDELAY;
+	_fallingTileCount[_nextDestroyRow] = 0;
+
+	float delay = 0.3f;
+	float delayDelta = 0.1f;
 
 	for (int i = 0; i < _width; i++)
 	{
-		// TODO : Tile 떨어뜨려라.
-		//			Tile은 자기 머리위에 있는 Cube 떨어뜨려라.
-		if(_minePos.first == i && _minePos.second == _height-1)
+		if (_minePos.first == i && _minePos.second == _nextDestroyRow)
 		{
 			_minePos.first = -1;
 			_minePos.second = -1;
 		}
 
-		_tiles[i][_height-1]->StartFall(delay + delayDelta * i);
+		_tiles[i][_nextDestroyRow]->StartFall(delay + delayDelta * i, i, _nextDestroyRow);
+		_fallingTileCount[_nextDestroyRow]++;
 		_nowFallingTileCount++;
 	}
+	_nextDestroyRow--;
+}
 
-	//Resize(_width, _height - 1);
+void Board::DeferredDestroyRow()
+{
+	_isAttacked = true;
 }
 
 bool Board::IsMineSet()
@@ -703,11 +757,10 @@ void Board::SetGameOver()
 	_isGameOver = true;
 }
 
-void Board::ReduceHPbyCubeFalling()
+void Board::AddCubeFallCount()
 {
-	_gameManager->ReduceHP(_playerIndex, CUBEDAMAGE);
+	_damageCount++;
 	_isPerfect = false;
-	// TODO : 에너지 다 깎이면 한 줄 삭제하고 체력 다시 채워줘야함.
 }
 
 void Board::FastForward()
@@ -722,17 +775,6 @@ void Board::EndFastForward()
 
 void Board::Resize(int newWidth, int newHeight)
 {
-	_tileState.resize(newWidth);
-
-	for (int i = 0; i < newWidth; ++i)
-	{
-		_tileState[i].resize(newHeight);
-		for (int j = 0; j < newHeight; ++j)
-		{
-			_tileState[i][j] = (int)TileStateFlag::TILE;
-		}
-	}
-
 	// 타일 높이가 변화시 먼저 처리
 	if (newHeight < _height)
 	{
@@ -792,11 +834,17 @@ void Board::Resize(int newWidth, int newHeight)
 		}
 	}
 
+	_tileState.resize(newWidth);
+
 	for (int i = 0; i < newWidth; ++i)
 	{
+		_tileState[i].resize(newHeight);
 		for (int j = 0; j < newHeight; ++j)
 		{
-			_tileState[i][j] = (int)TileStateFlag::TILE;
+			if (_tileState[i][j] == (int)TileStateFlag::NONE)
+			{
+				_tileState[i][j] = (int)TileStateFlag::TILE;
+			}
 		}
 	}
 
@@ -881,18 +929,15 @@ bool Board::UpdateDetonate()
 					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemoving(CUBEREMOVETIME);
 					break;
 				case TileStateFlag::DARKCUBE:
-					// DarkCube 수납 및 체력 감소 -> 스테이지 한 줄 삭제
-					_gameManager->ReduceHP(_playerIndex, DARKCUBEDAMAGE);
+					// DarkCube 수납 및 스테이지 한 줄 삭제
 					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemoving(CUBEREMOVETIME);
 					_isPerfect = false;
-					// TODO : 스테이지 한 줄 삭제
 					DestroyRow();
 					break;
 				case TileStateFlag::ADVANTAGECUBE:
 					// AdvantageCube 수납 및 AdvantageMine 설치
 					_tileState[i][j] = _tileState[i][j] | (int)TileStateFlag::ADVANTAGEMINE;
 					_tiles[i][j]->EnableAdvantageMine();
-					_advantageMinePosList.push_back({ i,j });
 					destroyCount++;
 					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemoving(CUBEREMOVETIME);
 					break;
@@ -914,7 +959,7 @@ bool Board::UpdateDetonate()
 		}
 	}
 
-	_gameManager->OnCubeDestroy(_playerIndex, destroyCount);
+	_gameManager->IncreaseScore(_playerIndex, destroyCount);
 
 	for (int i = 0; i < _width; i++)
 	{

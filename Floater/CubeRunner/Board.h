@@ -1,6 +1,7 @@
 ﻿#pragma once
 #pragma once
 #include <list>
+#include <unordered_map>
 #include "../FloaterGameEngine/include/EngineMinimal.h"
 
 
@@ -34,9 +35,10 @@ public:
 	virtual ~Board();
 
 protected:
-	void OnCreate() override;
-	void OnDestroy() override;
-	void PreUpdate(float deltaTime) override;
+	virtual void OnCreate() override;
+	virtual void OnDestroy() override;
+	virtual void PreUpdate(float deltaSecond) override;
+	virtual void PostUpdate(float deltaSeoncd) override;
 
 public:
 	void Resize(int width, int height);
@@ -59,14 +61,15 @@ public:
 	void OnEndRising();						// 큐브 1개가 rising 끝나면 호출할 함수.
 	void OnEndRowAdd();
 	void OnStartTileFall(int x, int z);		// x,z index의 타일이 떨어지기 시작함.
-	void OnEndTileFall();
+	void OnEndTileFall(int x, int z);
 
-	void DestroyRow();		// TODO : player1이 player2의 보드를 박살냈을때의 예외처리 필요.
+	void DestroyRow();
+	void DeferredDestroyRow();
 
 	bool IsMineSet();
 
 	void SetGameOver();
-	void ReduceHPbyCubeFalling();
+	void AddCubeFallCount();
 
 	void FastForward();
 	void EndFastForward();
@@ -106,15 +109,18 @@ private:
 	bool _isGameOver = false;
 	bool _isGameStart = false;
 	bool _isWaveRunning = false;
+	bool _isAttacked;
 	float _delayRemain;
 	float _fastForwardValue;
 	int _nowRollingCount;
 	int _nowRisingCount;
 	int _nowFallingTileCount;
+	int _damageCount;
 
 	bool _isPerfect;
 	int _nowAddTileCount;
+	int _nextDestroyRow;
 
 	std::pair<int, int> _minePos;
-	std::list<std::pair<int, int>> _advantageMinePosList;
+	std::unordered_map<int,int> _fallingTileCount;	// key는 heightIndex
 };

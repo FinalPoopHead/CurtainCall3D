@@ -27,7 +27,7 @@ public:
 	void DisableAdvantageMine();
 
 	void StartAddRow(float movingTime, flt::Vector3f targetPos);
-	void StartFall(float delay);
+	void StartFall(float delay, int row, int col);
 
 private:
 	void Fall(float deltaSecond);
@@ -46,4 +46,7 @@ public:
 	flt::Vector3f _targetPos;			// 이동할 위치
 	float _fallDelay;
 	float _fallSpeed;
+
+	int _row;
+	int _col;
 };
