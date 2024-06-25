@@ -31,13 +31,14 @@ void GameScene::Initialize()
 	// TODO : 매개변수로 몇 스테이지인지(width 값) 받아야되려나?
 
 	GameManager* gameManager = flt::CreateGameObject<GameManager>(true);
-	int playerIndex = 0;
 
 	DirectionalLight* light = flt::CreateGameObject<DirectionalLight>(true);
 
 	///	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///	//////////////////////////////////////////		player 1	//////////////////////////////////////////////
 	///	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	int playerIndex = 0;
 
 	Board* board1 = flt::CreateGameObject<Board>(true, gameManager, playerIndex, WIDTH, HEIGHT);
 	board1->tr.SetPosition(0.0f, 0.0f, 0.0f);
@@ -52,6 +53,7 @@ void GameScene::Initialize()
 	///	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	playerIndex++;
+
 	Board* board2 = flt::CreateGameObject<Board>(true, gameManager, playerIndex, WIDTH, HEIGHT);
 	board2->tr.SetPosition(40.0f, 0.0f, 0.0f);
 
