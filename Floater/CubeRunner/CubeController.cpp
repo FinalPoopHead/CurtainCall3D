@@ -239,11 +239,12 @@ void CubeController::Rising(float deltaSecond)
 		_gameObject->tr.AddWorldPosition(0.0f, _riseSpeed * DISTANCE * deltaSecond, 0.0f);
 		flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
 
-		if (pos.y >= 4.0f)	// 타일 높이보다 같거나 커지면 등장완료
+		if (pos.y >= DISTANCE)	// 타일 높이보다 같거나 커지면 등장완료
 		{
 			_status = eCUBESTATUS::NONE;
 			_board->OnEndRising();
 			_gameObject->tr.SetScale(1.0, 1.0, 1.0);
+			_gameObject->tr.SetWorldPosition(pos.x, DISTANCE, pos.z);
 		}
 	}
 }
