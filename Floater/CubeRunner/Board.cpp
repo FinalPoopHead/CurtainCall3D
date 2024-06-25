@@ -13,7 +13,7 @@ constexpr int CUBECOUNT = 64;
 constexpr float ROLLINGTIME = 1.0f;
 constexpr float ROLLINGDELAY = 0.5f;	// 아무것도 하지않고 굴러갈때의 딜레이
 constexpr float DETONATEDELAY = 2.0f;	// 폭파 후 딜레이
-constexpr float FALLTILEDELAY = 5.0f;	// 타일 삭제 딜레이
+constexpr float FALLTILEDELAY = 0.0f;	// 타일 삭제 딜레이
 constexpr float ADDTILEDELAY = 5.0f;	// 타일 추가 딜레이
 constexpr float TILEADDTIME = 2.0f;
 constexpr float CUBEREMOVETIME = 0.5f;
@@ -45,6 +45,7 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _fastForwardValue(FFDEFAULT)
 	, _nowRollingCount(0)
 	, _nowRisingCount(0)
+	, _nowFallingTileCount()
 	, _isPerfect(true)
 	, _nowAddTileCount()
 	, _nextDestroyRow()
@@ -164,6 +165,11 @@ void Board::PreUpdate(float deltaTime)
 	}
 
 	if (_nowRollingCount > 0)
+	{
+		return;
+	}
+
+	if (_nowFallingTileCount > 0)
 	{
 		return;
 	}
@@ -345,9 +351,9 @@ void Board::_TEST_GenerateRandomWave()
 
 	_isPerfect = true;
 
-	int _TEST_darkCount = 3;
+	int _TEST_darkCount = 0;
 
-	for (int i = 0; i < _width; ++i)
+	for (int i = 0; i < 1; ++i)
 	{
 		int delayCount = 0;
 		//if (i == _width / 2) continue;		// TEST 한 줄 비우기 위함
@@ -426,14 +432,12 @@ void Board::TickCubesRolling(float rollingTime)
 
 void Board::AddRow()
 {
-	// TODO : perfect 클리어 ! 맨 끝에 추가 row 부착.
-			//			부착연출 끝나면 Resize함수 호출하면 되겠다.
 	_nowAddTileCount = _width;
 	_delayRemain = ADDTILEDELAY;
+	_nextDestroyRow++;
 
 	for (int i = 0; i < _width; i++)
 	{
-		// TODO : 생성하지말고 pool 두고 갖다쓰자
 		Tile* tile = GetTileFromPool();
 
 		float x = 0.0f;
@@ -679,6 +683,7 @@ void Board::OnStartTileFall(int x, int z)
 void Board::OnEndTileFall(int x, int z)
 {
 	_fallingTileCount[z]--;
+	_nowFallingTileCount--;
 
 	if (_fallingTileCount[z] <= 0)
 	{
@@ -705,6 +710,7 @@ void Board::DestroyRow()
 
 		_tiles[i][_nextDestroyRow]->StartFall(delay + delayDelta * i, i, _nextDestroyRow);
 		_fallingTileCount[_nextDestroyRow]++;
+		_nowFallingTileCount++;
 	}
 	_nextDestroyRow--;
 }

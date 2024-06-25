@@ -111,6 +111,7 @@ private:
 	float _fastForwardValue;
 	int _nowRollingCount;
 	int _nowRisingCount;
+	int _nowFallingTileCount;
 
 	bool _isPerfect;
 	int _nowAddTileCount;

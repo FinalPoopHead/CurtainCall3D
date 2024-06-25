@@ -166,7 +166,7 @@ void GameManager::AddPlayerScoreText(int index, TextObject* playerScoreText)
 	_playerScoreText[index] = playerScoreText;
 }
 
-void GameManager::ReduceHP(int index, int damage)
+void GameManager::ReduceHP(int index, int damage /*= 1*/)
 {
 	if (_isGameOver[index])
 	{

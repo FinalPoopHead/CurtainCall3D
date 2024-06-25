@@ -28,7 +28,7 @@ public:
 	void AddPlayTimeText(int index, TextObject* playTimeText);
 	void AddPlayerScoreText(int index, TextObject* playerScoreText);
 
-	void ReduceHP(int index, int damage);
+	void ReduceHP(int index, int damage = 1);
 
 	void OnCubeDestroy(int playerIndex, int count);	// Cube가 수납될 때 Board 객체가 호출하는 이벤트 함수
 
