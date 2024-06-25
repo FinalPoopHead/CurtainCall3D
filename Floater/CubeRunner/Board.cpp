@@ -13,7 +13,7 @@ constexpr int CUBECOUNT = 64;
 constexpr float ROLLINGTIME = 1.0f;
 constexpr float ROLLINGDELAY = 0.5f;	// 아무것도 하지않고 굴러갈때의 딜레이
 constexpr float DETONATEDELAY = 2.0f;	// 폭파 후 딜레이
-constexpr float FALLTILEDELAY = 0.0f;	// 타일 삭제 딜레이
+constexpr float FALLTILEDELAY = 2.0f;	// 타일 삭제 딜레이
 constexpr float ADDTILEDELAY = 5.0f;	// 타일 추가 딜레이
 constexpr float TILEADDTIME = 2.0f;
 constexpr float CUBEREMOVETIME = 0.5f;
@@ -41,6 +41,7 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _isGameOver(false)
 	, _isGameStart(false)
 	, _isWaveRunning(false)
+	, _isAttacked(false)
 	, _delayRemain(ROLLINGDELAY)
 	, _fastForwardValue(FFDEFAULT)
 	, _nowRollingCount(0)
@@ -173,6 +174,17 @@ void Board::PreUpdate(float deltaSecond)
 	if (_nowFallingTileCount > 0)
 	{
 		return;
+	}
+
+	if (_nowAddTileCount > 0)
+	{
+		return;
+	}
+
+	if (_isAttacked)
+	{
+		_isAttacked = false;
+		DestroyRow();
 	}
 
 	if (_nowRollingCount == 0)
@@ -468,10 +480,14 @@ void Board::OnEndWave()
 {
 	_isWaveRunning = false;
 	_delayRemain = DETONATEDELAY;
+	
 
 	if (_isPerfect)
 	{
 		AddRow();
+		// TODO : 상대방 공격하는게 되긴 하는데.. 좀 요상하다 ㅋㅋㅋㅋ
+		//			Board 코드도 조금바꿔서 행동에 우선순위를 정해주고 큐에 담아서 처리하는 식으로 해야될듯..
+		// _gameManager->AttackAnotherPlayer(_playerIndex);
 	}
 }
 
@@ -723,6 +739,11 @@ void Board::DestroyRow()
 		_nowFallingTileCount++;
 	}
 	_nextDestroyRow--;
+}
+
+void Board::DeferredDestroyRow()
+{
+	_isAttacked = true;
 }
 
 bool Board::IsMineSet()

@@ -26,6 +26,7 @@ public:
 	void ReduceHP(int index, int damage = 1);
 
 	void IncreaseScore(int playerIndex, int count);	// Cube가 수납될 때 Board 객체가 호출하는 이벤트 함수
+	void AttackAnotherPlayer(int playerIndex);
 
 private:
 	void IncreasePlayerCount();

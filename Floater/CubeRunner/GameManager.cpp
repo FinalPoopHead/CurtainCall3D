@@ -250,6 +250,13 @@ void GameManager::IncreaseScore(int playerIndex, int count)
 	}
 }
 
+void GameManager::AttackAnotherPlayer(int playerIndex)
+{
+	int targetIndex = playerIndex == 0 ? 1 : 0;
+
+	_boards[targetIndex]->DeferredDestroyRow();
+}
+
 void GameManager::IncreasePlayerCount()
 {
 	_currentPlayerCount++;

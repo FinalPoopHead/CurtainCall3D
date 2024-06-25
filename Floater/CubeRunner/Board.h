@@ -63,7 +63,8 @@ public:
 	void OnStartTileFall(int x, int z);		// x,z index의 타일이 떨어지기 시작함.
 	void OnEndTileFall(int x, int z);
 
-	void DestroyRow();		// TODO : player1이 player2의 보드를 박살냈을때의 예외처리 필요.
+	void DestroyRow();
+	void DeferredDestroyRow();
 
 	bool IsMineSet();
 
@@ -108,6 +109,7 @@ private:
 	bool _isGameOver = false;
 	bool _isGameStart = false;
 	bool _isWaveRunning = false;
+	bool _isAttacked;
 	float _delayRemain;
 	float _fastForwardValue;
 	int _nowRollingCount;
