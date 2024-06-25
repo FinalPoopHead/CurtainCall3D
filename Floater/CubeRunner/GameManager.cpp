@@ -177,7 +177,7 @@ void GameManager::ReduceHP(int index, int damage /*= 1*/)
 
 	if(_fallCount[index] > _fallCountMax[index])
 	{
-		_fallCount[index] = 0;
+		_fallCount[index] = _fallCount[index] % (_fallCountMax[index] + 1);
 		_boards[index]->DestroyRow();
 		for (int i = 0; i < _fallCountMax[index]; i++)
 		{

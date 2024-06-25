@@ -8,8 +8,8 @@
 #include "CubeController.h"
 
 constexpr float GRAVITY = 9.8f;
-constexpr float STARTFALLSPEED = 15.0f;
-constexpr float FALLHEIGHT = -40.0f;
+constexpr float STARTFALLSPEED = 20.0f;
+constexpr float FALLHEIGHT = -50.0f;
 
 Tile::Tile(Board* board)
 	: _board(board)

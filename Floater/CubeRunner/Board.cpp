@@ -46,6 +46,7 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _nowRollingCount(0)
 	, _nowRisingCount(0)
 	, _nowFallingTileCount()
+	, _damageCount()
 	, _isPerfect(true)
 	, _nowAddTileCount()
 	, _nextDestroyRow()
@@ -100,7 +101,7 @@ void Board::OnDestroy()
 	Resize(0, 0);
 }
 
-void Board::PreUpdate(float deltaTime)
+void Board::PreUpdate(float deltaSecond)
 {
 	// TODO : FastForward를 플레이어 별로 나눠줘야 함
 	flt::KeyData keyData = flt::GetKeyDown(flt::KeyCode::l);
@@ -176,7 +177,7 @@ void Board::PreUpdate(float deltaTime)
 
 	if (_nowRollingCount == 0)
 	{
-		_delayRemain -= deltaTime * _fastForwardValue;
+		_delayRemain -= deltaSecond * _fastForwardValue;
 		if (_delayRemain <= 0.0f)
 		{
 			bool isCubeDetonated = UpdateDetonate();
@@ -211,6 +212,15 @@ void Board::PreUpdate(float deltaTime)
 		// TODO : 웨이브 클리어 연출 보여주고 웨이브 생성
 		_TEST_GenerateRandomWave();
 		_isWaveRunning = true;
+	}
+}
+
+void Board::PostUpdate(float deltaSeoncd)
+{
+	if (_damageCount > 0)
+	{
+		_gameManager->ReduceHP(_playerIndex, _damageCount);
+		_damageCount = 0;
 	}
 }
 
@@ -351,9 +361,9 @@ void Board::_TEST_GenerateRandomWave()
 
 	_isPerfect = true;
 
-	int _TEST_darkCount = 0;
+	int _TEST_darkCount = 3;
 
-	for (int i = 0; i < 1; ++i)
+	for (int i = 0; i < _width; ++i)
 	{
 		int delayCount = 0;
 		//if (i == _width / 2) continue;		// TEST 한 줄 비우기 위함
@@ -726,11 +736,10 @@ void Board::SetGameOver()
 	_isGameOver = true;
 }
 
-void Board::ReduceHPbyCubeFalling()
+void Board::AddCubeFallCount()
 {
-	_gameManager->ReduceHP(_playerIndex, CUBEDAMAGE);
+	_damageCount++;
 	_isPerfect = false;
-	// TODO : 에너지 다 깎이면 한 줄 삭제하고 체력 다시 채워줘야함.
 }
 
 void Board::FastForward()

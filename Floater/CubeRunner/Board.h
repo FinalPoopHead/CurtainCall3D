@@ -35,9 +35,10 @@ public:
 	virtual ~Board();
 
 protected:
-	void OnCreate() override;
-	void OnDestroy() override;
-	void PreUpdate(float deltaTime) override;
+	virtual void OnCreate() override;
+	virtual void OnDestroy() override;
+	virtual void PreUpdate(float deltaSecond) override;
+	virtual void PostUpdate(float deltaSeoncd) override;
 
 public:
 	void Resize(int width, int height);
@@ -67,7 +68,7 @@ public:
 	bool IsMineSet();
 
 	void SetGameOver();
-	void ReduceHPbyCubeFalling();
+	void AddCubeFallCount();
 
 	void FastForward();
 	void EndFastForward();
@@ -112,6 +113,7 @@ private:
 	int _nowRollingCount;
 	int _nowRisingCount;
 	int _nowFallingTileCount;
+	int _damageCount;
 
 	bool _isPerfect;
 	int _nowAddTileCount;

@@ -8,7 +8,7 @@ constexpr float ROLLANGLE = 90.0f;		// 회전할 각도
 constexpr float TARGETANGLE[4] = { 90.0f, 180.0f, 270.0f, 360.0f };	// 회전 목표 각도
 constexpr float GRAVITY = 9.8f;
 constexpr float STARTFALLSPEED = 20.0f;
-constexpr float FALLHEIGHT = -16.0f;
+constexpr float FALLHEIGHT = -50.0f;
 constexpr float DISTANCE = 4.0f;
 constexpr double OVERLAPSCALE = 0.98;
 
@@ -91,7 +91,7 @@ void CubeController::StartFalling(bool withDamage /*= true*/)
 	{
 		if (_cubeType != eCUBETYPE::DARK)
 		{
-			_board->ReduceHPbyCubeFalling();
+			_board->AddCubeFallCount();
 		}
 	}
 }
