@@ -8,6 +8,27 @@ class Board;
 class SpriteObject;
 class TextObject;
 
+struct Level
+{
+	int stageNum;
+	int levelNum;
+	int width;
+	int height;
+
+	std::vector<std::vector<int>> cubeData;	// 1: normal, 2: advantage, 3: dark
+};
+
+struct StageData
+{
+	int stageNum;
+	int levelCount;
+	int waveCount;
+	int stageWidth;
+	int stageHeight;
+
+	std::vector<Level> level;
+};
+
 class GameManager : public flt::GameObject
 {
 public:
@@ -33,6 +54,7 @@ private:
 	void AddScore(int index, int score);
 	void PrintComboText(int index, int count, int score);
 	void AddPlayTime(int index, float time);
+	void ReadStageFile();
 
 	/// 컨트롤 하는 게임 오브젝트들
 private:
@@ -60,4 +82,7 @@ private:
 	std::vector<int> _playerScore;
 
 	std::vector<flt::Vector2f> _comboTextPos;		// 플레이어 별 콤보 텍스트 위치
+
+private:
+	std::vector<StageData> _stageData;
 };

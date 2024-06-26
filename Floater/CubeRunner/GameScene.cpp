@@ -52,15 +52,15 @@ void GameScene::Initialize()
 	///	//////////////////////////////////////////		player 2	//////////////////////////////////////////////
 	///	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	playerIndex++;
-
-	Board* board2 = flt::CreateGameObject<Board>(true, gameManager, playerIndex, WIDTH, HEIGHT);
-	board2->tr.SetPosition(40.0f, 0.0f, 0.0f);
-
-	Player* player2 = flt::CreateGameObject<Player>(true, board2);
-
-	gameManager->CreateUI(playerIndex, WIDTH);						// UI를 먼저 만들고 Player와 Board를 등록해야함.
-	gameManager->SetBoardAndPlayer(playerIndex, board2, player2);
+// 	playerIndex++;
+// 
+// 	Board* board2 = flt::CreateGameObject<Board>(true, gameManager, playerIndex, WIDTH, HEIGHT);
+// 	board2->tr.SetPosition(40.0f, 0.0f, 0.0f);
+// 
+// 	Player* player2 = flt::CreateGameObject<Player>(true, board2);
+// 
+// 	gameManager->CreateUI(playerIndex, WIDTH);						// UI를 먼저 만들고 Player와 Board를 등록해야함.
+// 	gameManager->SetBoardAndPlayer(playerIndex, board2, player2);
 }
 
 void GameScene::Finalize()

@@ -1,4 +1,6 @@
-﻿#include "GameManager.h"
+﻿#include <fstream>
+#include <sstream>
+#include "GameManager.h"
 #include "../FloaterGameEngine/include/Input.h"
 
 #include "Player.h"
@@ -7,6 +9,7 @@
 #include "TextObject.h"
 
 constexpr int MAXPLAYERCOUNT = 2;
+constexpr int MAXSTAGECOUNT = 9;
 constexpr int CUBESCORE = 100;
 constexpr int COMBOTEXTCOUNT = 20;
 constexpr float COMBOTEXTSPEED = 0.2f;
@@ -43,6 +46,7 @@ GameManager::GameManager() :
 	, _gameTime(std::vector<float>(MAXPLAYERCOUNT))
 	, _playerScore(std::vector<int>(MAXPLAYERCOUNT))
 	, _comboTextPos(std::vector<flt::Vector2f>(MAXPLAYERCOUNT))
+	, _stageData(std::vector<StageData>(MAXSTAGECOUNT))
 {
 	for (int i = 0; i < MAXPLAYERCOUNT; i++)
 	{
@@ -65,6 +69,8 @@ GameManager::GameManager() :
 		comboText->SetTextColor(fontColor);
 		_comboTextPool.push_back(comboText);
 	}
+
+	ReadStageFile();
 }
 
 GameManager::~GameManager()
@@ -188,7 +194,7 @@ void GameManager::ReduceHP(int index, int damage /*= 1*/)
 
 	_fallCount[index] += damage;
 
-	if(_fallCount[index] > _fallCountMax[index])
+	if (_fallCount[index] > _fallCountMax[index])
 	{
 		_fallCount[index] = _fallCount[index] % (_fallCountMax[index] + 1);
 		_boards[index]->DestroyRow();
@@ -338,7 +344,7 @@ void GameManager::AddPlayTime(int index, float time)
 	_gameTime[index] += time;
 
 	int gameTime = static_cast<int>(_gameTime[index]);
-	
+
 	std::wstring timestr;
 
 	if (gameTime / 60 <= 9)
@@ -362,4 +368,112 @@ void GameManager::AddPlayTime(int index, float time)
 	}
 
 	_playTimeText[index]->SetText(timestr);
+}
+
+void GameManager::ReadStageFile()
+{
+	std::string str_buf;
+	std::fstream fs;
+
+	fs.open("../Resources/StageData/Stage Data.csv", std::ios::in);
+
+	if (!fs.eof())
+	{
+		getline(fs, str_buf);
+
+		for (int i = 0; i < MAXSTAGECOUNT; i++)
+		{
+			getline(fs, str_buf);
+
+			std::istringstream iss(str_buf);
+			std::string token;
+
+			int stageNum;
+			int levelCount;
+			int waveCount;
+			int stageWidth;
+			int stageHeight;
+
+			getline(iss, token, ',');
+			stageNum = std::stoi(token);
+
+			getline(iss, token, ',');
+			levelCount = std::stoi(token);
+
+			getline(iss, token, ',');
+			waveCount = std::stoi(token);
+
+			getline(iss, token, ',');
+			stageWidth = std::stoi(token);
+
+			getline(iss, token, ',');
+			stageHeight = std::stoi(token);
+
+			_stageData[i].stageNum = stageNum;
+			_stageData[i].levelCount = levelCount;
+			_stageData[i].waveCount = waveCount;
+			_stageData[i].stageWidth = stageWidth;
+			_stageData[i].stageHeight = stageHeight;
+		}
+	}
+	fs.close();
+
+	for (int stageNum = 1; stageNum <= 9; stageNum++)
+	{
+		std::string stagePath = "../Resources/StageData/Stage" + std::to_string(stageNum) + ".csv";
+		fs.open(stagePath, std::ios::in);
+
+		for (int levelCount = 1; levelCount <= _stageData[stageNum - 1].levelCount; levelCount++)
+		{
+			getline(fs, str_buf);
+
+			std::istringstream iss(str_buf);
+			std::string token;
+
+			int stageNum;
+			int levelNum;
+			int width;
+			int height;
+
+			getline(iss, token, ',');
+			stageNum = std::stoi(token);
+
+			getline(iss, token, ',');
+			levelNum = std::stoi(token);
+
+			getline(iss, token, ',');
+			width = std::stoi(token);
+
+			getline(iss, token, ',');
+			height = std::stoi(token);
+
+			Level level;
+			level.stageNum = stageNum;
+			level.levelNum = levelNum;
+			level.width = width;
+			level.height = height;
+
+			level.cubeData.resize(width);
+			for (int row = 0; row < width; row++)
+			{
+				level.cubeData[row].resize(height);
+			}
+
+			for (int col = 0; col < height; col++)
+			{
+				getline(fs, str_buf);
+				std::istringstream iss(str_buf);
+				std::string token;
+				for (int row = 0; row < width; row++)
+				{
+					getline(iss, token, ',');
+					level.cubeData[row][col] = std::stoi(token);
+				}
+			}
+
+			_stageData[stageNum - 1].level.push_back(level);
+		}
+		fs.close();
+	}
+
 }
