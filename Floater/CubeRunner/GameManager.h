@@ -15,7 +15,7 @@ struct Level
 	int width;
 	int height;
 
-	std::vector<std::vector<int>> cubeData;	// 1: normal, 2: advantage, 3: dark
+	std::vector<std::vector<int>> levelLayout;	// 1: normal, 2: advantage, 3: dark
 };
 
 struct StageData
@@ -48,6 +48,7 @@ public:
 
 	void IncreaseScore(int playerIndex, int count);	// Cube가 수납될 때 Board 객체가 호출하는 이벤트 함수
 	void AttackAnotherPlayer(int playerIndex);
+	void SetStage(int stageNum);
 
 private:
 	void IncreasePlayerCount();
@@ -85,4 +86,7 @@ private:
 
 private:
 	std::vector<StageData> _stageData;
+	int _currentStage;
+	int _currentLevel;
+	int _currentWave;
 };

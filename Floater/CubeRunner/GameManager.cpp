@@ -47,6 +47,9 @@ GameManager::GameManager() :
 	, _playerScore(std::vector<int>(MAXPLAYERCOUNT))
 	, _comboTextPos(std::vector<flt::Vector2f>(MAXPLAYERCOUNT))
 	, _stageData(std::vector<StageData>(MAXSTAGECOUNT))
+	, _currentStage()
+	, _currentLevel()
+	, _currentWave()
 {
 	for (int i = 0; i < MAXPLAYERCOUNT; i++)
 	{
@@ -80,6 +83,60 @@ GameManager::~GameManager()
 
 void GameManager::Update(float deltaSecond)
 {
+	flt::KeyData keyData = flt::GetKeyDown(flt::KeyCode::key1);
+	if (keyData)
+	{
+		SetStage(1);
+	}
+
+	keyData = flt::GetKeyDown(flt::KeyCode::key2);
+	if (keyData)
+	{
+		SetStage(2);
+	}
+
+	keyData = flt::GetKeyDown(flt::KeyCode::key3);
+	if (keyData)
+	{
+		SetStage(3);
+	}
+
+	keyData = flt::GetKeyDown(flt::KeyCode::key4);
+	if (keyData)
+	{
+		SetStage(4);
+	}
+
+	keyData = flt::GetKeyDown(flt::KeyCode::key5);
+	if (keyData)
+	{
+		SetStage(5);
+	}
+
+	keyData = flt::GetKeyDown(flt::KeyCode::key6);
+	if (keyData)
+	{
+		SetStage(6);
+	}
+
+	keyData = flt::GetKeyDown(flt::KeyCode::key7);
+	if (keyData)
+	{
+		SetStage(7);
+	}
+
+	keyData = flt::GetKeyDown(flt::KeyCode::key8);
+	if (keyData)
+	{
+		SetStage(8);
+	}
+
+	keyData = flt::GetKeyDown(flt::KeyCode::key9);
+	if (keyData)
+	{
+		SetStage(9);
+	}
+
 	for (auto& comboText : _liveComboTexts)
 	{
 		auto originOffset = comboText->GetOffsetPosition();
@@ -261,6 +318,30 @@ void GameManager::AttackAnotherPlayer(int playerIndex)
 	int targetIndex = playerIndex == 0 ? 1 : 0;
 
 	_boards[targetIndex]->DeferredDestroyRow();
+}
+
+void GameManager::SetStage(int stageNum)
+{
+	_currentStage = stageNum;
+	_currentLevel = 1;
+	_currentWave = 1;
+
+	StageData data = _stageData[_currentStage - 1];
+
+	for (int i = 0; i < MAXPLAYERCOUNT; i++)
+	{
+		if (_boards[i] != nullptr)
+		{
+			_boards[i]->Resize(data.stageWidth, data.stageHeight);
+			_boards[i]->Reset();
+			_boards[i]->GenerateLevel(data.level[0].levelLayout);
+		}
+
+		if(_players[i] != nullptr)
+		{
+			_players[i]->SetPositiontoCenter();
+		}
+	}
 }
 
 void GameManager::IncreasePlayerCount()
@@ -453,10 +534,10 @@ void GameManager::ReadStageFile()
 			level.width = width;
 			level.height = height;
 
-			level.cubeData.resize(width);
+			level.levelLayout.resize(width);
 			for (int row = 0; row < width; row++)
 			{
-				level.cubeData[row].resize(height);
+				level.levelLayout[row].resize(height);
 			}
 
 			for (int col = 0; col < height; col++)
@@ -467,7 +548,7 @@ void GameManager::ReadStageFile()
 				for (int row = 0; row < width; row++)
 				{
 					getline(iss, token, ',');
-					level.cubeData[row][col] = std::stoi(token);
+					level.levelLayout[row][col] = std::stoi(token);
 				}
 			}
 
@@ -475,5 +556,4 @@ void GameManager::ReadStageFile()
 		}
 		fs.close();
 	}
-
 }

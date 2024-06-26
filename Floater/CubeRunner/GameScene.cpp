@@ -23,6 +23,7 @@ constexpr float HPValueZorder = 0.3f;
 constexpr flt::Vector4f TimeTextColor = { 1.0f,1.0f,1.0f,1.0f };
 constexpr flt::Vector4f ScoreTextColor = { 1.0f,1.0f,1.0f,1.0f };
 
+constexpr int STAGE = 1;
 constexpr int WIDTH = 5;
 constexpr int HEIGHT = 15;
 

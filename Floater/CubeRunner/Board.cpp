@@ -9,7 +9,7 @@
 #include "GameManager.h"
 
 constexpr int TILECOUNT = 256;
-constexpr int CUBECOUNT = 64;
+constexpr int CUBECOUNT = 256;
 constexpr float ROLLINGTIME = 1.0f;
 constexpr float ROLLINGDELAY = 0.5f;	// 아무것도 하지않고 굴러갈때의 딜레이
 constexpr float DETONATEDELAY = 2.0f;	// 폭파 후 딜레이
@@ -221,8 +221,8 @@ void Board::PreUpdate(float deltaSecond)
 
 	if (!_isWaveRunning && _delayRemain <= 0.0f)
 	{
-		// TODO : 웨이브 클리어 연출 보여주고 웨이브 생성
-		_TEST_GenerateRandomWave();
+		// TODO : 웨이브 클리어 연출 보여주고 다음 웨이브 출발
+		//_TEST_GenerateRandomWave();
 		_isWaveRunning = true;
 	}
 }
@@ -420,6 +420,74 @@ void Board::_TEST_GenerateRandomWave()
 				}
 				cube = _advantageCubePool.front();
 				_advantageCubePool.pop_front();
+				break;
+			default:
+				ASSERT(false, "Invalid Random Value");
+				break;
+			}
+
+			auto cubeCtr = cube->GetComponent<CubeController>();
+			_cubeControllers.push_back(cubeCtr);
+			cubeCtr->StartRising(CUBERISINGTIME, CUBERISINGDELAY * delayCount);
+
+			cube->tr.SetPosition(x, 0.0f, z);
+			cube->Enable();
+			_tiles[i][j]->_cube = cube;
+			_nowRisingCount++;
+			delayCount++;
+		}
+
+		delayCount = 0;
+	}
+}
+
+void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout)
+{
+	if (_isGameOver)
+	{
+		return;
+	}
+
+	int width = levelLayout.size();
+	int height = levelLayout[0].size();
+
+	_isPerfect = true;
+
+	for (int i = 0; i < width; ++i)
+	{
+		int delayCount = 0;
+		for (int j = 0; j < height; ++j)
+		{
+			float x = _tiles[i][j]->tr.GetWorldPosition().x;
+			float z = _tiles[i][j]->tr.GetWorldPosition().z;
+
+			flt::GameObject* cube = nullptr;
+
+			switch (levelLayout[i][j])
+			{
+			case 1:
+				if (_normalCubePool.empty())
+				{
+					ASSERT(false, "NormalCubePool is Empty");
+				}
+				cube = _normalCubePool.front();
+				_normalCubePool.pop_front();
+				break;
+			case 2:
+				if (_advantageCubePool.empty())
+				{
+					ASSERT(false, "AdvantageCubePool is Empty");
+				}
+				cube = _advantageCubePool.front();
+				_advantageCubePool.pop_front();
+				break;
+			case 3:
+				if (_darkCubePool.empty())
+				{
+					ASSERT(false, "DarkCubePool is Empty");
+				}
+				cube = _darkCubePool.front();
+				_darkCubePool.pop_front();
 				break;
 			default:
 				ASSERT(false, "Invalid Random Value");
@@ -850,6 +918,14 @@ void Board::Resize(int newWidth, int newHeight)
 
 	_width = newWidth;
 	_height = newHeight;
+}
+
+void Board::Reset()
+{
+	// TODO : 진행중이던 게임 전부 리셋해야함.
+	// 큐브풀로 다 갖고오고 타일풀로 다 갖고오고 진행중이던거 전부 제거하고..
+	// 조금 까다롭군
+	_nextDestroyRow = _height - 1;
 }
 
 void Board::ConvertToTileLocalPosition(int x, int z, float& outX, float& outZ)

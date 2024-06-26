@@ -42,6 +42,7 @@ protected:
 
 public:
 	void Resize(int width, int height);
+	void Reset();
 	bool SetTileState(float x, float y, TileStateFlag state);
 	bool AddTileState(float x, float y, TileStateFlag state);
 	int QueryTileState(float x, float y);
@@ -52,6 +53,7 @@ public:
 	void ConvertToTilePosition(int x, int z, float& outX, float& outZ);
 
 	void _TEST_GenerateRandomWave();		// 임시로 랜덤 생성 용
+	void GenerateLevel(std::vector<std::vector<int>> levelLayout);
 	void BackToPool(flt::GameObject* obj);
 	void RemoveFromControllerList(CubeController* cubeCtr);
 	void SetMine(float x, float z);			// position X,Z에 지뢰를 설치한다.
