@@ -56,24 +56,10 @@ Tile::~Tile()
 
 }
 
-void Tile::OnCreate()
-{
-	//std::cout << "Tile OnCreate" << std::endl;
-}
-
-void Tile::OnEnable()
-{
-	//std::cout << "Tile OnEnable" << std::endl;
-}
-
 void Tile::OnDisable()
 {
-	//std::cout << "Tile OnDisable" << std::endl;
-}
-
-void Tile::OnDestroy()
-{
-	//std::cout << "Tile OnDestroy" << std::endl;
+	_isMoving = false;
+	_isFalling = false;
 }
 
 void Tile::PreUpdate(float deltaSecond)
@@ -95,8 +81,7 @@ void Tile::PreUpdate(float deltaSecond)
 		if (_elapsedTime >= _movingTime)
 		{
 			_isMoving = false;
-			_board->OnEndRowAdd();
-			Destroy();
+			_board->OnEndRowAdd(this);
 		}
 	}
 

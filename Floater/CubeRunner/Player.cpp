@@ -22,11 +22,7 @@ Player::Player(Board* board)
 
 	Camera* camera = flt::CreateGameObject<Camera>(true, this, _board);
 
-	float x = 0.0f;
-	float z = 0.0f;
-
-	_board->GetCenterPosition(x, z);
-	tr.SetPosition(x, 2.0f, z);
+	SetPositiontoCenter();
 }
 
 void Player::OnEnable()
@@ -244,5 +240,14 @@ void Player::SetGameOver()
 void Player::SetAlbedoPath(std::wstring path)
 {
 	_model->SetAledoPath(path);
+}
+
+void Player::SetPositiontoCenter()
+{
+	float x = 0.0f;
+	float z = 0.0f;
+
+	_board->GetCenterPosition(x, z);
+	tr.SetPosition(x, 2.0f, z);
 }
 

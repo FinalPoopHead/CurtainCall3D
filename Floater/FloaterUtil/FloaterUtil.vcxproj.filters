@@ -16,6 +16,15 @@
     <Filter Include="Reflection">
       <UniqueIdentifier>{774da497-9270-482e-b0d2-ab630721d6f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="noise">
+      <UniqueIdentifier>{f305b863-fa1b-46c9-b2f6-9915554109c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pointer">
+      <UniqueIdentifier>{e3d80cdb-4057-46a3-90d6-f56a108d4f7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tweening">
+      <UniqueIdentifier>{5a8a552c-2355-493d-b736-fd75bef117cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Allocator.h">
@@ -87,6 +96,19 @@
     <ClInclude Include="LogFormatObject.h">
       <Filter>Logger</Filter>
     </ClInclude>
+    <ClInclude Include="Perlin.h" />
+    <ClInclude Include="include\OwningPtr.h">
+      <Filter>pointer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\NonOwningPtr.h">
+      <Filter>pointer</Filter>
+    </ClInclude>
+    <ClInclude Include="FLTween.h">
+      <Filter>Tweening</Filter>
+    </ClInclude>
+    <ClInclude Include="Expected.h">
+      <Filter>Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConvString.cpp">
@@ -107,5 +129,6 @@
     <ClCompile Include="LogFormatObject.cpp">
       <Filter>Logger</Filter>
     </ClCompile>
+    <ClCompile Include="Perlin.cpp" />
   </ItemGroup>
 </Project>

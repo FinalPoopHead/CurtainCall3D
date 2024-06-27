@@ -11,6 +11,10 @@
 #include "../FloaterMath/include/Bezier.h"
 #include "../FloaterMath/include/floaterMath.h"
 #include "../FloaterUtil/include/Log.h"
+#include "../FloaterUtil/include/OwningPtr.h"
+#include "../FloaterUtil/include/NonOwningPtr.h"
+#include "../FloaterUtil/FLTween.h"
+
 
 //void Func(flt::info info);
 
@@ -19,14 +23,25 @@ int main(int argc, char* argv[])
 	setlocale(LC_ALL, ".UTF8");
 	std::cout << std::boolalpha;
 
-	flt::info(L"Hello {}!", L"World");
+	flt::Info(L"Hello {}!", L"World");
 
-	std::wstring_view kStringView = L"한글 테스트";
+	{
+		flt::OwningPtr<int> pInt = new int(10);
+		flt::NonOwningPtr<int> pInt2{ pInt };
+		flt::OwningPtr<int> pInt3 = std::move(pInt);
 
-	//flt::info(kStringView); // flt::info kStringView;
-	flt::info((std::wstring_view)kStringView); // flt::info kStringView;
-	flt::info{ kStringView }; // flt::info kStringView;
-	//Func(flt::info(kStringView));
+		std::cout << *pInt3 << std::endl;
+
+		const flt::OwningPtr<int> cpInt = new int(10);
+		const flt::NonOwningPtr<int> cpInt2{ cpInt };
+	}
+
+	auto tween = flt::tween::from(0).to(100).during(100.0f);
+
+	for(int i = 0; i < 100; ++i)
+	{
+		std::cout << tween.step(1.0f) << std::endl;
+	}
 
 
 

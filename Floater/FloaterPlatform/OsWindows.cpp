@@ -718,7 +718,7 @@ void flt::OsWindows::HandleMouseRawData(const RAWMOUSE& data)
 	if (mouseFlags & MOUSE_MOVE_ABSOLUTE)
 	{
 		// RemoteDesktop으로 마우스를 작동 시에 절대 좌표로 넘어옴.
-		ASSERT(false, "아직 제대로 구현 안함");
+		//ASSERT(false, "아직 제대로 구현 안함");
 		RECT rect;
 
 		if (mouseFlags & MOUSE_VIRTUAL_DESKTOP)

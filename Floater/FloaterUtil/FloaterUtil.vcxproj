@@ -150,6 +150,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Expected.h" />
+    <ClInclude Include="FLTween.h" />
     <ClInclude Include="include\Hash.h" />
     <ClInclude Include="include\HashTable.h" />
     <ClInclude Include="include\Allocator.h" />
@@ -173,6 +175,9 @@
     <ClInclude Include="include\ITester.h" />
     <ClInclude Include="include\FixedSizeMemoryPool.h" />
     <ClInclude Include="LogFormatObject.h" />
+    <ClInclude Include="include\NonOwningPtr.h" />
+    <ClInclude Include="include\OwningPtr.h" />
+    <ClInclude Include="Perlin.h" />
     <ClInclude Include="TesterFixedSizeMemoryPool.h" />
     <ClInclude Include="TesterRBTree.h" />
     <ClInclude Include="include\UUID.h" />
@@ -181,6 +186,7 @@
     <ClCompile Include="ConvString.cpp" />
     <ClCompile Include="FixedSizeMemoryPool.cpp" />
     <ClCompile Include="LogFormatObject.cpp" />
+    <ClCompile Include="Perlin.cpp" />
     <ClCompile Include="TesterFixedSizeMemoryPool.cpp" />
     <ClCompile Include="TesterRBTree.cpp" />
     <ClCompile Include="Timer.cpp" />

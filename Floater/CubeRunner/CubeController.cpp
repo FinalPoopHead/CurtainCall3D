@@ -55,6 +55,7 @@ void CubeController::PreUpdate(float deltaSecond)
 
 void CubeController::OnDisable()
 {
+	_status = eCUBESTATUS::NONE;
 	_board->RemoveFromControllerList(this);
 }
 

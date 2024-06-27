@@ -10,10 +10,7 @@ public:
 	virtual ~Tile();
 
 protected:
-	virtual void OnCreate() override;
-	virtual void OnEnable() override;
 	virtual void OnDisable() override;
-	virtual void OnDestroy() override;
 	virtual void PreUpdate(float deltaSecond) override;
 
 public:

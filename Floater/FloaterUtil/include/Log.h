@@ -48,14 +48,62 @@ namespace flt
 	// Helper class for logging
 
 	template<typename... Args>
-	struct info
+	struct Info
 	{
-		info(std::wstring_view fmt, Args&&... args, std::source_location location = std::source_location::current())
+		Info(std::wstring_view fmt, Args&&... args, std::source_location location = std::source_location::current())
 		{
 			Log(LogLevel::info, location, fmt, std::forward<Args>(args)...);
 		}
 	};
 
 	template <typename... Args>
-	info(std::wstring_view, Args&&...) -> info<Args...>;
+	Info(std::wstring_view, Args&&...) -> Info<Args...>;
+
+	template<typename... Args>
+	struct Debug
+	{
+		Debug(std::wstring_view fmt, Args&&... args, std::source_location location = std::source_location::current())
+		{
+			Log(LogLevel::debug, location, fmt, std::forward<Args>(args)...);
+		}
+	};
+
+	template <typename... Args>
+	Debug(std::wstring_view, Args&&...) -> Debug<Args...>;
+
+	template<typename... Args>
+	struct Warn
+	{
+		Warn(std::wstring_view fmt, Args&&... args, std::source_location location = std::source_location::current())
+		{
+			Log(LogLevel::warn, location, fmt, std::forward<Args>(args)...);
+		}
+	};
+
+	template <typename... Args>
+	Warn(std::wstring_view, Args&&...) -> Warn<Args...>;
+
+	template<typename... Args>
+	struct Error
+	{
+		Error(std::wstring_view fmt, Args&&... args, std::source_location location = std::source_location::current())
+		{
+			Log(LogLevel::err, location, fmt, std::forward<Args>(args)...);
+		}
+	};
+
+	template <typename... Args>
+	Error(std::wstring_view, Args&&...) -> Error<Args...>;
+
+	template<typename... Args>
+	struct Critical
+	{
+		Critical(std::wstring_view fmt, Args&&... args, std::source_location location = std::source_location::current())
+		{
+			Log(LogLevel::critical, location, fmt, std::forward<Args>(args)...);
+		}
+	};
+
+	template <typename... Args>
+	Critical(std::wstring_view, Args&&...) -> Critical<Args...>;
 }
