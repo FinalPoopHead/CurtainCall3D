@@ -334,7 +334,7 @@ void GameManager::SetStage(int stageNum)
 		{
 			_boards[i]->Resize(data.stageWidth, data.stageHeight);
 			_boards[i]->Reset();
-			_boards[i]->GenerateLevel(data.level[0].levelLayout);
+			_boards[i]->GenerateLevel(data.level[0].levelLayout, data.waveCount);
 		}
 
 		if(_players[i] != nullptr)

@@ -18,7 +18,7 @@ constexpr float ADDTILEDELAY = 5.0f;	// 타일 추가 딜레이
 constexpr float TILEADDTIME = 2.0f;
 constexpr float CUBEREMOVETIME = 0.5f;
 constexpr float CUBERISINGTIME = 1.0f;
-constexpr float CUBERISINGDELAY = 0.3f;
+constexpr float CUBERISINGDELAY = 0.15f;
 constexpr int CUBEDAMAGE = 1;
 constexpr int DARKCUBEDAMAGE = 1;
 constexpr float SLOWVALUE = 0.5f;
@@ -34,7 +34,8 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _tileSize(offset)
 	, _tileStates()
 	, _tiles()
-	, _cubeControllers()
+	, _waveCubeControllers()
+	, _runningCubeControllers()
 	, _advantageCubePool()
 	, _darkCubePool()
 	, _normalCubePool()
@@ -221,10 +222,12 @@ void Board::PreUpdate(float deltaSecond)
 		return;
 	}
 
-	if (!_isWaveRunning && _delayRemain <= 0.0f)
+	if (!_isWaveRunning && _delayRemain <= 0.0f && !_waveCubeControllers.empty())
 	{
 		// TODO : 웨이브 클리어 연출 보여주고 다음 웨이브 출발
 		//_TEST_GenerateRandomWave();
+		_runningCubeControllers = _waveCubeControllers.front();
+		_waveCubeControllers.pop_front();
 		_isWaveRunning = true;
 	}
 }
@@ -429,7 +432,7 @@ void Board::_TEST_GenerateRandomWave()
 			}
 
 			auto cubeCtr = cube->GetComponent<CubeController>();
-			_cubeControllers.push_back(cubeCtr);
+			_runningCubeControllers.push_back(cubeCtr);
 			cubeCtr->StartRising(CUBERISINGTIME, CUBERISINGDELAY * delayCount);
 
 			cube->tr.SetPosition(x, 0.0f, z);
@@ -443,7 +446,7 @@ void Board::_TEST_GenerateRandomWave()
 	}
 }
 
-void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout)
+void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount)
 {
 	if (_isGameOver)
 	{
@@ -455,10 +458,16 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout)
 
 	_isPerfect = true;
 
-	for (int i = 0; i < width; ++i)
+	_waveCubeControllers.clear();
+	int waveHeight = height / waveCount;
+	int heightCount = 0;
+	std::list<CubeController*> waveCubes;
+
+	for (int j = 0; j < height; ++j)
 	{
-		int delayCount = 0;
-		for (int j = 0; j < height; ++j)
+		heightCount++;
+
+		for (int i = 0; i < width; ++i)
 		{
 			float x = _tiles[i][j]->tr.GetWorldPosition().x;
 			float z = _tiles[i][j]->tr.GetWorldPosition().z;
@@ -497,23 +506,27 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout)
 			}
 
 			auto cubeCtr = cube->GetComponent<CubeController>();
-			_cubeControllers.push_back(cubeCtr);
-			cubeCtr->StartRising(CUBERISINGTIME, CUBERISINGDELAY * delayCount);
+			waveCubes.push_back(cubeCtr);
+			cubeCtr->StartRising(CUBERISINGTIME, CUBERISINGDELAY * j);
 
 			cube->tr.SetPosition(x, 0.0f, z);
 			cube->Enable();
 			_tiles[i][j]->_cube = cube;
 			_nowRisingCount++;
-			delayCount++;
 		}
 
-		delayCount = 0;
+		if(heightCount >= waveHeight)
+		{
+			heightCount = 0;
+			_waveCubeControllers.push_front(waveCubes);
+			waveCubes.clear();
+		}
 	}
 }
 
 void Board::TickCubesRolling(float rollingTime)
 {
-	for (auto& cubeCtr : _cubeControllers)
+	for (auto& cubeCtr : _runningCubeControllers)
 	{
 		if (cubeCtr->StartRolling(rollingTime))
 		{
@@ -631,14 +644,14 @@ void Board::BackToPool(flt::GameObject* obj)
 
 void Board::RemoveFromControllerList(CubeController* cubeCtr)
 {
-	auto removeCount = _cubeControllers.remove(cubeCtr);
+	auto removeCount = _runningCubeControllers.remove(cubeCtr);
 
 	if (removeCount == 0)
 	{
 		return;
 	}
 
-	if (_cubeControllers.empty())
+	if (_runningCubeControllers.empty())
 	{
 		OnEndWave();
 	}
@@ -960,7 +973,7 @@ void Board::Reset()
 	_minePos.first = -1;
 	_minePos.second = -1;
 
-	for(auto& cubeCtr : _cubeControllers)
+	for(auto& cubeCtr : _runningCubeControllers)
 	{
 		BackToPool(cubeCtr->GetGameObject());
 	}
@@ -992,7 +1005,7 @@ void Board::UpdateBoard()
 		}
 	}
 
-	for (auto& cubeCtr : _cubeControllers)
+	for (auto& cubeCtr : _runningCubeControllers)
 	{
 		auto pos = cubeCtr->GetPosition();
 		int x = 0;

@@ -53,7 +53,7 @@ public:
 	void ConvertToTilePosition(int x, int z, float& outX, float& outZ);
 
 	void _TEST_GenerateRandomWave();		// 임시로 랜덤 생성 용
-	void GenerateLevel(std::vector<std::vector<int>> levelLayout);
+	void GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount);
 	void BackToPool(flt::GameObject* obj);
 	void RemoveFromControllerList(CubeController* cubeCtr);
 	void SetMine(float x, float z);			// position X,Z에 지뢰를 설치한다.
@@ -103,7 +103,8 @@ private:
 	std::vector<std::vector<int>> _tileStates;
 	std::vector<std::vector<Tile*>> _tiles;
 
-	std::list<CubeController*> _cubeControllers;	// 현재 보드 위에 굴러가는 큐브들
+	std::list<std::list<CubeController*>> _waveCubeControllers;	// 웨이브별 큐브들
+	std::list<CubeController*> _runningCubeControllers;	// 현재 보드 위에 굴러가는 큐브들
 	std::list<AdvantageCube*> _advantageCubePool;								// 어드밴티지 큐브 풀
 	std::list<DarkCube*> _darkCubePool;											// 다크 큐브 풀
 	std::list<NormalCube*> _normalCubePool;										// 노말 큐브 풀
