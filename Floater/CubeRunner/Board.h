@@ -61,7 +61,7 @@ public:
 	void DetonateAdvantageMine();			// 어드밴티지 지뢰를 폭파시킨다.
 	void OnEndRolling();					// 큐브 1개가 rolling 끝나면 호출할 함수.
 	void OnEndRising();						// 큐브 1개가 rising 끝나면 호출할 함수.
-	void OnEndRowAdd();
+	void OnEndRowAdd(Tile* tile);
 	void OnStartTileFall(int x, int z);		// x,z index의 타일이 떨어지기 시작함.
 	void OnEndTileFall(int x, int z);
 
@@ -100,7 +100,7 @@ private:
 
 	std::list<Tile*> _tilePool;
 
-	std::vector<std::vector<int>> _tileState;
+	std::vector<std::vector<int>> _tileStates;
 	std::vector<std::vector<Tile*>> _tiles;
 
 	std::list<CubeController*> _cubeControllers;	// 현재 보드 위에 굴러가는 큐브들
@@ -125,4 +125,5 @@ private:
 
 	std::pair<int, int> _minePos;
 	std::unordered_map<int,int> _fallingTileCount;	// key는 heightIndex
+	std::list<Tile*> _addTiles;
 };
