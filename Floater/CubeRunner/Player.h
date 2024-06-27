@@ -17,6 +17,8 @@ protected:
 public:
 	void SetPadIndex(int padIndex) { _padIndex = padIndex; }
 	void SetGameOver();
+	void SetAlbedoPath(std::wstring path);
+	void SetPositiontoCenter();
 
 private:
 	PlayerModel* _model;

@@ -22,11 +22,7 @@ Player::Player(Board* board)
 
 	Camera* camera = flt::CreateGameObject<Camera>(true, this, _board);
 
-	float x = 0.0f;
-	float z = 0.0f;
-
-	_board->ConvertToTilePosition(2, 5, x, z);
-	tr.SetPosition(x, 2.0f, z);
+	SetPositiontoCenter();
 }
 
 void Player::OnEnable()
@@ -36,6 +32,12 @@ void Player::OnEnable()
 
 void Player::Update(float deltaSecond)
 {
+	if (flt::GetKeyDown(flt::KeyCode::backspace))
+	{
+		static MainMenuScene* scene = flt::CreateScene<MainMenuScene>();
+		flt::SetScene(scene);
+	}
+
 	if (_isGameOver)
 	{
 		return;
@@ -129,7 +131,7 @@ void Player::Update(float deltaSecond)
 	// 좌 우 이동
 	// 현재 상태에 이동 가능하거나 
 	// 다음 상태에 이동 가능하면 이동 가능
-	if ((tileState == (int)TileStateFlag::None)
+	if ((tileState == (int)TileStateFlag::NONE)
 		|| ((tileState & blocked) && (nextTileState & blocked)))
 	{
 		// 이동 불가능할 경우에는 x값을 원래 값으로 되돌린다.
@@ -143,7 +145,7 @@ void Player::Update(float deltaSecond)
 	// 상 하 이동
 	// 현재 상태에 이동이 가능하거나 
 	// 아래에 내려가는 경우에 한해서 다음 상태에 이동 가능하면 가능
-	if ((tileState == (int)TileStateFlag::None)
+	if ((tileState == (int)TileStateFlag::NONE)
 		|| ((tileState & blocked) && (nextTileState & blocked))
 		|| ((tileState & blocked) && !(nextTileState & blocked) && nextPosOffset.z > 0))
 	{
@@ -167,7 +169,7 @@ void Player::Update(float deltaSecond)
 	_isCrushed = false;
 	tileState = _board->QueryTileState(pos.x, pos.z);
 	nextTileState = _board->QueryNextTileState(pos.x, pos.z);
-	if ((tileState == (int)TileStateFlag::None)
+	if ((tileState == (int)TileStateFlag::NONE)
 		|| (tileState & blocked) && (nextTileState & blocked))
 	{
 		_isCrushed = true;
@@ -228,15 +230,24 @@ void Player::Update(float deltaSecond)
 			printf("Y Up\n");
 		}
 	}
-
-	if (flt::GetKeyDown(flt::KeyCode::enter))
-	{
-		static MainMenuScene* scene = flt::CreateScene<MainMenuScene>();
-		flt::SetScene(scene);
-	}
 }
 
 void Player::SetGameOver()
 {
 	_isGameOver = true;
 }
+
+void Player::SetAlbedoPath(std::wstring path)
+{
+	_model->SetAledoPath(path);
+}
+
+void Player::SetPositiontoCenter()
+{
+	float x = 0.0f;
+	float z = 0.0f;
+
+	_board->GetCenterPosition(x, z);
+	tr.SetPosition(x, 2.0f, z);
+}
+

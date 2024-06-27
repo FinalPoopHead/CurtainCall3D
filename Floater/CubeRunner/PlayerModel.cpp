@@ -22,3 +22,8 @@ void PlayerModel::PlayIdle()
 {
 	_renderer->PlayAnimation(0, true);
 }
+
+void PlayerModel::SetAledoPath(std::wstring path)
+{
+	_renderer->SetMaterial(0, path, flt::RawMaterial::TextureType::ALBEDO_OPACITY);
+}

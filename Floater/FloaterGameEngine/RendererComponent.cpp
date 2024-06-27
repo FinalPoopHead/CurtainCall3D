@@ -133,6 +133,17 @@ std::vector<std::wstring> flt::RendererComponent::GetAnimaionList() const
 	return list;
 }
 
+void flt::RendererComponent::SetCastShadow(bool isCast)
+{
+	_rendererObject->isCastShadow = isCast;
+
+	if (_isRegisted)
+	{
+		_renderer.DeregisterObject(_hObject);
+		_hObject = _renderer.RegisterObject(*_rendererObject);
+	}
+}
+
 void flt::RendererComponent::PlayAnimation(uint32 index, bool isLoop)
 {
 	_rendererObject->animState.index = index;

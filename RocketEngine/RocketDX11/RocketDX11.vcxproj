@@ -209,8 +209,8 @@
       <AdditionalDependencies>RocketCommon.lib;DirectXTK.lib;DirectXTex.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "*.hlsl" "$(ProjectDir)..\Resources\Shaders";
-copy /Y "*.hlsli" "$(ProjectDir)..\Resources\Shaders";</Command>
+      <Command>copy /Y "*.hlsl" "$(SolutionDir)Resources\Shaders";
+copy /Y "*.hlsli" "$(SolutionDir)Resources\Shaders";</Command>
     </PostBuildEvent>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -260,8 +260,8 @@ copy /Y "*.hlsli" "$(SolutionDir)Resources\Shaders";</Command>
       <AdditionalDependencies>RocketCommon.lib;DirectXTK.lib;DirectXTex.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "*.hlsl" "$(ProjectDir)..\Resources\Shaders";
-copy /Y "*.hlsli" "$(ProjectDir)..\Resources\Shaders";</Command>
+      <Command>copy /Y "*.hlsl" "$(SolutionDir)Resources\Shaders";
+copy /Y "*.hlsli" "$(SolutionDir)Resources\Shaders";</Command>
     </PostBuildEvent>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>

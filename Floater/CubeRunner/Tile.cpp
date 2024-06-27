@@ -9,7 +9,7 @@
 
 constexpr float GRAVITY = 9.8f;
 constexpr float STARTFALLSPEED = 20.0f;
-constexpr float FALLHEIGHT = -16.0f;
+constexpr float FALLHEIGHT = -50.0f;
 
 Tile::Tile(Board* board)
 	: _board(board)
@@ -25,6 +25,8 @@ Tile::Tile(Board* board)
 	, _targetPos()
 	, _fallDelay()
 	, _fallSpeed()
+	, _row()
+	, _col()
 {
 	std::wstring filePath = L"..\\Resources\\Models\\BrickBlock.fbx";
 
@@ -54,24 +56,10 @@ Tile::~Tile()
 
 }
 
-void Tile::OnCreate()
-{
-	//std::cout << "Tile OnCreate" << std::endl;
-}
-
-void Tile::OnEnable()
-{
-	//std::cout << "Tile OnEnable" << std::endl;
-}
-
 void Tile::OnDisable()
 {
-	//std::cout << "Tile OnDisable" << std::endl;
-}
-
-void Tile::OnDestroy()
-{
-	//std::cout << "Tile OnDestroy" << std::endl;
+	_isMoving = false;
+	_isFalling = false;
 }
 
 void Tile::PreUpdate(float deltaSecond)
@@ -93,8 +81,7 @@ void Tile::PreUpdate(float deltaSecond)
 		if (_elapsedTime >= _movingTime)
 		{
 			_isMoving = false;
-			_board->OnEndRowAdd();
-			Destroy();
+			_board->OnEndRowAdd(this);
 		}
 	}
 
@@ -146,8 +133,11 @@ void Tile::StartAddRow(float movingTime, flt::Vector3f targetPos)
 	_targetPos = targetPos;
 }
 
-void Tile::StartFall(float delay)
+void Tile::StartFall(float delay, int row, int col)
 {
+	_row = row;
+	_col = col;
+
 	DisableMine();
 	DisableAdvantageMine();
 	DisableDetonated();
@@ -164,16 +154,12 @@ void Tile::Fall(float deltaSecond)
 		_fallDelay -= deltaSecond;
 		if (_fallDelay <= 0.0f)
 		{
-			auto pos = tr.GetWorldPosition();
-			int x;
-			int z;
-			_board->ConvertToTileIndex(pos.x, pos.z, x, z);
-			_board->OnStartTileFall(x,z);
+			_board->OnStartTileFall(_row,_col);
 
 			if(_cube != nullptr)
 			{
 				auto cubeCtr = _cube->GetComponent<CubeController>();
-				cubeCtr->StartFalling(false);
+				cubeCtr->StartFalling();
 			}
 		}
 		return;
@@ -185,6 +171,6 @@ void Tile::Fall(float deltaSecond)
 	if (tr.GetWorldPosition().y <= FALLHEIGHT)
 	{
 		_isFalling = false;
-		_board->OnEndTileFall();
+		_board->OnEndTileFall(_row, _col);
 	}
 }

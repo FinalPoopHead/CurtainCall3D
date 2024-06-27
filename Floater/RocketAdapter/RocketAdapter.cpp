@@ -220,6 +220,8 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 
 				rocketObject->staticModelRenderer->BindTransform(&rocketObject->rocketTransform);
 
+				rocketObject->staticModelRenderer->SetCastShadow(renderable.isCastShadow);
+
 				// 하드코딩 일단 0번만 넣어주자.
 				if (renderable.materials[0].textures[RawMaterial::TextureType::ALBEDO_OPACITY]->path != L"")
 				{

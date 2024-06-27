@@ -8,9 +8,9 @@ constexpr float ROLLANGLE = 90.0f;		// 회전할 각도
 constexpr float TARGETANGLE[4] = { 90.0f, 180.0f, 270.0f, 360.0f };	// 회전 목표 각도
 constexpr float GRAVITY = 9.8f;
 constexpr float STARTFALLSPEED = 20.0f;
-constexpr float FALLHEIGHT = -16.0f;
+constexpr float FALLHEIGHT = -50.0f;
 constexpr float DISTANCE = 4.0f;
-constexpr double REMOVESCALE = 0.98;
+constexpr double OVERLAPSCALE = 0.98;
 
 CubeController::CubeController()
 	: _board(nullptr)
@@ -55,6 +55,7 @@ void CubeController::PreUpdate(float deltaSecond)
 
 void CubeController::OnDisable()
 {
+	_status = eCUBESTATUS::NONE;
 	_board->RemoveFromControllerList(this);
 }
 
@@ -91,7 +92,7 @@ void CubeController::StartFalling(bool withDamage /*= true*/)
 	{
 		if (_cubeType != eCUBETYPE::DARK)
 		{
-			_board->ReduceHPbyCubeFalling();
+			_board->AddCubeFallCount();
 		}
 	}
 }
@@ -111,7 +112,7 @@ void CubeController::StartRemoving(float removeTime)
 		break;
 	}
 
-	_gameObject->tr.SetScale(REMOVESCALE, REMOVESCALE, REMOVESCALE);
+	_gameObject->tr.SetScale(OVERLAPSCALE, OVERLAPSCALE, OVERLAPSCALE);
 	_removeSpeed = 1.0f / removeTime;
 
 	_status = eCUBESTATUS::REMOVING;
@@ -123,6 +124,9 @@ void CubeController::StartRising(float riseTime, float delay)
 	_riseSpeed = 1.0f / riseTime;
 	_riseDelay = delay;
 	_elapsedTime = 0.0f;
+
+	_gameObject->tr.SetScale(OVERLAPSCALE, OVERLAPSCALE, OVERLAPSCALE);
+	_gameObject->tr.SetWorldRotation({ 0.0f,0.0f,0.0f,1.0f });
 
 	_status = eCUBESTATUS::RISING;
 }
@@ -189,7 +193,7 @@ bool CubeController::IsOutofBoard()
 	auto pos = _gameObject->tr.GetWorldPosition();
 	auto state = _board->QueryTileState(pos.x, pos.z);
 
-	if (state == (int)TileStateFlag::None)
+	if (state == (int)TileStateFlag::NONE)
 	{
 		return true;
 	}
@@ -236,11 +240,12 @@ void CubeController::Rising(float deltaSecond)
 		_gameObject->tr.AddWorldPosition(0.0f, _riseSpeed * DISTANCE * deltaSecond, 0.0f);
 		flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
 
-		if (pos.y >= 4.0f)	// 타일 높이보다 같거나 커지면 등장완료
+		if (pos.y >= DISTANCE)	// 타일 높이보다 같거나 커지면 등장완료
 		{
 			_status = eCUBESTATUS::NONE;
 			_board->OnEndRising();
 			_gameObject->tr.SetScale(1.0, 1.0, 1.0);
+			_gameObject->tr.SetWorldPosition(pos.x, DISTANCE, pos.z);
 		}
 	}
 }

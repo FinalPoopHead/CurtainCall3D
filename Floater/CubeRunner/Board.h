@@ -1,6 +1,7 @@
 ﻿#pragma once
 #pragma once
 #include <list>
+#include <unordered_map>
 #include "../FloaterGameEngine/include/EngineMinimal.h"
 
 
@@ -13,19 +14,19 @@ class GameManager;
 
 enum class TileStateFlag
 {
-	None = 0x0000
-	, Tile = 0x0001
-	, Player = 0x0002
-	, Mine = 0x0004
-	, AdvantageMine = 0x0008
-	, Detonate = 0x0010
-	, NormalCube = 0x0100
-	, DarkCube = 0x0200
-	, AdvantageCube = 0x0400
+	NONE = 0x0000
+	, TILE = 0x0001
+	, PLAYER = 0x0002
+	, MINE = 0x0004
+	, ADVANTAGEMINE = 0x0008
+	, DETONATE = 0x0010
+	, NORMALCUBE = 0x0100
+	, DARKCUBE = 0x0200
+	, ADVANTAGECUBE = 0x0400
 };
 
-#define BLOCKED_TILE ((int)TileStateFlag::NormalCube | (int)TileStateFlag::DarkCube | (int)TileStateFlag::AdvantageCube)
-#define CUBE ((int)TileStateFlag::NormalCube | (int)TileStateFlag::DarkCube | (int)TileStateFlag::AdvantageCube)
+#define BLOCKED_TILE ((int)TileStateFlag::NORMALCUBE | (int)TileStateFlag::DARKCUBE | (int)TileStateFlag::ADVANTAGECUBE)
+#define CUBE ((int)TileStateFlag::NORMALCUBE | (int)TileStateFlag::DARKCUBE | (int)TileStateFlag::ADVANTAGECUBE)
 
 class Board : public flt::GameObject
 {
@@ -34,12 +35,14 @@ public:
 	virtual ~Board();
 
 protected:
-	void OnCreate() override;
-	void OnDestroy() override;
-	void PreUpdate(float deltaTime) override;
+	virtual void OnCreate() override;
+	virtual void OnDestroy() override;
+	virtual void PreUpdate(float deltaSecond) override;
+	virtual void PostUpdate(float deltaSeoncd) override;
 
 public:
 	void Resize(int width, int height);
+	void Reset();
 	bool SetTileState(float x, float y, TileStateFlag state);
 	bool AddTileState(float x, float y, TileStateFlag state);
 	int QueryTileState(float x, float y);
@@ -50,6 +53,7 @@ public:
 	void ConvertToTilePosition(int x, int z, float& outX, float& outZ);
 
 	void _TEST_GenerateRandomWave();		// 임시로 랜덤 생성 용
+	void GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount);
 	void BackToPool(flt::GameObject* obj);
 	void RemoveFromControllerList(CubeController* cubeCtr);
 	void SetMine(float x, float z);			// position X,Z에 지뢰를 설치한다.
@@ -57,16 +61,17 @@ public:
 	void DetonateAdvantageMine();			// 어드밴티지 지뢰를 폭파시킨다.
 	void OnEndRolling();					// 큐브 1개가 rolling 끝나면 호출할 함수.
 	void OnEndRising();						// 큐브 1개가 rising 끝나면 호출할 함수.
-	void OnEndRowAdd();
+	void OnEndRowAdd(Tile* tile);
 	void OnStartTileFall(int x, int z);		// x,z index의 타일이 떨어지기 시작함.
-	void OnEndTileFall();
+	void OnEndTileFall(int x, int z);
 
 	void DestroyRow();
+	void DeferredDestroyRow();
 
 	bool IsMineSet();
 
 	void SetGameOver();
-	void ReduceHPbyCubeFalling();
+	void AddCubeFallCount();
 
 	void FastForward();
 	void EndFastForward();
@@ -83,6 +88,9 @@ private:
 	void AddRow();
 	void OnEndWave();
 
+	Tile* GetTileFromPool();
+	void ReturnTileToPool(Tile* tile);
+
 private:
 	GameManager* _gameManager;
 	int _playerIndex;
@@ -90,10 +98,13 @@ private:
 	int _height;
 	float _tileSize;
 
-	std::vector<std::vector<int>> _tileState;
+	std::list<Tile*> _tilePool;
+
+	std::vector<std::vector<int>> _tileStates;
 	std::vector<std::vector<Tile*>> _tiles;
 
-	std::list<CubeController*> _cubeControllers;	// 현재 보드 위에 굴러가는 큐브들
+	std::list<std::list<CubeController*>> _waveCubeControllers;	// 웨이브별 큐브들
+	std::list<CubeController*> _runningCubeControllers;	// 현재 보드 위에 굴러가는 큐브들
 	std::list<AdvantageCube*> _advantageCubePool;								// 어드밴티지 큐브 풀
 	std::list<DarkCube*> _darkCubePool;											// 다크 큐브 풀
 	std::list<NormalCube*> _normalCubePool;										// 노말 큐브 풀
@@ -101,16 +112,19 @@ private:
 	bool _isGameOver = false;
 	bool _isGameStart = false;
 	bool _isWaveRunning = false;
+	bool _isAttacked;
 	float _delayRemain;
 	float _fastForwardValue;
 	int _nowRollingCount;
 	int _nowRisingCount;
 	int _nowFallingTileCount;
+	int _damageCount;
 
-	int _detonatedDarkCubeCount;
-	int _remainCubeCount;
+	bool _isPerfect;
 	int _nowAddTileCount;
+	int _nextDestroyRow;
 
 	std::pair<int, int> _minePos;
-	std::list<std::pair<int, int>> _advantageMinePosList;
+	std::unordered_map<int,int> _fallingTileCount;	// key는 heightIndex
+	std::list<Tile*> _addTiles;
 };
