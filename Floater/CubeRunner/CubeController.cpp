@@ -239,6 +239,7 @@ void CubeController::Rising(float deltaSecond)
 	{
 		_gameObject->tr.AddWorldPosition(0.0f, _riseSpeed * DISTANCE * deltaSecond, 0.0f);
 		flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
+		_board->AddTileState(pos.x, pos.z, TileStateFlag::RISING);
 
 		if (pos.y >= DISTANCE)	// 타일 높이보다 같거나 커지면 등장완료
 		{

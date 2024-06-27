@@ -14,6 +14,7 @@ constexpr float ROLLINGTIME = 1.0f;
 constexpr float ROLLINGDELAY = 0.5f;	// 아무것도 하지않고 굴러갈때의 딜레이
 constexpr float DETONATEDELAY = 2.0f;	// 폭파 후 딜레이
 constexpr float FALLTILEDELAY = 2.0f;	// 타일 삭제 딜레이
+constexpr float RISINGDELAY = 3.0f;
 constexpr float ADDTILEDELAY = 5.0f;	// 타일 추가 딜레이
 constexpr float TILEADDTIME = 2.0f;
 constexpr float CUBEREMOVETIME = 0.5f;
@@ -164,6 +165,11 @@ void Board::PreUpdate(float deltaSecond)
 		}
 	}
 
+	if (flt::GetKeyDown(flt::KeyCode::n))
+	{
+		_isGameStart = true;
+	}
+
 	if (_nowRisingCount > 0)
 	{
 		return;
@@ -212,22 +218,22 @@ void Board::PreUpdate(float deltaSecond)
 		}
 	}
 
-	if (flt::GetKeyDown(flt::KeyCode::n))
-	{
-		_isGameStart = true;
-	}
-
 	if (_isGameOver || !_isGameStart)
 	{
 		return;
 	}
 
-	if (!_isWaveRunning && _delayRemain <= 0.0f && !_waveCubeControllers.empty())
+	if (!_isWaveRunning && _delayRemain <= 0.0f)
 	{
 		// TODO : 웨이브 클리어 연출 보여주고 다음 웨이브 출발
 		//_TEST_GenerateRandomWave();
-		_runningCubeControllers = _waveCubeControllers.front();
-		_waveCubeControllers.pop_front();
+
+		if (_runningCubeControllers.empty() && !_waveCubeControllers.empty())
+		{
+			_runningCubeControllers = _waveCubeControllers.front();
+			_waveCubeControllers.pop_front();
+		}
+
 		_isWaveRunning = true;
 	}
 }
@@ -522,6 +528,9 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 			waveCubes.clear();
 		}
 	}
+
+	_runningCubeControllers = _waveCubeControllers.front();
+	_waveCubeControllers.pop_front();
 }
 
 void Board::TickCubesRolling(float rollingTime)
@@ -767,8 +776,16 @@ void Board::OnEndRising()
 	_nowRisingCount--;
 	if (_nowRisingCount <= 0)
 	{
+		for (auto& col : _tileStates)
+		{
+			for (auto& tileState : col)
+			{
+				tileState = tileState & ~(int)TileStateFlag::RISING;
+			}
+		}
+
 		_nowRisingCount = 0;
-		_delayRemain = ROLLINGDELAY;
+		_delayRemain = RISINGDELAY;
 		UpdateBoard();
 	}
 }
@@ -972,6 +989,14 @@ void Board::Reset()
 
 	_minePos.first = -1;
 	_minePos.second = -1;
+
+	for (auto& wave : _waveCubeControllers)
+	{
+		for (auto& cuveCtr : wave)
+		{
+			BackToPool(cuveCtr->GetGameObject());
+		}
+	}
 
 	for(auto& cubeCtr : _runningCubeControllers)
 	{

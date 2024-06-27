@@ -23,6 +23,7 @@ enum class TileStateFlag
 	, NORMALCUBE = 0x0100
 	, DARKCUBE = 0x0200
 	, ADVANTAGECUBE = 0x0400
+	, RISING = 0x0800
 };
 
 #define BLOCKED_TILE ((int)TileStateFlag::NORMALCUBE | (int)TileStateFlag::DARKCUBE | (int)TileStateFlag::ADVANTAGECUBE)
