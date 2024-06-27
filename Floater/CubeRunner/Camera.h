@@ -39,6 +39,7 @@ private:
 
 	bool _isMoving;
 	bool _isPlayerLook;
+	bool _isReadyToPlayerLook;
 
 	flt::Quaternion _currRotation;
 	flt::Vector3f _currPosition;

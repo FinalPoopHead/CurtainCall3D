@@ -9,16 +9,16 @@ TestGameObejct::TestGameObejct()
 	: flt::GameObject()
 {
 	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>(true);
-	std::wstring filePath = L"..\\x64\\fbx\\Rob02.fbx";
+	std::wstring filePath = L"..\\Resources\\Models\\A_TP_CH_Sprint_F.fbx";
 	renderer->SetFilePath(filePath);
-	renderer->SetMaterial(0, L"..\\x64\\fbx\\Textures\\Rob02Yellow_AlbedoTransparency.png", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
+	renderer->SetMaterial(0, L"..\\Resources\\Textures\\T_TP_CH_Camo_001_006_D.png", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
 
 	flt::BoxColliderComponent* boxCollider = AddComponent<flt::BoxColliderComponent>(true);
 	boxCollider->UseKinematic(true);
 	boxCollider->SetSize({ 100.0f, 100.0f, 100.0f });
 
 	flt::SoundComponent* sound = AddComponent<flt::SoundComponent>(true);
-	sound->AddSound(L"..\\x64\\data\\ingame_bgm.wav");
+	sound->AddSound(L"..\\Resources\\sound\\door.mp3");
 }
 
 TestGameObejct::~TestGameObejct()

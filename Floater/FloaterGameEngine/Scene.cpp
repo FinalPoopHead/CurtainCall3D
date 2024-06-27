@@ -500,80 +500,7 @@ void flt::Scene::StartFrame()
 		component->OnEnable();
 	}
 
-	/*
-	// list일 경우 이전 버전 코드
-	for (auto& object : _gameObjectsToCreate)
-	{
-		_gameObjects.emplace_back(object);
-		if (object->_isEnable)
-		{
-			object->_isEnable = false;
-			_gameObjectsToEnable.emplace_back(object);
-			for (auto& component : object->_components)
-			{
-				if (component == nullptr)
-				{
-					continue;
-				}
-
-				if (!component->_isEnable)
-				{
-					continue;
-				}
-				// true일 경우 아래에서 이미 호출한줄 알고 비활성상태로 바꿔줌.
-				//component->_isEnable = false;
-				//_componentsToEnable.emplace_back(component);
-				component->OnCreate();
-			}
-		}
-
-		object->OnCreate();
-	}
-	_gameObjectsToCreate.clear();
-
-
-	for (auto& object : _gameObjectsToEnable)
-	{
-		if (object->_isEnable == true)
-		{
-			continue;
-		}
-
-		object->_isEnable = true;
-
-		for (auto& component : object->_components)
-		{
-			if (component == nullptr)
-			{
-				continue;
-			}
-
-			if (component->_isEnable)
-			{
-				component->OnEnable();
-			}
-		}
-		object->OnEnable();
-	}
-	_gameObjectsToEnable.clear();
-
-	for (auto& component : _componentsToEnable)
-	{
-		if (component->_isEnable == true)
-		{
-			continue;
-		}
-
-		component->_isEnable = true;
-		component->OnEnable();
-	}
-	_componentsToEnable.clear();
-	*/
-}
-
-
-void flt::Scene::EndFrame()
-{
+	// 비활성화 처리. 한 프레임 내에 enable, disable 이 여러번 불린다면 diable이 되어야 하며, update는 호출되지 않는다.
 	while (!_gameObjectsToDisable.empty())
 	{
 		GameObject* object = _gameObjectsToDisable.back();
@@ -665,95 +592,12 @@ void flt::Scene::EndFrame()
 		_gameObjects.erase(std::remove(_gameObjects.begin(), _gameObjects.end(), object), _gameObjects.end());
 		delete object;
 	}
-
-	/*
-	// list일 경우 이전 버전 코드
-	for (auto& object : _gameObjectsToDisable)
-	{
-		//이미 이 전 상태와 같다면 패스.
-		if (object->_isEnable == false)
-		{
-			continue;
-		}
-
-		object->_isEnable = false;
-
-		for (auto& component : object->_components)
-		{
-			if (component == nullptr)
-			{
-				continue;
-			}
-
-			if (component->_isEnable)
-			{
-				component->OnDisable();
-			}
-		}
-		object->OnDisable();
-	}
-	_gameObjectsToDisable.clear();
-
-	//추가로 삭제할 오브젝트들도 Disable 처리
-	for (auto& object : _gameObjectsToDestroy)
-	{
-		//이미 이 전 상태와 같다면 패스.
-		if (object->_isEnable == false)
-		{
-			continue;
-		}
-
-		object->_isEnable = false;
-
-		for (auto& component : object->_components)
-		{
-			if (component == nullptr)
-			{
-				continue;
-			}
-
-			if (component->_isEnable)
-			{
-				component->OnDisable();
-			}
-		}
-		object->OnDisable();
-	}
+}
 
 
-	for (auto& component : _componentsToDisable)
-	{
-		if (component->_isEnable == false)
-		{
-			continue;
-		}
+void flt::Scene::EndFrame()
+{
 
-		component->_isEnable = false;
-		component->OnDisable();
-	}
-
-	// Destroy 처리
-
-	for (auto& object : _gameObjectsToDestroy)
-	{
-		for (auto& component : object->_components)
-		{
-			if (component == nullptr)
-			{
-				continue;
-			}
-
-			// Disable인 컴포넌트들도 Destroy해야하는가..?
-			component->OnDestroy();
-			delete component;
-		}
-		object->OnDestroy();
-
-		_gameObjects.erase(std::remove(_gameObjects.begin(), _gameObjects.end(), object), _gameObjects.end());
-		delete object;
-	}
-	_gameObjectsToDestroy.clear();
-	*/
 }
 
 void flt::Scene::StartScene()
