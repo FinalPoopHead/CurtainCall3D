@@ -173,6 +173,20 @@ void Board::PreUpdate(float deltaSecond)
 	switch (_boardState)
 	{
 	case eBoardState::NONE:
+		if (!_isGameOver)
+		{
+			// TODO : 웨이브 클리어 연출 보여주고 다음 웨이브 출발
+			if (_runningCubeControllers.empty() && !_waveCubeControllers.empty())
+			{
+				_runningCubeControllers = _waveCubeControllers.front();
+				_waveCubeControllers.pop_front();
+			}
+			else if (_waveCubeControllers.empty())
+			{
+				// TODO : 레벨 끝! 다음 레벨로 넘어가야함
+			}
+		}
+
 		if (!_runningCubeControllers.empty())
 		{
 			TickCubesRolling(ROLLINGTIME);
@@ -182,6 +196,10 @@ void Board::PreUpdate(float deltaSecond)
 		AccumulateTime(deltaSecond * _fastForwardValue);
 		break;
 	case eBoardState::CUBEROLLING:
+		if (_runningCubeControllers.empty())
+		{
+			_boardState = eBoardState::WAITING;
+		}
 	case eBoardState::TILEDESTROYING:
 	case eBoardState::CUBERISING:
 	case eBoardState::ADDTILE:
@@ -537,16 +555,6 @@ void Board::OnEndWave()
 		// TODO : 상대방 공격하는게 되긴 하는데.. 좀 요상하다 ㅋㅋㅋㅋ
 		//			Board 코드도 조금바꿔서 행동에 우선순위를 정해주고 큐에 담아서 처리하는 식으로 해야될듯..
 		// _gameManager->AttackAnotherPlayer(_playerIndex);
-	}
-
-	if (!_isGameOver)
-	{
-		// TODO : 웨이브 클리어 연출 보여주고 다음 웨이브 출발
-		if (_runningCubeControllers.empty() && !_waveCubeControllers.empty())
-		{
-			_runningCubeControllers = _waveCubeControllers.front();
-			_waveCubeControllers.pop_front();
-		}
 	}
 }
 
