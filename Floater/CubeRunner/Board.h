@@ -93,7 +93,7 @@ private:
 	//void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
 	void ConvertToTileLocalPosition(int x, int z, float& outX, float& outZ);
 
-	void AccumulateTime(float deltaSecond);
+	void Wait(float deltaSecond);
 	void OnWaiting();
 	void OnEndWaiting();
 	void SetDelay(float second);

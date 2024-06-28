@@ -195,7 +195,7 @@ void Board::PreUpdate(float deltaSecond)
 		}
 		break;
 	case eBoardState::WAITING:
-		AccumulateTime(deltaSecond * _fastForwardValue);
+		Wait(deltaSecond * _fastForwardValue);
 		break;
 	case eBoardState::CUBEROLLING:
 		if (_runningCubeControllers.empty())
@@ -1005,7 +1005,7 @@ void Board::ConvertToTileLocalPosition(int x, int z, float& outX, float& outZ)
 	outZ *= -_tileSize;
 }
 
-void Board::AccumulateTime(float deltaSecond)
+void Board::Wait(float deltaSecond)
 {
 	_delayRemain -= deltaSecond;
 	OnWaiting();
