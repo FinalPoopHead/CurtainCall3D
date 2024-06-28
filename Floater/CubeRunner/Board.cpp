@@ -200,6 +200,8 @@ void Board::PreUpdate(float deltaSecond)
 		{
 			_boardState = eBoardState::WAITING;
 		}
+		return;
+		break;
 	case eBoardState::TILEDESTROYING:
 	case eBoardState::CUBERISING:
 	case eBoardState::ADDTILE:
