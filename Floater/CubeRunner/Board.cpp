@@ -8,20 +8,22 @@
 #include "CubeController.h"
 #include "GameManager.h"
 
-constexpr int TILECOUNT = 512;
-constexpr int CUBECOUNT = 512;
-constexpr float ROLLINGTIME = 1.0f;
-constexpr float ROLLINGDELAY = 0.5f;	// 아무것도 하지않고 굴러갈때의 딜레이
-constexpr float DETONATEDELAY = 2.0f;	// 폭파 후 딜레이
-constexpr float FALLTILEDELAY = 2.0f;	// 타일 삭제 딜레이
-constexpr float RISINGDELAY = 3.0f;
-constexpr float ADDTILEDELAY = 5.0f;	// 타일 추가 딜레이
-constexpr float TILEADDTIME = 2.0f;
-constexpr float CUBEREMOVETIME = 0.5f;
-constexpr float CUBERISINGTIME = 1.0f;
-constexpr float CUBERISINGDELAY = 0.15f;
-constexpr int CUBEDAMAGE = 1;
-constexpr int DARKCUBEDAMAGE = 1;
+constexpr int TILE_COUNT = 512;
+constexpr int CUBE_COUNT = 512;
+
+constexpr float GENERATE_TIME = 1.0f;
+constexpr float ROLLING_TIME = 1.0f;
+constexpr float REMOVE_TIME = 0.5f;
+constexpr float ADDTILE_TIME = 2.0f;
+
+constexpr float GENERATE_DELAY = 3.0f;
+constexpr float ROLLING_DELAY = 0.5f;	// 아무것도 하지않고 굴러갈때의 딜레이
+constexpr float DETONATE_DELAY = 2.0f;	// 폭파 후 딜레이
+constexpr float ADDTILE_DELAY = 5.0f;	// 타일 추가 딜레이
+constexpr float FALLTILE_DELAY = 2.0f;	// 타일 삭제 딜레이
+
+constexpr int CUBE_DAMAGE = 1;
+constexpr int DARKCUBE_DAMAGE = 1;
 constexpr float SLOWVALUE = 0.5f;
 constexpr float FFDEFAULT = 1.0f;
 constexpr float FFVALUE = 8.0f;
@@ -44,7 +46,7 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _normalCubePool()
 	, _isGameOver(false)
 	, _isAttacked(false)
-	, _delayRemain(ROLLINGDELAY)
+	, _delayRemain(ROLLING_DELAY)
 	, _fastForwardValue(FFDEFAULT)
 	, _nowRollingCount(0)
 	, _nowRisingCount(0)
@@ -68,7 +70,7 @@ Board::~Board()
 void Board::OnCreate()
 {
 	// Create TilePool
-	for (int i = 0; i < TILECOUNT; i++)
+	for (int i = 0; i < TILE_COUNT; i++)
 	{
 		Tile* tile = flt::CreateGameObject<Tile>(false, this);
 		tile->tr.SetParent(&this->tr);
@@ -85,7 +87,7 @@ void Board::OnCreate()
 	_nextDestroyRow = height - 1;
 
 	// Create CubePool
-	for (int i = 0; i < CUBECOUNT; i++)
+	for (int i = 0; i < CUBE_COUNT; i++)
 	{
 		NormalCube* normalCube = flt::CreateGameObject<NormalCube>(false);
 		normalCube->GetComponent<CubeController>()->SetBoard(this);
@@ -148,13 +150,13 @@ void Board::PreUpdate(float deltaSecond)
 				{
 				case eTileStateFlag::NORMALCUBE:
 					// NormalCube 수납
-					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemove(CUBEREMOVETIME);
+					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemove(REMOVE_TIME);
 					_tiles[i][j]->_cube = nullptr;
 					_tileStates[i][j] = (int)_tileStates[i][j] & ~CUBE;
 					break;
 				case eTileStateFlag::ADVANTAGECUBE:
 					// AdvantageCube 수납
-					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemove(CUBEREMOVETIME);
+					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemove(REMOVE_TIME);
 					_tiles[i][j]->_cube = nullptr;
 					_tileStates[i][j] = (int)_tileStates[i][j] & ~CUBE;
 					break;
@@ -189,7 +191,7 @@ void Board::PreUpdate(float deltaSecond)
 
 		if (!_runningCubeControllers.empty())
 		{
-			TickCubesRolling(ROLLINGTIME);
+			TickCubesRolling(ROLLING_TIME);
 		}
 		break;
 	case eBoardState::WAITING:
@@ -359,6 +361,7 @@ void Board::_TEST_GenerateRandomWave()
 	_isPerfect = true;
 
 	int _TEST_darkCount = 3;
+	float startDelay = 0.15f;
 
 	for (int i = 0; i < _width; ++i)
 	{
@@ -413,7 +416,7 @@ void Board::_TEST_GenerateRandomWave()
 
 			auto cubeCtr = cube->GetComponent<CubeController>();
 			_runningCubeControllers.push_back(cubeCtr);
-			cubeCtr->StartGenerate(CUBERISINGTIME, CUBERISINGDELAY * delayCount);
+			cubeCtr->StartGenerate(GENERATE_TIME, startDelay * delayCount);
 
 			cube->tr.SetPosition(x, 0.0f, z);
 			cube->Enable();
@@ -444,6 +447,7 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 	int waveHeight = height / waveCount;
 	int heightCount = 0;
 	std::list<CubeController*> waveCubes;
+	float startDelay = 0.15f;
 
 	for (int j = 0; j < height; ++j)
 	{
@@ -489,7 +493,7 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 
 			auto cubeCtr = cube->GetComponent<CubeController>();
 			waveCubes.push_back(cubeCtr);
-			cubeCtr->StartGenerate(CUBERISINGTIME, CUBERISINGDELAY * j);
+			cubeCtr->StartGenerate(GENERATE_TIME, startDelay * j);
 
 			cube->tr.SetPosition(x, 0.0f, z);
 			cube->Enable();
@@ -545,7 +549,7 @@ void Board::AddRow()
 		x += tr.GetWorldPosition().x;
 		z += tr.GetWorldPosition().z;
 
-		tile->StartAddRow(TILEADDTIME, { x,0.0f,z });
+		tile->StartAddRow(ADDTILE_TIME, { x,0.0f,z });
 	}
 }
 
@@ -566,7 +570,7 @@ Tile* Board::GetTileFromPool()
 
 	if (_tilePool.empty())
 	{
-		for (int i = 0; i < TILECOUNT; i++)
+		for (int i = 0; i < TILE_COUNT; i++)
 		{
 			Tile* newTile = flt::CreateGameObject<Tile>(false, this);
 			newTile->tr.SetParent(&this->tr);
@@ -737,13 +741,13 @@ void Board::OnEndCubeRoll()
 	_nowRollingCount--;
 	if (_nowRollingCount <= 0)
 	{
-		float delay = ROLLINGDELAY;
+		float delay = ROLLING_DELAY;
 		_nowRollingCount = 0;
 
 		UpdateBoard();
 		if (UpdateDetonate())
 		{
-			delay = DETONATEDELAY;
+			delay = DETONATE_DELAY;
 		}
 
 		SetDelay(delay);
@@ -766,7 +770,7 @@ void Board::OnEndCubeGenerate()
 		}
 
 		UpdateBoard();
-		SetDelay(RISINGDELAY);
+		SetDelay(GENERATE_DELAY);
 	}
 }
 
@@ -780,7 +784,7 @@ void Board::OnEndTileAdd(Tile* tile)
 	{
 		_nowAddTileCount = 0;
 		Resize(_width, _height + 1);
-		SetDelay(ADDTILEDELAY);
+		SetDelay(ADDTILE_DELAY);
 	}
 }
 
@@ -799,7 +803,7 @@ void Board::OnEndTileFall(int x, int z)
 	{
 		_fallingTileCount[z] = 0;
 		Resize(_width, z);
-		SetDelay(FALLTILEDELAY);
+		SetDelay(FALLTILE_DELAY);
 	}
 }
 
@@ -1029,11 +1033,11 @@ void Board::OnEndWaiting()
 
 	if (isCubeDetonated)		// 폭파 된 것이 있다면 delay 연장.
 	{
-		SetDelay(DETONATEDELAY);
+		SetDelay(DETONATE_DELAY);
 	}
 	else if (!_runningCubeControllers.empty())	// 폭파 된 것이 없다면 구르기 시작.
 	{
-		TickCubesRolling(ROLLINGTIME);
+		TickCubesRolling(ROLLING_TIME);
 	}
 }
 
@@ -1114,11 +1118,11 @@ bool Board::UpdateDetonate()
 				case eTileStateFlag::NORMALCUBE:
 					// NormalCube 수납
 					destroyCount++;
-					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemove(CUBEREMOVETIME);
+					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemove(REMOVE_TIME);
 					break;
 				case eTileStateFlag::DARKCUBE:
 					// DarkCube 수납 및 스테이지 한 줄 삭제
-					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemove(CUBEREMOVETIME);
+					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemove(REMOVE_TIME);
 					_isPerfect = false;
 					DestroyRow();
 					break;
@@ -1127,7 +1131,7 @@ bool Board::UpdateDetonate()
 					_tileStates[i][j] = _tileStates[i][j] | (int)eTileStateFlag::ADVANTAGEMINE;
 					_tiles[i][j]->EnableAdvantageMine();
 					destroyCount++;
-					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemove(CUBEREMOVETIME);
+					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemove(REMOVE_TIME);
 					break;
 				default:
 					break;
