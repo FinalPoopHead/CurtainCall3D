@@ -14,7 +14,7 @@ enum class eCUBESTATUS
 	ROLLING,
 	FALLING,
 	REMOVING,
-	RISING		// 등장 연출
+	GENERATING		// 등장 연출
 };
 
 class Board;
@@ -30,10 +30,10 @@ public:
 
 	virtual void PreUpdate(float deltaSecond) override;
 	virtual void OnDisable() override;
-	bool StartRolling(float rotateTime);
-	void StartFalling(bool withDamage = true);
-	void StartRemoving(float removeTime);
-	void StartRising(float riseTime, float delay);
+	bool StartRoll(float rotateTime);
+	void StartFall(bool withDamage = true);
+	void StartRemove(float removeTime);
+	void StartGenerate(float riseTime, float delay);
 	bool IsRolling() { return _status == eCUBESTATUS::ROLLING; }
 	flt::Vector4f GetPosition() { return _gameObject->tr.GetWorldPosition(); }
 	eCUBETYPE GetCubeType() { return _cubeType; }
@@ -46,7 +46,7 @@ private:
 	bool IsOutofBoard();			// 보드를 벗어나는지 체크
 	bool IsFallEnough();			// 충분히 떨어졌는지 체크
 	void Removing(float deltaSecond);
-	void Rising(float deltaSecond);
+	void Generating(float deltaSecond);
 
 private:
 	Board* _board;			// 게임의 바닥 보드.
@@ -55,8 +55,8 @@ private:
 	int _targetIndex;		// 회전 목표 각도 인덱스
 	float _rotateSpeed;		// 회전 속도 -> 주어진 회전시간의 역수
 	float _removeSpeed;		// 제거 속도 -> 주어진 제거시간의 역수
-	float _riseSpeed;		// 상승 속도 -> 주어진 상승시간의 역수
-	float _riseDelay;		// 상승 딜레이
+	float _generateSpeed;		// 상승 속도 -> 주어진 상승시간의 역수
+	float _generateDelay;		// 상승 딜레이
 	float _elapsedTime;
 	float _currentAngle;	// 현재 회전 각도
 	flt::Vector3f _rotatePivot;	// 회전 중심

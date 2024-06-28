@@ -12,7 +12,7 @@ class DarkCube;
 class NormalCube;
 class GameManager;
 
-enum class TileStateFlag
+enum class eTileStateFlag
 {
 	NONE = 0x0000
 	, TILE = 0x0001
@@ -26,8 +26,18 @@ enum class TileStateFlag
 	, RISING = 0x0800
 };
 
-#define BLOCKED_TILE ((int)TileStateFlag::NORMALCUBE | (int)TileStateFlag::DARKCUBE | (int)TileStateFlag::ADVANTAGECUBE)
-#define CUBE ((int)TileStateFlag::NORMALCUBE | (int)TileStateFlag::DARKCUBE | (int)TileStateFlag::ADVANTAGECUBE)
+enum class eBoardState
+{
+	NONE
+	, WAITING
+	, CUBEROLLING
+	, TILEDESTROYING
+	, CUBERISING
+	, ADDTILE
+};
+
+#define BLOCKED_TILE ((int)eTileStateFlag::NORMALCUBE | (int)eTileStateFlag::DARKCUBE | (int)eTileStateFlag::ADVANTAGECUBE)
+#define CUBE ((int)eTileStateFlag::NORMALCUBE | (int)eTileStateFlag::DARKCUBE | (int)eTileStateFlag::ADVANTAGECUBE)
 
 class Board : public flt::GameObject
 {
@@ -44,8 +54,8 @@ protected:
 public:
 	void Resize(int width, int height);
 	void Reset();
-	bool SetTileState(float x, float y, TileStateFlag state);
-	bool AddTileState(float x, float y, TileStateFlag state);
+	bool SetTileState(float x, float y, eTileStateFlag state);
+	bool AddTileState(float x, float y, eTileStateFlag state);
 	int QueryTileState(float x, float y);
 	int QueryNextTileState(float x, float y);
 	bool GetCenterPosition(float& x, float& y);
@@ -60,9 +70,9 @@ public:
 	void SetMine(float x, float z);			// position X,Z에 지뢰를 설치한다.
 	void DetonateMine();					// 지뢰를 폭파시킨다.
 	void DetonateAdvantageMine();			// 어드밴티지 지뢰를 폭파시킨다.
-	void OnEndRolling();					// 큐브 1개가 rolling 끝나면 호출할 함수.
-	void OnEndRising();						// 큐브 1개가 rising 끝나면 호출할 함수.
-	void OnEndRowAdd(Tile* tile);
+	void OnEndCubeRoll();					// 큐브 1개가 rolling 끝나면 호출할 함수.
+	void OnEndCubeGenerate();						// 큐브 1개가 rising 끝나면 호출할 함수.
+	void OnEndTileAdd(Tile* tile);
 	void OnStartTileFall(int x, int z);		// x,z index의 타일이 떨어지기 시작함.
 	void OnEndTileFall(int x, int z);
 
@@ -83,6 +93,12 @@ private:
 	//void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
 	void ConvertToTileLocalPosition(int x, int z, float& outX, float& outZ);
 
+	void AccumulateTime(float deltaSecond);
+	void OnWaiting();
+	void OnEndWaiting();
+	void SetDelay(float second);
+	void AddDelay(float second);
+	
 	void UpdateBoard();
 	bool UpdateDetonate();		// 수납된 큐브가 있으면 true 아니면 false
 	void TickCubesRolling(float rollingTime);			// 일괄적으로 굴리기 시작.
@@ -98,6 +114,7 @@ private:
 	int _width;
 	int _height;
 	float _tileSize;
+	eBoardState _boardState;
 
 	std::list<Tile*> _tilePool;
 
@@ -111,8 +128,6 @@ private:
 	std::list<NormalCube*> _normalCubePool;										// 노말 큐브 풀
 
 	bool _isGameOver = false;
-	bool _isGameStart = false;
-	bool _isWaveRunning = false;
 	bool _isAttacked;
 	float _delayRemain;
 	float _fastForwardValue;

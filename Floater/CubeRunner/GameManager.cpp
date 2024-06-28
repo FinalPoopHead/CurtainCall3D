@@ -83,6 +83,12 @@ GameManager::~GameManager()
 
 void GameManager::Update(float deltaSecond)
 {
+	for (auto& comboText : _liveComboTexts)
+	{
+		auto originOffset = comboText->GetOffsetPosition();
+		comboText->SetOffsetPosition({ originOffset.x, originOffset.y - COMBOTEXTSPEED * deltaSecond });
+	}
+
 	flt::KeyData keyData = flt::GetKeyDown(flt::KeyCode::key1);
 	if (keyData)
 	{
@@ -145,22 +151,16 @@ void GameManager::Update(float deltaSecond)
 			return;
 		}
 
-		StageData data = _stageData[_currentStage - 1];
+		StageData currentStage = _stageData[_currentStage - 1];
 
 		for (int i = 0; i < MAXPLAYERCOUNT; i++)
 		{
 			if (_boards[i] != nullptr)
 			{
 				_boards[i]->Reset();
-				_boards[i]->GenerateLevel(data.level[0].levelLayout, data.waveCount);
+				_boards[i]->GenerateLevel(currentStage.level[0].levelLayout, currentStage.waveCount);
 			}
 		}
-	}
-
-	for (auto& comboText : _liveComboTexts)
-	{
-		auto originOffset = comboText->GetOffsetPosition();
-		comboText->SetOffsetPosition({ originOffset.x, originOffset.y - COMBOTEXTSPEED * deltaSecond });
 	}
 }
 

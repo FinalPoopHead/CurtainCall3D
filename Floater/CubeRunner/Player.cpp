@@ -52,13 +52,13 @@ void Player::Update(float deltaSecond)
 
 	// 현재 움직일 수 없는 상태면 crushed 된 상태다.
 	_isCrushed = false;
-	if ((tileState == (int)TileStateFlag::NONE)
+	if ((tileState == (int)eTileStateFlag::NONE)
 		|| (tileState & blocked) && (nextTileState & blocked))
 	{
 		_isCrushed = true;
 	}
 
-	if (tileState & (int)TileStateFlag::RISING)
+	if (tileState & (int)eTileStateFlag::RISING)
 	{
 		nextPosOffset = { 0.0f, 0.0f, -20.0f * deltaSecond, 0.0f };
 		auto nextPos = pos + nextPosOffset;
@@ -152,7 +152,7 @@ void Player::Update(float deltaSecond)
 	// 좌 우 이동
 	// 현재 상태에 이동 가능하거나 
 	// 다음 상태에 이동 가능하면 이동 가능
-	if ((tileState == (int)TileStateFlag::NONE)
+	if ((tileState == (int)eTileStateFlag::NONE)
 		|| ((tileState & blocked) && (nextTileState & blocked)))
 	{
 		// 이동 불가능할 경우에는 x값을 원래 값으로 되돌린다.
@@ -166,7 +166,7 @@ void Player::Update(float deltaSecond)
 	// 상 하 이동
 	// 현재 상태에 이동이 가능하거나 
 	// 아래에 내려가는 경우에 한해서 다음 상태에 이동 가능하면 가능
-	if ((tileState == (int)TileStateFlag::NONE)
+	if ((tileState == (int)eTileStateFlag::NONE)
 		|| ((tileState & blocked) && (nextTileState & blocked))
 		|| ((tileState & blocked) && !(nextTileState & blocked) && nextPosOffset.z > 0))
 	{
