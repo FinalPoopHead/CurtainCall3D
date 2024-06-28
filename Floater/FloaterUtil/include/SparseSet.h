@@ -250,7 +250,7 @@ namespace flt
 
 		void Reserve(uint32 size) noexcept;
 
-		iterator Insert(T&& value) noexcept;
+		//iterator Insert(T&& value) noexcept;
 
 		std::vector<iterator> Find(const T& value) noexcept;
 
@@ -345,23 +345,23 @@ namespace flt
 		_capacity = capacity;
 	}
 
-	template<typename T>
-	flt::SparseSet<T>::iterator flt::SparseSet<T>::Insert(T&& value) noexcept
-	{
-		++_version;
-		if (_free.empty())
-		{
-			Reserve(_capacity * 2);
-		}
+	//template<typename T>
+	//flt::SparseSet<T>::iterator flt::SparseSet<T>::Insert(T&& value) noexcept
+	//{
+	//	++_version;
+	//	if (_free.empty())
+	//	{
+	//		Reserve(_capacity * 2);
+	//	}
 
-		size_t sparseIndex = _free.back();
-		_free.pop_back();
+	//	size_t sparseIndex = _free.back();
+	//	_free.pop_back();
 
-		_sparse[sparseIndex] = (int)_dense.size();
-		_dense.emplace_back(std::forward<T>(value), sparseIndex);
+	//	_sparse[sparseIndex] = (int)_dense.size();
+	//	_dense.emplace_back(std::forward<T>(value), sparseIndex);
 
-		return iterator(this, _dense.size() - 1, _version);
-	}
+	//	return iterator(this, _dense.size() - 1, _version);
+	//}
 
 	template<typename T>
 	std::vector<typename flt::SparseSet<T>::iterator> flt::SparseSet<T>::Find(const T& value) noexcept
@@ -406,9 +406,13 @@ namespace flt
 		++_version;
 		uint32 denseIndex = _sparse[sparseIndex];
 		_sparse[sparseIndex] = -1;
-		_dense[denseIndex] = _dense.back();
+
+		if (denseIndex < _dense.size() - 1)
+		{
+			_dense[denseIndex] = _dense.back();
+			_sparse[_dense[denseIndex].sparseIndex] = denseIndex;
+		}
 		_dense.pop_back();
-		_sparse[_dense[denseIndex].sparseIndex] = denseIndex;
 		_free.push_back(sparseIndex);
 	}
 
@@ -442,10 +446,11 @@ namespace flt
 		int sparseIndex = _free.back();
 		_free.pop_back();
 
-		_sparse[sparseIndex] = (int)_dense.size();
+		int denseIndex = (int)_dense.size();
+		_sparse[sparseIndex] = denseIndex;
 		_dense.emplace_back(std::forward<T>(value), sparseIndex);
 
-		return iterator(this, _dense.size() - 1, _version);
+		return iterator(this, denseIndex, _version);
 	}
 
 	template<typename T>
@@ -461,10 +466,11 @@ namespace flt
 		int sparseIndex = _free.back();
 		_free.pop_back();
 
-		_sparse[sparseIndex] = (int)_dense.size();
+		int denseIndex = (int)_dense.size();
+		_sparse[sparseIndex] = denseIndex;
 		_dense.emplace_back(sparseIndex, std::forward<Args>(args)...);
 
-		return iterator(this, _dense.size() - 1, _version);
+		return iterator(this, denseIndex, _version);
 	}
 
 	template<typename T>
