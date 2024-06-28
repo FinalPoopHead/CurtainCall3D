@@ -19,14 +19,15 @@ constexpr float ADDTILE_TIME = 2.0f;
 constexpr float GENERATE_DELAY = 3.0f;
 constexpr float ROLLING_DELAY = 0.5f;	// 아무것도 하지않고 굴러갈때의 딜레이
 constexpr float DETONATE_DELAY = 2.0f;	// 폭파 후 딜레이
-constexpr float ADDTILE_DELAY = 5.0f;	// 타일 추가 딜레이
+constexpr float ADDTILE_DELAY = 4.0f;	// 타일 추가 딜레이
+constexpr float WAVECLEAR_DELAY = 4.0f;
 constexpr float FALLTILE_DELAY = 2.0f;	// 타일 삭제 딜레이
 
 constexpr int CUBE_DAMAGE = 1;
 constexpr int DARKCUBE_DAMAGE = 1;
 constexpr float SLOWVALUE = 0.5f;
 constexpr float FFDEFAULT = 1.0f;
-constexpr float FFVALUE = 8.0f;
+constexpr float FFVALUE = 12.0f;
 
 Board::Board(GameManager* gameManager, int playerIndex, int width, int height, float offset /*= 4.00f*/) :
 	flt::GameObject()
@@ -44,7 +45,7 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _advantageCubePool()
 	, _darkCubePool()
 	, _normalCubePool()
-	, _isGameOver(false)
+	, _isGameOver(true)
 	, _isAttacked(false)
 	, _delayRemain(ROLLING_DELAY)
 	, _fastForwardValue(FFDEFAULT)
@@ -59,16 +60,6 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _fallingTileCount()
 	, _addTiles()
 {
-
-}
-
-Board::~Board()
-{
-
-}
-
-void Board::OnCreate()
-{
 	// Create TilePool
 	for (int i = 0; i < TILE_COUNT; i++)
 	{
@@ -77,14 +68,14 @@ void Board::OnCreate()
 		_tilePool.push_back(tile);
 	}
 
-	int width = _width;
-	int height = _height;
+	int newWidth = _width;
+	int newHeight = _height;
 
 	_width = 0;
 	_height = 0;
 
-	Resize(width, height);
-	_nextDestroyRow = height - 1;
+	Resize(newWidth, newHeight);
+	_nextDestroyRow = newHeight - 1;
 
 	// Create CubePool
 	for (int i = 0; i < CUBE_COUNT; i++)
@@ -101,6 +92,16 @@ void Board::OnCreate()
 		darkCube->GetComponent<CubeController>()->SetBoard(this);
 		_darkCubePool.push_back(darkCube);
 	}
+}
+
+Board::~Board()
+{
+
+}
+
+void Board::OnCreate()
+{
+
 }
 
 void Board::OnDestroy()
@@ -186,6 +187,7 @@ void Board::PreUpdate(float deltaSecond)
 			else if (_waveCubeControllers.empty())
 			{
 				// TODO : 레벨 끝! 다음 레벨로 넘어가야함
+				_gameManager->OnEndLevel(_playerIndex);
 			}
 		}
 
@@ -433,10 +435,7 @@ void Board::_TEST_GenerateRandomWave()
 
 void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount)
 {
-	if (_isGameOver)
-	{
-		return;
-	}
+	_isGameOver = false;
 
 	int width = levelLayout.size();
 	int height = levelLayout[0].size();
@@ -561,6 +560,10 @@ void Board::OnEndWave()
 		// TODO : 상대방 공격하는게 되긴 하는데.. 좀 요상하다 ㅋㅋㅋㅋ
 		//			Board 코드도 조금바꿔서 행동에 우선순위를 정해주고 큐에 담아서 처리하는 식으로 해야될듯..
 		// _gameManager->AttackAnotherPlayer(_playerIndex);
+	}
+	else
+	{
+		SetDelay(WAVECLEAR_DELAY);
 	}
 }
 

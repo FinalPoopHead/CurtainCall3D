@@ -127,7 +127,7 @@ private:
 	std::list<DarkCube*> _darkCubePool;											// 다크 큐브 풀
 	std::list<NormalCube*> _normalCubePool;										// 노말 큐브 풀
 
-	bool _isGameOver = false;
+	bool _isGameOver;
 	bool _isAttacked;
 	float _delayRemain;
 	float _fastForwardValue;

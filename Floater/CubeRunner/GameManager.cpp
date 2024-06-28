@@ -48,8 +48,7 @@ GameManager::GameManager() :
 	, _comboTextPos(std::vector<flt::Vector2f>(MAXPLAYERCOUNT))
 	, _stageData(std::vector<StageData>(MAXSTAGECOUNT))
 	, _currentStage()
-	, _currentLevel()
-	, _currentWave()
+	, _currentLevel(std::vector<int>(MAXPLAYERCOUNT))
 {
 	for (int i = 0; i < MAXPLAYERCOUNT; i++)
 	{
@@ -143,25 +142,20 @@ void GameManager::Update(float deltaSecond)
 		SetStage(9);
 	}
 
-	keyData = flt::GetKeyDown(flt::KeyCode::g);
-	if (keyData)
-	{
-		if(_currentStage < 1 || _currentStage > MAXSTAGECOUNT)
-		{
-			return;
-		}
-
-		StageData currentStage = _stageData[_currentStage - 1];
-
-		for (int i = 0; i < MAXPLAYERCOUNT; i++)
-		{
-			if (_boards[i] != nullptr)
-			{
-				_boards[i]->Reset();
-				_boards[i]->GenerateLevel(currentStage.level[0].levelLayout, currentStage.waveCount);
-			}
-		}
-	}
+// 	keyData = flt::GetKeyDown(flt::KeyCode::g);
+// 	if (keyData)
+// 	{
+// 		StageData currentStage = _stageData[_currentStage - 1];
+// 
+// 		for (int i = 0; i < MAXPLAYERCOUNT; i++)
+// 		{
+// 			if (_boards[i] != nullptr)
+// 			{
+// 				_boards[i]->Reset();
+// 				_boards[i]->GenerateLevel(currentStage.level[0].levelLayout, currentStage.waveCount);
+// 			}
+// 		}
+// 	}
 }
 
 void GameManager::PostUpdate(float deltaSecond)
@@ -343,8 +337,10 @@ void GameManager::AttackAnotherPlayer(int playerIndex)
 void GameManager::SetStage(int stageNum)
 {
 	_currentStage = stageNum;
-	_currentLevel = 1;
-	_currentWave = 1;
+	for (int i = 0; i < MAXPLAYERCOUNT; i++)
+	{
+		_currentLevel[i] = 1;
+	}
 
 	StageData data = _stageData[_currentStage - 1];
 
@@ -354,13 +350,33 @@ void GameManager::SetStage(int stageNum)
 		{
 			_boards[i]->Resize(data.stageWidth, data.stageHeight);
 			_boards[i]->Reset();
-			//_boards[i]->GenerateLevel(data.level[0].levelLayout, data.waveCount);
+			_boards[i]->GenerateLevel(data.level[0].levelLayout, data.waveCount);
 		}
 
 		if(_players[i] != nullptr)
 		{
 			_players[i]->SetPositiontoCenter();
 		}
+	}
+}
+
+void GameManager::OnEndLevel(int playerIndex)
+{
+	++_currentLevel[playerIndex];
+	if(_currentLevel[playerIndex] > _stageData[_currentStage - 1].levelCount)
+	{
+		// TODO : 스테이지 클리어
+		//_currentLevel[playerIndex] = 1;
+		return;
+	}
+
+	int levelIndex = _currentLevel[playerIndex] - 1;
+	auto currentStage = _stageData[_currentStage - 1];
+
+	if (_boards[playerIndex] != nullptr)
+	{
+		_boards[playerIndex]->Reset();
+		_boards[playerIndex]->GenerateLevel(currentStage.level[levelIndex].levelLayout, currentStage.waveCount);
 	}
 }
 
