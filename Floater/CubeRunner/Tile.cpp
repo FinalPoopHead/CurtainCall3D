@@ -30,6 +30,8 @@ Tile::Tile(Board* board)
 {
 	std::wstring filePath = L"..\\Resources\\Models\\BrickBlock.fbx";
 
+	// tr.SetScale(0.5f, 0.5f, 0.5f); // FOR DEBUG
+
 	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>(true);
 	renderer->SetFilePath(filePath);
 	renderer->SetMaterial(0, L"../Resources/Textures/Concrete 1-diffuse.png", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
@@ -81,7 +83,7 @@ void Tile::PreUpdate(float deltaSecond)
 		if (_elapsedTime >= _movingTime)
 		{
 			_isMoving = false;
-			_board->OnEndRowAdd(this);
+			_board->OnEndTileAdd(this);
 		}
 	}
 
@@ -159,7 +161,7 @@ void Tile::Fall(float deltaSecond)
 			if(_cube != nullptr)
 			{
 				auto cubeCtr = _cube->GetComponent<CubeController>();
-				cubeCtr->StartFalling();
+				cubeCtr->StartFall();
 			}
 		}
 		return;

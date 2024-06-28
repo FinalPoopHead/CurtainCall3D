@@ -46,6 +46,27 @@ void Player::Update(float deltaSecond)
 	flt::Vector4f pos = tr.GetWorldPosition();
 	flt::Vector4f nextPosOffset{};
 
+	int tileState = _board->QueryTileState(pos.x, pos.z);
+	int nextTileState = _board->QueryNextTileState(pos.x, pos.z);
+	int blocked = BLOCKED_TILE;
+
+	// 현재 움직일 수 없는 상태면 crushed 된 상태다.
+	_isCrushed = false;
+	if ((tileState == (int)eTileStateFlag::NONE)
+		|| (tileState & blocked) && (nextTileState & blocked))
+	{
+		_isCrushed = true;
+	}
+
+	if (tileState & (int)eTileStateFlag::RISING)
+	{
+		nextPosOffset = { 0.0f, 0.0f, -20.0f * deltaSecond, 0.0f };
+		auto nextPos = pos + nextPosOffset;
+		tr.SetWorldPosition(nextPos);
+		nextPosOffset = { 0.0f,0.0f,0.0f,0.0f };
+		return;
+	}
+
 	flt::KeyData keyData = flt::GetKey(flt::KeyCode::w);
 	if (keyData)
 	{
@@ -124,14 +145,14 @@ void Player::Update(float deltaSecond)
 
 	tr.LookAt(nextPos);
 
-	int tileState = _board->QueryTileState(nextPos.x, pos.z);
-	int nextTileState = _board->QueryNextTileState(nextPos.x, pos.z);
-	int blocked = BLOCKED_TILE;
+	tileState = _board->QueryTileState(nextPos.x, pos.z);
+	nextTileState = _board->QueryNextTileState(nextPos.x, pos.z);
+	blocked = BLOCKED_TILE;
 
 	// 좌 우 이동
 	// 현재 상태에 이동 가능하거나 
 	// 다음 상태에 이동 가능하면 이동 가능
-	if ((tileState == (int)TileStateFlag::NONE)
+	if ((tileState == (int)eTileStateFlag::NONE)
 		|| ((tileState & blocked) && (nextTileState & blocked)))
 	{
 		// 이동 불가능할 경우에는 x값을 원래 값으로 되돌린다.
@@ -145,7 +166,7 @@ void Player::Update(float deltaSecond)
 	// 상 하 이동
 	// 현재 상태에 이동이 가능하거나 
 	// 아래에 내려가는 경우에 한해서 다음 상태에 이동 가능하면 가능
-	if ((tileState == (int)TileStateFlag::NONE)
+	if ((tileState == (int)eTileStateFlag::NONE)
 		|| ((tileState & blocked) && (nextTileState & blocked))
 		|| ((tileState & blocked) && !(nextTileState & blocked) && nextPosOffset.z > 0))
 	{
@@ -164,16 +185,6 @@ void Player::Update(float deltaSecond)
 	}
 	nextPos = nextPosOffset + pos;
 	tr.SetWorldPosition(nextPos);
-
-	// 현재 움직일 수 없는 상태면 crushed 된 상태다.
-	_isCrushed = false;
-	tileState = _board->QueryTileState(pos.x, pos.z);
-	nextTileState = _board->QueryNextTileState(pos.x, pos.z);
-	if ((tileState == (int)TileStateFlag::NONE)
-		|| (tileState & blocked) && (nextTileState & blocked))
-	{
-		_isCrushed = true;
-	}
 
 	// 디버그용 코드
 	keyData = flt::GetKey(flt::KeyCode::mouseLButton);

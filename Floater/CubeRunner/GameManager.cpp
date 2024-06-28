@@ -83,6 +83,12 @@ GameManager::~GameManager()
 
 void GameManager::Update(float deltaSecond)
 {
+	for (auto& comboText : _liveComboTexts)
+	{
+		auto originOffset = comboText->GetOffsetPosition();
+		comboText->SetOffsetPosition({ originOffset.x, originOffset.y - COMBOTEXTSPEED * deltaSecond });
+	}
+
 	flt::KeyData keyData = flt::GetKeyDown(flt::KeyCode::key1);
 	if (keyData)
 	{
@@ -137,10 +143,24 @@ void GameManager::Update(float deltaSecond)
 		SetStage(9);
 	}
 
-	for (auto& comboText : _liveComboTexts)
+	keyData = flt::GetKeyDown(flt::KeyCode::g);
+	if (keyData)
 	{
-		auto originOffset = comboText->GetOffsetPosition();
-		comboText->SetOffsetPosition({ originOffset.x, originOffset.y - COMBOTEXTSPEED * deltaSecond });
+		if(_currentStage < 1 || _currentStage > MAXSTAGECOUNT)
+		{
+			return;
+		}
+
+		StageData currentStage = _stageData[_currentStage - 1];
+
+		for (int i = 0; i < MAXPLAYERCOUNT; i++)
+		{
+			if (_boards[i] != nullptr)
+			{
+				_boards[i]->Reset();
+				_boards[i]->GenerateLevel(currentStage.level[0].levelLayout, currentStage.waveCount);
+			}
+		}
 	}
 }
 
@@ -334,7 +354,7 @@ void GameManager::SetStage(int stageNum)
 		{
 			_boards[i]->Resize(data.stageWidth, data.stageHeight);
 			_boards[i]->Reset();
-			_boards[i]->GenerateLevel(data.level[0].levelLayout, data.waveCount);
+			//_boards[i]->GenerateLevel(data.level[0].levelLayout, data.waveCount);
 		}
 
 		if(_players[i] != nullptr)

@@ -18,8 +18,8 @@ CubeController::CubeController()
 	, _targetIndex(0)
 	, _rotateSpeed(0.0f)
 	, _removeSpeed(0.0f)
-	, _riseSpeed(0.0f)
-	, _riseDelay(0.0f)
+	, _generateSpeed(0.0f)
+	, _generateDelay(0.0f)
 	, _elapsedTime(0.0f)
 	, _currentAngle(0.0f)
 	, _rotatePivot(0.0f, 0.0f, 0.0f)
@@ -47,8 +47,8 @@ void CubeController::PreUpdate(float deltaSecond)
 	case eCUBESTATUS::REMOVING:
 		Removing(deltaSecond * _board->GetFFValue());
 		break;
-	case eCUBESTATUS::RISING:
-		Rising(deltaSecond * _board->GetFFValue());
+	case eCUBESTATUS::GENERATING:
+		Generating(deltaSecond * _board->GetFFValue());
 		break;
 	}
 }
@@ -59,7 +59,7 @@ void CubeController::OnDisable()
 	_board->RemoveFromControllerList(this);
 }
 
-bool CubeController::StartRolling(float rotateTime)
+bool CubeController::StartRoll(float rotateTime)
 {
 	if (_status != eCUBESTATUS::NONE)
 	{
@@ -78,7 +78,7 @@ bool CubeController::StartRolling(float rotateTime)
 	return true;
 }
 
-void CubeController::StartFalling(bool withDamage /*= true*/)
+void CubeController::StartFall(bool withDamage /*= true*/)
 {
 	if (_status != eCUBESTATUS::NONE)
 	{
@@ -97,16 +97,16 @@ void CubeController::StartFalling(bool withDamage /*= true*/)
 	}
 }
 
-void CubeController::StartRemoving(float removeTime)
+void CubeController::StartRemove(float removeTime)
 {
 	// 치트키 사용시 바로 제거시키기 위해 rolling과 rising 카운트 제거해주는 것
 	switch (_status)
 	{
 	case eCUBESTATUS::ROLLING:
-		_board->OnEndRolling();
+		_board->OnEndCubeRoll();
 		break;
-	case eCUBESTATUS::RISING:
-		_board->OnEndRising();
+	case eCUBESTATUS::GENERATING:
+		_board->OnEndCubeGenerate();
 		break;
 	default:
 		break;
@@ -119,16 +119,16 @@ void CubeController::StartRemoving(float removeTime)
 	// _board->RemoveFromControllerList(this);
 }
 
-void CubeController::StartRising(float riseTime, float delay)
+void CubeController::StartGenerate(float riseTime, float delay)
 {
-	_riseSpeed = 1.0f / riseTime;
-	_riseDelay = delay;
+	_generateSpeed = 1.0f / riseTime;
+	_generateDelay = delay;
 	_elapsedTime = 0.0f;
 
 	_gameObject->tr.SetScale(OVERLAPSCALE, OVERLAPSCALE, OVERLAPSCALE);
 	_gameObject->tr.SetWorldRotation({ 0.0f,0.0f,0.0f,1.0f });
 
-	_status = eCUBESTATUS::RISING;
+	_status = eCUBESTATUS::GENERATING;
 }
 
 void CubeController::Roll(float deltaSecond)
@@ -167,11 +167,11 @@ void CubeController::FinishRolling()
 	_status = eCUBESTATUS::NONE;
 	_targetIndex++;
 	_targetIndex %= 4;
-	_board->OnEndRolling();
+	_board->OnEndCubeRoll();
 
 	if (IsOutofBoard())
 	{
-		StartFalling();
+		StartFall();
 	}
 }
 
@@ -193,7 +193,7 @@ bool CubeController::IsOutofBoard()
 	auto pos = _gameObject->tr.GetWorldPosition();
 	auto state = _board->QueryTileState(pos.x, pos.z);
 
-	if (state == (int)TileStateFlag::NONE)
+	if (state == (int)eTileStateFlag::NONE)
 	{
 		return true;
 	}
@@ -229,21 +229,22 @@ void CubeController::Removing(float deltaSecond)
 	}
 }
 
-void CubeController::Rising(float deltaSecond)
+void CubeController::Generating(float deltaSecond)
 {
-	if (_elapsedTime <= _riseDelay)
+	if (_elapsedTime <= _generateDelay)
 	{
 		_elapsedTime += deltaSecond;
 	}
 	else
 	{
-		_gameObject->tr.AddWorldPosition(0.0f, _riseSpeed * DISTANCE * deltaSecond, 0.0f);
+		_gameObject->tr.AddWorldPosition(0.0f, _generateSpeed * DISTANCE * deltaSecond, 0.0f);
 		flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
+		_board->AddTileState(pos.x, pos.z, eTileStateFlag::RISING);
 
 		if (pos.y >= DISTANCE)	// 타일 높이보다 같거나 커지면 등장완료
 		{
 			_status = eCUBESTATUS::NONE;
-			_board->OnEndRising();
+			_board->OnEndCubeGenerate();
 			_gameObject->tr.SetScale(1.0, 1.0, 1.0);
 			_gameObject->tr.SetWorldPosition(pos.x, DISTANCE, pos.z);
 		}
