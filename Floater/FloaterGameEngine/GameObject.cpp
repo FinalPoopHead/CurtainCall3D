@@ -1,11 +1,13 @@
 ﻿#include "./include/internal/GameObject.h"
 #include "./include/internal/Scene.h"
 
-flt::GameObject::GameObject() :
-	_scene(),
-	name(),
-	_components(),
-	_isEnable(true)
+flt::GameObject::GameObject()
+	: _scene()
+	, name()
+	, _components()
+	, _isEnable(true)
+	, _index(-1)
+	, _updateIndex(-1)
 {
 
 }

@@ -14,7 +14,7 @@
 #include "../FloaterUtil/include/OwningPtr.h"
 #include "../FloaterUtil/include/NonOwningPtr.h"
 #include "../FloaterUtil/FLTween.h"
-
+#include "../FloaterUtil/include/SparseSet.h"
 
 //void Func(flt::info info);
 
@@ -23,18 +23,53 @@ int main(int argc, char* argv[])
 	setlocale(LC_ALL, ".UTF8");
 	std::cout << std::boolalpha;
 
-	flt::Info(L"Hello {}!", L"World");
+	//flt::Info(L"Hello {}!", L"World");
 
-	{
-		flt::OwningPtr<int> pInt = new int(10);
-		flt::NonOwningPtr<int> pInt2{ pInt };
-		flt::OwningPtr<int> pInt3 = std::move(pInt);
+	//{
+	//	flt::OwningPtr<int> pInt = new int(10);
+	//	flt::NonOwningPtr<int> pInt2{ pInt };
+	//	flt::OwningPtr<int> pInt3 = std::move(pInt);
 
-		std::cout << *pInt3 << std::endl;
+	//	std::cout << *pInt3 << std::endl;
 
-		const flt::OwningPtr<int> cpInt = new int(10);
-		const flt::NonOwningPtr<int> cpInt2{ cpInt };
-	}
+	//	const flt::OwningPtr<int> cpInt = new int(10);
+	//	const flt::NonOwningPtr<int> cpInt2{ cpInt };
+	//}
+
+	//{
+	//	flt::SparseSet<float> sparseSet;
+	//	sparseSet.Insert(1.0f);
+	//	sparseSet.Insert(2.0f);
+	//	sparseSet.Insert(3.0f);
+	//	sparseSet.Insert(4.0f);
+	//	sparseSet.Insert(5.0f);
+	//	sparseSet.Insert(6.0f);
+	//	sparseSet.Insert(7.0f);
+
+	//	for (auto& value : sparseSet)
+	//	{
+	//		std::cout << value << " ";
+	//	}
+	//	std::cout << std::endl;
+
+	//	sparseSet.Reserve(5);
+
+	//	for (auto& value : sparseSet)
+	//	{
+	//		std::cout << value << " ";
+	//	}
+	//	std::cout << std::endl;
+
+	//	sparseSet.Remove(3);
+
+	//	for (auto& value : sparseSet)
+	//	{
+	//		std::cout << value << " ";
+	//	}
+	//	std::cout << std::endl;
+
+	//	auto iters = sparseSet.Find(5.0f);
+	//}
 
 	auto tween = flt::tween::from(0).to(100).during(100.0f);
 

@@ -3,6 +3,7 @@
 #include "Component.h"
 #include "../../CollisionPair.h"
 #include "../../../FloaterUtil/include/Timer.h"
+#include "../../../FloaterUtil/include/SparseSet.h"
 #include <unordered_set>
 #include <list>
 #include <vector>
@@ -43,7 +44,7 @@ namespace flt
 		void EndScene();
 
 
-		std::vector<GameObject*> GetGameObjects() const { return _gameObjects; }
+		//std::vector<GameObject*> GetGameObjects() const { return _gameObjects; }
 		std::vector<GameObject*> GetGameObjects(const std::wstring& name) const;
 
 	private:
@@ -58,7 +59,10 @@ namespace flt
 		void CallCollisionEvent();
 
 	private:
-		std::vector<GameObject*> _gameObjects;
+		SparseSet<GameObject*> _gameObjects;
+		SparseSet<GameObject*> _activeGameObjects;
+		SparseSet<GameObject*> _stagingActiveGameObjects;
+		//std::vector<GameObject*> _gameObjects;
 		std::vector<GameObject*> _gameObjectsToCreate;
 		std::vector<GameObject*> _gameObjectsToEnable;
 		std::vector<GameObject*> _gameObjectsToDisable;

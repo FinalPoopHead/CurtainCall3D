@@ -2,6 +2,7 @@
 
 namespace flt
 {
+	template<typename T>
 	class Vector
 	{
 #pragma region Nasted

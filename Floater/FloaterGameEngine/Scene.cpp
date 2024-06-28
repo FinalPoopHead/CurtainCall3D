@@ -439,7 +439,7 @@ void flt::Scene::StartFrame()
 		GameObject* object = _gameObjectsToCreate.back();
 		_gameObjectsToCreate.pop_back();
 
-		_gameObjects.emplace_back(object);
+		_gameObjects.EmplaceBack(object);
 
 		for (auto& component : object->_components)
 		{
@@ -589,7 +589,9 @@ void flt::Scene::StartFrame()
 		}
 		object->OnDestroy();
 
-		_gameObjects.erase(std::remove(_gameObjects.begin(), _gameObjects.end(), object), _gameObjects.end());
+		int index = object->_index;
+		_gameObjects.Erase(index);
+		//_gameObjects.erase(std::remove(_gameObjects.begin(), _gameObjects.end(), object), _gameObjects.end());
 		delete object;
 	}
 }
@@ -645,9 +647,9 @@ void flt::Scene::EndScene()
 		object->OnDestroy();
 	}
 
-	while (!_gameObjects.empty())
+	while (!_gameObjects.Empty())
 	{
-		GameObject* object = _gameObjects.back();
+		GameObject* object = _gameObjects.Back();
 
 		for (auto& component : object->_components)
 		{
@@ -661,7 +663,7 @@ void flt::Scene::EndScene()
 		delete object;
 		//object = nullptr;
 
-		_gameObjects.pop_back();
+		_gameObjects.PopBack();
 	}
 
 	while (!_gameObjectsToCreate.empty())
