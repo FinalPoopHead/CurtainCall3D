@@ -65,6 +65,8 @@ void GameScene::Initialize()
 // 
 // 	gameManager->CreateUI(playerIndex, WIDTH);						// UI를 먼저 만들고 Player와 Board를 등록해야함.
 // 	gameManager->SetBoardAndPlayer(playerIndex, board2, player2);
+
+	gameManager->SetStage(1);		// TEST : 임시
 }
 
 void GameScene::Finalize()

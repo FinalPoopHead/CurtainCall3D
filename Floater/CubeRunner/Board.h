@@ -59,6 +59,7 @@ public:
 	int QueryTileState(float x, float y);
 	int QueryNextTileState(float x, float y);
 	bool GetCenterPosition(float& x, float& y);
+	bool GetRatioPosition(float ratioX, float ratioY, float& outX, float& outY);
 
 	void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
 	void ConvertToTilePosition(int x, int z, float& outX, float& outZ);
@@ -93,7 +94,7 @@ private:
 	//void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
 	void ConvertToTileLocalPosition(int x, int z, float& outX, float& outZ);
 
-	void AccumulateTime(float deltaSecond);
+	void Wait(float deltaSecond);
 	void OnWaiting();
 	void OnEndWaiting();
 	void SetDelay(float second);
@@ -127,7 +128,7 @@ private:
 	std::list<DarkCube*> _darkCubePool;											// 다크 큐브 풀
 	std::list<NormalCube*> _normalCubePool;										// 노말 큐브 풀
 
-	bool _isGameOver = false;
+	bool _isGameOver;
 	bool _isAttacked;
 	float _delayRemain;
 	float _fastForwardValue;
