@@ -107,7 +107,7 @@ namespace flt
 
 		private:
 			SparseSet<T>* _set;
-			int _denseIndex;
+			size_t _denseIndex;
 			unsigned int _version;
 		};
 
@@ -206,7 +206,7 @@ namespace flt
 
 		private:
 			const SparseSet<T>* _set;
-			int _denseIndex;
+			size_t _denseIndex;
 			unsigned int _version;
 		};
 
@@ -397,7 +397,7 @@ namespace flt
 	template<typename T>
 	void flt::SparseSet<T>::Erase(int sparseIndex) noexcept
 	{
-		if (sparseIndex < 0 || sparseIndex > _capacity)
+		if (sparseIndex < 0 || sparseIndex > (int)_capacity)
 		{
 			ASSERT(false, "invaild index");
 			return;
@@ -463,7 +463,7 @@ namespace flt
 			Reserve(_capacity * 2);
 		}
 
-		int sparseIndex = _free.back();
+		int sparseIndex = (int)_free.back();
 		_free.pop_back();
 
 		int denseIndex = (int)_dense.size();
