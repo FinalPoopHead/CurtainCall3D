@@ -234,10 +234,6 @@ void flt::Scene::PrePhysicsUpdate()
 
 		for (auto& component : object->_components)
 		{
-			if (component == nullptr)
-			{
-				continue;
-			}
 			if (!component->_isEnable)
 			{
 				continue;
@@ -263,10 +259,6 @@ void flt::Scene::PostPhysicsUpdate()
 
 		for (auto& component : object->_components)
 		{
-			if (component == nullptr)
-			{
-				continue;
-			}
 			if (!component->_isEnable)
 			{
 				continue;
@@ -286,10 +278,6 @@ void flt::Scene::PostPhysicsUpdate()
 
 		for (auto& component : object->_components)
 		{
-			if (component == nullptr)
-			{
-				continue;
-			}
 			if (!component->_isEnable)
 			{
 				continue;
@@ -314,10 +302,6 @@ void flt::Scene::Update(float deltaSecond)
 
 		for (auto& component : object->_components)
 		{
-			if (component == nullptr)
-			{
-				continue;
-			}
 			if (!component->_isEnable)
 			{
 				continue;
@@ -338,10 +322,6 @@ void flt::Scene::Update(float deltaSecond)
 
 		for (auto& component : object->_components)
 		{
-			if (component == nullptr)
-			{
-				continue;
-			}
 			if (!component->_isEnable)
 			{
 				continue;
@@ -362,10 +342,6 @@ void flt::Scene::Update(float deltaSecond)
 
 		for (auto& component : object->_components)
 		{
-			if (component == nullptr)
-			{
-				continue;
-			}
 			if (!component->_isEnable)
 			{
 				continue;
@@ -389,10 +365,6 @@ void flt::Scene::PreRender()
 
 		for (auto& component : object->_components)
 		{
-			if (component == nullptr)
-			{
-				continue;
-			}
 			if (!component->_isEnable)
 			{
 				continue;
@@ -416,10 +388,6 @@ void flt::Scene::PostRender()
 
 		for (auto& component : object->_components)
 		{
-			if (component == nullptr)
-			{
-				continue;
-			}
 			if (!component->_isEnable)
 			{
 				continue;
@@ -441,11 +409,6 @@ void flt::Scene::StartFrame()
 
 		for (auto& component : object->_components)
 		{
-			if (component == nullptr)
-			{
-				continue;
-			}
-
 			component->OnCreate();
 		}
 		object->OnCreate();
@@ -514,11 +477,6 @@ void flt::Scene::StartFrame()
 
 		for (auto& component : object->_components)
 		{
-			if (component == nullptr)
-			{
-				continue;
-			}
-
 			if (component->_isEnable)
 			{
 				component->OnDisable();
@@ -549,12 +507,6 @@ void flt::Scene::StartFrame()
 
 		for (auto& component : object->_components)
 		{
-			if (component == nullptr)
-			{
-				continue;
-			}
-
-			// Disable인 컴포넌트들도 Destroy해야하는가..?
 			component->OnDestroy();
 			delete component;
 		}
@@ -589,11 +541,6 @@ void flt::Scene::EndScene()
 
 		for (auto& component : object->_components)
 		{
-			if (component == nullptr)
-			{
-				continue;
-			}
-
 			if (component->_isEnable == false)
 			{
 				continue;
@@ -608,11 +555,6 @@ void flt::Scene::EndScene()
 	{
 		for (auto& component : object->_components)
 		{
-			if (component == nullptr)
-			{
-				continue;
-			}
-
 			component->OnDestroy();
 		}
 		object->OnDestroy();
@@ -624,10 +566,6 @@ void flt::Scene::EndScene()
 
 		for (auto& component : object->_components)
 		{
-			if (component == nullptr)
-			{
-				continue;
-			}
 			delete component;
 			//component = nullptr;
 		}
@@ -644,10 +582,6 @@ void flt::Scene::EndScene()
 
 		for (auto& component : object->_components)
 		{
-			if (component == nullptr)
-			{
-				continue;
-			}
 			delete component;
 		}
 		delete object;

@@ -2,6 +2,7 @@
 #include "Component.h"
 #include "../../../FloaterRendererCommon/include/Transform.h"
 #include "../../../FloaterRendererCommon/include/TransformOwner.h"
+#include "../../../FloaterUtil/include/SparseSet.h"
 #include <type_traits>
 #include <vector>
 #include <string>
@@ -59,7 +60,8 @@ namespace flt
 
 	private:
 		Scene* _scene;
-		std::vector<ComponentBase*> _components;
+		//std::vector<ComponentBase*> _components;
+		SparseSet<ComponentBase*> _components;
 		bool _isEnable;
 
 		int _index;
@@ -74,9 +76,9 @@ namespace flt
 		int index = component->GetIndex();
 		//component->_gameObject = this;
 
-		if (_components.size() <= index)
+		if (_components.Capacity() <= index)
 		{
-			_components.resize(index + 1);
+			_components.Reserve(index + 1);
 		}
 
 		if (_components[index] != nullptr)
@@ -96,7 +98,7 @@ namespace flt
 	T* flt::GameObject::GetComponent()
 	{
 		int index = T::s_index;
-		if (index < 0 || _components.size() <= index)
+		if (index < 0 || _components.Capacity() <= index)
 		{
 			return nullptr;
 		}
