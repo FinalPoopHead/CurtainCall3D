@@ -125,6 +125,14 @@ void flt::GameEngine::Finalize()
 	_instance = nullptr;
 }
 
+flt::Scene* flt::GameEngine::GetScene(const std::wstring& sceneName)
+{
+	auto iter = _scenes.find(sceneName);
+	ASSERT(iter != _scenes.end(), "Scene is not added");
+
+	return iter->second;
+}
+
 flt::Scene* flt::GameEngine::SetScene(Scene* scene)
 {
 	//ASSERT(_scenes.find(scene) != _scenes.end(), "Scene is not added");

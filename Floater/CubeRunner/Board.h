@@ -59,6 +59,7 @@ public:
 	int QueryTileState(float x, float y);
 	int QueryNextTileState(float x, float y);
 	bool GetCenterPosition(float& x, float& y);
+	bool GetRatioPosition(float ratioX, float ratioY, float& outX, float& outY);
 
 	void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
 	void ConvertToTilePosition(int x, int z, float& outX, float& outZ);

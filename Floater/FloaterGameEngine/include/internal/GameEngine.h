@@ -32,6 +32,7 @@ namespace flt
 		bool Update();
 		void Finalize();
 
+		Scene* GetScene(const std::wstring& sceneName);
 		Scene* SetScene(Scene* scene);
 		Scene* SetScene(const std::wstring& sceneName);
 		bool AddScene(const std::wstring& sceneName, Scene* scene);

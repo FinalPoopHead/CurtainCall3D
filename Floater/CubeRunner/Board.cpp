@@ -311,16 +311,32 @@ int Board::QueryNextTileState(float x, float y)
 
 bool Board::GetCenterPosition(float& x, float& y)
 {
-	float leftX = 0.0f;
-	float leftY = 0.0f;
-	ConvertToTilePosition(0, 0, leftX, leftY);
+	float leftTopX = 0.0f;
+	float leftTopY = 0.0f;
+	ConvertToTilePosition(0, 0, leftTopX, leftTopY);
 
-	float rightX = 0.0f;
-	float rightY = 0.0f;
-	ConvertToTilePosition(_width - 1, _height - 1, rightX, rightY);
+	float rightBottomX = 0.0f;
+	float rightBottomY = 0.0f;
+	ConvertToTilePosition(_width - 1, _height - 1, rightBottomX, rightBottomY);
 
-	x = (leftX + rightX) / 2.0f;
-	y = (leftY + rightY) / 2.0f;
+	x = (leftTopX + rightBottomX) / 2.0f;
+	y = (leftTopY + rightBottomY) / 2.0f;
+
+	return true;
+}
+
+bool Board::GetRatioPosition(float ratioX, float ratioY, float& outX, float& outY)
+{
+	float leftTopX = 0.0f;
+	float leftTopY = 0.0f;
+	ConvertToTilePosition(0, 0, leftTopX, leftTopY);
+
+	float rightBottomX = 0.0f;
+	float rightBottomY = 0.0f;
+	ConvertToTilePosition(_width - 1, _height - 1, rightBottomX, rightBottomY);
+
+	outX = leftTopX + (rightBottomX - leftTopX) * ratioX;
+	outY = leftTopY + (rightBottomY - leftTopY) * ratioY;
 
 	return true;
 }
