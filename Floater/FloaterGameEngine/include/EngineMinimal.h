@@ -19,6 +19,8 @@ namespace flt
 
 		flt::Scene* GetCurrentScene();
 		bool AddScene(const std::wstring& sceneName, flt::Scene* scene);
+		Scene* GetScene(const std::wstring& sceneName);
+		Scene* SetScene(Scene* scene);
 
 		GameEngine* engine;
 	};
@@ -48,6 +50,21 @@ namespace flt
 	Scene* SetScene(Scene* scene);
 
 	Scene* SetScene(const std::wstring& sceneName);
+
+	//template<typename T, typename... Args>
+	//Scene* SetScene(T* scene, Args&&... args)
+	//{
+	//	scene->OnSet(std::forward<Args>(args)...);
+	//	return __impl::g_engineWrapper.SetScene(scene);
+	//}
+
+	//template<typename... Args>
+	//Scene* SetScene(const std::wstring& sceneName, Args&&... args)
+	//{
+	//	Scene* scene = __impl::g_engineWrapper.GetScene(sceneName);
+	//	scene->OnSet(std::forward<Args>(args)...);
+	//	return __impl::g_engineWrapper.SetScene(scene);
+	//}
 
 	Vector2f GetWindowSize();
 

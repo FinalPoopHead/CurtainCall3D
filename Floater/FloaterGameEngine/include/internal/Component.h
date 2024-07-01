@@ -44,7 +44,7 @@ namespace flt
 	public:
 		void Enable();
 		void Disable();
-		bool IsEnable() const { return _isEnable; }
+		bool IsEnable() const;
 
 	private:
 		virtual int GetIndex() = 0;

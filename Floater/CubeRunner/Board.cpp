@@ -9,7 +9,7 @@
 #include "GameManager.h"
 
 constexpr int TILECOUNT = 512;
-constexpr int CUBECOUNT = 512;
+constexpr int CUBECOUNT = 24;
 constexpr float ROLLINGTIME = 1.0f;
 constexpr float ROLLINGDELAY = 0.5f;	// 아무것도 하지않고 굴러갈때의 딜레이
 constexpr float DETONATEDELAY = 2.0f;	// 폭파 후 딜레이
@@ -622,7 +622,11 @@ void Board::BackToPool(flt::GameObject* obj)
 		ASSERT(false, "Invalid Cube Type");
 	}
 
-	obj->Disable();
+	if (!obj->isEnable())
+	{
+		int i = 0;
+	}
+	//obj->Disable();
 }
 
 void Board::RemoveFromControllerList(CubeController* cubeCtr)
@@ -978,22 +982,24 @@ void Board::Reset()
 		}
 	}
 
-	while (!_runningCubeControllers.empty())
+	int i = 0;
+	for (auto& cubeCtr : _runningCubeControllers)
 	{
-		int size = _runningCubeControllers.size();
-
-		auto& cubeCtr = _runningCubeControllers.front();
+		++i;
 		BackToPool(cubeCtr->GetGameObject());
-
-		if(size == _runningCubeControllers.size())
-		{
-			_runningCubeControllers.pop_front();
-		}
 	}
 
-	//for (auto& cubeCtr : _runningCubeControllers)
+	//while (!_runningCubeControllers.empty())
 	//{
+	//	int size = _runningCubeControllers.size();
+
+	//	auto& cubeCtr = _runningCubeControllers.front();
 	//	BackToPool(cubeCtr->GetGameObject());
+
+	//	if(size == _runningCubeControllers.size())
+	//	{
+	//		_runningCubeControllers.pop_front();
+	//	}
 	//}
 
 	for (auto& tile : _addTiles)
