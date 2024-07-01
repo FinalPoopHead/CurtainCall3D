@@ -3,8 +3,14 @@
 
 flt::Scene::Scene() :
 	_gameObjects(),
-	_gameObjectsToEnable(),
-	_componentsToEnable()
+	_activeGameObjects(),
+	_stagingActiveGameObjects(),
+	_gameObjectsToCreate(),
+	_gameObjectsToDestroy(),
+	_componentsToEnable(),
+	_componentsToDisable(),
+	_collisionPairs(),
+	_collisionFlag(false)
 {
 }
 
@@ -79,14 +85,16 @@ void flt::Scene::AddEnableGameObject(GameObject* gameObject, bool isEnable)
 		ASSERT(isExist, "Not exist game object");
 	}
 
-	if (isEnable)
-	{
-		_gameObjectsToEnable.emplace_back(gameObject);
-	}
-	else
-	{
-		_gameObjectsToDisable.emplace_back(gameObject);
-	}
+	//if (isEnable)
+	//{
+	//	_gameObjectsToEnable.emplace_back(gameObject);
+	//}
+	//else
+	//{
+	//	_gameObjectsToDisable.emplace_back(gameObject);
+	//}
+
+	_stagingActiveGameObjects[gameObject] = isEnable;
 }
 
 void flt::Scene::AddEnableComponent(ComponentBase* component, bool isEnable)
@@ -439,7 +447,7 @@ void flt::Scene::StartFrame()
 		GameObject* object = _gameObjectsToCreate.back();
 		_gameObjectsToCreate.pop_back();
 
-		_gameObjects.emplace_back(object);
+		_gameObjects.EmplaceBack(object);
 
 		for (auto& component : object->_components)
 		{
@@ -455,35 +463,37 @@ void flt::Scene::StartFrame()
 		if (object->_isEnable)
 		{
 			object->_isEnable = false;
-			_gameObjectsToEnable.emplace_back(object);
+			object->Enable();
 		}
 	}
 
-	while (!_gameObjectsToEnable.empty())
+	while(!_stagingActiveGameObjects.empty())
 	{
-		GameObject* object = _gameObjectsToEnable.back();
-		_gameObjectsToEnable.pop_back();
+		auto iter = _stagingActiveGameObjects.begin();
+		GameObject* object = iter->first;
+		bool isUpdate = iter->second;
 
-		if (object->_isEnable == true)
+
+		if (isUpdate)
 		{
-			continue;
-		}
-
-		object->_isEnable = true;
-
-		for (auto& component : object->_components)
-		{
-			if (component == nullptr)
+			// 아직 활성화 되어있지 않는 경우에만 처리
+			if(object->_updateIndex == -1)
 			{
-				continue;
-			}
-
-			if (component->_isEnable)
-			{
-				component->OnEnable();
+				auto iter = _activeGameObjects.EmplaceBack(object);
+				object->_updateIndex = iter.GetIndex();
 			}
 		}
-		object->OnEnable();
+		else
+		{
+			// 이미 활성화 되어있는 경우에만 처리
+			if(object->_updateIndex != -1)
+			{
+				_activeGameObjects.Erase(object->_updateIndex);
+				object->_updateIndex = -1;
+			}
+		}
+
+		_stagingActiveGameObjects.erase(iter);
 	}
 
 	while (!_componentsToEnable.empty())
@@ -498,35 +508,6 @@ void flt::Scene::StartFrame()
 
 		component->_isEnable = true;
 		component->OnEnable();
-	}
-
-	// 비활성화 처리. 한 프레임 내에 enable, disable 이 여러번 불린다면 diable이 되어야 하며, update는 호출되지 않는다.
-	while (!_gameObjectsToDisable.empty())
-	{
-		GameObject* object = _gameObjectsToDisable.back();
-		_gameObjectsToDisable.pop_back();
-
-		//이미 이 전 상태와 같다면 패스.
-		if (object->_isEnable == false)
-		{
-			continue;
-		}
-
-		object->_isEnable = false;
-
-		for (auto& component : object->_components)
-		{
-			if (component == nullptr)
-			{
-				continue;
-			}
-
-			if (component->_isEnable)
-			{
-				component->OnDisable();
-			}
-		}
-		object->OnDisable();
 	}
 
 	for (int i = 0; i < _gameObjectsToDestroy.size(); ++i)
@@ -589,7 +570,9 @@ void flt::Scene::StartFrame()
 		}
 		object->OnDestroy();
 
-		_gameObjects.erase(std::remove(_gameObjects.begin(), _gameObjects.end(), object), _gameObjects.end());
+		int index = object->_index;
+		_gameObjects.Erase(index);
+		//_gameObjects.erase(std::remove(_gameObjects.begin(), _gameObjects.end(), object), _gameObjects.end());
 		delete object;
 	}
 }
@@ -645,9 +628,9 @@ void flt::Scene::EndScene()
 		object->OnDestroy();
 	}
 
-	while (!_gameObjects.empty())
+	while (!_gameObjects.Empty())
 	{
-		GameObject* object = _gameObjects.back();
+		GameObject* object = _gameObjects.Back();
 
 		for (auto& component : object->_components)
 		{
@@ -661,7 +644,7 @@ void flt::Scene::EndScene()
 		delete object;
 		//object = nullptr;
 
-		_gameObjects.pop_back();
+		_gameObjects.PopBack();
 	}
 
 	while (!_gameObjectsToCreate.empty())
@@ -680,9 +663,7 @@ void flt::Scene::EndScene()
 		delete object;
 	}
 
-
-	_gameObjectsToEnable.clear();
-	_gameObjectsToDisable.clear();
+	_stagingActiveGameObjects.clear();
 	_gameObjectsToDestroy.clear();
 	_componentsToEnable.clear();
 	_componentsToDisable.clear();

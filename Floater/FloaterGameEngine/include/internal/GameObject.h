@@ -61,6 +61,9 @@ namespace flt
 		Scene* _scene;
 		std::vector<ComponentBase*> _components;
 		bool _isEnable;
+
+		int _index;
+		int _updateIndex;
 	};
 
 

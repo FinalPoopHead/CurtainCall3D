@@ -109,11 +109,10 @@ namespace flt
 		{
 			_elapsed -= _points[_current].duration;
 			_current++;
-		}
-
-		if (_current >= _points.size())
-		{
-			return _points.back().value;
+			if (_current >= _points.size())
+			{
+				return _points.back().value;
+			}
 		}
 
 		float t = _points[_current].easing(_elapsed / _points[_current].duration);

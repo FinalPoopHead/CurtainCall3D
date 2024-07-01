@@ -3,7 +3,8 @@
 #include "Component.h"
 #include "../../CollisionPair.h"
 #include "../../../FloaterUtil/include/Timer.h"
-#include <unordered_set>
+#include "../../../FloaterUtil/include/SparseSet.h"
+#include <unordered_map>
 #include <list>
 #include <vector>
 #include <set>
@@ -43,7 +44,7 @@ namespace flt
 		void EndScene();
 
 
-		std::vector<GameObject*> GetGameObjects() const { return _gameObjects; }
+		//std::vector<GameObject*> GetGameObjects() const { return _gameObjects; }
 		std::vector<GameObject*> GetGameObjects(const std::wstring& name) const;
 
 	private:
@@ -58,10 +59,10 @@ namespace flt
 		void CallCollisionEvent();
 
 	private:
-		std::vector<GameObject*> _gameObjects;
+		SparseSet<GameObject*> _gameObjects;
+		SparseSet<GameObject*> _activeGameObjects;
+		std::unordered_map<GameObject*, bool> _stagingActiveGameObjects;
 		std::vector<GameObject*> _gameObjectsToCreate;
-		std::vector<GameObject*> _gameObjectsToEnable;
-		std::vector<GameObject*> _gameObjectsToDisable;
 		std::vector<GameObject*> _gameObjectsToDestroy;
 
 		std::vector<ComponentBase*> _componentsToEnable;
@@ -69,7 +70,7 @@ namespace flt
 
 		std::vector<CollisionPair> _collisionPairs;
 		//std::unordered_set<CollisionPair> _collisionSet;
-		bool _collisionFlag = false;
+		bool _collisionFlag;
 	};
 
 	template<GameObjectDerived T, typename... TArgs>

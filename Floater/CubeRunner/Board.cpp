@@ -987,10 +987,23 @@ void Board::Reset()
 		}
 	}
 
-	for (auto& cubeCtr : _runningCubeControllers)
+	while (!_runningCubeControllers.empty())
 	{
+		int size = _runningCubeControllers.size();
+
+		auto& cubeCtr = _runningCubeControllers.front();
 		BackToPool(cubeCtr->GetGameObject());
+
+		if(size == _runningCubeControllers.size())
+		{
+			_runningCubeControllers.pop_front();
+		}
 	}
+
+	//for (auto& cubeCtr : _runningCubeControllers)
+	//{
+	//	BackToPool(cubeCtr->GetGameObject());
+	//}
 
 	for (auto& tile : _addTiles)
 	{
