@@ -183,6 +183,10 @@ void Board::PreUpdate(float deltaSecond)
 			{
 				_runningCubeControllers = _waveCubeControllers.front();
 				_waveCubeControllers.pop_front();
+				for (auto& cubeCtr : _runningCubeControllers)
+				{
+					cubeCtr->SetIsRunning(true);
+				}
 			}
 			else if (_waveCubeControllers.empty())
 			{
@@ -512,6 +516,11 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 
 	_runningCubeControllers = _waveCubeControllers.front();
 	_waveCubeControllers.pop_front();
+
+	for (auto& cubeCtr : _runningCubeControllers)
+	{
+		cubeCtr->SetIsRunning(true);
+	}
 }
 
 void Board::TickCubesRolling(float rollingTime)
@@ -986,24 +995,13 @@ void Board::Reset()
 			BackToPool(cubeCtr->GetGameObject());
 		}
 	}
+	_waveCubeControllers.clear();
 
-	while (!_runningCubeControllers.empty())
+	for (auto& cubeCtr : _runningCubeControllers)
 	{
-		int size = _runningCubeControllers.size();
-
-		auto& cubeCtr = _runningCubeControllers.front();
 		BackToPool(cubeCtr->GetGameObject());
-
-		if(size == _runningCubeControllers.size())
-		{
-			_runningCubeControllers.pop_front();
-		}
 	}
-
-	//for (auto& cubeCtr : _runningCubeControllers)
-	//{
-	//	BackToPool(cubeCtr->GetGameObject());
-	//}
+	_runningCubeControllers.clear();
 
 	for (auto& tile : _addTiles)
 	{
@@ -1129,25 +1127,40 @@ bool Board::UpdateDetonate()
 			{
 				eTileStateFlag cubeType = (eTileStateFlag)((int)_tileStates[i][j] & CUBE);
 
+				CubeController* cubeCtr = nullptr;
+				if (_tiles[i][j]->_cube != nullptr)
+				{
+					cubeCtr = _tiles[i][j]->_cube->GetComponent<CubeController>();
+				}
+
 				switch (cubeType)
 				{
 				case eTileStateFlag::NORMALCUBE:
 					// NormalCube 수납
-					destroyCount++;
-					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemove(REMOVE_TIME);
+					if (cubeCtr->IsRunning())
+					{
+						destroyCount++;
+						cubeCtr->StartRemove(REMOVE_TIME);
+					}
 					break;
 				case eTileStateFlag::DARKCUBE:
 					// DarkCube 수납 및 스테이지 한 줄 삭제
-					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemove(REMOVE_TIME);
-					_isPerfect = false;
-					DestroyRow();
+					if (cubeCtr->IsRunning())
+					{
+						cubeCtr->StartRemove(REMOVE_TIME);
+						_isPerfect = false;
+						DestroyRow();
+					}
 					break;
 				case eTileStateFlag::ADVANTAGECUBE:
 					// AdvantageCube 수납 및 AdvantageMine 설치
-					_tileStates[i][j] = _tileStates[i][j] | (int)eTileStateFlag::ADVANTAGEMINE;
-					_tiles[i][j]->EnableAdvantageMine();
-					destroyCount++;
-					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemove(REMOVE_TIME);
+					if (cubeCtr->IsRunning())
+					{
+						_tileStates[i][j] = _tileStates[i][j] | (int)eTileStateFlag::ADVANTAGEMINE;
+						_tiles[i][j]->EnableAdvantageMine();
+						destroyCount++;
+						cubeCtr->StartRemove(REMOVE_TIME);
+					}
 					break;
 				default:
 					break;

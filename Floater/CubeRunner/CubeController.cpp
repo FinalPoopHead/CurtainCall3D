@@ -14,6 +14,7 @@ constexpr double OVERLAPSCALE = 0.98;
 
 CubeController::CubeController()
 	: _board(nullptr)
+	, _isRunning(false)
 	, _status(eCUBESTATUS::NONE)
 	, _targetIndex(0)
 	, _rotateSpeed(0.0f)
@@ -55,8 +56,9 @@ void CubeController::PreUpdate(float deltaSecond)
 
 void CubeController::OnDisable()
 {
+	_isRunning = false;
 	_status = eCUBESTATUS::NONE;
-	_board->RemoveFromControllerList(this);
+	// _board->RemoveFromControllerList(this);
 }
 
 bool CubeController::StartRoll(float rotateTime)
@@ -87,6 +89,8 @@ void CubeController::StartFall(bool withDamage /*= true*/)
 
 	_status = eCUBESTATUS::FALLING;
 	_fallSpeed = STARTFALLSPEED;
+	_board->RemoveFromControllerList(this);
+	_isRunning = false;
 
 	if (withDamage)
 	{
@@ -116,7 +120,8 @@ void CubeController::StartRemove(float removeTime)
 	_removeSpeed = 1.0f / removeTime;
 
 	_status = eCUBESTATUS::REMOVING;
-	// _board->RemoveFromControllerList(this);
+	_board->RemoveFromControllerList(this);
+	_isRunning = false;
 }
 
 void CubeController::StartGenerate(float riseTime, float delay)

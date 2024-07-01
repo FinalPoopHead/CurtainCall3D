@@ -38,6 +38,8 @@ public:
 	flt::Vector4f GetPosition() { return _gameObject->tr.GetWorldPosition(); }
 	eCUBETYPE GetCubeType() { return _cubeType; }
 	flt::GameObject* GetGameObject() { return _gameObject; }
+	void SetIsRunning(bool isRunning) { _isRunning = isRunning; }
+	bool IsRunning() { return _isRunning; }
 
 private:
 	void Roll(float deltaSecond);
@@ -51,6 +53,7 @@ private:
 private:
 	Board* _board;			// 게임의 바닥 보드.
 
+	bool _isRunning;		// 큐브가 동작중인지 체크(웨이브 대기중인지)
 	eCUBESTATUS _status;	// 큐브의 상태
 	int _targetIndex;		// 회전 목표 각도 인덱스
 	float _rotateSpeed;		// 회전 속도 -> 주어진 회전시간의 역수
