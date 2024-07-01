@@ -19,36 +19,6 @@ flt::Scene::~Scene()
 	
 }
 
-void flt::Scene::Initialize()
-{
-
-}
-
-void flt::Scene::Finalize()
-{
-
-}
-
-void flt::Scene::OnCreate()
-{
-
-}
-
-void flt::Scene::OnEnable()
-{
-
-}
-
-void flt::Scene::OnDisable()
-{
-
-}
-
-void flt::Scene::OnDestroy()
-{
-
-}
-
 //void flt::Scene::CreateGameObject(GameObject* gameObject)
 //{
 //	_gameObjects.emplace_back(gameObject);

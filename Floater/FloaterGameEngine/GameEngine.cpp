@@ -70,13 +70,13 @@ void flt::GameEngine::Finalize()
 {
 	if (_currentScene != nullptr)
 	{
-		_currentScene->OnDisable();
+		//_currentScene->OnDisable();
 	}
 	_currentScene = nullptr;
 
 	for (auto& [sceneName, scene] : _scenes)
 	{
-		scene->OnDestroy();
+		scene->Finalize();
 		delete scene;
 	}
 
@@ -97,22 +97,6 @@ void flt::GameEngine::Finalize()
 	// 여기에서 해도 되는지 모르겠다.
 	delete s_instance;
 	s_instance = nullptr;
-}
-
-flt::Scene* flt::GameEngine::SetLoadingScene(Scene* scene)
-{
-	Scene* oldScene = _loadingScene;
-	_loadingScene = scene;
-
-	return oldScene;
-}
-
-flt::Scene* flt::GameEngine::GetScene(const std::wstring& sceneName)
-{
-	auto iter = _scenes.find(sceneName);
-	ASSERT(iter != _scenes.end(), "Scene is not added");
-
-	return iter->second;
 }
 
 flt::Scene* flt::GameEngine::SetScene(Scene* scene)
@@ -197,13 +181,13 @@ void flt::GameEngine::ChangeScene()
 	ASSERT(_nextScene, "ChangeScene is nullptr");
 	if (_currentScene != nullptr)
 	{
-		//_currentScene->Finalize();
+		_currentScene->Finalize();
 		_currentScene->EndScene();
-		_currentScene->OnDisable();
+		//_currentScene->OnDisable();
 	}
 
 	_currentScene = _nextScene;
-	_currentScene->OnEnable();
+	_currentScene->Initialize();
 	_currentScene->StartScene();
 
 	//UpdateImpl(_loadingScene);

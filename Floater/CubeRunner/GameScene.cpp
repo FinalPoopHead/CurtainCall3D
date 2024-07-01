@@ -10,9 +10,6 @@
 #include "SpriteObject.h"
 #include "TextObject.h"
 
-int g_PlayerNum;
-int g_StageNum;
-
 constexpr flt::Vector2f HPPANEL_OFFSETPOS = { 0.9f,0.95f };
 constexpr flt::Vector2f TIMEPANEL_OFFSETPOS = { 0.8f,0.05f };
 constexpr flt::Vector2f SCOREPANEL_OFFSETPOS = { 0.05f,0.05f };
@@ -30,7 +27,7 @@ constexpr int STAGE = 1;
 constexpr int WIDTH = 5;
 constexpr int HEIGHT = 15;
 
-void GameScene::OnEnable()
+void GameScene::Initialize()
 {
 	// TODO : 매개변수로 몇 스테이지인지(width 값) 받아야되려나?
 
@@ -69,7 +66,8 @@ void GameScene::OnEnable()
 	gameManager->SetStage(1);		// TEST : 임시
 }
 
-void GameScene::OnDisable()
+void GameScene::Finalize()
 {
 
 }
+

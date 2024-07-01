@@ -32,7 +32,6 @@ namespace flt
 		bool Update();
 		void Finalize();
 
-		Scene* SetLoadingScene(Scene* scene);
 		Scene* GetScene(const std::wstring& sceneName);
 		Scene* SetScene(Scene* scene);
 		Scene* SetScene(const std::wstring& sceneName);
