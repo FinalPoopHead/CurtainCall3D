@@ -50,6 +50,8 @@ public:
 	void AttackAnotherPlayer(int playerIndex);
 	void SetStage(int stageNum);
 
+	void OnEndLevel(int playerIndex);
+
 private:
 	void IncreasePlayerCount();
 	void AddScore(int index, int score);
@@ -87,6 +89,5 @@ private:
 private:
 	std::vector<StageData> _stageData;
 	int _currentStage;
-	int _currentLevel;
-	int _currentWave;
+	std::vector<int> _currentLevel;
 };

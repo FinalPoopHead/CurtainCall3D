@@ -30,7 +30,7 @@ Tile::Tile(Board* board)
 {
 	std::wstring filePath = L"..\\Resources\\Models\\BrickBlock.fbx";
 
-	 tr.SetScale(0.5f, 0.5f, 0.5f); // FOR DEBUG
+	// tr.SetScale(0.5f, 0.5f, 0.5f); // FOR DEBUG
 
 	flt::RendererComponent* renderer = AddComponent<flt::RendererComponent>(true);
 	renderer->SetFilePath(filePath);

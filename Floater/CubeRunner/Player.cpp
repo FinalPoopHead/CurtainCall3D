@@ -258,7 +258,7 @@ void Player::SetPositiontoCenter()
 	float x = 0.0f;
 	float z = 0.0f;
 
-	_board->GetCenterPosition(x, z);
+	_board->GetRatioPosition(0.5f, 0.75f, x, z);
 	tr.SetPosition(x, 2.0f, z);
 }
 
