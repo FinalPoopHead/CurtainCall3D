@@ -7,10 +7,8 @@
 class GameScene : public flt::Scene
 {
 public:
-	virtual void Initialize() override;
-	virtual void Finalize() override;
-
-	void OnSet(int a, int b);
+	virtual void OnEnable() override;
+	virtual void OnDisable() override;
 
 public:
 

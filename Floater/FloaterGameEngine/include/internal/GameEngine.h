@@ -32,6 +32,7 @@ namespace flt
 		bool Update();
 		void Finalize();
 
+		Scene* SetLoadingScene(Scene* scene);
 		Scene* GetScene(const std::wstring& sceneName);
 		Scene* SetScene(Scene* scene);
 		Scene* SetScene(const std::wstring& sceneName);
@@ -50,9 +51,10 @@ namespace flt
 
 	private:
 		void ChangeScene();
+		bool UpdateImpl(Scene* scene);
 
 	private:
-		static GameEngine* _instance;
+		static GameEngine* s_instance;
 
 	private:
 		std::unique_ptr<Platform> _platform;
@@ -61,6 +63,7 @@ namespace flt
 
 		IRenderer* _renderer;
 
+		Scene* _loadingScene;
 		Scene* _nextScene;
 		Scene* _currentScene;
 		std::unordered_map<std::wstring, Scene*> _scenes;

@@ -41,6 +41,7 @@ namespace flt
 	T* CreateScene(TArgs&&... args)
 	{
 		T* scene = new T(std::forward<TArgs>(args)...);
+		scene->OnCreate();
 		std::wstring sceneName = flt::TypeName<T>().data();
 		sceneName.resize(flt::TypeName<T>().length());
 		__impl::g_engineWrapper.AddScene(sceneName, scene);

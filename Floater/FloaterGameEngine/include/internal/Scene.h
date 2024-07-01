@@ -28,8 +28,13 @@ namespace flt
 		Scene();
 		~Scene();
 
-		virtual void Initialize();
-		virtual void Finalize();
+		[[deprecated("Use OnCreate instead")]]  virtual void Initialize();
+		[[deprecated("Use OnDestroy instead")]] virtual void Finalize();
+
+		virtual void OnCreate();
+		virtual void OnEnable();
+		virtual void OnDisable();
+		virtual void OnDestroy();
 
 		//[[deprecated("Use template CreateGameObject instead")]] void CreateGameObject(GameObject* gameObject);
 		void PrePhysicsUpdate();

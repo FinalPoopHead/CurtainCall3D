@@ -7,7 +7,7 @@
 extern int g_PlayerNum;
 extern int g_StageNum;
 
-void MainMenuScene::Initialize()
+void MainMenuScene::OnEnable()
 {
 	Menu* menu = flt::CreateGameObject<Menu>(true);
 
@@ -48,10 +48,9 @@ void MainMenuScene::Initialize()
 
 	flt::GameObject* camera = flt::CreateGameObject<flt::GameObject>(true);
 	camera->AddComponent<flt::CameraComponent>(true);
-
 }
 
-void MainMenuScene::Finalize()
+void MainMenuScene::OnDisable()
 {
 
 }

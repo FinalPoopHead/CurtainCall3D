@@ -5,7 +5,7 @@
 class MainMenuScene : public flt::Scene
 {
 public:
-	virtual void Initialize() override;
-	virtual void Finalize() override;
+	virtual void OnEnable() override;
+	virtual void OnDisable() override;
 };
 

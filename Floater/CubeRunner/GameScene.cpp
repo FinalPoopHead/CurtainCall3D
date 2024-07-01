@@ -30,7 +30,7 @@ constexpr int STAGE = 1;
 constexpr int WIDTH = 5;
 constexpr int HEIGHT = 15;
 
-void GameScene::Initialize()
+void GameScene::OnEnable()
 {
 	// TODO : 매개변수로 몇 스테이지인지(width 값) 받아야되려나?
 
@@ -67,12 +67,7 @@ void GameScene::Initialize()
 // 	gameManager->SetBoardAndPlayer(playerIndex, board2, player2);
 }
 
-void GameScene::Finalize()
+void GameScene::OnDisable()
 {
 
-}
-
-void GameScene::OnSet(int a, int b)
-{
-	std::cout << "a : " << a << " b : " << b << std::endl;
 }
