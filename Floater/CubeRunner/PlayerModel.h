@@ -8,7 +8,7 @@ public:
 
 	void PlayWalk();
 	void PlayIdle();
-	void SetAledoPath(std::wstring path);
+	void SetAlbedoPath(std::wstring path);
 private:
 	flt::RendererComponent* _renderer;
 };

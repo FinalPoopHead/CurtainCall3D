@@ -10,6 +10,9 @@
 #include "SpriteObject.h"
 #include "TextObject.h"
 
+int g_PlayerNum = 1;
+int g_StageNum = 1;
+
 constexpr flt::Vector2f HPPANEL_OFFSETPOS = { 0.9f,0.95f };
 constexpr flt::Vector2f TIMEPANEL_OFFSETPOS = { 0.8f,0.05f };
 constexpr flt::Vector2f SCOREPANEL_OFFSETPOS = { 0.05f,0.05f };
