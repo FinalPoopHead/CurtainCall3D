@@ -5,13 +5,14 @@
 #include "../FloaterRendererCommon/include/Camera.h"
 
 
-flt::CameraComponent::CameraComponent() : 
-	_rendererObject(new RendererObject{ _isDraw }),
-	_renderer(*GameEngine::Instance()->GetRenderer()),
-	_hObject(),
-	_isDraw(true)
+flt::CameraComponent::CameraComponent() 
+	: _rendererObject(new RendererObject{ _isDraw })
+	, _renderer(*GameEngine::Instance()->GetRenderer())
+	, _hObject()
+	, _index(0)
+	, _isDraw(true)
 {
-	
+	_rendererObject->camera = new flt::Camera(&_gameObject->transform);
 }
 
 flt::CameraComponent::~CameraComponent()
@@ -19,10 +20,21 @@ flt::CameraComponent::~CameraComponent()
 	delete _rendererObject;
 }
 
+uint32 flt::CameraComponent::SetIndex(uint32 priority)
+{
+	_index = priority;
+
+	if (_hObject)
+	{
+		_renderer.DeregisterObject(_hObject);
+		_hObject = _renderer.RegisterObject(*_rendererObject);
+	}
+	
+}
+
 void flt::CameraComponent::OnCreate()
 {
 	_rendererObject->transform = &_gameObject->transform;
-	_rendererObject->camera = new flt::Camera(&_gameObject->transform);
 }
 
 void flt::CameraComponent::OnEnable()

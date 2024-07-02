@@ -15,6 +15,8 @@ namespace flt
 		CameraComponent();
 		~CameraComponent();
 
+		uint32 SetIndex(uint32 priority);
+	protected:
 		virtual void OnCreate() override;
 		virtual void OnEnable() override;
 		virtual void Update(float deltaSecond) override;
@@ -25,6 +27,7 @@ namespace flt
 		RendererObject* _rendererObject;
 		IRenderer& _renderer;
 		uint64 _hObject;
+		uint32 _index;
 		bool _isDraw;
 	};
 }

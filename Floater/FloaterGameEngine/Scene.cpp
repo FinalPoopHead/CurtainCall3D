@@ -426,7 +426,6 @@ void flt::Scene::StartFrame()
 		GameObject* object = iter->first;
 		bool isUpdate = iter->second;
 
-
 		if (isUpdate)
 		{
 			// 아직 활성화 되어있지 않는 경우에만 처리
