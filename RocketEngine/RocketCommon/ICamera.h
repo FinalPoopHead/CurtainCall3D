@@ -17,6 +17,7 @@ namespace Rocket::Core
 		virtual void SetFOVY(float fov) = 0;
 		virtual void SetAsMainCamera() = 0;			// 유일무이한 MainCamera로 세팅한다.
 		virtual void AddToMainCamera() = 0;			// MainCamera 리스트에 추가한다. (현재는 2개짜리 배열)
+		virtual bool SetMainCameraIndex(int index) = 0;	// MainCamera 리스트에서 몇번째에 있는지 설정한다.
 		virtual void BindTransform(RocketTransform* transform) = 0;
 
 		// Resize? viewport 사이즈 관리

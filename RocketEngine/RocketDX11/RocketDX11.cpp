@@ -425,13 +425,9 @@ namespace Rocket::Core
 	{
 		_deltaTime = deltaTime;
 
-		Camera** mainCams = Camera::GetMainCamArr();
-		for (int i = 0; i < 2; i++)
+		for (auto& mainCam : Camera::GetMainCameras())
 		{
-			if (mainCams[i] != nullptr)
-			{
-				mainCams[i]->Update();
-			}
+			mainCam->Update();
 		}
 
 		// TODO : 원래 컬링도 같이 진행해서 불필요한 애니메이션 연산을 줄였는데 멀티카메라 때문에 어려워졌다 어떻게 하지..?
@@ -451,14 +447,15 @@ namespace Rocket::Core
 	{
 		BeginRender(1.0f, 0.0f, 1.0f, 1.0f);
 
+		// TODO : 여기도 카메라 갯수에 따라 로직을 나누는게 아니라 똑같이 그려야 한다.
 		// 카메라가 하나 일 때
-		if (Camera::GetMainCamera(1) == nullptr)
+		if (Camera::GetMainCameras().size() == 1)
 		{
 			auto mainCam = Camera::GetMainCamera(0);
 
 			RenderPerCamera(mainCam, _deferredBuffers.get(), _backBufferRTV.GetAddressOf());
 		}
-		else	// 카메라가 두 개일 때
+		else if(Camera::GetMainCameras().size() > 1)	// 카메라가 두 개일 때
 		{
 			for (int i = 0; i < 2; i++)
 			//for (int i = 1; i >= 0; i--)
@@ -658,10 +655,13 @@ namespace Rocket::Core
 			cam->SetAspect((float)backBufferDesc.Width / (float)backBufferDesc.Height);
 		}
 
-		if (Camera::GetMainCamArr()[0] != nullptr && Camera::GetMainCamArr()[1] != nullptr)
+		if (Camera::GetMainCameras().size() > 1)
 		{
-			Camera::GetMainCamArr()[0]->HalftheAspect();
-			Camera::GetMainCamArr()[1]->HalftheAspect();
+			// TODO : 지금은 카메라를 2개까지만 사용하므로 사용하는 임시코드다..
+			for (auto& mainCam : Camera::GetMainCameras())
+			{
+				mainCam->HalftheAspect();
+			}
 		}
 
 		_objectManager.SetScreenSize((float)backBufferDesc.Width, (float)backBufferDesc.Height);

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <vector>
 #include <d3d11.h>
 #include <wrl.h>
 #include <DirectXCollision.h>
@@ -34,15 +35,16 @@ namespace Rocket::Core
 		virtual void SetFOVY(float fov) override;
 		virtual void SetAsMainCamera() override;
 		virtual void AddToMainCamera() override;
+		virtual bool SetMainCameraIndex(int index) override;
 		virtual void BindTransform(RocketTransform* transform) override;
 
 		/// Static
 	public:
 		static Camera* GetMainCamera(UINT index = 0);
-		static Camera** GetMainCamArr();
+		static std::vector<Camera*>& GetMainCameras();
 
 	private:
-		static Camera* _mainCamera[2];
+		static std::vector<Camera*> _mainCamera;
 
 	public:
 		DirectX::XMFLOAT3 GetPosition() const;
