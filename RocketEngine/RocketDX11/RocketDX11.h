@@ -107,7 +107,7 @@ namespace Rocket::Core
 
 	private:
 		// 매 프레임 Frustum Culling 적용 후 살아남은 객체들
-		std::vector<IRenderable*> _renderList;
+		std::list<IRenderable*> _renderList;
 
 		/// deferred 관련
 	private:
