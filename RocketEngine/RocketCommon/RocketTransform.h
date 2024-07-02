@@ -28,10 +28,10 @@ namespace Rocket::Core
 		void SetLocalRotationEuler(const Vector3& euler);
 		void SetLocalScale(const Vector3& scale);
 
-		Vector3 GetLocalPosition() const;
-		Quaternion GetLocalRotation() const;
+		const Vector3& GetLocalPosition() const;
+		const Quaternion& GetLocalRotation() const;
 		Vector3 GetLocalEuler() const;
-		Vector3 GetLocalScale() const;
+		const Vector3& GetLocalScale() const;
 
 		/// Local 기준 포인터 반환 (Tween Animation 고려)
 		Vector3* GetLocalPositionPtr();
@@ -47,7 +47,7 @@ namespace Rocket::Core
 		Matrix GetScaleMatrix() const;
 		Matrix GetRotationMatrix() const;
 		Matrix GetTranslationMatrix() const;
-		Matrix GetWorldTM();
+		const Matrix& GetWorldTM();
 
 		/// Local 기준 행렬
 		Matrix GetLocalScaleMatrix() const;

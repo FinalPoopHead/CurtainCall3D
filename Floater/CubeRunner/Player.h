@@ -18,7 +18,7 @@ public:
 	void SetPadIndex(int padIndex) { _padIndex = padIndex; }
 	void SetGameOver();
 	void SetAlbedoPath(std::wstring path);
-	void SetPositiontoCenter();
+	void SetPositionToRatioPosition(float ratioX, float ratioY);
 
 private:
 	PlayerModel* _model;

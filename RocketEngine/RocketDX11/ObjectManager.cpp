@@ -256,7 +256,7 @@ namespace Rocket::Core
 		return _staticModelRendererList;
 	}
 
-	void ObjectManager::DestroyCamera(Camera* camera, bool isLastMainCamera /*= false*/)
+	void ObjectManager::DestroyCamera(Camera* camera)
 	{
 		auto iter = std::find(_cameraList.begin(), _cameraList.end(), camera);
 		if (iter != _cameraList.end())
@@ -265,7 +265,7 @@ namespace Rocket::Core
 			delete camera;
 		}
 
-		if (isLastMainCamera)
+		if (Camera::GetMainCameras().size() == 0)
 		{
 			if (_cameraList.empty())
 			{

@@ -22,7 +22,7 @@ Player::Player(Board* board)
 
 	Camera* camera = flt::CreateGameObject<Camera>(true, this, _board);
 
-	SetPositiontoCenter();
+	SetPositionToRatioPosition(0.5f, 0.75f);
 }
 
 void Player::OnEnable()
@@ -250,15 +250,15 @@ void Player::SetGameOver()
 
 void Player::SetAlbedoPath(std::wstring path)
 {
-	_model->SetAledoPath(path);
+	_model->SetAlbedoPath(path);
 }
 
-void Player::SetPositiontoCenter()
+void Player::SetPositionToRatioPosition(float ratioX, float ratioY)
 {
 	float x = 0.0f;
 	float z = 0.0f;
 
-	_board->GetRatioPosition(0.5f, 0.75f, x, z);
+	_board->GetRatioPosition(ratioX, ratioY, x, z);
 	tr.SetPosition(x, 2.0f, z);
 }
 

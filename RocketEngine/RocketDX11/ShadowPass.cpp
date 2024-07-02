@@ -39,14 +39,9 @@ namespace Rocket::Core
 		// 그러면 ShadowMap이 라이트 갯수만큼있어야..?
 		for (auto& light : objMgr.GetDirectionalLightList())
 		{
-			std::vector<MeshRenderer*> staticMeshList;
-			staticMeshList.reserve(256);
-
-			std::vector<StaticModelRenderer*> staticModelList;
-			staticModelList.reserve(256);
-
-			std::vector<DynamicModelRenderer*> dynamicModelList;
-			dynamicModelList.reserve(256);
+			std::list<MeshRenderer*> staticMeshList;
+			std::list<StaticModelRenderer*> staticModelList;
+			std::list<DynamicModelRenderer*> dynamicModelList;
 
 			for (auto meshRenderer : objMgr.GetMeshRenderers())
 			{

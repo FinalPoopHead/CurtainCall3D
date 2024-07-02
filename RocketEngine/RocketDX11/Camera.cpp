@@ -8,7 +8,7 @@
 
 namespace Rocket::Core
 {
-	Camera* Camera::_mainCamera[2];
+	std::vector<Camera*> Camera::_mainCamera;
 
 	Camera::Camera()
 		: _isActive(true)
@@ -94,8 +94,8 @@ namespace Rocket::Core
 
 	void Camera::SetAsMainCamera()
 	{
-		_mainCamera[0] = this;
-		_mainCamera[1] = nullptr;
+		_mainCamera.clear();
+		_mainCamera.push_back(this);
 	}
 
 	void Camera::BindTransform(RocketTransform* transform)
@@ -156,20 +156,31 @@ namespace Rocket::Core
 
 	void Camera::AddToMainCamera()
 	{
-		if (_mainCamera[0] == nullptr)
-		{
-			_mainCamera[0] = this;
-		}
-		else if (_mainCamera[1] == nullptr)
-		{
-			_mainCamera[1] = this;
+		_mainCamera.push_back(this);
 
-			_mainCamera[0]->HalftheAspect();
-			_mainCamera[1]->HalftheAspect();
+		if (_mainCamera.size() > 1)
+		{
+			for (auto& camera : _mainCamera)
+			{
+				// TODO : 현재는 카메라를 2대까지만 쓰므로 이렇게 짜도 되지만.. 나중에는 수정해야함
+				camera->HalftheAspect();
+			}
 		}
+
+// 		if (_mainCamera[0] == nullptr)
+// 		{
+// 			_mainCamera[0] = this;
+// 		}
+// 		else if (_mainCamera[1] == nullptr)
+// 		{
+// 			_mainCamera[1] = this;
+// 
+// 			_mainCamera[0]->HalftheAspect();
+// 			_mainCamera[1]->HalftheAspect();
+// 		}
 	}
 
-	Camera** Camera::GetMainCamArr()
+	std::vector<Camera*>& Camera::GetMainCameras()
 	{
 		return _mainCamera;
 	}
@@ -181,27 +192,33 @@ namespace Rocket::Core
 
 	void Camera::Destroy()
 	{
-		bool isLastMainCamera = false;
+		auto iter = std::find(_mainCamera.begin(), _mainCamera.end(), this);
 
-		// 메인 카메라인 경우
-		if (_mainCamera[0] == this)
+		if (iter != _mainCamera.end())
 		{
-			if (_mainCamera[1] != nullptr)
-			{
-				_mainCamera[1]->SetAsMainCamera();
-			}
-			else
-			{
-				_mainCamera[0] = nullptr;
-				isLastMainCamera = true;
-			}
-
-		}
-		else if (_mainCamera[1] == this)
-		{
-			_mainCamera[0]->SetAsMainCamera();
+			_mainCamera.erase(iter);
 		}
 
-		ObjectManager::Instance().DestroyCamera(this, isLastMainCamera);
+		ObjectManager::Instance().DestroyCamera(this);
 	}
+
+	bool Camera::SetMainCameraIndex(int index)
+	{
+		if (index < 0 || index >= _mainCamera.size())
+		{
+			return false;
+		}
+
+		Camera* camera = _mainCamera[index];
+		if (camera != this) // 목표 위치가 내가 아니라면 swap
+		{
+			auto iter = std::find(_mainCamera.begin(), _mainCamera.end(), this);
+
+			_mainCamera[index] = this;
+			*iter = camera;
+		}
+
+		return true;
+	}
+
 }

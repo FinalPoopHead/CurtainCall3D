@@ -10,6 +10,9 @@
 #include "SpriteObject.h"
 #include "TextObject.h"
 
+int g_PlayerNum = 1;
+int g_StageNum = 1;
+
 constexpr flt::Vector2f HPPANEL_OFFSETPOS = { 0.9f,0.95f };
 constexpr flt::Vector2f TIMEPANEL_OFFSETPOS = { 0.8f,0.05f };
 constexpr flt::Vector2f SCOREPANEL_OFFSETPOS = { 0.05f,0.05f };
@@ -35,35 +38,20 @@ void GameScene::Initialize()
 
 	DirectionalLight* light = flt::CreateGameObject<DirectionalLight>(true);
 
-	///	//////////////////////////////////////////////////////////////////////////////////////////////////////////
-	///	//////////////////////////////////////////		player 1	//////////////////////////////////////////////
-	///	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	float boardOffset = 100.0f;
 
-	int playerIndex = 0;
+	for (int playerIndex = 0; playerIndex < g_PlayerNum; playerIndex++)
+	{
+		Board* board = flt::CreateGameObject<Board>(true, gameManager, playerIndex, WIDTH, HEIGHT);
+		board->tr.SetPosition(boardOffset * playerIndex, 0.0f, 0.0f);
 
-	Board* board1 = flt::CreateGameObject<Board>(true, gameManager, playerIndex, WIDTH, HEIGHT);
-	board1->tr.SetPosition(0.0f, 0.0f, 0.0f);
+		Player* player = flt::CreateGameObject<Player>(true, board);
 
-	Player* player1 = flt::CreateGameObject<Player>(true, board1);
+		gameManager->CreateUI(playerIndex, WIDTH);						// UI를 먼저 만들고 Player와 Board를 등록해야함.
+		gameManager->SetBoardAndPlayer(playerIndex, board, player);
+	}
 
-	gameManager->CreateUI(playerIndex, WIDTH);						// UI를 먼저 만들고 Player와 Board를 등록해야함.
-	gameManager->SetBoardAndPlayer(playerIndex, board1, player1);
-
-	///	//////////////////////////////////////////////////////////////////////////////////////////////////////////
-	///	//////////////////////////////////////////		player 2	//////////////////////////////////////////////
-	///	//////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// 	playerIndex++;
-// 
-// 	Board* board2 = flt::CreateGameObject<Board>(true, gameManager, playerIndex, WIDTH, HEIGHT);
-// 	board2->tr.SetPosition(40.0f, 0.0f, 0.0f);
-// 
-// 	Player* player2 = flt::CreateGameObject<Player>(true, board2);
-// 
-// 	gameManager->CreateUI(playerIndex, WIDTH);						// UI를 먼저 만들고 Player와 Board를 등록해야함.
-// 	gameManager->SetBoardAndPlayer(playerIndex, board2, player2);
-
-	gameManager->SetStage(1);		// TEST : 임시
+	gameManager->SetStage(g_StageNum);		// TEST : 임시
 }
 
 void GameScene::Finalize()
