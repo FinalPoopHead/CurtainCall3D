@@ -2,6 +2,7 @@
 #include "../FloaterGameEngine/include/EngineMinimal.h"
 
 class Board;
+class Camera;
 class PlayerModel;
 
 class Player : public flt::GameObject
@@ -19,6 +20,9 @@ public:
 	void SetGameOver();
 	void SetAlbedoPath(std::wstring path);
 	void SetPositionToRatioPosition(float ratioX, float ratioY);
+
+public:
+	Camera* camera;
 
 private:
 	PlayerModel* _model;

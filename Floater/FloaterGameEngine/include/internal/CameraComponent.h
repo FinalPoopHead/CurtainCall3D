@@ -15,6 +15,8 @@ namespace flt
 		CameraComponent();
 		~CameraComponent();
 
+		uint32 SetIndex(uint32 priority);
+	protected:
 		virtual void OnCreate() override;
 		virtual void OnEnable() override;
 		virtual void Update(float deltaSecond) override;
