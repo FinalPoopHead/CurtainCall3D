@@ -9,7 +9,6 @@ flt::CameraComponent::CameraComponent()
 	: _rendererObject(new RendererObject{ _isDraw })
 	, _renderer(*GameEngine::Instance()->GetRenderer())
 	, _hObject()
-	, _index(0)
 	, _isDraw(true)
 {
 	_rendererObject->camera = new flt::Camera(&_gameObject->transform);
@@ -22,7 +21,8 @@ flt::CameraComponent::~CameraComponent()
 
 uint32 flt::CameraComponent::SetIndex(uint32 priority)
 {
-	_index = priority;
+	int oldIndex = _rendererObject->camera->priority;
+	_rendererObject->camera->priority = (int)priority;
 
 	if (_hObject)
 	{
@@ -30,6 +30,7 @@ uint32 flt::CameraComponent::SetIndex(uint32 priority)
 		_hObject = _renderer.RegisterObject(*_rendererObject);
 	}
 	
+	return (uint32)oldIndex;
 }
 
 void flt::CameraComponent::OnCreate()

@@ -27,7 +27,6 @@ namespace flt
 		RendererObject* _rendererObject;
 		IRenderer& _renderer;
 		uint64 _hObject;
-		uint32 _index;
 		bool _isDraw;
 	};
 }

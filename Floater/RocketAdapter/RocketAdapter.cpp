@@ -1,4 +1,5 @@
 ﻿#include "./include/RocketAdapter.h"
+#include "../FloaterRendererCommon/include/Camera.h"
 #include "RocketObject.h"
 #include "RawNodeConverter.h"
 
@@ -163,6 +164,7 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 		//rocketObject->camera->SetAsMainCamera();
 		rocketObject->camera->AddToMainCamera();
 		rocketObject->camera->BindTransform(&rocketObject->rocketTransform);
+		rocketObject->camera->SetMainCameraIndex(renderable.camera->priority);
 	}
 
 	if (renderable.node != nullptr)
