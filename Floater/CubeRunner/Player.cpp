@@ -9,7 +9,8 @@
 #include "MainMenuScene.h"
 
 Player::Player(Board* board)
-	: _model(nullptr)
+	: camera(nullptr)
+	, _model(nullptr)
 	, _board(board)
 	, _isGameOver(false)
 	, _isCrushed(false)
@@ -20,7 +21,7 @@ Player::Player(Board* board)
 	tr.AddChild(&_model->tr);
 	_model->tr.SetRotation(0.0f, 180.0f, 0.0f);
 
-	Camera* camera = flt::CreateGameObject<Camera>(true, this, _board);
+	camera = flt::CreateGameObject<Camera>(true, this, _board);
 
 	SetPositionToRatioPosition(0.5f, 0.75f);
 }

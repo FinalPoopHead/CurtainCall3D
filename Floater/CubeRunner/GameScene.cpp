@@ -39,13 +39,13 @@ void GameScene::Initialize()
 	DirectionalLight* light = flt::CreateGameObject<DirectionalLight>(true);
 
 	float boardOffset = 100.0f;
-
 	for (int playerIndex = 0; playerIndex < g_PlayerNum; playerIndex++)
 	{
 		Board* board = flt::CreateGameObject<Board>(true, gameManager, playerIndex, WIDTH, HEIGHT);
 		board->tr.SetPosition(boardOffset * playerIndex, 0.0f, 0.0f);
 
 		Player* player = flt::CreateGameObject<Player>(true, board);
+		player->camera->GetComponent<flt::CameraComponent>()->SetIndex(playerIndex);
 
 		gameManager->CreateUI(playerIndex, WIDTH);						// UI를 먼저 만들고 Player와 Board를 등록해야함.
 		gameManager->SetBoardAndPlayer(playerIndex, board, player);
