@@ -472,7 +472,6 @@ namespace Rocket::Core
 				_blitPass->Render(_deviceContext.Get(), _shaderResourceViewArr[i].GetAddressOf());
 
 				_renderList.clear();
-				_renderList.reserve(512);
 			}
 		}
 
@@ -913,7 +912,6 @@ namespace Rocket::Core
 		}
 
 		_renderList.clear();
-		_renderList.reserve(512);
 
 		return;
 	}
@@ -940,8 +938,7 @@ namespace Rocket::Core
 		// Frustum Culling
 		Camera* mainCam = Camera::GetMainCamera();
 
-		std::vector<IRenderable*> renderList;
-		renderList.reserve(256);
+		std::list<IRenderable*> renderList;
 
 		for (auto meshRenderer : _objectManager.GetMeshRenderers())
 		{
