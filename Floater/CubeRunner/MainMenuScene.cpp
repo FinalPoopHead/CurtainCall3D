@@ -4,8 +4,6 @@
 #include "MenuSelector.h"
 #include "TestCamera.h"
 
-extern int g_PlayerNum;
-extern int g_StageNum;
 
 void MainMenuScene::Initialize()
 {
@@ -19,7 +17,7 @@ void MainMenuScene::Initialize()
 	item1->SetOffsetPosition({ 0.75f, 0.65f });
 	item1->SetSize({100.0f, 80.0f});
 
-	item1->SetSelectFunc([]() { flt::SetScene(L"class GameScene"); g_PlayerNum = 2; g_StageNum = 1; });
+	item1->SetSelectFunc([]() { flt::SetScene(L"class GameScene"); });
 
 
 	MenuItem* item2 = flt::CreateGameObject<MenuItem>(true);
@@ -40,15 +38,12 @@ void MainMenuScene::Initialize()
 	item3->SetTextColor(1.0f, 0.0f, 0.0f);
 	item3->SetOffsetPosition({ 0.75f, 0.5f });
 
-	item3->SetSelectFunc([]() { flt::SetScene(L"class GameScene"); g_PlayerNum = 1; g_StageNum = 1; });
-
 
 	MenuSelector* selector = flt::CreateGameObject<MenuSelector>(true, menu);
 
 
 	flt::GameObject* camera = flt::CreateGameObject<flt::GameObject>(true);
 	camera->AddComponent<flt::CameraComponent>(true);
-
 }
 
 void MainMenuScene::Finalize()

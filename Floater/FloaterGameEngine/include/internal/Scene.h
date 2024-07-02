@@ -28,8 +28,8 @@ namespace flt
 		Scene();
 		~Scene();
 
-		virtual void Initialize();
-		virtual void Finalize();
+		virtual void Initialize() {}
+		virtual void Finalize() {}
 
 		//[[deprecated("Use template CreateGameObject instead")]] void CreateGameObject(GameObject* gameObject);
 		void PrePhysicsUpdate();

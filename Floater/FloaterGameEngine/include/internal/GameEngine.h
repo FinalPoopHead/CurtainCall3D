@@ -50,9 +50,10 @@ namespace flt
 
 	private:
 		void ChangeScene();
+		bool UpdateImpl(Scene* scene);
 
 	private:
-		static GameEngine* _instance;
+		static GameEngine* s_instance;
 
 	private:
 		std::unique_ptr<Platform> _platform;
@@ -61,6 +62,7 @@ namespace flt
 
 		IRenderer* _renderer;
 
+		Scene* _loadingScene;
 		Scene* _nextScene;
 		Scene* _currentScene;
 		std::unordered_map<std::wstring, Scene*> _scenes;

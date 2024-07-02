@@ -53,56 +53,30 @@ void flt::GameEngine::Initialize()
 
 bool flt::GameEngine::Update()
 {
+	bool isRun = true;
 	if (_nextScene)
 	{
 		ChangeScene();
 	}
-	ASSERT(_currentScene, "Scene is not set");
-
-	_timer.Update();
-	float deltaSecond = (float)_timer.GetDeltaSeconds();
-	bool closeWindow = _platform->Update(deltaSecond);
-
-	_currentScene->StartFrame();
-
-	constexpr float fixedUpdateInterval = 0.02f;
-	_fixedUpdateElapsedSecond += deltaSecond;
-	// 너무 한번에 물리 루프를 돌지 않게 제한
-	// 추후 물리 루프 1회에 들어가는 시간을 계산해서 루프 횟수 등을 조절 할 생각.
-	if (_fixedUpdateElapsedSecond > 0.07f)
+	else
 	{
-		_fixedUpdateElapsedSecond = 0.07f;
-	}
-	while (_fixedUpdateElapsedSecond > fixedUpdateInterval)
-	{
-		_currentScene->PrePhysicsUpdate();
-		_physicsEngine->Update(fixedUpdateInterval, _currentScene->_collisionPairs);
-		_currentScene->PostPhysicsUpdate();
-		_fixedUpdateElapsedSecond -= fixedUpdateInterval;
+		isRun = UpdateImpl(_currentScene);
 	}
 
-
-	_currentScene->Update(deltaSecond);
-
-	_currentScene->PreRender();
-	_renderer->Render(deltaSecond);
-	_currentScene->PostRender();
-
-	_currentScene->EndFrame();
-
-	return closeWindow;
+	return isRun;
 }
 
 void flt::GameEngine::Finalize()
 {
 	if (_currentScene != nullptr)
 	{
-		_currentScene->Finalize();
+		//_currentScene->OnDisable();
 	}
 	_currentScene = nullptr;
 
 	for (auto& [sceneName, scene] : _scenes)
 	{
+		scene->Finalize();
 		delete scene;
 	}
 
@@ -121,16 +95,8 @@ void flt::GameEngine::Finalize()
 	_soundEngine = nullptr;
 
 	// 여기에서 해도 되는지 모르겠다.
-	delete _instance;
-	_instance = nullptr;
-}
-
-flt::Scene* flt::GameEngine::GetScene(const std::wstring& sceneName)
-{
-	auto iter = _scenes.find(sceneName);
-	ASSERT(iter != _scenes.end(), "Scene is not added");
-
-	return iter->second;
+	delete s_instance;
+	s_instance = nullptr;
 }
 
 flt::Scene* flt::GameEngine::SetScene(Scene* scene)
@@ -161,6 +127,7 @@ bool flt::GameEngine::AddScene(const std::wstring& sceneName, Scene* scene)
 		return false;
 	}
 	_scenes.insert({ sceneName, scene });
+
 	return true;
 }
 
@@ -184,6 +151,7 @@ flt::GameEngine::GameEngine() :
 	_renderer(nullptr),
 	_physicsEngine(nullptr),
 	_soundEngine(nullptr),
+	_loadingScene(nullptr),
 	_nextScene(nullptr),
 	_currentScene(nullptr),
 	_timer(),
@@ -200,12 +168,12 @@ flt::GameEngine::~GameEngine()
 
 flt::GameEngine* flt::GameEngine::Instance()
 {
-	if (_instance == nullptr)
+	if (s_instance == nullptr)
 	{
-		_instance = new GameEngine();
-		_instance->Initialize();
+		s_instance = new GameEngine();
+		s_instance->Initialize();
 	}
-	return _instance;
+	return s_instance;
 }
 
 void flt::GameEngine::ChangeScene()
@@ -215,13 +183,54 @@ void flt::GameEngine::ChangeScene()
 	{
 		_currentScene->Finalize();
 		_currentScene->EndScene();
+		//_currentScene->OnDisable();
 	}
 
 	_currentScene = _nextScene;
-	_currentScene->StartScene();
 	_currentScene->Initialize();
+	_currentScene->StartScene();
+
+	//UpdateImpl(_loadingScene);
 
 	_nextScene = nullptr;
 }
 
-flt::GameEngine* flt::GameEngine::_instance = nullptr;
+bool flt::GameEngine::UpdateImpl(Scene* scene)
+{
+	ASSERT(scene, "Scene is not set");
+
+	_timer.Update();
+	float deltaSecond = (float)_timer.GetDeltaSeconds();
+	bool isOnWindows = _platform->Update(deltaSecond);
+
+	scene->StartFrame();
+
+	constexpr float fixedUpdateInterval = 0.02f;
+	_fixedUpdateElapsedSecond += deltaSecond;
+	// 너무 한번에 물리 루프를 돌지 않게 제한
+	// 추후 물리 루프 1회에 들어가는 시간을 계산해서 루프 횟수 등을 조절 할 생각.
+	if (_fixedUpdateElapsedSecond > 0.07f)
+	{
+		_fixedUpdateElapsedSecond = 0.07f;
+	}
+	while (_fixedUpdateElapsedSecond > fixedUpdateInterval)
+	{
+		scene->PrePhysicsUpdate();
+		_physicsEngine->Update(fixedUpdateInterval, scene->_collisionPairs);
+		scene->PostPhysicsUpdate();
+		_fixedUpdateElapsedSecond -= fixedUpdateInterval;
+	}
+
+
+	scene->Update(deltaSecond);
+
+	scene->PreRender();
+	_renderer->Render(deltaSecond);
+	scene->PostRender();
+
+	scene->EndFrame();
+
+	return isOnWindows;
+}
+
+flt::GameEngine* flt::GameEngine::s_instance = nullptr;

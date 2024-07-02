@@ -107,7 +107,7 @@ namespace flt
 
 		private:
 			SparseSet<T>* _set;
-			int _denseIndex;
+			size_t _denseIndex;
 			unsigned int _version;
 		};
 
@@ -206,7 +206,7 @@ namespace flt
 
 		private:
 			const SparseSet<T>* _set;
-			int _denseIndex;
+			size_t _denseIndex;
 			unsigned int _version;
 		};
 
@@ -251,23 +251,24 @@ namespace flt
 		void Reserve(uint32 size) noexcept;
 
 		//iterator Insert(T&& value) noexcept;
+		iterator Insert(uint32 sparseIndex, T&& value) noexcept;
 
 		std::vector<iterator> Find(const T& value) noexcept;
 
 		//void Remove(const T& value) noexcept;
 		//void Remove(const iterator& it) noexcept;
-		void Erase(int index) noexcept;
+		void Erase(uint32 index) noexcept;
 		void Clear() noexcept;
 		iterator PushBack(T&& value) noexcept;
 		template<typename... Args>
 		iterator EmplaceBack(Args&&... args) noexcept;
 		void PopBack() noexcept;
 
-		[[nodiscard]] const T& operator[](int sparseIndex) const noexcept { return _dense[_sparse[sparseIndex]].value; }
-		[[nodiscard]] T& operator[](int sparseIndex) noexcept { return _dense[_sparse[sparseIndex]].value; }
+		//[[nodiscard]] const T& operator[](uint32 sparseIndex) const noexcept { return _dense[_sparse[sparseIndex]].value; }
+		[[nodiscard]] T& operator[](uint32 sparseIndex) noexcept;
 
-		[[nodiscard]] const T& At(int sparseIndex) const noexcept { return _dense[_sparse[sparseIndex]].value; }
-		[[nodiscard]] T& At(int sparseIndex) noexcept { return _dense[_sparse[sparseIndex]].value; }
+		[[nodiscard]] const T& At(uint32 sparseIndex) const noexcept { return _dense[_sparse[sparseIndex]].value; }
+		[[nodiscard]] T& At(uint32 sparseIndex) noexcept { return _dense[_sparse[sparseIndex]].value; }
 
 		[[nodiscard]] const T& Front() const noexcept { return _dense.front().value; }
 		[[nodiscard]] T& Front() noexcept { return _dense.front().value; }
@@ -345,23 +346,21 @@ namespace flt
 		_capacity = capacity;
 	}
 
-	//template<typename T>
-	//flt::SparseSet<T>::iterator flt::SparseSet<T>::Insert(T&& value) noexcept
-	//{
-	//	++_version;
-	//	if (_free.empty())
-	//	{
-	//		Reserve(_capacity * 2);
-	//	}
+	template<typename T>
+	flt::SparseSet<T>::iterator flt::SparseSet<T>::Insert(uint32 sparseIndex, T&& value) noexcept
+	{
+		++_version;
+		while(sparseIndex >= _capacity)
+		{
+			Reserve(_capacity * 2);
+		}
 
-	//	size_t sparseIndex = _free.back();
-	//	_free.pop_back();
+		_free.erase(std::remove(_free.begin(), _free.end(), sparseIndex), _free.end());
+		_sparse[sparseIndex] = (int)_dense.size();
+		_dense.emplace_back(std::forward<T>(value), sparseIndex);
 
-	//	_sparse[sparseIndex] = (int)_dense.size();
-	//	_dense.emplace_back(std::forward<T>(value), sparseIndex);
-
-	//	return iterator(this, _dense.size() - 1, _version);
-	//}
+		return iterator(this, _dense.size() - 1, _version);
+	}
 
 	template<typename T>
 	std::vector<typename flt::SparseSet<T>::iterator> flt::SparseSet<T>::Find(const T& value) noexcept
@@ -395,7 +394,7 @@ namespace flt
 	//}
 
 	template<typename T>
-	void flt::SparseSet<T>::Erase(int sparseIndex) noexcept
+	void flt::SparseSet<T>::Erase(uint32 sparseIndex) noexcept
 	{
 		if (sparseIndex < 0 || sparseIndex > _capacity)
 		{
@@ -463,7 +462,7 @@ namespace flt
 			Reserve(_capacity * 2);
 		}
 
-		int sparseIndex = _free.back();
+		int sparseIndex = (int)_free.back();
 		_free.pop_back();
 
 		int denseIndex = (int)_dense.size();
@@ -484,6 +483,20 @@ namespace flt
 		_dense.pop_back();
 		_free.push_back(sparseIndex);
 	}
+
+
+	template<typename T>
+	T& flt::SparseSet<T>::operator[](uint32 sparseIndex) noexcept
+	{
+		if(_sparse[sparseIndex] == -1)
+		{
+			Insert(sparseIndex, T{});
+			//ASSERT(false, "invaild index");
+			//return _dense[0].value;
+		}
+		return _dense[_sparse[sparseIndex]].value;
+	}
+
 
 	template<typename T>
 	flt::SparseSet<T>::const_iterator flt::SparseSet<T>::begin() const noexcept

@@ -10,8 +10,6 @@ public:
 	virtual void Initialize() override;
 	virtual void Finalize() override;
 
-	void OnSet(int a, int b);
-
 public:
 
 

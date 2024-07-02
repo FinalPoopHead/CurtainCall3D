@@ -28,11 +28,6 @@ void flt::GameObject::Enable()
 
 	for (auto& component : _components)
 	{
-		if (component == nullptr)
-		{
-			continue;
-		}
-
 		if (component->_isEnable)
 		{
 			component->OnEnable();
@@ -53,11 +48,6 @@ void flt::GameObject::Disable()
 
 	for (auto& component : _components)
 	{
-		if (component == nullptr)
-		{
-			continue;
-		}
-
 		if (component->_isEnable)
 		{
 			component->OnDisable();
@@ -76,9 +66,9 @@ bool flt::GameObject::AddComponent(ComponentBase* component)
 {
 	int index = component->GetIndex();
 
-	if (_components.size() <= index)
+	if (_components.Capacity() <= index)
 	{
-		_components.resize(index + 1);
+		_components.Reserve(index + 1);
 	}
 
 	if (_components[index] != nullptr)
@@ -94,7 +84,7 @@ bool flt::GameObject::AddComponent(ComponentBase* component)
 void flt::GameObject::RemoveComponent(ComponentBase* component)
 {
 	int index = component->GetIndex();
-	if (_components.size() <= index)
+	if (_components.Capacity() <= index)
 	{
 		return;
 	}

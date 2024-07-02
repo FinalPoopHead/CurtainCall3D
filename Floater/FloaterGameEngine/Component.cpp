@@ -13,9 +13,4 @@ void flt::ComponentBase::Disable()
 	_gameObject->_scene->AddEnableComponent(this, false);
 }
 
-bool flt::ComponentBase::IsEnable() const
-{
-	return _isEnable && _gameObject->isEnable();
-}
-
 int flt::ComponentBase::s_indexCounter = 0;
