@@ -133,13 +133,13 @@ namespace Rocket::Core
 		SetDirtyRecur(this);
 	}
 
-	Vector3 RocketTransform::GetLocalPosition() const
-	{
+	const Vector3& RocketTransform::GetLocalPosition() const
+{
 		return _position;
 	}
 
-	Quaternion RocketTransform::GetLocalRotation() const
-	{
+	const Quaternion& RocketTransform::GetLocalRotation() const
+{
 		return _rotation;
 	}
 
@@ -155,8 +155,8 @@ namespace Rocket::Core
 		return { degreeX,degreeY,degreeZ };
 	}
 
-	Vector3 RocketTransform::GetLocalScale() const
-	{
+	const Vector3& RocketTransform::GetLocalScale() const
+{
 		return _scale;
 	}
 
@@ -211,8 +211,8 @@ namespace Rocket::Core
 		return result;
 	}
 
-	Matrix RocketTransform::GetWorldTM()
-	{
+	const Matrix& RocketTransform::GetWorldTM()
+{
 		// 이거 한번 써봐야 할듯?
 		// return Matrix::CreateWorld(_position, GetForward(), GetUp());
 
@@ -231,7 +231,7 @@ namespace Rocket::Core
 		_worldTM = result;
 		_isDirty = false;
 
-		return result;
+		return _worldTM;
 	}
 
 	Matrix RocketTransform::GetLocalScaleMatrix() const
