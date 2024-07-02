@@ -142,20 +142,20 @@ void GameManager::Update(float deltaSecond)
 		SetStage(9);
 	}
 
-// 	keyData = flt::GetKeyDown(flt::KeyCode::g);
-// 	if (keyData)
-// 	{
-// 		StageData currentStage = _stageData[_currentStage - 1];
-// 
-// 		for (int i = 0; i < MAXPLAYERCOUNT; i++)
-// 		{
-// 			if (_boards[i] != nullptr)
-// 			{
-// 				_boards[i]->Reset();
-// 				_boards[i]->GenerateLevel(currentStage.level[0].levelLayout, currentStage.waveCount);
-// 			}
-// 		}
-// 	}
+	// 	keyData = flt::GetKeyDown(flt::KeyCode::g);
+	// 	if (keyData)
+	// 	{
+	// 		StageData currentStage = _stageData[_currentStage - 1];
+	// 
+	// 		for (int i = 0; i < MAXPLAYERCOUNT; i++)
+	// 		{
+	// 			if (_boards[i] != nullptr)
+	// 			{
+	// 				_boards[i]->Reset();
+	// 				_boards[i]->GenerateLevel(currentStage.level[0].levelLayout, currentStage.waveCount);
+	// 			}
+	// 		}
+	// 	}
 }
 
 void GameManager::PostUpdate(float deltaSecond)
@@ -353,9 +353,9 @@ void GameManager::SetStage(int stageNum)
 			_boards[i]->GenerateLevel(data.level[0].levelLayout, data.waveCount);
 		}
 
-		if(_players[i] != nullptr)
+		if (_players[i] != nullptr)
 		{
-			_players[i]->SetPositiontoCenter();
+			_players[i]->SetPositionToRatioPosition(0.5f, 0.75f);
 		}
 	}
 }
@@ -363,7 +363,7 @@ void GameManager::SetStage(int stageNum)
 void GameManager::OnEndLevel(int playerIndex)
 {
 	++_currentLevel[playerIndex];
-	if(_currentLevel[playerIndex] > _stageData[_currentStage - 1].levelCount)
+	if (_currentLevel[playerIndex] > _stageData[_currentStage - 1].levelCount)
 	{
 		// TODO : 스테이지 클리어
 		//_currentLevel[playerIndex] = 1;
