@@ -405,7 +405,8 @@ void flt::Scene::StartFrame()
 		GameObject* object = _gameObjectsToCreate.back();
 		_gameObjectsToCreate.pop_back();
 
-		_gameObjects.EmplaceBack(object);
+		auto iter = _gameObjects.EmplaceBack(object);
+		object->_index = iter.GetIndex();
 
 		for (auto& component : object->_components)
 		{
