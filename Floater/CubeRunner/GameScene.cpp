@@ -14,7 +14,7 @@ int g_PlayerNum = 1;
 int g_StageNum = 1;
 
 constexpr int STAGE = 1;
-constexpr int WIDTH = 5;
+constexpr int WIDTH = 4;
 constexpr int HEIGHT = 15;
 
 void GameScene::Initialize()
