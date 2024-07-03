@@ -55,6 +55,13 @@ void MainMenuScene::Initialize()
 	MenuSelector* selector = flt::CreateGameObject<MenuSelector>(true, menu);
 
 
+	MenuItem* title = flt::CreateGameObject<MenuItem>(true);
+	title->SetDefaultSpritePath(L"../Resources/Sprites/GameTitle.png");
+	title->SetOffsetPosition({ 0.5f, 0.3f });
+	flt::Vector2f titleSize{ 256.0f, 122.8f };
+	titleSize *= 2.5f;
+	title->SetSize(titleSize);
+
 	flt::GameObject* camera = flt::CreateGameObject<flt::GameObject>(true);
 	camera->AddComponent<flt::CameraComponent>(true);
 }

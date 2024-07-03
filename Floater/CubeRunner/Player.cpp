@@ -28,7 +28,7 @@ Player::Player(Board* board)
 
 void Player::OnEnable()
 {
-	_padIndex = 0;
+	//_padIndex = 0;
 }
 
 void Player::Update(float deltaSecond)

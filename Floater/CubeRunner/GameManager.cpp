@@ -253,6 +253,7 @@ void GameManager::SetBoardAndPlayer(int index, Board* board, Player* player)
 
 	_boards[index] = board;
 	_players[index] = player;
+	player->SetPadIndex(index);
 	IncreasePlayerCount();
 }
 
