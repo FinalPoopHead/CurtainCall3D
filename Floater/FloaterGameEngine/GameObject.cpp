@@ -2,7 +2,13 @@
 #include "./include/internal/Scene.h"
 
 flt::GameObject::GameObject()
-	: _scene()
+	: GameObject(nullptr)
+{
+
+}
+
+flt::GameObject::GameObject(flt::Scene* owendScene)
+	: _scene(owendScene)
 	, name()
 	, _components()
 	, _isEnable(true)
@@ -74,6 +80,11 @@ void flt::GameObject::RemoveAllChildren()
 		tr.GetChild(0)->SetParent(nullptr);
 		child = tr.GetChild(0);
 	}
+}
+
+bool flt::GameObject::IsEnable()
+{
+	return _isEnable;
 }
 
 void flt::GameObject::RemoveChild(int index)

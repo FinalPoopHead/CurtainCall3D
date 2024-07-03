@@ -19,6 +19,7 @@ namespace flt
 
 	public:
 		GameObject();
+		GameObject(flt::Scene* owendScene);
 		~GameObject();
 
 		GameObject* GetParent() const;
@@ -29,6 +30,7 @@ namespace flt
 		void RemoveChild(GameObject* child);
 		void RemoveChild(int index);
 		void RemoveAllChildren();
+		bool IsEnable();
 
 	protected:
 		// 씬에 추가되었을 때 비활성화 여부와 상관 없이 호출

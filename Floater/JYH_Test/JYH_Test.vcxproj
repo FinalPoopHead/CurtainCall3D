@@ -148,6 +148,8 @@
   <ItemGroup>
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="GlideObject.cpp" />
+    <ClCompile Include="HierarachyMgr.cpp" />
+    <ClCompile Include="HierarchyTest.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TestGameObejct.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -161,6 +163,8 @@
     <ClInclude Include="Controller.h" />
     <ClInclude Include="GlideComponent.h" />
     <ClInclude Include="GlideObject.h" />
+    <ClInclude Include="HierarachyMgr.h" />
+    <ClInclude Include="HierarchyTest.h" />
     <ClInclude Include="RotateComponent.h" />
     <ClInclude Include="TestGameObejct.h" />
     <ClInclude Include="TestScene.h" />
