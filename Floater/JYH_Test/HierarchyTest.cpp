@@ -15,3 +15,13 @@ void HierarchyTest::Update(float deltaSeconds)
 		std::wcout << name << L" | ";
 	}
 }
+
+void HierarchyTest::OnEnable()
+{
+	std::wcout << name << L" en| ";
+}
+
+void HierarchyTest::OnDisable()
+{
+	std::wcout << name << L" dis| ";
+}

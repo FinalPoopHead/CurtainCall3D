@@ -74,6 +74,7 @@ namespace flt
 		std::vector<CollisionPair> _collisionPairs;
 		//std::unordered_set<CollisionPair> _collisionSet;
 		bool _collisionFlag;
+		bool _isActive;
 	};
 
 	template<GameObjectDerived T, typename... TArgs>

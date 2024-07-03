@@ -9,5 +9,8 @@ public:
 
 protected:
 	virtual void Update(float deltaSeconds);
+
+	virtual void OnEnable() override;
+	virtual void OnDisable() override;
 };
 

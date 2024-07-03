@@ -25,9 +25,13 @@ flt::GameObject::~GameObject()
 
 flt::GameObject* flt::GameObject::GetParent() const
 {
-	GameObject* parent = static_cast<GameObject*>(tr.GetParent()->GetOwner());
+	Transform* parentTr = tr.GetParent();
+	if (parentTr)
+	{
+		return 	static_cast<GameObject*>(parentTr->GetOwner());
+	}
 
-	return parent;
+	return nullptr;
 }
 
 void flt::GameObject::SetParent(GameObject* parent)
@@ -82,9 +86,14 @@ void flt::GameObject::RemoveAllChildren()
 	}
 }
 
-bool flt::GameObject::IsEnable()
+bool flt::GameObject::IsEnable() const
 {
 	return _isEnable;
+}
+
+bool flt::GameObject::IsWorldEnable() const
+{
+	return CheckEnableRecursive();
 }
 
 void flt::GameObject::RemoveChild(int index)
@@ -101,15 +110,13 @@ void flt::GameObject::Enable()
 
 	_isEnable = true;
 
-	for (auto& component : _components)
+	if(!IsWorldEnable())
 	{
-		if (component->_isEnable)
-		{
-			component->OnEnable();
-		}
+		// 내가 Enable이 되어도 부모가 Enable이 아니면 콜백 호출과 Enable 등록을 하지 않음.
+ 		return;
 	}
-	OnEnable();
-	_scene->AddEnableGameObject(this, true);
+
+	CallEnableRecursive();
 }
 
 void flt::GameObject::Disable()
@@ -119,17 +126,12 @@ void flt::GameObject::Disable()
 		return;
 	}
 
-	_isEnable = false;
-
-	for (auto& component : _components)
+	if(IsWorldEnable())
 	{
-		if (component->_isEnable)
-		{
-			component->OnDisable();
-		}
+ 		CallDisableRecursive();
 	}
-	OnDisable();
-	_scene->AddEnableGameObject(this, false);
+
+	_isEnable = false;
 }
 
 void flt::GameObject::Destroy()
@@ -153,6 +155,70 @@ bool flt::GameObject::AddComponent(ComponentBase* component)
 
 	_components[index] = component;
 	component->_gameObject = this;
+	return true;
+}
+
+void flt::GameObject::CallEnableRecursive()
+{
+	if (!_isEnable)
+	{
+		return;
+	}
+
+	for(auto& component : _components)
+	{
+		if (component->_isEnable)
+		{
+			component->OnEnable();
+		}
+	}
+	OnEnable();
+	_scene->AddEnableGameObject(this, true);
+
+	std::vector<GameObject*> children = GetChildren();
+	for (auto& child : children)
+	{
+		child->CallEnableRecursive();
+	}
+}
+
+void flt::GameObject::CallDisableRecursive()
+{
+	if(!_isEnable)
+	{
+		return;
+	}
+
+	for(auto& component : _components)
+	{
+		if (component->_isEnable)
+		{
+			component->OnDisable();
+		}
+	}
+	OnDisable();
+	_scene->AddEnableGameObject(this, false);
+
+	std::vector<GameObject*> children = GetChildren();
+	for (auto& child : children)
+	{
+		child->CallDisableRecursive();
+	}
+}
+
+bool flt::GameObject::CheckEnableRecursive() const
+{
+	if(!(_isEnable && _scene->_isActive))
+	{
+		return false;
+	}
+
+	GameObject* parent = GetParent();
+	if (parent)
+	{
+		return parent->CheckEnableRecursive();
+	}
+
 	return true;
 }
 

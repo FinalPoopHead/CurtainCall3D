@@ -25,7 +25,7 @@ void HierarachyMgr::PreUpdate(float deltaSeconds)
 {
 	if (GetKeyDown(flt::KeyCode::key1))
 	{
-		std::cout << "key1\n";
+		std::cout << "\nkey1  ";
 
 		if (_hierarchyTestArr[1]->IsEnable())
 		{
@@ -40,7 +40,7 @@ void HierarachyMgr::PreUpdate(float deltaSeconds)
 
 	if (GetKeyDown(flt::KeyCode::key2))
 	{
-		std::cout << "key2\n";
+		std::cout << "\nkey2  ";
 
 		if (_hierarchyTestArr[2]->IsEnable())
 		{
@@ -54,7 +54,7 @@ void HierarachyMgr::PreUpdate(float deltaSeconds)
 
 	if(GetKeyDown(flt::KeyCode::key3))
 	{
-		std::cout << "key3\n";
+		std::cout << "\nkey3  ";
 
 		if (_hierarchyTestArr[6]->IsEnable())
 		{
@@ -64,6 +64,10 @@ void HierarachyMgr::PreUpdate(float deltaSeconds)
 		{
 			_hierarchyTestArr[6]->Enable();
 		}
+	}
+	if (flt::GetKeyDown(flt::KeyCode::spacebar))
+	{
+		std::cout << "\n";
 	}
 }
 
