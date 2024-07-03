@@ -474,8 +474,8 @@ namespace Rocket::Core
 
 		_deviceContext->OMSetRenderTargets(1, _backBufferRTV.GetAddressOf(), nullptr);
 		_deviceContext->RSSetViewports(1, &_viewport);
-		RenderText(-1);
 		RenderTexture(-1);
+		RenderText(-1);
 
 		EndRender();
 	}
@@ -856,8 +856,8 @@ namespace Rocket::Core
 		_deviceContext->OMSetRenderTargets(1, renderTargetView, nullptr);
 
 		//	RenderLine();
-		RenderText(cameraIndex);
 		RenderTexture(cameraIndex);
+		RenderText(cameraIndex);
 
 		if (_isDebugMode)
 		{

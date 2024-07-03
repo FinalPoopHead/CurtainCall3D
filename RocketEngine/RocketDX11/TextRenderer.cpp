@@ -58,7 +58,7 @@ namespace Rocket::Core
 
 		// TODO : 240617 현재 임시로 텍스트의 중앙이 좌표점이 되게끔 설정해놨음.
 		Vector2 origin = _font->MeasureString(wstr.c_str());
-		origin /= 2.0f;
+		// origin /= 2.0f;
 		origin = { 0.0f,0.0f };	// TODO : 240617 임시로 좌측상단으로 롤백함.
 
 		// TODO : 240617 현재 임시로 테두리 모드를 기본으로 그리게 해놨음.

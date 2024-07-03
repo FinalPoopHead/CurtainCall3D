@@ -66,11 +66,15 @@ private:
 	
 	// UI들
 	// TODO : 체력 UI, 시간 UI, 점수 UI, 게임오버 UI, 콤보 UI 등등 추가 필요
+	std::vector<SpriteObject*> _stageInfoPanel;
+	std::vector<std::vector<SpriteObject*>> _levelCountSlot;
+	std::vector<std::vector<SpriteObject*>> _levelCountBlue;
+	std::vector<TextObject*> _stageCountText;
+	std::vector<TextObject*> _playerScoreText;
 	std::vector<SpriteObject*> _fallCountPanel;
 	std::vector<std::vector<SpriteObject*>> _fallCountSlot;
 	std::vector<std::vector<SpriteObject*>> _fallCountRed;
 	std::vector<TextObject*> _playTimeText;
-	std::vector<TextObject*> _playerScoreText;
 	std::list<TextObject*> _comboTextPool;
 	std::list<TextObject*> _liveComboTexts;
 

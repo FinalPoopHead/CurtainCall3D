@@ -18,25 +18,33 @@ constexpr flt::Vector2f COMBOTEXTPOSITION = { 0.05f,0.85f };
 // UI 관련
 constexpr flt::Vector2f HPPANEL_OFFSETPOS = { 0.9f,0.95f };
 constexpr flt::Vector2f TIMEPANEL_OFFSETPOS = { 0.8f,0.05f };
-constexpr flt::Vector2f SCOREPANEL_OFFSETPOS = { 0.05f,0.05f };
+constexpr flt::Vector2f STAGEINFOPANEL_OFFSETPOS = { 0.05f,0.1f };
+
+constexpr float STAGESLOTZORDER = 0.2f;
+constexpr float STAGETEXTZORDER = 0.3f;
+
+constexpr float LEVELSLOTZORDER = 0.2f;
+constexpr float LEVELVALUEZORDER = 0.3f;
 
 constexpr float HPOFFSETSIZE = 80.0f;
-constexpr flt::Vector2f HPUISIZE = { 64.0f,20.0f };
 
 constexpr float HPSlotZorder = 0.2f;
 constexpr float HPValueZorder = 0.3f;
 
-constexpr flt::Vector4f TimeTextColor = { 1.0f,1.0f,1.0f,1.0f };
-constexpr flt::Vector4f ScoreTextColor = { 1.0f,1.0f,1.0f,1.0f };
+constexpr flt::Vector4f TextColor = { 1.0f,1.0f,1.0f,1.0f };
 
 GameManager::GameManager() :
 	_players(std::vector<Player*>(MAXPLAYERCOUNT))
 	, _boards(std::vector<Board*>(MAXPLAYERCOUNT))
+	, _stageInfoPanel(std::vector<SpriteObject*>(MAXPLAYERCOUNT))
+	, _levelCountSlot(std::vector<std::vector<SpriteObject*>>(MAXPLAYERCOUNT))
+	, _levelCountBlue(std::vector<std::vector<SpriteObject*>>(MAXPLAYERCOUNT))
+	, _stageCountText(std::vector<TextObject*>(MAXPLAYERCOUNT))
+	, _playerScoreText(std::vector<TextObject*>(MAXPLAYERCOUNT))
 	, _fallCountPanel(std::vector<SpriteObject*>(MAXPLAYERCOUNT))
 	, _fallCountSlot(std::vector<std::vector<SpriteObject*>>(MAXPLAYERCOUNT))
 	, _fallCountRed(std::vector<std::vector<SpriteObject*>>(MAXPLAYERCOUNT))
 	, _playTimeText(std::vector<TextObject*>(MAXPLAYERCOUNT))
-	, _playerScoreText(std::vector<TextObject*>(MAXPLAYERCOUNT))
 	, _comboTextPool()
 	, _liveComboTexts()
 	, _currentPlayerCount(0)
@@ -199,21 +207,60 @@ void GameManager::CreateUI(int index, int width)
 	_fallCount[index] = 0;
 	_fallCountMax[index] = width - 1;
 
+	std::wstring stageCounterSlotPath = L"../Resources/Sprites/StageCounterSlot.png";
+	std::wstring levelCounterSlotPath = L"../Resources/Sprites/LevelCounterSlot.png";
+	std::wstring levelCounterBluePath = L"../Resources/Sprites/LevelCounterBlue.png";
 	std::wstring counterSlotPath = L"../Resources/Sprites/FallCounterSlot.png";
 	std::wstring counterRedPath = L"../Resources/Sprites/FallCounterRed.png";
 	std::wstring fontPath = L"../Resources/Fonts/LineSeedSansKR_KoreanCompatible_40.spritefont";
+	std::wstring smallFontPath = L"../Resources/Fonts/LineSeedSansKR_KoreanCompatible_25.spritefont";
 
 	TextObject* playTimeText = flt::CreateGameObject<TextObject>(true);
 	playTimeText->SetOffsetPosition(TIMEPANEL_OFFSETPOS);
 	playTimeText->SetText(L"00:00");
-	playTimeText->SetFont(fontPath);
-	playTimeText->SetTextColor(TimeTextColor);
+	playTimeText->SetFont(smallFontPath);
+	playTimeText->SetTextColor(TextColor);
+
+	SpriteObject* stageInfoPanel = flt::CreateGameObject<SpriteObject>(true);
+	stageInfoPanel->SetOffsetPosition(STAGEINFOPANEL_OFFSETPOS);
+
+	SpriteObject* stageCounterSlot = flt::CreateGameObject<SpriteObject>(true);
+	stageCounterSlot->tr.SetParent(&stageInfoPanel->tr);
+	stageCounterSlot->SetSprite(stageCounterSlotPath);
+	stageCounterSlot->SetZOrder(STAGESLOTZORDER);
+	stageCounterSlot->SetPosition({ 0.0f,0.0f });
+
+	TextObject* stageCounterText = flt::CreateGameObject<TextObject>(true);
+	stageCounterText->tr.SetParent(&stageInfoPanel->tr);
+	stageCounterText->SetFont(fontPath);
+	stageCounterText->SetTextColor(TextColor);
+	stageCounterText->SetText(L"0");
+	stageCounterText->SetPosition({ -25.0f,-20.0f });
 
 	TextObject* playerScoreText = flt::CreateGameObject<TextObject>(true);
-	playerScoreText->SetOffsetPosition(SCOREPANEL_OFFSETPOS);
+	playerScoreText->tr.SetParent(&stageInfoPanel->tr);
+	playerScoreText->SetFont(smallFontPath);
+	playerScoreText->SetTextColor(TextColor);
 	playerScoreText->SetText(L"0");
-	playerScoreText->SetFont(fontPath);
-	playerScoreText->SetTextColor(ScoreTextColor);
+	playerScoreText->SetPosition({ 44.0f, 4.0f });
+
+	for (int i = 0; i < 4; i++)
+	{
+		SpriteObject* levelCounterSlot = flt::CreateGameObject<SpriteObject>(true);
+		levelCounterSlot->tr.SetParent(&stageInfoPanel->tr);
+		levelCounterSlot->SetSprite(levelCounterSlotPath);
+		levelCounterSlot->SetZOrder(LEVELSLOTZORDER);
+		levelCounterSlot->SetPosition({ 70.0f + 50.0f * i, -9.0f});
+
+		SpriteObject* levelCounterBlue = flt::CreateGameObject<SpriteObject>(false);
+		levelCounterBlue->tr.SetParent(&stageInfoPanel->tr);
+		levelCounterBlue->SetSprite(levelCounterBluePath);
+		levelCounterBlue->SetZOrder(LEVELVALUEZORDER);
+		levelCounterBlue->SetPosition({ 70.0f + 50.0f * i, -9.0f });
+
+		_levelCountSlot[index].push_back(levelCounterSlot);
+		_levelCountBlue[index].push_back(levelCounterBlue);
+	}
 
 	SpriteObject* hpPanel = flt::CreateGameObject<SpriteObject>(true);
 	hpPanel->SetOffsetPosition(HPPANEL_OFFSETPOS);
@@ -221,20 +268,20 @@ void GameManager::CreateUI(int index, int width)
 	_playTimeText[index] = playTimeText;
 	_playerScoreText[index] = playerScoreText;
 	_fallCountPanel[index] = hpPanel;
+	_stageInfoPanel[index] = stageInfoPanel;
+	_stageCountText[index] = stageCounterText;
 
 	for (int i = 0; i < width - 1; i++)
 	{
 		SpriteObject* hpSlot = flt::CreateGameObject<SpriteObject>(true);
 		hpSlot->tr.SetParent(&hpPanel->tr);
 		hpSlot->SetSprite(counterSlotPath);
-		hpSlot->SetSize(HPUISIZE);
 		hpSlot->SetZOrder(HPSlotZorder);
 		hpSlot->SetPosition({ -HPOFFSETSIZE * i,0.0f });
 
 		SpriteObject* hpRed = flt::CreateGameObject<SpriteObject>(false);
 		hpRed->tr.SetParent(&hpPanel->tr);
 		hpRed->SetSprite(counterRedPath);
-		hpRed->SetSize(HPUISIZE);
 		hpRed->SetZOrder(HPValueZorder);
 		hpRed->SetPosition({ -HPOFFSETSIZE * i,0.0f });
 
@@ -337,9 +384,18 @@ void GameManager::AttackAnotherPlayer(int playerIndex)
 void GameManager::SetStage(int stageNum)
 {
 	_currentStage = stageNum;
+
 	for (int i = 0; i < MAXPLAYERCOUNT; i++)
 	{
+		_stageCountText[i]->SetText(std::to_wstring(stageNum));
 		_currentLevel[i] = 1;
+
+		for (int j = 0; j < 4; j++)
+		{
+			_levelCountBlue[i][j]->Disable();
+		}
+
+		_levelCountBlue[i][0]->Enable();
 	}
 
 	StageData data = _stageData[_currentStage - 1];
@@ -377,6 +433,11 @@ void GameManager::OnEndLevel(int playerIndex)
 	{
 		_boards[playerIndex]->Reset();
 		_boards[playerIndex]->GenerateLevel(currentStage.level[levelIndex].levelLayout, currentStage.waveCount);
+		
+		for (int i = 0; i < _currentLevel[playerIndex]; ++i)
+		{
+			_levelCountBlue[playerIndex][i]->Enable();
+		}
 	}
 }
 
@@ -410,10 +471,10 @@ void GameManager::IncreasePlayerCount()
 				_playTimeText[i]->SetOffsetPosition({ offSetBase + originOffset.x / MAXPLAYERCOUNT, originOffset.y });
 			}
 
-			if (_playerScoreText[i] != nullptr)
+			if (_stageInfoPanel[i] != nullptr)
 			{
-				auto originOffset = _playerScoreText[i]->GetOffsetPosition();
-				_playerScoreText[i]->SetOffsetPosition({ offSetBase + originOffset.x / MAXPLAYERCOUNT, originOffset.y });
+				auto originOffset = _stageInfoPanel[i]->GetOffsetPosition();
+				_stageInfoPanel[i]->SetOffsetPosition({ offSetBase + originOffset.x / MAXPLAYERCOUNT, originOffset.y });
 			}
 
 			_comboTextPos[i] = { offSetBase + COMBOTEXTPOSITION.x / MAXPLAYERCOUNT, COMBOTEXTPOSITION.y };
