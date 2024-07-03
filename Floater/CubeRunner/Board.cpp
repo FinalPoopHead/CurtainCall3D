@@ -27,7 +27,7 @@ constexpr int CUBE_DAMAGE = 1;
 constexpr int DARKCUBE_DAMAGE = 1;
 constexpr float SLOWVALUE = 0.5f;
 constexpr float FFDEFAULT = 1.0f;
-constexpr float FFVALUE = 12.0f;
+constexpr float FFVALUE = 20.0f;
 
 Board::Board(GameManager* gameManager, int playerIndex, int width, int height, float offset /*= 4.00f*/) :
 	flt::GameObject()
