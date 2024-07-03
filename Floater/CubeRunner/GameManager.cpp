@@ -303,6 +303,7 @@ void GameManager::SetBoardAndPlayer(int index, Board* board, Player* player)
 
 	_boards.push_back(board);
 	_players.push_back(player);
+	player->SetPadIndex(index);
 	IncreasePlayerCount();
 }
 

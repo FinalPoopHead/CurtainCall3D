@@ -84,6 +84,10 @@ void flt::UIComponent::SetImage(const std::wstring& filePath)
 	_size.x = static_cast<float>(w);
 	_size.y = static_cast<float>(h);
 
+	Vector4f scale = _gameObject->tr.GetLocalScale();
+	_size.x *= scale.x;
+	_size.y *= scale.y;
+
 	if (_isRegisted)
 	{
 		_renderer.DeregisterObject(_hObject);
@@ -147,9 +151,12 @@ flt::Vector2f flt::UIComponent::GetImageSize()
 
 void flt::UIComponent::SetSize(flt::Vector2f imgSize)
 {
-	Vector2f currSize = GetSize();
+	//Vector2f currSize = GetSize();
+	int w = 0;
+	int h = 0;
+	_image->GetSize(w, h);
 
-	_gameObject->tr.SetScale(imgSize.x / currSize.x, imgSize.y / currSize.y, 1.0f);
+	_gameObject->tr.SetScale(imgSize.x / (float)w, imgSize.y / (float)h, 1.0f);
 
 	_size = imgSize;
 
@@ -207,7 +214,7 @@ void flt::UIComponent::SetTextColor(float r, float g, float b)
 
 void flt::UIComponent::UpdateGameObjectPosition()
 {
-	_gameObject->tr.SetPosition(_position.x - _size.x / 2, _position.y - _size.x / 2, _zOrder);
+	_gameObject->tr.SetPosition(_position.x - _size.x / 2, _position.y - _size.y / 2, _zOrder);
 }
 
 void flt::UIComponent::SetPositionUseOffset()

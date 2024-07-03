@@ -28,7 +28,7 @@ Player::Player(Board* board)
 
 void Player::OnEnable()
 {
-	_padIndex = 0;
+	//_padIndex = 0;
 }
 
 void Player::Update(float deltaSecond)
@@ -133,6 +133,37 @@ void Player::Update(float deltaSecond)
 		if (state.buttons & flt::GamePadState::ButtonFlag::RIGHT)
 		{
 			nextPosOffset.x += 1.0f;
+		}
+
+		if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
+		{
+			// 지뢰 설치
+			if (!_board->IsMineSet())
+			{
+				_board->SetMine(pos.x, pos.z);
+			}
+			else
+			{
+				_board->DetonateMine();
+			}
+		}
+		if (state.buttonsDown & flt::GamePadState::ButtonFlag::B)
+		{
+			// 슈퍼 지뢰 폭파
+			_board->DetonateAdvantageMine();
+		}
+		if (state.buttonsDown & flt::GamePadState::ButtonFlag::X)
+		{
+
+		}
+		if (state.buttonsDown & flt::GamePadState::ButtonFlag::Y)
+		{
+			// 빨리감기
+			_board->FastForward();
+		}
+		if(state.buttonsUp & flt::GamePadState::ButtonFlag::Y)
+		{
+			_board->EndFastForward();
 		}
 	}
 

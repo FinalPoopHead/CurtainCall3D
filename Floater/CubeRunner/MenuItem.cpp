@@ -18,6 +18,17 @@ void MenuItem::SetSprite(const std::wstring& spriteName)
 	_ui->SetImage(spriteName);
 }
 
+void MenuItem::SetPointedSpritePath(const std::wstring& spriteName)
+{
+	_pointedSpriteName = spriteName;
+}
+
+void MenuItem::SetDefaultSpritePath(const std::wstring& spriteName)
+{
+	_defaultSpriteName = spriteName;
+	SetSprite(spriteName);
+}
+
 void MenuItem::SetPosition(flt::Vector2f pos)
 {
 	_ui->SetPosition(pos);
@@ -82,6 +93,16 @@ void MenuItem::SetTextColor(flt::Vector4f color)
 void MenuItem::SetTextColor(float r, float g, float b)
 {
 	_ui->SetTextColor(r, g, b);
+}
+
+void MenuItem::OnPointed()
+{
+	SetSprite(_pointedSpriteName);
+}
+
+void MenuItem::OnUnpointed()
+{
+	SetSprite(_defaultSpriteName);
 }
 
 void MenuItem::Select(flt::KeyCode keyCode)
