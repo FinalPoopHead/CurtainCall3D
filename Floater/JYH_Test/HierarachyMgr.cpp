@@ -65,6 +65,13 @@ void HierarachyMgr::PreUpdate(float deltaSeconds)
 			_hierarchyTestArr[6]->Enable();
 		}
 	}
+
+	if (GetKeyDown(flt::KeyCode::key4))
+	{
+		std::cout << "\nkey4  ";
+
+		_hierarchyTestArr[2]->Destroy();
+	}
 	if (flt::GetKeyDown(flt::KeyCode::spacebar))
 	{
 		std::cout << "\n";

@@ -25,3 +25,8 @@ void HierarchyTest::OnDisable()
 {
 	std::wcout << name << L" dis| ";
 }
+
+void HierarchyTest::OnDestroy()
+{
+	std::wcout << name << L" X| ";
+}

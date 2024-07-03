@@ -210,6 +210,7 @@ void flt::Scene::DestroyGameObjectRecursive(GameObject* gameObject)
 	}
 	gameObject->OnDestroy();
 
+	gameObject->_index = -1;
 	_gameObjectsToDelete.push_back(gameObject);
 }
 
@@ -373,34 +374,6 @@ void flt::Scene::StartFrame()
 		}
 	}
 
-	while(!_stagingActiveGameObjects.empty())
-	{
-		auto iter = _stagingActiveGameObjects.begin();
-		GameObject* object = iter->first;
-		bool isUpdate = iter->second;
-
-		if (isUpdate)
-		{
-			// 아직 활성화 되어있지 않는 경우에만 처리
-			if(object->_updateIndex == -1)
-			{
-				auto iter = _activeGameObjects.EmplaceBack(object);
-				object->_updateIndex = iter.GetIndex();
-			}
-		}
-		else
-		{
-			// 이미 활성화 되어있는 경우에만 처리
-			if(object->_updateIndex != -1)
-			{
-				_activeGameObjects.Erase(object->_updateIndex);
-				object->_updateIndex = -1;
-			}
-		}
-
-		_stagingActiveGameObjects.erase(iter);
-	}
-
 	while (!_componentsToEnable.empty())
 	{
 		ComponentBase* component = _componentsToEnable.back();
@@ -418,23 +391,7 @@ void flt::Scene::StartFrame()
 	for (int i = 0; i < _gameObjectsToDestroy.size(); ++i)
 	{
 		GameObject* object = _gameObjectsToDestroy[i];
-
-		//이미 이 전 상태와 같다면 패스.
-		if (object->_isEnable == false)
-		{
-			continue;
-		}
-
-		object->_isEnable = false;
-
-		for (auto& component : object->_components)
-		{
-			if (component->_isEnable)
-			{
-				component->OnDisable();
-			}
-		}
-		object->OnDisable();
+		object->Disable();
 	}
 
 	while (!_componentsToDisable.empty())
@@ -466,6 +423,34 @@ void flt::Scene::StartFrame()
 		_gameObjects.Erase(index);
 		object->_index = -1;
 		DestroyGameObjectRecursive(object);
+	}
+
+	while (!_stagingActiveGameObjects.empty())
+	{
+		auto iter = _stagingActiveGameObjects.begin();
+		GameObject* object = iter->first;
+		bool isUpdate = iter->second;
+
+		if (isUpdate)
+		{
+			// 아직 활성화 되어있지 않는 경우에만 처리
+			if (object->_updateIndex == -1)
+			{
+				auto iter = _activeGameObjects.EmplaceBack(object);
+				object->_updateIndex = iter.GetIndex();
+			}
+		}
+		else
+		{
+			// 이미 활성화 되어있는 경우에만 처리
+			if (object->_updateIndex != -1)
+			{
+				_activeGameObjects.Erase(object->_updateIndex);
+				object->_updateIndex = -1;
+			}
+		}
+
+		_stagingActiveGameObjects.erase(iter);
 	}
 
 	while(!_gameObjectsToDelete.empty())
