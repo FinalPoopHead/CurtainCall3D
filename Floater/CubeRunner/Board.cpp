@@ -181,6 +181,7 @@ void Board::PreUpdate(float deltaSecond)
 			// TODO : 웨이브 클리어 연출 보여주고 다음 웨이브 출발
 			if (_runningCubeControllers.empty() && !_waveCubeControllers.empty())
 			{
+				_isPerfect = true;
 				_runningCubeControllers = _waveCubeControllers.front();
 				_waveCubeControllers.pop_front();
 				for (auto& cubeCtr : _runningCubeControllers)
@@ -222,6 +223,11 @@ void Board::PreUpdate(float deltaSecond)
 
 void Board::PostUpdate(float deltaSeoncd)
 {
+	if (_isGameOver)
+	{
+		return;
+	}
+
 	if (_damageCount > 0)
 	{
 		_gameManager->ReduceHP(_playerIndex, _damageCount);
@@ -243,6 +249,40 @@ bool Board::SetTileState(float x, float y, eTileStateFlag state)
 	_tileStates[tileX][tileY] = (int)state;
 
 	return true;
+}
+
+void Board::SetTileStateWithCubeCtr(CubeController* cubeCtr)
+{
+	auto pos = cubeCtr->GetPosition();
+	int x = 0;
+	int z = 0;
+	ConvertToTileIndex(pos.x, pos.z, x, z);
+
+	if (x < 0 || x >= _width || z < 0 || z >= _height)
+	{
+		return;
+	}
+
+	eTileStateFlag state = eTileStateFlag::NONE;
+
+	switch (cubeCtr->GetCubeType())
+	{
+	case eCUBETYPE::NORMAL:
+		state = eTileStateFlag::NORMALCUBE;
+		break;
+	case eCUBETYPE::DARK:
+		state = eTileStateFlag::DARKCUBE;
+		break;
+	case eCUBETYPE::ADVANTAGE:
+		state = eTileStateFlag::ADVANTAGECUBE;
+		break;
+
+	default:
+		break;
+	}
+
+	AddTileState(pos.x, pos.z, state);
+	_tiles[x][z]->_cube = cubeCtr->GetGameObject();
 }
 
 bool Board::AddTileState(float x, float y, eTileStateFlag state)
@@ -460,8 +500,6 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 	int width = levelLayout.size();
 	int height = levelLayout[0].size();
 
-	_isPerfect = true;
-
 	_waveCubeControllers.clear();
 	int waveHeight = height / waveCount;
 	int heightCount = 0;
@@ -470,7 +508,12 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 
 	for (int j = 0; j < height; ++j)
 	{
-		heightCount++;
+		if (j >= _height)
+		{
+			_waveCubeControllers.push_front(waveCubes);
+			waveCubes.clear();
+			break;
+		}
 
 		for (int i = 0; i < width; ++i)
 		{
@@ -520,6 +563,8 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 			_nowRisingCount++;
 		}
 
+		++heightCount;
+
 		if (heightCount >= waveHeight)
 		{
 			heightCount = 0;
@@ -529,9 +574,14 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 	}
 
 	_boardState = eBoardState::CUBERISING;
+	if (_height == 0)
+	{
+		_boardState = eBoardState::NONE;
+	}
 
 	_runningCubeControllers = _waveCubeControllers.front();
 	_waveCubeControllers.pop_front();
+	_isPerfect = true;
 
 	for (auto& cubeCtr : _runningCubeControllers)
 	{
@@ -579,9 +629,11 @@ void Board::AddRow()
 
 void Board::OnEndWave()
 {
+	std::cout << "퍼펙트임?" << _isPerfect << std::endl;
 	if (_isPerfect)
 	{
 		AddRow();
+		std::cout << "줄 추가함. 다음 줄 : " << _nextDestroyRow << std::endl;
 		// TODO : 상대방 공격하는게 되긴 하는데.. 좀 요상하다 ㅋㅋㅋㅋ
 		//			Board 코드도 조금바꿔서 행동에 우선순위를 정해주고 큐에 담아서 처리하는 식으로 해야될듯..
 		// _gameManager->AttackAnotherPlayer(_playerIndex);
@@ -879,6 +931,7 @@ void Board::AddCubeFallCount()
 {
 	_damageCount++;
 	_isPerfect = false;
+	std::cout << "큐브가 떨어짐" << std::endl;
 }
 
 void Board::FastForward()
@@ -1094,38 +1147,17 @@ void Board::UpdateBoard()
 		}
 	}
 
+	for (auto& wave : _waveCubeControllers)
+	{
+		for (auto& cubeCtr : wave)
+		{
+			SetTileStateWithCubeCtr(cubeCtr);
+		}
+	}
+
 	for (auto& cubeCtr : _runningCubeControllers)
 	{
-		auto pos = cubeCtr->GetPosition();
-		int x = 0;
-		int z = 0;
-		ConvertToTileIndex(pos.x, pos.z, x, z);
-
-		if (x < 0 || x >= _width || z < 0 || z >= _height)
-		{
-			continue;
-		}
-
-		eTileStateFlag state = eTileStateFlag::NONE;
-
-		switch (cubeCtr->GetCubeType())
-		{
-		case eCUBETYPE::NORMAL:
-			state = eTileStateFlag::NORMALCUBE;
-			break;
-		case eCUBETYPE::DARK:
-			state = eTileStateFlag::DARKCUBE;
-			break;
-		case eCUBETYPE::ADVANTAGE:
-			state = eTileStateFlag::ADVANTAGECUBE;
-			break;
-
-		default:
-			break;
-		}
-
-		AddTileState(pos.x, pos.z, state);
-		_tiles[x][z]->_cube = cubeCtr->GetGameObject();
+		SetTileStateWithCubeCtr(cubeCtr);
 	}
 }
 
@@ -1165,6 +1197,7 @@ bool Board::UpdateDetonate()
 					{
 						cubeCtr->StartRemove(REMOVE_TIME);
 						_isPerfect = false;
+						std::cout << "다크큐브 부숨" << std::endl;
 						DestroyRow();
 					}
 					break;

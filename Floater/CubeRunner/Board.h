@@ -101,6 +101,7 @@ private:
 	void AddDelay(float second);
 	
 	void UpdateBoard();
+	void SetTileStateWithCubeCtr(CubeController* cubeCtr);
 	bool UpdateDetonate();		// 수납된 큐브가 있으면 true 아니면 false
 	void TickCubesRolling(float rollingTime);			// 일괄적으로 굴리기 시작.
 	void AddRow();

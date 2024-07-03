@@ -53,10 +53,14 @@ void Player::Update(float deltaSecond)
 
 	// 현재 움직일 수 없는 상태면 crushed 된 상태다.
 	_isCrushed = false;
-	if ((tileState == (int)eTileStateFlag::NONE)
-		|| (tileState & blocked) && (nextTileState & blocked))
+	if ((tileState & blocked) && (nextTileState & blocked))
 	{
 		_isCrushed = true;
+	}
+
+	if ((tileState == (int)eTileStateFlag::NONE))
+	{
+		// 타일 밖이다. 게임오버처리를 여기서해야되나 Board 에서 해야되나..
 	}
 
 	if (tileState & (int)eTileStateFlag::RISING)
