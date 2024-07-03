@@ -69,13 +69,14 @@ GameManager::GameManager() :
 	}
 
 	std::wstring fontPath = L"../Resources/Fonts/LineSeedSansKR_KoreanCompatible_40.spritefont";
+	std::wstring smallFontPath = L"../Resources/Fonts/LineSeedSansKR_KoreanCompatible_25.spritefont";
 	flt::Vector4f fontColor = { 1.0f,1.0f,1.0f,1.0f };
 
 	// Create comboTextPool
 	for (int i = 0; i < COMBOTEXTPOOLCOUNT; ++i)
 	{
 		TextObject* comboText = flt::CreateGameObject<TextObject>(false);
-		comboText->SetFont(fontPath);
+		comboText->SetFont(smallFontPath);
 		comboText->SetText(L"default text");
 		comboText->SetTextColor(fontColor);
 		_comboTextPool.push_back(comboText);
@@ -243,7 +244,7 @@ void GameManager::CreateUI(int index)
 	playerScoreText->SetFont(smallFontPath);
 	playerScoreText->SetTextColor(TextColor);
 	playerScoreText->SetText(L"0");
-	playerScoreText->SetPosition({ 44.0f, 4.0f });
+	playerScoreText->SetPosition({ 36.0f, 6.0f });
 	_playerScoreText.push_back(playerScoreText);
 
 	_levelCountSlot.emplace_back();
@@ -255,13 +256,13 @@ void GameManager::CreateUI(int index)
 		levelCounterSlot->tr.SetParent(&stageInfoPanel->tr);
 		levelCounterSlot->SetSprite(levelCounterSlotPath);
 		levelCounterSlot->SetZOrder(LEVELSLOTZORDER);
-		levelCounterSlot->SetPosition({ 70.0f + 50.0f * i, -9.0f});
+		levelCounterSlot->SetPosition({ 62.0f + 50.0f * i, -18.0f});
 
 		SpriteObject* levelCounterBlue = flt::CreateGameObject<SpriteObject>(false);
 		levelCounterBlue->tr.SetParent(&stageInfoPanel->tr);
 		levelCounterBlue->SetSprite(levelCounterBluePath);
 		levelCounterBlue->SetZOrder(LEVELVALUEZORDER);
-		levelCounterBlue->SetPosition({ 70.0f + 50.0f * i, -9.0f });
+		levelCounterBlue->SetPosition({ 62.0f + 50.0f * i, -18.0f });
 
 		_levelCountSlot[index].push_back(levelCounterSlot);
 		_levelCountBlue[index].push_back(levelCounterBlue);
@@ -415,13 +416,19 @@ void GameManager::SetStage(int stageNum)
 	}
 }
 
+void GameManager::ProgressStage()
+{
+	// TODO : 구현해야함.
+	ASSERT(false);
+}
+
 void GameManager::OnEndLevel(int playerIndex)
 {
 	++_currentLevel[playerIndex];
 	if (_currentLevel[playerIndex] > _stageData[_currentStage - 1].levelCount)
 	{
 		// TODO : 스테이지 클리어
-		//_currentLevel[playerIndex] = 1;
+		_currentLevel[playerIndex] = 1;
 		return;
 	}
 

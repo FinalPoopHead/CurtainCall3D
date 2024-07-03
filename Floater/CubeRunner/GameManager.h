@@ -46,7 +46,7 @@ public:
 
 	void ReduceHP(int index, int damage = 1);
 
-	void IncreaseScore(int playerIndex, int count);	// Cube가 수납될 때 Board 객체가 호출하는 이벤트 함수
+	void IncreaseScore(int playerIndex, int count);	// Cube가 수납될 때 Board 객체가 호출하는 이벤트 함수 // DarkCube를 섞어서 깨면 어떻게해야되려나..?
 	void AttackAnotherPlayer(int playerIndex);
 	void SetStage(int stageNum);		// 해당 스테이지로 Hard Set한다 (기존 정보 초기화) -> 플레이어 별로 해야되나?
 	void ProgressStage();				// 다음 스테이지로 넘어간다	
@@ -60,7 +60,7 @@ private:
 	void AddPlayTime(int index, float time);
 	void ReadStageFile();
 	void ResetGame();
-	void ResizeFallCountUI(int nextCount);
+	void ResizeFallCountUI(int nextCount); 
 	void SetPlayTimeText(int index, float time);
 
 	/// 컨트롤 하는 게임 오브젝트들
