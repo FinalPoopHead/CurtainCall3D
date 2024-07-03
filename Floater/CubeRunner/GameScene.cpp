@@ -13,21 +13,8 @@
 int g_PlayerNum = 1;
 int g_StageNum = 1;
 
-constexpr flt::Vector2f HPPANEL_OFFSETPOS = { 0.9f,0.95f };
-constexpr flt::Vector2f TIMEPANEL_OFFSETPOS = { 0.8f,0.05f };
-constexpr flt::Vector2f SCOREPANEL_OFFSETPOS = { 0.05f,0.05f };
-
-constexpr float HPOFFSETSIZE = 80.0f;
-constexpr flt::Vector2f HPUISIZE = { 64.0f,20.0f };
-
-constexpr float HPSlotZorder = 0.2f;
-constexpr float HPValueZorder = 0.3f;
-
-constexpr flt::Vector4f TimeTextColor = { 1.0f,1.0f,1.0f,1.0f };
-constexpr flt::Vector4f ScoreTextColor = { 1.0f,1.0f,1.0f,1.0f };
-
 constexpr int STAGE = 1;
-constexpr int WIDTH = 5;
+constexpr int WIDTH = 4;
 constexpr int HEIGHT = 15;
 
 void GameScene::Initialize()
