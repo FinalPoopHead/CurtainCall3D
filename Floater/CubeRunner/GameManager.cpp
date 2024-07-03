@@ -12,6 +12,7 @@ constexpr int MAXPLAYERCOUNT = 2;
 constexpr int MAXSTAGECOUNT = 9;
 constexpr int CUBESCORE = 100;
 constexpr int COMBOTEXTPOOLCOUNT = 20;
+constexpr int MAXFALLCOUNT = 6;			// 최대 fallcount 개수
 constexpr float COMBOTEXTSPEED = 0.2f;
 constexpr flt::Vector2f COMBOTEXTPOSITION = { 0.05f,0.85f };
 
@@ -71,7 +72,7 @@ GameManager::GameManager() :
 	flt::Vector4f fontColor = { 1.0f,1.0f,1.0f,1.0f };
 
 	// Create comboTextPool
-	for (int i = 0; i < COMBOTEXTPOOLCOUNT; i++)
+	for (int i = 0; i < COMBOTEXTPOOLCOUNT; ++i)
 	{
 		TextObject* comboText = flt::CreateGameObject<TextObject>(false);
 		comboText->SetFont(fontPath);
@@ -202,10 +203,9 @@ void GameManager::PostUpdate(float deltaSecond)
 	}
 }
 
-void GameManager::CreateUI(int index, int width)
+void GameManager::CreateUI(int index)
 {
 	_fallCount[index] = 0;
-	_fallCountMax[index] = width - 1;
 
 	std::wstring stageCounterSlotPath = L"../Resources/Sprites/StageCounterSlot.png";
 	std::wstring levelCounterSlotPath = L"../Resources/Sprites/LevelCounterSlot.png";
@@ -267,6 +267,7 @@ void GameManager::CreateUI(int index, int width)
 		_levelCountBlue[index].push_back(levelCounterBlue);
 	}
 
+	// 미리 6개까지 만들어두고 Disable하면서 사용한다.
 	SpriteObject* fallCountPanel = flt::CreateGameObject<SpriteObject>(true);
 	fallCountPanel->SetOffsetPosition(HPPANEL_OFFSETPOS);
 	_fallCountPanel.push_back(fallCountPanel);
@@ -274,9 +275,9 @@ void GameManager::CreateUI(int index, int width)
 	_fallCountSlot.emplace_back();
 	_fallCountRed.emplace_back();
 
-	for (int i = 0; i < width - 1; i++)
+	for (int i = 0; i < MAXFALLCOUNT; i++)
 	{
-		SpriteObject* fallCountSlot = flt::CreateGameObject<SpriteObject>(true);
+		SpriteObject* fallCountSlot = flt::CreateGameObject<SpriteObject>(false);
 		fallCountSlot->tr.SetParent(&fallCountPanel->tr);
 		fallCountSlot->SetSprite(counterSlotPath);
 		fallCountSlot->SetZOrder(FALLCOUNTSLOTZORDER);
@@ -408,8 +409,8 @@ void GameManager::SetStage(int stageNum)
 		}
 
 		_stageCountText[i]->SetText(std::to_wstring(stageNum));
-		_fallCountMax[i] = data.stageWidth - 1;
 
+		// _fallCountMax[i] = data.stageWidth - 1; // 아래 함수에서 처리 
 		ResizeFallCountUI(data.stageWidth - 1);
 	}
 }
@@ -645,11 +646,6 @@ void GameManager::ResetGame()
 			_fallCountRed[i][j]->Disable();
 		}
 
-		for (int j = _fallCountMax[i] - 1; j >= _fallCountMax[i] - _fallCount[i]; --j)
-		{
-			_fallCountRed[i][j]->Enable();
-		}
-
 		SetPlayTimeText(i, 0.0f);
 
 		for (int j = 0; j < 4; j++)
@@ -670,42 +666,31 @@ void GameManager::ResetGame()
 
 void GameManager::ResizeFallCountUI(int nextCount)
 {
+	if (nextCount > MAXFALLCOUNT)
+	{
+		nextCount = MAXFALLCOUNT;
+	}
+
 	for (int i = 0; i < _players.size(); ++i)
 	{
 		auto& slots = _fallCountSlot[i];
-		auto& reds = _fallCountRed[i];
 
-		if (slots.size() < nextCount)
+		if (_fallCountMax[i] < nextCount)
 		{
-			for (int slotIndex = slots.size(); slotIndex < nextCount; ++slotIndex)
+			for (int slotIndex = _fallCountMax[i]; slotIndex < nextCount; ++slotIndex)
 			{
-				SpriteObject* fallCountSlot = flt::CreateGameObject<SpriteObject>(true);
-				fallCountSlot->tr.SetParent(&_fallCountPanel[i]->tr);
-				fallCountSlot->SetSprite(counterSlotPath);
-				fallCountSlot->SetZOrder(FALLCOUNTSLOTZORDER);
-				fallCountSlot->SetPosition({ -FALLCOUNTOFFSET * slotIndex,0.0f });
-
-				SpriteObject* fallCountRed = flt::CreateGameObject<SpriteObject>(false);
-				fallCountRed->tr.SetParent(&_fallCountPanel[i]->tr);
-				fallCountRed->SetSprite(counterRedPath);
-				fallCountRed->SetZOrder(FALLCOUNTREDZORDER);
-				fallCountRed->SetPosition({ -FALLCOUNTOFFSET * slotIndex,0.0f });
-
-				slots.push_back(fallCountSlot);
-				reds.push_back(fallCountRed);
+				slots[slotIndex]->Enable();
 			}
 		}
-		else if (slots.size() > nextCount)
+		else if (_fallCountMax[i] > nextCount)
 		{
-			int diff = slots.size() - nextCount;
-			for (int diffCount = 0; diffCount < diff; ++diffCount)
+			for (int slotIndex = _fallCountMax[i] - 1; slotIndex >= nextCount; --slotIndex)
 			{
-				slots.back()->Destroy();
-				reds.back()->Destroy();
-				slots.pop_back();
-				reds.pop_back();
+				slots[slotIndex]->Disable();
 			}
 		}
+
+		_fallCountMax[i] = nextCount;
 	}
 }
 
