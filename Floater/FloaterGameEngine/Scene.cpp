@@ -221,6 +221,23 @@ void flt::Scene::CallCollisionEvent()
 	//_collisionPairs.clear();
 }
 
+void flt::Scene::DestroyGameObjectRecursive(GameObject* gameObject)
+{
+	std::vector<GameObject*> children = gameObject->GetChildren();
+	for (auto& child : children)
+	{
+		DestroyGameObjectRecursive(child);
+	}
+
+	for (auto& component : gameObject->_components)
+	{
+		component->OnDestroy();
+	}
+	gameObject->OnDestroy();
+
+	_gameObjectsToDelete.push_back(gameObject);
+}
+
 void flt::Scene::PrePhysicsUpdate()
 {
 	for (auto& object : _gameObjects)
@@ -505,17 +522,28 @@ void flt::Scene::StartFrame()
 		GameObject* object = _gameObjectsToDestroy.back();
 		_gameObjectsToDestroy.pop_back();
 
+		int index = object->_index;
+		if(index == -1)
+		{
+			continue;
+		}
+
+		_gameObjects.Erase(index);
+		object->_index = -1;
+		DestroyGameObjectRecursive(object);
+	}
+
+	while(!_gameObjectsToDelete.empty())
+	{
+		GameObject* object = _gameObjectsToDelete.back();
+		_gameObjectsToDelete.pop_back();
+
+		ASSERT(object->_index == -1, "Destroy GameObject Error");
 		for (auto& component : object->_components)
 		{
-			component->OnDestroy();
 			delete component;
 		}
-		object->OnDestroy();
-
-		int index = object->_index;
-		_gameObjects.Erase(index);
 		delete object;
-		//_gameObjects.erase(std::remove(_gameObjects.begin(), _gameObjects.end(), object), _gameObjects.end());
 	}
 }
 

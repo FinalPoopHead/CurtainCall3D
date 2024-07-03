@@ -21,6 +21,15 @@ namespace flt
 		GameObject();
 		~GameObject();
 
+		GameObject* GetParent() const;
+		void SetParent(GameObject* parent);
+		std::vector<GameObject*> GetChildren() const;
+		GameObject* GetChild(int index) const;
+		void AddChild(GameObject* child);
+		void RemoveChild(GameObject* child);
+		void RemoveChild(int index);
+		void RemoveAllChildren();
+
 	protected:
 		// 씬에 추가되었을 때 비활성화 여부와 상관 없이 호출
 		virtual void OnCreate() {}
