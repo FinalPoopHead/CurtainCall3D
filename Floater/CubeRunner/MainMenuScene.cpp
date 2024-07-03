@@ -19,7 +19,8 @@ void MainMenuScene::Initialize()
 	MenuItem* item1 = flt::CreateGameObject<MenuItem>(true);
 	menu->AddItem(item1);
 
-	item1->SetSprite(L"../Resources/Sprites/SinglePlayer2.png");
+	item1->SetDefaultSpritePath(L"../Resources/Sprites/SinglePlayer2.png");
+	item1->SetPointedSpritePath(L"../Resources/Sprites/SinglePlayer2Pointed.png");
 	//item1->SetPosition({ 1000.0f, 400.0f });
 	item1->SetOffsetPosition({ menuItemOffsetX, menuItemOffsetY });
 	menuItemOffsetY += 0.1f;
@@ -31,7 +32,8 @@ void MainMenuScene::Initialize()
 	MenuItem* item2 = flt::CreateGameObject<MenuItem>(true);
 	menu->AddItem(item2);
 
-	item2->SetSprite(L"../Resources/Sprites/MultiPlayer2.png");
+	item2->SetDefaultSpritePath(L"../Resources/Sprites/MultiPlayer2.png");
+	item2->SetPointedSpritePath(L"../Resources/Sprites/MultiPlayer2Pointed.png");
 	//item2->SetPosition({ 1000.0f, 500.0f });
 	item2->SetOffsetPosition({ menuItemOffsetX, menuItemOffsetY });
 	menuItemOffsetY += 0.1f;
@@ -42,7 +44,8 @@ void MainMenuScene::Initialize()
 	MenuItem* item3 = flt::CreateGameObject<MenuItem>(true);
 	menu->AddItem(item3);
 
-	item3->SetSprite(L"../Resources/Sprites/Exit.png");
+	item3->SetDefaultSpritePath(L"../Resources/Sprites/Exit.png");
+	item3->SetPointedSpritePath(L"../Resources/Sprites/ExitPointed.png");
 	item3->SetOffsetPosition({ menuItemOffsetX, menuItemOffsetY });
 	menuItemOffsetY += 0.1f;
 	item3->SetSize(menuItemSize);

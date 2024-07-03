@@ -84,6 +84,10 @@ void flt::UIComponent::SetImage(const std::wstring& filePath)
 	_size.x = static_cast<float>(w);
 	_size.y = static_cast<float>(h);
 
+	Vector4f scale = _gameObject->tr.GetLocalScale();
+	_size.x *= scale.x;
+	_size.y *= scale.y;
+
 	if (_isRegisted)
 	{
 		_renderer.DeregisterObject(_hObject);

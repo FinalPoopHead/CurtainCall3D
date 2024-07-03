@@ -16,6 +16,7 @@ public:
 
 protected:
 	void OnEnable() override;
+	void OnDisable() override;
 	void Update(float deltaSecond) override;
 
 private:
