@@ -1055,6 +1055,7 @@ void Board::Reset()
 			tile->DisableMine();
 			tile->_isFalling = false;
 			tile->_isMoving = false;
+			tile->_cube = nullptr;
 		}
 	}
 
