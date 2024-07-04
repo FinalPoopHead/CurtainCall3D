@@ -111,13 +111,7 @@ void Board::OnDestroy()
 
 void Board::PreUpdate(float deltaSecond)
 {
-	// 	system("cls");
-	// 	std::cout << "nowRollingCount : " << _nowRollingCount << std::endl;
-	// 	std::cout << "nowRisingCount : " << _nowRisingCount << std::endl;
-	// 	std::cout << "nowFallingTileCount : " << _nowFallingTileCount << std::endl;
-	// 	std::cout << "nowAddTileCount : " << _nowAddTileCount << std::endl;
-
-		// TODO : FastForward를 플레이어 별로 나눠줘야 함
+	// TODO : FastForward를 플레이어 별로 나눠줘야 함
 	flt::KeyData keyData = flt::GetKeyDown(flt::KeyCode::l);
 	if (keyData)
 	{

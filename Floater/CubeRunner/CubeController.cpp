@@ -49,7 +49,7 @@ void CubeController::PreUpdate(float deltaSecond)
 		Removing(deltaSecond * _board->GetFFValue());
 		break;
 	case eCUBESTATUS::GENERATING:
-		Generating(deltaSecond * _board->GetFFValue());
+		Generating(deltaSecond);
 		break;
 	}
 }
