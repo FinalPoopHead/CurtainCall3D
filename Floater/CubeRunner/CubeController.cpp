@@ -116,7 +116,7 @@ void CubeController::StartRemove(float removeTime)
 		break;
 	}
 
-	_gameObject->tr.SetScale(1.0, OVERLAPSCALE, 1.0);
+	_gameObject->tr.SetScale(OVERLAPSCALE + 0.005f, OVERLAPSCALE + 0.005f, 1.0);
 	_removeSpeed = 1.0f / removeTime;
 
 	_status = eCUBESTATUS::REMOVING;
