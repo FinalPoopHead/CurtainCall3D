@@ -19,7 +19,19 @@ namespace flt
 
 	public:
 		GameObject();
+		GameObject(flt::Scene* owendScene);
 		~GameObject();
+
+		GameObject* GetParent() const;
+		void SetParent(GameObject* parent);
+		std::vector<GameObject*> GetChildren() const;
+		GameObject* GetChild(int index) const;
+		void AddChild(GameObject* child);
+		void RemoveChild(GameObject* child);
+		void RemoveChild(int index);
+		void RemoveAllChildren();
+		bool IsEnable() const;
+		bool IsWorldEnable() const;
 
 	protected:
 		// 씬에 추가되었을 때 비활성화 여부와 상관 없이 호출
@@ -43,7 +55,6 @@ namespace flt
 		void Enable();
 		void Disable();
 		void Destroy();
-		bool isEnable() const { return _isEnable; }
 
 	public:
 		[[deprecated("Use Template Function")]] bool AddComponent(ComponentBase* component);
@@ -54,6 +65,11 @@ namespace flt
 
 		template <typename T>
 		T* GetComponent();
+
+	private:
+		void CallEnableRecursive();
+		void CallDisableRecursive();
+		bool CheckEnableRecursive() const;
 
 	public:
 		std::wstring name;

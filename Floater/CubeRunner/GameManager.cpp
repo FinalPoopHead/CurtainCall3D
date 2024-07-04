@@ -174,7 +174,7 @@ void GameManager::PostUpdate(float deltaSecond)
 	{
 		auto offsetPos = liveText->GetOffsetPosition();
 
-		if (offsetPos.y <= 0.85f && !liveText->isEnable())
+		if (offsetPos.y <= 0.85f && !liveText->IsEnable())
 		{
 			liveText->Enable();		// 특정 높이가 되면 Enable
 		}

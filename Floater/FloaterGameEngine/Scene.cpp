@@ -10,7 +10,8 @@ flt::Scene::Scene() :
 	_componentsToEnable(),
 	_componentsToDisable(),
 	_collisionPairs(),
-	_collisionFlag(false)
+	_collisionFlag(false),
+	_isActive(false)
 {
 }
 
@@ -18,25 +19,6 @@ flt::Scene::~Scene()
 {
 	
 }
-
-//void flt::Scene::CreateGameObject(GameObject* gameObject)
-//{
-//	_gameObjects.emplace_back(gameObject);
-//	if (gameObject->_isEnable)
-//	{
-//		_gameObjectsToEnable.emplace_back(gameObject, gameObject->_isEnable);
-//
-//		for (auto& component : gameObject->_components)
-//		{
-//			if (component == nullptr)
-//			{
-//				continue;
-//			}
-//
-//			_componentsToEnable.emplace_back(component, true);
-//		}
-//	}
-//}
 
 std::vector<flt::GameObject*> flt::Scene::GetGameObjects(const std::wstring& name) const
 {
@@ -56,33 +38,26 @@ void flt::Scene::AddEnableGameObject(GameObject* gameObject, bool isEnable)
 {
 	{
 		bool isExist = false;
-		for (auto& object : _gameObjects)
+		int index = gameObject->_index;
+		if (index != -1)
 		{
-			if (object == gameObject)
+			ASSERT(_gameObjects[index] == gameObject, "Not exist GameObject");
+			isExist = true;
+		}
+		else
+		{
+			for (auto& object : _gameObjectsToCreate)
 			{
-				isExist = true;
-				break;
+				if (object == gameObject)
+				{
+					isExist = true;
+					break;
+				}
 			}
 		}
-		for (auto& object : _gameObjectsToCreate)
-		{
-			if (object == gameObject)
-			{
-				isExist = true;
-				break;
-			}
-		}
+
 		ASSERT(isExist, "Not exist game object");
 	}
-
-	//if (isEnable)
-	//{
-	//	_gameObjectsToEnable.emplace_back(gameObject);
-	//}
-	//else
-	//{
-	//	_gameObjectsToDisable.emplace_back(gameObject);
-	//}
 
 	_stagingActiveGameObjects[gameObject] = isEnable;
 }
@@ -221,15 +196,28 @@ void flt::Scene::CallCollisionEvent()
 	//_collisionPairs.clear();
 }
 
+void flt::Scene::DestroyGameObjectRecursive(GameObject* gameObject)
+{
+	std::vector<GameObject*> children = gameObject->GetChildren();
+	for (auto& child : children)
+	{
+		DestroyGameObjectRecursive(child);
+	}
+
+	for (auto& component : gameObject->_components)
+	{
+		component->OnDestroy();
+	}
+	gameObject->OnDestroy();
+
+	gameObject->_index = -1;
+	_gameObjectsToDelete.push_back(gameObject);
+}
+
 void flt::Scene::PrePhysicsUpdate()
 {
-	for (auto& object : _gameObjects)
+	for (auto& object : _activeGameObjects)
 	{
-		if (!object->_isEnable)
-		{
-			continue;
-		}
-
 		//object->FixedUpdate();
 
 		for (auto& component : object->_components)
@@ -250,13 +238,8 @@ void flt::Scene::PostPhysicsUpdate()
 	CallCollisionEvent();
 
 	// postPhysics
-	for (auto& object : _gameObjects)
+	for (auto& object : _activeGameObjects)
 	{
-		if (!object->_isEnable)
-		{
-			continue;
-		}
-
 		for (auto& component : object->_components)
 		{
 			if (!component->_isEnable)
@@ -269,13 +252,8 @@ void flt::Scene::PostPhysicsUpdate()
 	}
 
 	// FixedUpdate
-	for (auto& object : _gameObjects)
+	for (auto& object : _activeGameObjects)
 	{
-		if (!object->_isEnable)
-		{
-			continue;
-		}
-
 		for (auto& component : object->_components)
 		{
 			if (!component->_isEnable)
@@ -291,13 +269,8 @@ void flt::Scene::PostPhysicsUpdate()
 
 void flt::Scene::Update(float deltaSecond)
 {
-	for (auto& object : _gameObjects)
+	for (auto& object : _activeGameObjects)
 	{
-		if (!object->_isEnable)
-		{
-			continue;
-		}
-
 		object->PreUpdate(deltaSecond);
 
 		for (auto& component : object->_components)
@@ -311,13 +284,8 @@ void flt::Scene::Update(float deltaSecond)
 		}
 	}
 
-	for (auto& object : _gameObjects)
+	for (auto& object : _activeGameObjects)
 	{
-		if (!object->_isEnable)
-		{
-			continue;
-		}
-
 		object->Update(deltaSecond);
 
 		for (auto& component : object->_components)
@@ -331,13 +299,8 @@ void flt::Scene::Update(float deltaSecond)
 		}
 	}
 
-	for (auto& object : _gameObjects)
+	for (auto& object : _activeGameObjects)
 	{
-		if (!object->_isEnable)
-		{
-			continue;
-		}
-
 		object->PostUpdate(deltaSecond);
 
 		for (auto& component : object->_components)
@@ -354,13 +317,8 @@ void flt::Scene::Update(float deltaSecond)
 
 void flt::Scene::PreRender()
 {
-	for (auto& object : _gameObjects)
+	for (auto& object : _activeGameObjects)
 	{
-		if (!object->_isEnable)
-		{
-			continue;
-		}
-
 		object->PreRender();
 
 		for (auto& component : object->_components)
@@ -377,13 +335,8 @@ void flt::Scene::PreRender()
 
 void flt::Scene::PostRender()
 {
-	for (auto& object : _gameObjects)
+	for (auto& object : _activeGameObjects)
 	{
-		if (!object->_isEnable)
-		{
-			continue;
-		}
-
 		object->PostRender();
 
 		for (auto& component : object->_components)
@@ -421,34 +374,6 @@ void flt::Scene::StartFrame()
 		}
 	}
 
-	while(!_stagingActiveGameObjects.empty())
-	{
-		auto iter = _stagingActiveGameObjects.begin();
-		GameObject* object = iter->first;
-		bool isUpdate = iter->second;
-
-		if (isUpdate)
-		{
-			// 아직 활성화 되어있지 않는 경우에만 처리
-			if(object->_updateIndex == -1)
-			{
-				auto iter = _activeGameObjects.EmplaceBack(object);
-				object->_updateIndex = iter.GetIndex();
-			}
-		}
-		else
-		{
-			// 이미 활성화 되어있는 경우에만 처리
-			if(object->_updateIndex != -1)
-			{
-				_activeGameObjects.Erase(object->_updateIndex);
-				object->_updateIndex = -1;
-			}
-		}
-
-		_stagingActiveGameObjects.erase(iter);
-	}
-
 	while (!_componentsToEnable.empty())
 	{
 		ComponentBase* component = _componentsToEnable.back();
@@ -466,23 +391,7 @@ void flt::Scene::StartFrame()
 	for (int i = 0; i < _gameObjectsToDestroy.size(); ++i)
 	{
 		GameObject* object = _gameObjectsToDestroy[i];
-
-		//이미 이 전 상태와 같다면 패스.
-		if (object->_isEnable == false)
-		{
-			continue;
-		}
-
-		object->_isEnable = false;
-
-		for (auto& component : object->_components)
-		{
-			if (component->_isEnable)
-			{
-				component->OnDisable();
-			}
-		}
-		object->OnDisable();
+		object->Disable();
 	}
 
 	while (!_componentsToDisable.empty())
@@ -505,17 +414,56 @@ void flt::Scene::StartFrame()
 		GameObject* object = _gameObjectsToDestroy.back();
 		_gameObjectsToDestroy.pop_back();
 
+		int index = object->_index;
+		if(index == -1)
+		{
+			continue;
+		}
+
+		_gameObjects.Erase(index);
+		object->_index = -1;
+		DestroyGameObjectRecursive(object);
+	}
+
+	while (!_stagingActiveGameObjects.empty())
+	{
+		auto iter = _stagingActiveGameObjects.begin();
+		GameObject* object = iter->first;
+		bool isUpdate = iter->second;
+
+		if (isUpdate)
+		{
+			// 아직 활성화 되어있지 않는 경우에만 처리
+			if (object->_updateIndex == -1)
+			{
+				auto iter = _activeGameObjects.EmplaceBack(object);
+				object->_updateIndex = iter.GetIndex();
+			}
+		}
+		else
+		{
+			// 이미 활성화 되어있는 경우에만 처리
+			if (object->_updateIndex != -1)
+			{
+				_activeGameObjects.Erase(object->_updateIndex);
+				object->_updateIndex = -1;
+			}
+		}
+
+		_stagingActiveGameObjects.erase(iter);
+	}
+
+	while(!_gameObjectsToDelete.empty())
+	{
+		GameObject* object = _gameObjectsToDelete.back();
+		_gameObjectsToDelete.pop_back();
+
+		ASSERT(object->_index == -1, "Destroy GameObject Error");
 		for (auto& component : object->_components)
 		{
-			component->OnDestroy();
 			delete component;
 		}
-		object->OnDestroy();
-
-		int index = object->_index;
-		_gameObjects.Erase(index);
 		delete object;
-		//_gameObjects.erase(std::remove(_gameObjects.begin(), _gameObjects.end(), object), _gameObjects.end());
 	}
 }
 
@@ -532,21 +480,14 @@ void flt::Scene::StartScene()
 
 void flt::Scene::EndScene()
 {
-	for (auto& object : _gameObjects)
+	for (auto& object : _activeGameObjects)
 	{
-		if (object->_isEnable == false)
-		{
-			continue;
-		}
-
 		for (auto& component : object->_components)
 		{
-			if (component->_isEnable == false)
+			if (component->_isEnable)
 			{
-				continue;
+				component->OnDisable();
 			}
-
-			component->OnDisable();
 		}
 		object->OnDisable();
 	}
@@ -567,7 +508,6 @@ void flt::Scene::EndScene()
 		for (auto& component : object->_components)
 		{
 			delete component;
-			//component = nullptr;
 		}
 		delete object;
 		//object = nullptr;
@@ -587,61 +527,10 @@ void flt::Scene::EndScene()
 		delete object;
 	}
 
+	_activeGameObjects.Clear();
 	_stagingActiveGameObjects.clear();
 	_gameObjectsToDestroy.clear();
 	_componentsToEnable.clear();
 	_componentsToDisable.clear();
 	_collisionPairs.clear();
-
-	/*for (auto& object : _gameObjects)
-	{
-		if (object->_isEnable == false)
-		{
-			continue;
-		}
-
-		for (auto& component : object->_components)
-		{
-			if (component == nullptr)
-			{
-				continue;
-			}
-
-			if (component->_isEnable == false)
-			{
-				continue;
-			}
-
-			component->OnDisable();
-		}
-		object->OnDisable();
-	}
-
-	for (auto& object : _gameObjects)
-	{
-		for (auto& component : object->_components)
-		{
-			if (component == nullptr)
-			{
-				continue;
-			}
-
-			component->OnDestroy();
-		}
-		object->OnDestroy();
-	}
-
-	for (auto& object : _gameObjects)
-	{
-		for (auto& component : object->_components)
-		{
-			if (component == nullptr)
-			{
-				continue;
-			}
-			delete component;
-		}
-		delete object;
-	}
-	_gameObjects.clear();*/
 }
