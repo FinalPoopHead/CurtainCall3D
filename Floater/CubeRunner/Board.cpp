@@ -141,30 +141,28 @@ void Board::PreUpdate(float deltaSecond)
 	keyData = flt::GetKeyDown(flt::KeyCode::p);
 	if (keyData)
 	{
-		for (int i = 0; i < _width; i++)
+		std::list<CubeController*> removeList;
+		for (auto& cubeCtr : _runningCubeControllers)
 		{
-			for (int j = 0; j < _height; j++)
+			if(cubeCtr->GetCubeType() == eCUBETYPE::DARK)
 			{
-				eTileStateFlag cubeType = (eTileStateFlag)((int)_tileStates[i][j] & CUBE);
-
-				switch (cubeType)
-				{
-				case eTileStateFlag::NORMALCUBE:
-					// NormalCube 수납
-					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemove(REMOVE_TIME);
-					_tiles[i][j]->_cube = nullptr;
-					_tileStates[i][j] = (int)_tileStates[i][j] & ~CUBE;
-					break;
-				case eTileStateFlag::ADVANTAGECUBE:
-					// AdvantageCube 수납
-					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemove(REMOVE_TIME);
-					_tiles[i][j]->_cube = nullptr;
-					_tileStates[i][j] = (int)_tileStates[i][j] & ~CUBE;
-					break;
-				default:
-					break;
-				}
+				continue;
 			}
+
+			auto pos = cubeCtr->GetPosition();
+			int x = 0;
+			int z = 0;
+
+			ConvertToTileIndex(pos.x, pos.z, x, z);
+
+			_tiles[x][z]->_cube = nullptr;
+			_tileStates[x][z] = (int)_tileStates[x][z] & ~CUBE;
+			removeList.push_back(cubeCtr);
+		}
+
+		for (auto& cubeCtr : removeList)
+		{
+			cubeCtr->StartRemove(REMOVE_TIME);
 		}
 	}
 
@@ -181,6 +179,7 @@ void Board::PreUpdate(float deltaSecond)
 			// TODO : 웨이브 클리어 연출 보여주고 다음 웨이브 출발
 			if (_runningCubeControllers.empty() && !_waveCubeControllers.empty())
 			{
+				_isPerfect = true;
 				_runningCubeControllers = _waveCubeControllers.front();
 				_waveCubeControllers.pop_front();
 				for (auto& cubeCtr : _runningCubeControllers)
@@ -222,6 +221,11 @@ void Board::PreUpdate(float deltaSecond)
 
 void Board::PostUpdate(float deltaSeoncd)
 {
+	if (_isGameOver)
+	{
+		return;
+	}
+
 	if (_damageCount > 0)
 	{
 		_gameManager->ReduceHP(_playerIndex, _damageCount);
@@ -243,6 +247,40 @@ bool Board::SetTileState(float x, float y, eTileStateFlag state)
 	_tileStates[tileX][tileY] = (int)state;
 
 	return true;
+}
+
+void Board::SetTileStateWithCubeCtr(CubeController* cubeCtr)
+{
+	auto pos = cubeCtr->GetPosition();
+	int x = 0;
+	int z = 0;
+	ConvertToTileIndex(pos.x, pos.z, x, z);
+
+	if (x < 0 || x >= _width || z < 0 || z >= _height)
+	{
+		return;
+	}
+
+	eTileStateFlag state = eTileStateFlag::NONE;
+
+	switch (cubeCtr->GetCubeType())
+	{
+	case eCUBETYPE::NORMAL:
+		state = eTileStateFlag::NORMALCUBE;
+		break;
+	case eCUBETYPE::DARK:
+		state = eTileStateFlag::DARKCUBE;
+		break;
+	case eCUBETYPE::ADVANTAGE:
+		state = eTileStateFlag::ADVANTAGECUBE;
+		break;
+
+	default:
+		break;
+	}
+
+	AddTileState(pos.x, pos.z, state);
+	_tiles[x][z]->_cube = cubeCtr->GetGameObject();
 }
 
 bool Board::AddTileState(float x, float y, eTileStateFlag state)
@@ -460,8 +498,6 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 	int width = levelLayout.size();
 	int height = levelLayout[0].size();
 
-	_isPerfect = true;
-
 	_waveCubeControllers.clear();
 	int waveHeight = height / waveCount;
 	int heightCount = 0;
@@ -470,7 +506,12 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 
 	for (int j = 0; j < height; ++j)
 	{
-		heightCount++;
+		if (j >= _height)
+		{
+			_waveCubeControllers.push_front(waveCubes);
+			waveCubes.clear();
+			break;
+		}
 
 		for (int i = 0; i < width; ++i)
 		{
@@ -520,6 +561,8 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 			_nowRisingCount++;
 		}
 
+		++heightCount;
+
 		if (heightCount >= waveHeight)
 		{
 			heightCount = 0;
@@ -529,9 +572,14 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 	}
 
 	_boardState = eBoardState::CUBERISING;
+	if (_height == 0)
+	{
+		_boardState = eBoardState::NONE;
+	}
 
 	_runningCubeControllers = _waveCubeControllers.front();
 	_waveCubeControllers.pop_front();
+	_isPerfect = true;
 
 	for (auto& cubeCtr : _runningCubeControllers)
 	{
@@ -555,7 +603,7 @@ void Board::TickCubesRolling(float rollingTime)
 void Board::AddRow()
 {
 	_nowAddTileCount = _width;
-	_nextDestroyRow++;
+	++_nextDestroyRow;
 	_boardState = eBoardState::ADDTILE;
 
 	for (int i = 0; i < _width; i++)
@@ -804,7 +852,7 @@ void Board::OnEndCubeGenerate()
 
 void Board::OnEndTileAdd(Tile* tile)
 {
-	_nowAddTileCount--;
+	--_nowAddTileCount;
 	ReturnTileToPool(tile);
 	_addTiles.remove(tile);
 
@@ -856,7 +904,7 @@ void Board::DestroyRow()
 		_fallingTileCount[_nextDestroyRow]++;
 		_nowFallingTileCount++;
 	}
-	_nextDestroyRow--;
+	--_nextDestroyRow;
 }
 
 void Board::DeferredDestroyRow()
@@ -1000,7 +1048,7 @@ void Board::Reset()
 	_nowFallingTileCount = 0;
 	_nowAddTileCount = 0;
 	_nextDestroyRow = _height - 1;
-
+	
 	_minePos.first = -1;
 	_minePos.second = -1;
 
@@ -1094,38 +1142,17 @@ void Board::UpdateBoard()
 		}
 	}
 
+	for (auto& wave : _waveCubeControllers)
+	{
+		for (auto& cubeCtr : wave)
+		{
+			SetTileStateWithCubeCtr(cubeCtr);
+		}
+	}
+
 	for (auto& cubeCtr : _runningCubeControllers)
 	{
-		auto pos = cubeCtr->GetPosition();
-		int x = 0;
-		int z = 0;
-		ConvertToTileIndex(pos.x, pos.z, x, z);
-
-		if (x < 0 || x >= _width || z < 0 || z >= _height)
-		{
-			continue;
-		}
-
-		eTileStateFlag state = eTileStateFlag::NONE;
-
-		switch (cubeCtr->GetCubeType())
-		{
-		case eCUBETYPE::NORMAL:
-			state = eTileStateFlag::NORMALCUBE;
-			break;
-		case eCUBETYPE::DARK:
-			state = eTileStateFlag::DARKCUBE;
-			break;
-		case eCUBETYPE::ADVANTAGE:
-			state = eTileStateFlag::ADVANTAGECUBE;
-			break;
-
-		default:
-			break;
-		}
-
-		AddTileState(pos.x, pos.z, state);
-		_tiles[x][z]->_cube = cubeCtr->GetGameObject();
+		SetTileStateWithCubeCtr(cubeCtr);
 	}
 }
 
@@ -1163,9 +1190,9 @@ bool Board::UpdateDetonate()
 					// DarkCube 수납 및 스테이지 한 줄 삭제
 					if (cubeCtr->IsRunning())
 					{
-						cubeCtr->StartRemove(REMOVE_TIME);
 						_isPerfect = false;
 						DestroyRow();
+						cubeCtr->StartRemove(REMOVE_TIME);
 					}
 					break;
 				case eTileStateFlag::ADVANTAGECUBE:
