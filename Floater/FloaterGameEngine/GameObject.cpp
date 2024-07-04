@@ -208,7 +208,12 @@ void flt::GameObject::CallDisableRecursive()
 
 bool flt::GameObject::CheckEnableRecursive() const
 {
-	if(!(_isEnable && _scene->_isActive))
+	//if(!(_isEnable && _scene->_isActive))
+	//{
+	//	return false;
+	//}
+
+	if(!_isEnable)
 	{
 		return false;
 	}
