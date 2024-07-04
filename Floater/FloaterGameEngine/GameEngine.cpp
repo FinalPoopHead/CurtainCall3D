@@ -99,6 +99,14 @@ void flt::GameEngine::Finalize()
 	s_instance = nullptr;
 }
 
+flt::Scene* flt::GameEngine::GetScene(const std::wstring& sceneName)
+{
+	auto iter = _scenes.find(sceneName);
+	ASSERT(iter != _scenes.end(), "Scene is not added");
+
+	return iter->second;
+}
+
 flt::Scene* flt::GameEngine::SetScene(Scene* scene)
 {
 	//ASSERT(_scenes.find(scene) != _scenes.end(), "Scene is not added");
@@ -113,10 +121,7 @@ flt::Scene* flt::GameEngine::SetScene(const std::wstring& sceneName)
 	auto iter = _scenes.find(sceneName);
 	ASSERT(iter != _scenes.end(), "Scene is not added");
 
-	_nextScene = iter->second;
-	Scene* ret = _currentScene;
-
-	return ret;
+	return SetScene(iter->second);
 }
 
 bool flt::GameEngine::AddScene(const std::wstring& sceneName, Scene* scene)
@@ -183,10 +188,12 @@ void flt::GameEngine::ChangeScene()
 	{
 		_currentScene->Finalize();
 		_currentScene->EndScene();
+		_currentScene->_isActive = false;
 		//_currentScene->OnDisable();
 	}
 
 	_currentScene = _nextScene;
+	_currentScene->_isActive = true;
 	_currentScene->Initialize();
 	_currentScene->StartScene();
 

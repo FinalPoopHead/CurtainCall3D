@@ -32,7 +32,7 @@ Camera::Camera(Player* player, Board* board)
 void Camera::TracePlayer()
 {
 	_isPlayerLook = true;
-	_isReadyToPlayerLook = false;
+	_isReadyToPlayerLook = true;
 	_isTweenMove = false;
 	_isTweenRotate = false;
 
@@ -137,7 +137,7 @@ void Camera::UpdateCameraMove(float deltaSecond)
 		tr.SetRotation(_currRotation);
 		tr.AddLocalRotation({ 1.0f, 0.0f, 0.0f }, flt::DegToRad(_lookDegree));
 	}
-	else if (_isPlayerLook)
+	/*else if (_isPlayerLook)
 	{
 		_moveTimeElapsed += deltaSecond;
 		float moveT = (_moveTimeElapsed / 2.0f);
@@ -164,7 +164,7 @@ void Camera::UpdateCameraMove(float deltaSecond)
 		{
 			_isReadyToPlayerLook = true;
 		}
-	}
+	}*/
 	else
 	{
 		if (_isTweenMove)

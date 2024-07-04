@@ -468,6 +468,16 @@ bool flt::Transform::SetParent(Transform* pParent)
 	return true;
 }
 
+flt::Transform* flt::Transform::GetChild(size_t index) const noexcept
+{
+	if (index >= _children.size())
+	{
+		return nullptr;
+	}
+
+	return _children[index];
+}
+
 bool flt::Transform::AddChild(Transform* pChild)
 {
 	return pChild->SetParent(this);

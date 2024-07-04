@@ -81,7 +81,7 @@ namespace flt
 		Transform* GetParent() const noexcept { return _pParent; }
 		bool SetParent(Transform* pParent);
 
-		Transform* GetChild(size_t index) const noexcept { return _children[index]; }
+		Transform* GetChild(size_t index) const noexcept;
 		const std::vector<Transform*>& GetChildren() const noexcept { return _children; }
 		bool AddChild(Transform* pChild);
 

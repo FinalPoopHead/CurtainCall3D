@@ -58,12 +58,15 @@ namespace flt
 
 		void CallCollisionEvent();
 
+		void DestroyGameObjectRecursive(GameObject* gameObject);
+
 	private:
 		SparseSet<GameObject*> _gameObjects;
 		SparseSet<GameObject*> _activeGameObjects;
 		std::unordered_map<GameObject*, bool> _stagingActiveGameObjects;
 		std::vector<GameObject*> _gameObjectsToCreate;
 		std::vector<GameObject*> _gameObjectsToDestroy;
+		std::vector<GameObject*> _gameObjectsToDelete;
 
 		std::vector<ComponentBase*> _componentsToEnable;
 		std::vector<ComponentBase*> _componentsToDisable;
@@ -71,6 +74,7 @@ namespace flt
 		std::vector<CollisionPair> _collisionPairs;
 		//std::unordered_set<CollisionPair> _collisionSet;
 		bool _collisionFlag;
+		bool _isActive;
 	};
 
 	template<GameObjectDerived T, typename... TArgs>
