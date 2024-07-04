@@ -111,7 +111,13 @@ void Board::OnDestroy()
 
 void Board::PreUpdate(float deltaSecond)
 {
-	// TODO : FastForward를 플레이어 별로 나눠줘야 함
+	// 	system("cls");
+	// 	std::cout << "nowRollingCount : " << _nowRollingCount << std::endl;
+	// 	std::cout << "nowRisingCount : " << _nowRisingCount << std::endl;
+	// 	std::cout << "nowFallingTileCount : " << _nowFallingTileCount << std::endl;
+	// 	std::cout << "nowAddTileCount : " << _nowAddTileCount << std::endl;
+
+		// TODO : FastForward를 플레이어 별로 나눠줘야 함
 	flt::KeyData keyData = flt::GetKeyDown(flt::KeyCode::l);
 	if (keyData)
 	{
@@ -144,7 +150,7 @@ void Board::PreUpdate(float deltaSecond)
 		std::list<CubeController*> removeList;
 		for (auto& cubeCtr : _runningCubeControllers)
 		{
-			if(cubeCtr->GetCubeType() == eCUBETYPE::DARK)
+			if (cubeCtr->GetCubeType() == eCUBETYPE::DARK)
 			{
 				continue;
 			}
@@ -681,7 +687,7 @@ void Board::ReturnTileToPool(Tile* tile)
 	tile->Disable();
 }
 
-void Board::BackToPool(flt::GameObject* obj)
+void Board::ReturnCubeToPool(flt::GameObject* obj)
 {
 	std::string temp = typeid(*obj).name();
 	if (temp.compare(typeid(NormalCube).name()) == 0)
@@ -856,11 +862,15 @@ void Board::OnEndTileAdd(Tile* tile)
 	ReturnTileToPool(tile);
 	_addTiles.remove(tile);
 
-	if (_nowAddTileCount <= 0)
+	if (_nowAddTileCount == 0)
 	{
 		_nowAddTileCount = 0;
 		Resize(_width, _height + 1);
 		SetDelay(ADDTILE_DELAY);
+	}
+	else if (_nowAddTileCount < 0)
+	{
+		_nowAddTileCount = 0;
 	}
 }
 
@@ -875,11 +885,16 @@ void Board::OnEndTileFall(int x, int z)
 	_fallingTileCount[z]--;
 	_nowFallingTileCount--;
 
-	if (_fallingTileCount[z] <= 0)
+	// TODO : 이거 0일대만 처리하고 0보다 작으면 아무것도 하지말고 0으로 쳐버리면 될듯?
+	if (_fallingTileCount[z] == 0)
 	{
 		_fallingTileCount[z] = 0;
 		Resize(_width, z);
 		SetDelay(FALLTILE_DELAY);
+	}
+	else if (_fallingTileCount[z] < 0)
+	{
+		_fallingTileCount[z] = 0;
 	}
 }
 
@@ -900,9 +915,9 @@ void Board::DestroyRow()
 			_minePos.second = -1;
 		}
 
-		_tiles[i][_nextDestroyRow]->StartFall(delay + delayDelta * i, i, _nextDestroyRow);
 		_fallingTileCount[_nextDestroyRow]++;
 		_nowFallingTileCount++;
+		_tiles[i][_nextDestroyRow]->StartFall(delay + delayDelta * i, i, _nextDestroyRow);
 	}
 	--_nextDestroyRow;
 }
@@ -1024,6 +1039,25 @@ void Board::Reset()
 	// 큐브풀로 다 갖고오고 타일풀로 다 갖고오고 진행중이던거 전부 제거하고..
 	// 조금 까다롭군
 
+	for (int i = 0; i < _width; ++i)
+	{
+		for (int j = 0; j < _height; ++j)
+		{
+			auto& tile = _tiles[i][j];
+
+			float x = 0.0f;
+			float z = 0.0f;
+			ConvertToTileLocalPosition(i, j, x, z);
+
+			tile->tr.SetPosition({ x, 0.0f, z });
+			tile->DisableAdvantageMine();
+			tile->DisableDetonated();
+			tile->DisableMine();
+			tile->_isFalling = false;
+			tile->_isMoving = false;
+		}
+	}
+
 	for (auto& tileCol : _tileStates)
 	{
 		for (auto& tileState : tileCol)
@@ -1032,23 +1066,14 @@ void Board::Reset()
 		}
 	}
 
-	for (auto& tileCol : _tiles)
-	{
-		for (auto& tile : tileCol)
-		{
-			tile->DisableAdvantageMine();
-			tile->DisableDetonated();
-			tile->DisableMine();
-		}
-	}
-
 	_boardState = eBoardState::NONE;
 	_nowRollingCount = 0;
 	_nowRisingCount = 0;
 	_nowFallingTileCount = 0;
+	_fallingTileCount.clear();
 	_nowAddTileCount = 0;
 	_nextDestroyRow = _height - 1;
-	
+
 	_minePos.first = -1;
 	_minePos.second = -1;
 
@@ -1056,14 +1081,14 @@ void Board::Reset()
 	{
 		for (auto& cubeCtr : wave)
 		{
-			BackToPool(cubeCtr->GetGameObject());
+			ReturnCubeToPool(cubeCtr->GetGameObject());
 		}
 	}
 	_waveCubeControllers.clear();
 
 	for (auto& cubeCtr : _runningCubeControllers)
 	{
-		BackToPool(cubeCtr->GetGameObject());
+		ReturnCubeToPool(cubeCtr->GetGameObject());
 	}
 	_runningCubeControllers.clear();
 

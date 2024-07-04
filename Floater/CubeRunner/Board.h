@@ -66,7 +66,7 @@ public:
 
 	void _TEST_GenerateRandomWave();		// 임시로 랜덤 생성 용
 	void GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount);
-	void BackToPool(flt::GameObject* obj);
+	void ReturnCubeToPool(flt::GameObject* obj);
 	void RemoveFromControllerList(CubeController* cubeCtr);
 	void SetMine(float x, float z);			// position X,Z에 지뢰를 설치한다.
 	void DetonateMine();					// 지뢰를 폭파시킨다.
