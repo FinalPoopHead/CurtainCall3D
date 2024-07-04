@@ -141,30 +141,28 @@ void Board::PreUpdate(float deltaSecond)
 	keyData = flt::GetKeyDown(flt::KeyCode::p);
 	if (keyData)
 	{
-		for (int i = 0; i < _width; i++)
+		std::list<CubeController*> removeList;
+		for (auto& cubeCtr : _runningCubeControllers)
 		{
-			for (int j = 0; j < _height; j++)
+			if(cubeCtr->GetCubeType() == eCUBETYPE::DARK)
 			{
-				eTileStateFlag cubeType = (eTileStateFlag)((int)_tileStates[i][j] & CUBE);
-
-				switch (cubeType)
-				{
-				case eTileStateFlag::NORMALCUBE:
-					// NormalCube 수납
-					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemove(REMOVE_TIME);
-					_tiles[i][j]->_cube = nullptr;
-					_tileStates[i][j] = (int)_tileStates[i][j] & ~CUBE;
-					break;
-				case eTileStateFlag::ADVANTAGECUBE:
-					// AdvantageCube 수납
-					_tiles[i][j]->_cube->GetComponent<CubeController>()->StartRemove(REMOVE_TIME);
-					_tiles[i][j]->_cube = nullptr;
-					_tileStates[i][j] = (int)_tileStates[i][j] & ~CUBE;
-					break;
-				default:
-					break;
-				}
+				continue;
 			}
+
+			auto pos = cubeCtr->GetPosition();
+			int x = 0;
+			int z = 0;
+
+			ConvertToTileIndex(pos.x, pos.z, x, z);
+
+			_tiles[x][z]->_cube = nullptr;
+			_tileStates[x][z] = (int)_tileStates[x][z] & ~CUBE;
+			removeList.push_back(cubeCtr);
+		}
+
+		for (auto& cubeCtr : removeList)
+		{
+			cubeCtr->StartRemove(REMOVE_TIME);
 		}
 	}
 
@@ -605,7 +603,7 @@ void Board::TickCubesRolling(float rollingTime)
 void Board::AddRow()
 {
 	_nowAddTileCount = _width;
-	_nextDestroyRow++;
+	++_nextDestroyRow;
 	_boardState = eBoardState::ADDTILE;
 
 	for (int i = 0; i < _width; i++)
@@ -629,11 +627,9 @@ void Board::AddRow()
 
 void Board::OnEndWave()
 {
-	std::cout << "퍼펙트임?" << _isPerfect << std::endl;
 	if (_isPerfect)
 	{
 		AddRow();
-		std::cout << "줄 추가함. 다음 줄 : " << _nextDestroyRow << std::endl;
 		// TODO : 상대방 공격하는게 되긴 하는데.. 좀 요상하다 ㅋㅋㅋㅋ
 		//			Board 코드도 조금바꿔서 행동에 우선순위를 정해주고 큐에 담아서 처리하는 식으로 해야될듯..
 		// _gameManager->AttackAnotherPlayer(_playerIndex);
@@ -856,7 +852,7 @@ void Board::OnEndCubeGenerate()
 
 void Board::OnEndTileAdd(Tile* tile)
 {
-	_nowAddTileCount--;
+	--_nowAddTileCount;
 	ReturnTileToPool(tile);
 	_addTiles.remove(tile);
 
@@ -908,7 +904,7 @@ void Board::DestroyRow()
 		_fallingTileCount[_nextDestroyRow]++;
 		_nowFallingTileCount++;
 	}
-	_nextDestroyRow--;
+	--_nextDestroyRow;
 }
 
 void Board::DeferredDestroyRow()
@@ -931,7 +927,6 @@ void Board::AddCubeFallCount()
 {
 	_damageCount++;
 	_isPerfect = false;
-	std::cout << "큐브가 떨어짐" << std::endl;
 }
 
 void Board::FastForward()
@@ -1053,7 +1048,7 @@ void Board::Reset()
 	_nowFallingTileCount = 0;
 	_nowAddTileCount = 0;
 	_nextDestroyRow = _height - 1;
-
+	
 	_minePos.first = -1;
 	_minePos.second = -1;
 
@@ -1195,10 +1190,9 @@ bool Board::UpdateDetonate()
 					// DarkCube 수납 및 스테이지 한 줄 삭제
 					if (cubeCtr->IsRunning())
 					{
-						cubeCtr->StartRemove(REMOVE_TIME);
 						_isPerfect = false;
-						std::cout << "다크큐브 부숨" << std::endl;
 						DestroyRow();
+						cubeCtr->StartRemove(REMOVE_TIME);
 					}
 					break;
 				case eTileStateFlag::ADVANTAGECUBE:
