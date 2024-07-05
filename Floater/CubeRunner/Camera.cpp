@@ -5,13 +5,13 @@
 #include "../FloaterGameEngine/include/Input.h"
 
 
-Camera::Camera(Player* player, Board* board) 
+Camera::Camera(Player* player, Board* board)
 	: _player(player)
 	, _board(board)
 	, _height(10.0f)
 	, _playHeight(40.0f)
 	, _lookZOffset(0.0f)
-	, _posZOffsest(-10.0f)
+	, _posZOffset(-10.0f)
 	, _playerDistance(35.0f)
 	, _lookDegree(40.0f)
 	, _movSpeed(1.5f)
@@ -19,6 +19,7 @@ Camera::Camera(Player* player, Board* board)
 	, _isMoving(true)
 	, _isPlayerLook(true)
 	, _isReadyToPlayerLook(true)
+	, _isLevelGenerating(false)
 {
 	AddComponent<flt::CameraComponent>(true);
 
@@ -33,6 +34,19 @@ void Camera::TracePlayer()
 {
 	_isPlayerLook = true;
 	_isReadyToPlayerLook = true;
+	_isLevelGenerating = false;
+	_isTweenMove = false;
+	_isTweenRotate = false;
+
+	_startPosition = (flt::Vector3f)tr.GetLocalPosition();
+	_startRotation = tr.GetLocalRotation();
+}
+
+void Camera::LookGenerating()
+{
+	//_isPlayerLook = true;
+	_isReadyToPlayerLook = false;
+	_isLevelGenerating = true;
 	_isTweenMove = false;
 	_isTweenRotate = false;
 
@@ -44,6 +58,7 @@ void Camera::TweenMove(flt::Vector3f targetPos, float time, std::function<float(
 {
 	_isPlayerLook = false;
 	_isReadyToPlayerLook = false;
+	_isLevelGenerating = false;
 	_isTweenMove = true;
 	_startPosition = (flt::Vector3f)tr.GetLocalPosition();
 	_targetPosition = targetPos;
@@ -56,6 +71,7 @@ void Camera::TweenRotate(flt::Quaternion targetRot, float time, std::function<fl
 {
 	_isPlayerLook = false;
 	_isReadyToPlayerLook = false;
+	_isLevelGenerating = false;
 	_isTweenRotate = true;
 	_startRotation = tr.GetLocalRotation();
 	_targetRotation = targetRot;
@@ -69,18 +85,18 @@ void Camera::PostUpdate(float deltaSecond)
 	//flt::Vector3f targetPosition = CalcTargetPosition();
 	//tr.SetPosition(targetPosition);
 	//_currPosition = targetPosition;
-	if(flt::GetKeyDown(flt::KeyCode::mouseLButton))
-	{
-		if (_isPlayerLook)
-		{
-			TweenMove({ 0.0f, 0.0f, 0.0f }, 1.0f);
-			TweenRotate({ 0.0f, 0.0f, 0.0f, 1.0f }, 1.0f);
-		}
-		else
-		{
-			TracePlayer();
-		}
-	}
+// 	if(flt::GetKeyDown(flt::KeyCode::mouseLButton))
+// 	{
+// 		if (_isPlayerLook)
+// 		{
+// 			TweenMove({ 0.0f, 0.0f, 0.0f }, 1.0f);
+// 			TweenRotate({ 0.0f, 0.0f, 0.0f, 1.0f }, 1.0f);
+// 		}
+// 		else
+// 		{
+// 			TracePlayer();
+// 		}
+// 	}
 
 	UpdateCameraMove(deltaSecond);
 }
@@ -91,7 +107,7 @@ flt::Quaternion Camera::CalcTargetRotation()
 
 	flt::Vector3f direction = flt::Vector3f{ playerPos.x, _playHeight, playerPos.z + _lookZOffset } - (flt::Vector3f)tr.GetWorldPosition();
 
-	flt::Quaternion targetRotation{}; 
+	flt::Quaternion targetRotation{};
 	targetRotation.Look(direction);
 
 	return targetRotation;
@@ -104,7 +120,7 @@ flt::Vector3f Camera::CalcTargetPosition()
 	flt::Vector4f playerPos = _player->tr.GetWorldPosition();
 	float cameraX = centerPos.x + (playerPos.x - centerPos.x) * 3.0f;
 
-	flt::Vector3f linerPos = flt::Vector3f{ cameraX, playerPos.y, playerPos.z + _posZOffsest };
+	flt::Vector3f linerPos = flt::Vector3f{ cameraX, playerPos.y, playerPos.z + _posZOffset };
 	flt::Vector3f positionDir = linerPos - (flt::Vector3f)_player->tr.GetWorldPosition();
 	positionDir.Normalize();
 	positionDir *= _playerDistance;
@@ -133,6 +149,25 @@ void Camera::UpdateCameraMove(float deltaSecond)
 		tr.SetPosition(_currPosition);
 
 		_currRotation = flt::Quaternion::Slerp(_currRotation, CalcTargetRotation(), std::clamp(deltaSecond * _rotSpeed, 0.0f, 1.0f));
+
+		tr.SetRotation(_currRotation);
+		tr.AddLocalRotation({ 1.0f, 0.0f, 0.0f }, flt::DegToRad(_lookDegree));
+	}
+	else if (_isLevelGenerating)
+	{
+		flt::Vector4f playerPos = _player->tr.GetWorldPosition();
+		flt::Vector3f targetPos = CalcTargetPosition();
+		targetPos.x = playerPos.x;
+
+		_currPosition = flt::Vector3f::Lerp(_currPosition, targetPos, std::clamp(deltaSecond * _movSpeed, 0.0f, 1.0f));
+		tr.SetPosition(_currPosition);
+
+		flt::Vector3f direction = flt::Vector3f{ playerPos.x, playerPos.y + _playHeight / 2.0f, playerPos.z } - (flt::Vector3f)tr.GetWorldPosition();
+
+		flt::Quaternion targetRotation{};
+		targetRotation.Look(direction);
+
+		_currRotation = flt::Quaternion::Slerp(_currRotation, targetRotation, std::clamp(deltaSecond * _rotSpeed, 0.0f, 1.0f));
 
 		tr.SetRotation(_currRotation);
 		tr.AddLocalRotation({ 1.0f, 0.0f, 0.0f }, flt::DegToRad(_lookDegree));

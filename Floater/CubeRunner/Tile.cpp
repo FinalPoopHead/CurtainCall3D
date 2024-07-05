@@ -68,7 +68,7 @@ void Tile::PreUpdate(float deltaSecond)
 {
 	if (_isMoving)
 	{
-		_elapsedTime += deltaSecond * _board->GetFFValue();
+		_elapsedTime += deltaSecond;
 
 		if (_elapsedTime >= _movingTime)
 		{

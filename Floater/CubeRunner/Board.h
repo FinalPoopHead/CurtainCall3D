@@ -11,6 +11,7 @@ class AdvantageCube;
 class DarkCube;
 class NormalCube;
 class GameManager;
+class Player;
 
 enum class eTileStateFlag
 {
@@ -32,7 +33,7 @@ enum class eBoardState
 	, WAITING
 	, CUBEROLLING
 	, TILEDESTROYING
-	, CUBERISING
+	, CUBEGENERATING
 	, ADDTILE
 };
 
@@ -103,9 +104,12 @@ private:
 	void UpdateBoard();
 	void SetTileStateWithCubeCtr(CubeController* cubeCtr);
 	bool UpdateDetonate();		// 수납된 큐브가 있으면 true 아니면 false
+	bool CheckWaveClear();		// 다크큐브 제외하고 전부 제거됐는지 체크.
 	void TickCubesRolling(float rollingTime);			// 일괄적으로 굴리기 시작.
 	void AddRow();
 	void OnEndWave();
+
+	void MoveCameraToEnd();
 
 	Tile* GetTileFromPool();
 	void ReturnTileToPool(Tile* tile);
@@ -139,10 +143,14 @@ private:
 	int _damageCount;
 
 	bool _isPerfect;
+	bool _isWaveClear;
 	int _nowAddTileCount;
 	int _nextDestroyRow;
 
 	std::pair<int, int> _minePos;
 	std::unordered_map<int,int> _fallingTileCount;	// key는 heightIndex
 	std::list<Tile*> _addTiles;
+
+	int _testIndex;
+	float _testValue[5];
 };

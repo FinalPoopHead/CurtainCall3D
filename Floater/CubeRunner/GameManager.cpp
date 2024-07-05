@@ -447,6 +447,16 @@ void GameManager::OnEndLevel(int playerIndex)
 	}
 }
 
+Player* GameManager::GetPlayer(int index)
+{
+	if(index < 0 || index >= _players.size())
+	{
+		return nullptr;
+	}
+
+	return _players[index];
+}
+
 void GameManager::IncreasePlayerCount()
 {
 	if (_players.size() >= MAXPLAYERCOUNT)

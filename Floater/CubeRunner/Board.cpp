@@ -7,6 +7,8 @@
 #include "NormalCube.h"
 #include "CubeController.h"
 #include "GameManager.h"
+#include "Player.h"
+#include "Camera.h"
 
 constexpr int TILE_COUNT = 512;
 constexpr int CUBE_COUNT = 512;
@@ -14,7 +16,7 @@ constexpr int CUBE_COUNT = 512;
 constexpr float GENERATE_TIME = 1.0f;
 constexpr float ROLLING_TIME = 1.0f;
 constexpr float REMOVE_TIME = 0.5f;
-constexpr float ADDTILE_TIME = 2.0f;
+constexpr float ADDTILE_TIME = 1.0f;
 
 constexpr float GENERATE_DELAY = 3.0f;
 constexpr float ROLLING_DELAY = 0.5f;	// 아무것도 하지않고 굴러갈때의 딜레이
@@ -27,7 +29,7 @@ constexpr int CUBE_DAMAGE = 1;
 constexpr int DARKCUBE_DAMAGE = 1;
 constexpr float SLOWVALUE = 0.5f;
 constexpr float FFDEFAULT = 1.0f;
-constexpr float FFVALUE = 20.0f;
+constexpr float FFVALUE = 8.0f;
 
 Board::Board(GameManager* gameManager, int playerIndex, int width, int height, float offset /*= 4.00f*/) :
 	flt::GameObject()
@@ -54,12 +56,25 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _nowFallingTileCount()
 	, _damageCount()
 	, _isPerfect(true)
+	, _isWaveClear(false)
 	, _nowAddTileCount()
 	, _nextDestroyRow()
 	, _minePos({ -1,-1 })
 	, _fallingTileCount()
 	, _addTiles()
 {
+	_testIndex = 0;
+	for (int i = 0; i < 5; i++)
+	{
+		_testValue[i] = 1.0f;
+	}
+
+	_testValue[0] = 0.5f;
+	_testValue[1] = 1.5f;
+	_testValue[2] = 1.0f;
+	_testValue[3] = 25.0f;
+	_testValue[4] = 20.0f;
+
 	// Create TilePool
 	for (int i = 0; i < TILE_COUNT; i++)
 	{
@@ -124,6 +139,66 @@ void Board::PreUpdate(float deltaSecond)
 		EndFastForward();
 	}
 
+	keyData = flt::GetKeyDown(flt::KeyCode::tab);
+	if (keyData)
+	{
+		_testIndex = (_testIndex + 1) % 5;
+		std::string modeStr = "babo";
+		switch (_testIndex)
+		{
+		case 0:
+			modeStr = "X";
+			break;
+		case 1:
+			modeStr = "Y";
+			break;
+		case 2:
+			modeStr = "Z";
+			break;
+		case 3:
+			modeStr = "xAngle";
+			break;
+		case 4:
+			modeStr = "yAngle";
+			break;
+		default:
+			break;
+		}
+		std::cout << modeStr << std::endl;
+	}
+
+	float diff = 1.0f;
+
+	keyData = flt::GetKeyDown(flt::KeyCode::up);
+	if (keyData)
+	{
+		_testValue[_testIndex] += diff;
+		std::cout << "[X : " << _testValue[0] << "] [Y : " << _testValue[1] << "] [Z : " << _testValue[2] << "] [xAngle : " << _testValue[3] << "] [yAngle : " << _testValue[4] << "]" << std::endl;
+	}
+
+	keyData = flt::GetKeyDown(flt::KeyCode::down);
+	if (keyData)
+	{
+		_testValue[_testIndex] -= diff;
+		std::cout << "[X : " << _testValue[0] << "] [Y : " << _testValue[1] << "] [Z : " << _testValue[2] << "] [xAngle : " << _testValue[3] << "] [yAngle : " << _testValue[4] << "]" << std::endl;
+	}
+	
+	diff = 0.1f;
+
+	keyData = flt::GetKeyDown(flt::KeyCode::right);
+	if (keyData)
+	{
+		_testValue[_testIndex] += diff;
+		std::cout << "[X : " << _testValue[0] << "] [Y : " << _testValue[1] << "] [Z : " << _testValue[2] << "] [xAngle : " << _testValue[3] << "] [yAngle : " << _testValue[4] << "]" << std::endl;
+	}
+
+	keyData = flt::GetKeyDown(flt::KeyCode::left);
+	if (keyData)
+	{
+		_testValue[_testIndex] -= diff;
+		std::cout << "[X : " << _testValue[0] << "] [Y : " << _testValue[1] << "] [Z : " << _testValue[2] << "] [xAngle : " << _testValue[3] << "] [yAngle : " << _testValue[4] << "]" << std::endl;
+	}
+
 	// TODO : 슬로우모드임
 	keyData = flt::GetKeyDown(flt::KeyCode::o);
 	if (keyData)
@@ -180,6 +255,7 @@ void Board::PreUpdate(float deltaSecond)
 			if (_runningCubeControllers.empty() && !_waveCubeControllers.empty())
 			{
 				_isPerfect = true;
+				_isWaveClear = false;
 				_runningCubeControllers = _waveCubeControllers.front();
 				_waveCubeControllers.pop_front();
 				for (auto& cubeCtr : _runningCubeControllers)
@@ -210,7 +286,7 @@ void Board::PreUpdate(float deltaSecond)
 		return;
 		break;
 	case eBoardState::TILEDESTROYING:
-	case eBoardState::CUBERISING:
+	case eBoardState::CUBEGENERATING:
 	case eBoardState::ADDTILE:
 		return;
 		break;
@@ -488,7 +564,7 @@ void Board::_TEST_GenerateRandomWave()
 		delayCount = 0;
 	}
 
-	_boardState = eBoardState::CUBERISING;
+	_boardState = eBoardState::CUBEGENERATING;
 }
 
 void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount)
@@ -503,6 +579,7 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 	int heightCount = 0;
 	std::list<CubeController*> waveCubes;
 	float startDelay = 0.15f;
+	float delayBase = 1.5f;
 
 	for (int j = 0; j < height; ++j)
 	{
@@ -547,13 +624,13 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 				_darkCubePool.pop_front();
 				break;
 			default:
-				ASSERT(false, "Invalid Random Value");
+				ASSERT(false, "Invalid CubeType");
 				break;
 			}
 
 			auto cubeCtr = cube->GetComponent<CubeController>();
 			waveCubes.push_back(cubeCtr);
-			cubeCtr->StartGenerate(GENERATE_TIME, startDelay * j);
+			cubeCtr->StartGenerate(GENERATE_TIME, delayBase + startDelay * j);
 
 			cube->tr.SetPosition(x, 0.0f, z);
 			cube->Enable();
@@ -571,7 +648,7 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 		}
 	}
 
-	_boardState = eBoardState::CUBERISING;
+	_boardState = eBoardState::CUBEGENERATING;
 	if (_height == 0)
 	{
 		_boardState = eBoardState::NONE;
@@ -580,11 +657,15 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 	_runningCubeControllers = _waveCubeControllers.front();
 	_waveCubeControllers.pop_front();
 	_isPerfect = true;
+	_isWaveClear = false;
 
 	for (auto& cubeCtr : _runningCubeControllers)
 	{
 		cubeCtr->SetIsRunning(true);
 	}
+
+	auto player = _gameManager->GetPlayer(_playerIndex);
+	player->camera->LookGenerating();
 }
 
 void Board::TickCubesRolling(float rollingTime)
@@ -630,6 +711,7 @@ void Board::OnEndWave()
 	if (_isPerfect)
 	{
 		AddRow();
+		MoveCameraToEnd();
 		// TODO : 상대방 공격하는게 되긴 하는데.. 좀 요상하다 ㅋㅋㅋㅋ
 		//			Board 코드도 조금바꿔서 행동에 우선순위를 정해주고 큐에 담아서 처리하는 식으로 해야될듯..
 		// _gameManager->AttackAnotherPlayer(_playerIndex);
@@ -638,6 +720,42 @@ void Board::OnEndWave()
 	{
 		SetDelay(WAVECLEAR_DELAY);
 	}
+}
+
+void Board::MoveCameraToEnd()
+{
+	float offsetX = 0.5f;
+	float offsetY = 1.5f;
+	float offsetZ = 1.0f;
+	float offsetAngleX = 25.0f;
+	float offsetAngleY = 20.0f;
+
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
+	ConvertToTilePosition(_width - 1, _height, x, z);
+	float tileWidth = 2.0f * _width;
+	float tileHeight = 2.0f * _height;
+
+	y += tileHeight / offsetY;
+	z -= tileHeight / offsetZ;
+
+	flt::Quaternion rot;
+
+	auto player = _gameManager->GetPlayer(_playerIndex);
+	if (player->camera->tr.GetWorldRotation().GetEuler().y < 0.0f)
+	{
+		x += tileWidth / offsetX;
+		rot.SetEuler(offsetAngleX, -offsetAngleY, 0.0f);
+	}
+	else
+	{
+		x -= tileWidth + tileWidth / offsetX;
+		rot.SetEuler(offsetAngleX, offsetAngleY, 0.0f);
+	}
+
+	player->camera->TweenMove({ x,y,z }, 0.5f);
+	player->camera->TweenRotate(rot, 0.5f);
 }
 
 Tile* Board::GetTileFromPool()
@@ -715,6 +833,8 @@ void Board::RemoveFromControllerList(CubeController* cubeCtr)
 	{
 		return;
 	}
+
+	CheckWaveClear();
 
 	if (_runningCubeControllers.empty())
 	{
@@ -847,6 +967,8 @@ void Board::OnEndCubeGenerate()
 
 		UpdateBoard();
 		SetDelay(GENERATE_DELAY);
+		auto player = _gameManager->GetPlayer(_playerIndex);
+		player->camera->TracePlayer();
 	}
 }
 
@@ -861,6 +983,8 @@ void Board::OnEndTileAdd(Tile* tile)
 		_nowAddTileCount = 0;
 		Resize(_width, _height + 1);
 		SetDelay(ADDTILE_DELAY);
+		auto player = _gameManager->GetPlayer(_playerIndex);
+		player->camera->TracePlayer();
 	}
 	else if (_nowAddTileCount < 0)
 	{
@@ -941,11 +1065,19 @@ void Board::AddCubeFallCount()
 void Board::FastForward()
 {
 	_fastForwardValue = FFVALUE;
+
+	if (_isWaveClear)
+	{
+		MoveCameraToEnd();
+	}
 }
 
 void Board::EndFastForward()
 {
 	_fastForwardValue = FFDEFAULT;
+
+	auto player = _gameManager->GetPlayer(_playerIndex);
+	player->camera->TracePlayer();
 }
 
 void Board::Resize(int newWidth, int newHeight)
@@ -1259,4 +1391,28 @@ bool Board::UpdateDetonate()
 	_minePos.second = -1;
 
 	return result;
+}
+
+bool Board::CheckWaveClear()
+{
+	if (_runningCubeControllers.empty())
+	{
+		_isWaveClear = false;
+		return false;
+	}
+
+	for (auto& cubeCtr : _runningCubeControllers)
+	{
+		auto cubeType = cubeCtr->GetCubeType();
+
+		if (cubeType == eCUBETYPE::ADVANTAGE
+			|| cubeType == eCUBETYPE::NORMAL)
+		{
+			_isWaveClear = false;
+			return false;
+		}
+	}
+
+	_isWaveClear = true;
+	return true;
 }

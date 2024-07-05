@@ -11,6 +11,7 @@ public:
 	Camera(Player* player, Board* board);
 
 	void TracePlayer();
+	void LookGenerating();
 	void TweenMove(flt::Vector3f targetPos, float time, std::function<float(float)> ease = [](float t) { return t; });
 	void TweenRotate(flt::Quaternion targetRot, float time, std::function<float(float)> ease = [](float t) { return t; });
 
@@ -31,7 +32,7 @@ private:
 	float _height;
 	float _playHeight;
 	float _lookZOffset;
-	float _posZOffsest;
+	float _posZOffset;
 	float _playerDistance;
 	float _lookDegree;
 	float _movSpeed;
@@ -40,6 +41,7 @@ private:
 	bool _isMoving;
 	bool _isPlayerLook;
 	bool _isReadyToPlayerLook;
+	bool _isLevelGenerating;
 
 	flt::Quaternion _currRotation;
 	flt::Vector3f _currPosition;
