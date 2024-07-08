@@ -56,7 +56,8 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _nowFallingTileCount()
 	, _damageCount()
 	, _isPerfect(true)
-	, _isWaveClear(false)
+	, _isOnlyDarkRemain(false)
+	, _isCameraWorking(false)
 	, _nowAddTileCount()
 	, _nextDestroyRow()
 	, _minePos({ -1,-1 })
@@ -139,6 +140,11 @@ void Board::PreUpdate(float deltaSecond)
 		EndFastForward();
 	}
 
+	if (_fastForwardValue == FFVALUE)
+	{
+		OnFastForwarding();
+	}
+
 	keyData = flt::GetKeyDown(flt::KeyCode::tab);
 	if (keyData)
 	{
@@ -212,7 +218,7 @@ void Board::PreUpdate(float deltaSecond)
 		EndFastForward();
 	}
 
-	// TODO : 치트키. 블랙큐브 빼고 전부 제거
+	// 치트키. 블랙큐브 빼고 전부 제거
 	keyData = flt::GetKeyDown(flt::KeyCode::p);
 	if (keyData)
 	{
@@ -251,11 +257,11 @@ void Board::PreUpdate(float deltaSecond)
 	case eBoardState::NONE:
 		if (!_isGameOver)
 		{
-			// TODO : 웨이브 클리어 연출 보여주고 다음 웨이브 출발
+			// 웨이브 클리어 연출 보여주고 다음 웨이브 출발
 			if (_runningCubeControllers.empty() && !_waveCubeControllers.empty())
 			{
 				_isPerfect = true;
-				_isWaveClear = false;
+				_isOnlyDarkRemain = false;
 				_runningCubeControllers = _waveCubeControllers.front();
 				_waveCubeControllers.pop_front();
 				for (auto& cubeCtr : _runningCubeControllers)
@@ -657,7 +663,7 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 	_runningCubeControllers = _waveCubeControllers.front();
 	_waveCubeControllers.pop_front();
 	_isPerfect = true;
-	_isWaveClear = false;
+	_isOnlyDarkRemain = false;
 
 	for (auto& cubeCtr : _runningCubeControllers)
 	{
@@ -666,6 +672,7 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 
 	auto player = _gameManager->GetPlayer(_playerIndex);
 	player->camera->LookGenerating();
+	_isCameraWorking = true;
 }
 
 void Board::TickCubesRolling(float rollingTime)
@@ -756,6 +763,7 @@ void Board::MoveCameraToEnd()
 
 	player->camera->TweenMove({ x,y,z }, 0.5f);
 	player->camera->TweenRotate(rot, 0.5f);
+	_isCameraWorking = true;
 }
 
 Tile* Board::GetTileFromPool()
@@ -834,7 +842,7 @@ void Board::RemoveFromControllerList(CubeController* cubeCtr)
 		return;
 	}
 
-	CheckWaveClear();
+	CheckOnlyDarkRemain();
 
 	if (_runningCubeControllers.empty())
 	{
@@ -967,8 +975,6 @@ void Board::OnEndCubeGenerate()
 
 		UpdateBoard();
 		SetDelay(GENERATE_DELAY);
-		auto player = _gameManager->GetPlayer(_playerIndex);
-		player->camera->TracePlayer();
 	}
 }
 
@@ -983,8 +989,6 @@ void Board::OnEndTileAdd(Tile* tile)
 		_nowAddTileCount = 0;
 		Resize(_width, _height + 1);
 		SetDelay(ADDTILE_DELAY);
-		auto player = _gameManager->GetPlayer(_playerIndex);
-		player->camera->TracePlayer();
 	}
 	else if (_nowAddTileCount < 0)
 	{
@@ -1065,19 +1069,18 @@ void Board::AddCubeFallCount()
 void Board::FastForward()
 {
 	_fastForwardValue = FFVALUE;
-
-	if (_isWaveClear)
-	{
-		MoveCameraToEnd();
-	}
 }
 
 void Board::EndFastForward()
 {
 	_fastForwardValue = FFDEFAULT;
 
-	auto player = _gameManager->GetPlayer(_playerIndex);
-	player->camera->TracePlayer();
+	if (_isOnlyDarkRemain)
+	{
+		auto player = _gameManager->GetPlayer(_playerIndex);
+		player->camera->TracePlayer();
+		_isCameraWorking = false;
+	}
 }
 
 void Board::Resize(int newWidth, int newHeight)
@@ -1250,6 +1253,7 @@ void Board::Wait(float deltaSecond)
 
 void Board::OnWaiting()
 {
+	// TODO : 상대방이 공격하면 여기서 처리하는건데.. 음..
 	if (_isAttacked)
 	{
 		_isAttacked = false;
@@ -1268,6 +1272,25 @@ void Board::OnEndWaiting()
 	else if (!_runningCubeControllers.empty())	// 폭파 된 것이 없다면 구르기 시작.
 	{
 		TickCubesRolling(ROLLING_TIME);
+	}
+
+	if (_isCameraWorking && !_isOnlyDarkRemain)
+	{
+		_fastForwardValue = FFDEFAULT;
+
+		auto player = _gameManager->GetPlayer(_playerIndex);
+		player->camera->TracePlayer();
+		_isCameraWorking = false;
+
+		SetDelay(0.5f);		// 카메라 워크가 끝나면서 갑자기 웨이브가 시작되므로
+	}
+}
+
+void Board::OnFastForwarding()
+{
+	if (_isOnlyDarkRemain)
+	{
+		MoveCameraToEnd();
 	}
 }
 
@@ -1393,11 +1416,11 @@ bool Board::UpdateDetonate()
 	return result;
 }
 
-bool Board::CheckWaveClear()
+bool Board::CheckOnlyDarkRemain()
 {
 	if (_runningCubeControllers.empty())
 	{
-		_isWaveClear = false;
+		_isOnlyDarkRemain = false;
 		return false;
 	}
 
@@ -1408,11 +1431,11 @@ bool Board::CheckWaveClear()
 		if (cubeType == eCUBETYPE::ADVANTAGE
 			|| cubeType == eCUBETYPE::NORMAL)
 		{
-			_isWaveClear = false;
+			_isOnlyDarkRemain = false;
 			return false;
 		}
 	}
 
-	_isWaveClear = true;
+	_isOnlyDarkRemain = true;
 	return true;
 }

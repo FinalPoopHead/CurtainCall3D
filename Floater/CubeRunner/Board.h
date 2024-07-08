@@ -98,13 +98,14 @@ private:
 	void Wait(float deltaSecond);
 	void OnWaiting();
 	void OnEndWaiting();
+	void OnFastForwarding();
 	void SetDelay(float second);
 	void AddDelay(float second);
 	
 	void UpdateBoard();
 	void SetTileStateWithCubeCtr(CubeController* cubeCtr);
 	bool UpdateDetonate();		// 수납된 큐브가 있으면 true 아니면 false
-	bool CheckWaveClear();		// 다크큐브 제외하고 전부 제거됐는지 체크.
+	bool CheckOnlyDarkRemain();		// 다크큐브 제외하고 전부 제거됐는지 체크.
 	void TickCubesRolling(float rollingTime);			// 일괄적으로 굴리기 시작.
 	void AddRow();
 	void OnEndWave();
@@ -143,7 +144,8 @@ private:
 	int _damageCount;
 
 	bool _isPerfect;
-	bool _isWaveClear;
+	bool _isOnlyDarkRemain;
+	bool _isCameraWorking;
 	int _nowAddTileCount;
 	int _nextDestroyRow;
 
