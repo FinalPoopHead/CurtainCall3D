@@ -52,7 +52,7 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _delayRemain(ROLLING_DELAY)
 	, _fastForwardValue(FFDEFAULT)
 	, _nowRollingCount(0)
-	, _nowRisingCount(0)
+	, _nowGeneratingCount(0)
 	, _nowFallingTileCount()
 	, _damageCount()
 	, _isPerfect(true)
@@ -563,7 +563,7 @@ void Board::_TEST_GenerateRandomWave()
 			cube->tr.SetPosition(x, 0.0f, z);
 			cube->Enable();
 			_tiles[i][j]->_cube = cube;
-			_nowRisingCount++;
+			_nowGeneratingCount++;
 			delayCount++;
 		}
 
@@ -641,7 +641,7 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 			cube->tr.SetPosition(x, 0.0f, z);
 			cube->Enable();
 			_tiles[i][j]->_cube = cube;
-			_nowRisingCount++;
+			_nowGeneratingCount++;
 		}
 
 		++heightCount;
@@ -960,16 +960,16 @@ void Board::OnEndCubeRoll()
 
 void Board::OnEndCubeGenerate()
 {
-	_nowRisingCount--;
-	if (_nowRisingCount <= 0)
+	_nowGeneratingCount--;
+	if (_nowGeneratingCount <= 0)
 	{
-		_nowRisingCount = 0;
+		_nowGeneratingCount = 0;
 
 		for (auto& col : _tileStates)
 		{
 			for (auto& tileState : col)
 			{
-				tileState = tileState & ~(int)eTileStateFlag::RISING;
+				tileState = tileState & ~(int)eTileStateFlag::GENERATING;
 			}
 		}
 
@@ -1198,7 +1198,7 @@ void Board::Reset()
 
 	_boardState = eBoardState::NONE;
 	_nowRollingCount = 0;
-	_nowRisingCount = 0;
+	_nowGeneratingCount = 0;
 	_nowFallingTileCount = 0;
 	_fallingTileCount.clear();
 	_nowAddTileCount = 0;

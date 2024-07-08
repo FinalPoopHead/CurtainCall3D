@@ -244,7 +244,7 @@ void CubeController::Generating(float deltaSecond)
 	{
 		_gameObject->tr.AddWorldPosition(0.0f, _generateSpeed * DISTANCE * deltaSecond, 0.0f);
 		flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
-		_board->AddTileState(pos.x, pos.z, eTileStateFlag::RISING);
+		_board->AddTileState(pos.x, pos.z, eTileStateFlag::GENERATING);
 
 		if (pos.y >= DISTANCE)	// 타일 높이보다 같거나 커지면 등장완료
 		{

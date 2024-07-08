@@ -51,7 +51,6 @@ void Player::Update(float deltaSecond)
 	int nextTileState = _board->QueryNextTileState(pos.x, pos.z);
 	int blocked = BLOCKED_TILE;
 
-	// 현재 움직일 수 없는 상태면 crushed 된 상태다.
 	_isCrushed = false;
 	if ((tileState & blocked) && (nextTileState & blocked))
 	{
@@ -60,12 +59,20 @@ void Player::Update(float deltaSecond)
 
 	if ((tileState == (int)eTileStateFlag::NONE))
 	{
-		// 타일 밖이다. 게임오버처리를 여기서해야되나 Board 에서 해야되나..
+		camera->TraceFalling();
+		_fallSpeed += 9.8f * deltaSecond;
+		if (_fallSpeed >= 30.0f)
+		{
+			_fallSpeed = 30.0f;
+		}
+
+		tr.AddWorldPosition(0.0f, -_fallSpeed * deltaSecond, 0.0f);
+		return;
 	}
 
-	if (tileState & (int)eTileStateFlag::RISING)
+	if (tileState & (int)eTileStateFlag::GENERATING)
 	{
-		nextPosOffset = { 0.0f, 0.0f, -20.0f * deltaSecond, 0.0f };
+		nextPosOffset = { 0.0f, 0.0f, -30.0f * deltaSecond, 0.0f };
 		auto nextPos = pos + nextPosOffset;
 		tr.SetWorldPosition(nextPos);
 		nextPosOffset = { 0.0f,0.0f,0.0f,0.0f };

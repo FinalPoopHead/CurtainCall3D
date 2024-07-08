@@ -31,4 +31,5 @@ private:
 	bool _isCrushed;
 	int _padIndex;
 	float _speed;
+	float _fallSpeed;
 };

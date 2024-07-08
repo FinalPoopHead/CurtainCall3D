@@ -16,10 +16,7 @@ Camera::Camera(Player* player, Board* board)
 	, _lookDegree(40.0f)
 	, _movSpeed(1.5f)
 	, _rotSpeed(15.0f)
-	, _isMoving(true)
-	, _isPlayerLook(true)
-	, _isReadyToPlayerLook(true)
-	, _isLevelGenerating(false)
+	, _state(eCameraState::TRACEPLAYER)
 {
 	AddComponent<flt::CameraComponent>(true);
 
@@ -32,9 +29,7 @@ Camera::Camera(Player* player, Board* board)
 
 void Camera::TracePlayer()
 {
-	_isPlayerLook = true;
-	_isReadyToPlayerLook = true;
-	_isLevelGenerating = false;
+	_state = eCameraState::TRACEPLAYER;
 	_isTweenMove = false;
 	_isTweenRotate = false;
 
@@ -44,9 +39,22 @@ void Camera::TracePlayer()
 
 void Camera::LookGenerating()
 {
-	//_isPlayerLook = true;
-	_isReadyToPlayerLook = false;
-	_isLevelGenerating = true;
+	_state = eCameraState::LOOKGENERATING;
+	_isTweenMove = false;
+	_isTweenRotate = false;
+
+	_startPosition = (flt::Vector3f)tr.GetLocalPosition();
+	_startRotation = tr.GetLocalRotation();
+}
+
+void Camera::TraceFalling()
+{
+	if (_state == eCameraState::FALL)
+	{
+		return;
+	}
+	 
+	_state = eCameraState::FALL;
 	_isTweenMove = false;
 	_isTweenRotate = false;
 
@@ -56,9 +64,7 @@ void Camera::LookGenerating()
 
 void Camera::TweenMove(flt::Vector3f targetPos, float time, std::function<float(float)> ease)
 {
-	_isPlayerLook = false;
-	_isReadyToPlayerLook = false;
-	_isLevelGenerating = false;
+	_state = eCameraState::TWEEN;
 	_isTweenMove = true;
 	_startPosition = (flt::Vector3f)tr.GetLocalPosition();
 	_targetPosition = targetPos;
@@ -69,9 +75,7 @@ void Camera::TweenMove(flt::Vector3f targetPos, float time, std::function<float(
 
 void Camera::TweenRotate(flt::Quaternion targetRot, float time, std::function<float(float)> ease)
 {
-	_isPlayerLook = false;
-	_isReadyToPlayerLook = false;
-	_isLevelGenerating = false;
+	_state = eCameraState::TWEEN;
 	_isTweenRotate = true;
 	_startRotation = tr.GetLocalRotation();
 	_targetRotation = targetRot;
@@ -105,7 +109,7 @@ flt::Quaternion Camera::CalcTargetRotation()
 {
 	flt::Vector4f playerPos = _player->tr.GetWorldPosition();
 
-	flt::Vector3f direction = flt::Vector3f{ playerPos.x, _playHeight, playerPos.z + _lookZOffset } - (flt::Vector3f)tr.GetWorldPosition();
+	flt::Vector3f direction = flt::Vector3f{ playerPos.x, playerPos.y + _playHeight, playerPos.z + _lookZOffset } - (flt::Vector3f)tr.GetWorldPosition();
 
 	flt::Quaternion targetRotation{};
 	targetRotation.Look(direction);
@@ -126,7 +130,7 @@ flt::Vector3f Camera::CalcTargetPosition()
 	positionDir *= _playerDistance;
 	positionDir += (flt::Vector3f)_player->tr.GetWorldPosition();
 
-	positionDir.y = _playHeight;
+	positionDir.y = playerPos.y + _playHeight;
 
 	return positionDir;
 }
@@ -143,7 +147,9 @@ flt::Vector3f Camera::CalcTargetPosition()
 
 void Camera::UpdateCameraMove(float deltaSecond)
 {
-	if (_isReadyToPlayerLook)
+	switch (_state)
+	{
+	case eCameraState::TRACEPLAYER:
 	{
 		_currPosition = flt::Vector3f::Lerp(_currPosition, CalcTargetPosition(), std::clamp(deltaSecond * _movSpeed, 0.0f, 1.0f));
 		tr.SetPosition(_currPosition);
@@ -153,14 +159,15 @@ void Camera::UpdateCameraMove(float deltaSecond)
 		tr.SetRotation(_currRotation);
 		tr.AddLocalRotation({ 1.0f, 0.0f, 0.0f }, flt::DegToRad(_lookDegree));
 	}
-	else if (_isLevelGenerating)
+	break;
+	case eCameraState::LOOKGENERATING:
 	{
 		flt::Vector4f playerPos = _player->tr.GetWorldPosition();
 		flt::Vector3f targetPos = CalcTargetPosition();
 		targetPos.x = playerPos.x;
 		targetPos.y = targetPos.y / 2.5f;
 
-		_currPosition = flt::Vector3f::Lerp(_currPosition, targetPos, std::clamp(deltaSecond * _movSpeed, 0.0f, 1.0f));
+		_currPosition = flt::Vector3f::Lerp(_currPosition, targetPos, std::clamp(deltaSecond * _movSpeed, 0.0f, 0.3f));
 		tr.SetPosition(_currPosition);
 
 		//flt::Vector3f direction = flt::Vector3f{ playerPos.x, playerPos.y, playerPos.z } - (flt::Vector3f)tr.GetWorldPosition();
@@ -168,11 +175,67 @@ void Camera::UpdateCameraMove(float deltaSecond)
 		flt::Quaternion targetRotation{};
 		targetRotation.Look(direction);
 
-		_currRotation = flt::Quaternion::Slerp(_currRotation, targetRotation, std::clamp(deltaSecond * _rotSpeed, 0.0f, 1.0f));
+		_currRotation = flt::Quaternion::Slerp(_currRotation, targetRotation, std::clamp(deltaSecond * _rotSpeed, 0.0f, 0.3f));
 
 		tr.SetRotation(_currRotation);
 		tr.AddLocalRotation({ 1.0f, 0.0f, 0.0f }, flt::DegToRad(_lookDegree));
 	}
+	break;
+	case eCameraState::FALL:
+	{
+		flt::Vector4f playerPos = _player->tr.GetWorldPosition();
+		flt::Vector4f pos = tr.GetWorldPosition();
+
+		if (pos.y - playerPos.y > 40.0f)
+		{
+			tr.SetWorldPosition(pos.x, playerPos.y - 60.0f, pos.z);
+		}
+
+		//flt::Vector3f direction = flt::Vector3f{ playerPos.x, playerPos.y, playerPos.z } - (flt::Vector3f)tr.GetWorldPosition();
+		flt::Vector3f direction = flt::Vector3f{ playerPos.x, playerPos.y, playerPos.z } - (flt::Vector3f)tr.GetWorldPosition();
+		flt::Quaternion targetRotation{};
+		targetRotation.Look(direction);
+
+		_currRotation = flt::Quaternion::Slerp(_currRotation, targetRotation, std::clamp(deltaSecond * _rotSpeed, 0.0f, 0.1f));
+
+		tr.SetRotation(_currRotation);
+		//tr.AddLocalRotation({ 1.0f, 0.0f, 0.0f }, flt::DegToRad(_lookDegree));
+	}
+	break;
+	case eCameraState::TWEEN:
+		if (_isTweenMove)
+		{
+			_moveTimeElapsed += deltaSecond;
+			float t = _moveEase(_moveTimeElapsed / _moveTime);
+			if (t >= 1.0f)
+			{
+				t = 1.0f;
+				_isTweenMove = false;
+				_moveTimeElapsed = 0.0f;
+			}
+			flt::Vector3f pos = flt::Vector3f::Lerp(_startPosition, _targetPosition, t);
+			tr.SetPosition(pos);
+		}
+		if (_isTweenRotate)
+		{
+			_rotateTimeElapsed += deltaSecond;
+			float t = _rotateEase(_rotateTimeElapsed / _rotateTime);
+			if (t >= 1.0f)
+			{
+				t = 1.0f;
+				_isTweenRotate = false;
+				_rotateTimeElapsed = 0.0f;
+			}
+			flt::Quaternion rot = flt::Quaternion::Slerp(_startRotation, _targetRotation, t);
+			tr.SetRotation(rot);
+		}
+	break;
+
+	default:
+		break;
+
+	}
+
 	/*else if (_isPlayerLook)
 	{
 		_moveTimeElapsed += deltaSecond;
@@ -201,33 +264,4 @@ void Camera::UpdateCameraMove(float deltaSecond)
 			_isReadyToPlayerLook = true;
 		}
 	}*/
-	else
-	{
-		if (_isTweenMove)
-		{
-			_moveTimeElapsed += deltaSecond;
-			float t = _moveEase(_moveTimeElapsed / _moveTime);
-			if (t >= 1.0f)
-			{
-				t = 1.0f;
-				_isTweenMove = false;
-				_moveTimeElapsed = 0.0f;
-			}
-			flt::Vector3f pos = flt::Vector3f::Lerp(_startPosition, _targetPosition, t);
-			tr.SetPosition(pos);
-		}
-		if (_isTweenRotate)
-		{
-			_rotateTimeElapsed += deltaSecond;
-			float t = _rotateEase(_rotateTimeElapsed / _rotateTime);
-			if (t >= 1.0f)
-			{
-				t = 1.0f;
-				_isTweenRotate = false;
-				_rotateTimeElapsed = 0.0f;
-			}
-			flt::Quaternion rot = flt::Quaternion::Slerp(_startRotation, _targetRotation, t);
-			tr.SetRotation(rot);
-		}
-	}
 }

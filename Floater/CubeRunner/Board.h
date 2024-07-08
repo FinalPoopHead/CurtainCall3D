@@ -24,7 +24,7 @@ enum class eTileStateFlag
 	, NORMALCUBE = 0x0100
 	, DARKCUBE = 0x0200
 	, ADVANTAGECUBE = 0x0400
-	, RISING = 0x0800
+	, GENERATING = 0x0800
 };
 
 enum class eBoardState
@@ -139,7 +139,7 @@ private:
 	float _delayRemain;
 	float _fastForwardValue;
 	int _nowRollingCount;
-	int _nowRisingCount;
+	int _nowGeneratingCount;
 	int _nowFallingTileCount;
 	int _damageCount;
 
