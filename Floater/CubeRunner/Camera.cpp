@@ -158,13 +158,13 @@ void Camera::UpdateCameraMove(float deltaSecond)
 		flt::Vector4f playerPos = _player->tr.GetWorldPosition();
 		flt::Vector3f targetPos = CalcTargetPosition();
 		targetPos.x = playerPos.x;
-		targetPos.y = targetPos.y / 2.0f;
+		targetPos.y = targetPos.y / 2.5f;
 
 		_currPosition = flt::Vector3f::Lerp(_currPosition, targetPos, std::clamp(deltaSecond * _movSpeed, 0.0f, 1.0f));
 		tr.SetPosition(_currPosition);
 
 		//flt::Vector3f direction = flt::Vector3f{ playerPos.x, playerPos.y, playerPos.z } - (flt::Vector3f)tr.GetWorldPosition();
-		flt::Vector3f direction = flt::Vector3f{ playerPos.x, _playHeight, playerPos.z } - (flt::Vector3f)tr.GetWorldPosition();
+		flt::Vector3f direction = flt::Vector3f{ playerPos.x, _playHeight * 0.8f, playerPos.z } - (flt::Vector3f)tr.GetWorldPosition();
 		flt::Quaternion targetRotation{};
 		targetRotation.Look(direction);
 
