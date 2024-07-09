@@ -38,6 +38,7 @@ void GameScene::Initialize()
 		gameManager->SetBoardAndPlayer(playerIndex, board, player);
 	}
 
+	gameManager->ResetGame();
 	gameManager->SetStage(g_StageNum);		// TEST : 임시
 }
 

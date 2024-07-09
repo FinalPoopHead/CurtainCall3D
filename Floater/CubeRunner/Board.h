@@ -32,6 +32,7 @@ enum class eBoardState
 	NONE
 	, WAITING
 	, CUBEROLLING
+	, STAGECHANGING
 	, TILEDESTROYING
 	, CUBEGENERATING
 	, ADDTILE
@@ -53,7 +54,7 @@ protected:
 	virtual void PostUpdate(float deltaSeoncd) override;
 
 public:
-	void Resize(int width, int height);
+	void Resize(int newWidth, int newHeight);
 	void Reset();
 	bool SetTileState(float x, float y, eTileStateFlag state);
 	bool AddTileState(float x, float y, eTileStateFlag state);
@@ -66,7 +67,7 @@ public:
 	void ConvertToTilePosition(int x, int z, float& outX, float& outZ);
 
 	void _TEST_GenerateRandomWave();		// 임시로 랜덤 생성 용
-	void GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount);
+	void GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount, bool isFirst = false);
 	void ReturnCubeToPool(flt::GameObject* obj);
 	void RemoveFromControllerList(CubeController* cubeCtr);
 	void SetMine(float x, float z);			// position X,Z에 지뢰를 설치한다.
@@ -78,6 +79,7 @@ public:
 	void OnStartTileFall(int x, int z);		// x,z index의 타일이 떨어지기 시작함.
 	void OnEndTileFall(int x, int z);
 
+	void AddColumn();
 	void DestroyRow();
 	void DeferredDestroyRow();
 
