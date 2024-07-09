@@ -4,10 +4,11 @@
 
 enum class eCameraState
 {
-	TRACEPLAYER,
-	LOOKGENERATING,
-	FALL,
-	TWEEN
+	NONE
+	, TRACEPLAYER
+	, LOOKGENERATING
+	, FALL
+	, TWEEN
 };
 
 class Player;
@@ -18,6 +19,7 @@ class Camera : public flt::GameObject
 public:
 	Camera(Player* player, Board* board);
 
+	void StopCamera();
 	void TracePlayer();
 	void LookGenerating();
 	void TraceFalling();

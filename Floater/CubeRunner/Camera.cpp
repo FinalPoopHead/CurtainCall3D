@@ -27,6 +27,13 @@ Camera::Camera(Player* player, Board* board)
 	tr.SetRotation(_currRotation);
 }
 
+void Camera::StopCamera()
+{
+	_state = eCameraState::NONE;
+	_isTweenMove = false;
+	_isTweenRotate = false;
+}
+
 void Camera::TracePlayer()
 {
 	_state = eCameraState::TRACEPLAYER;
@@ -186,15 +193,15 @@ void Camera::UpdateCameraMove(float deltaSecond)
 		flt::Vector4f playerPos = _player->tr.GetWorldPosition();
 		flt::Vector4f pos = tr.GetWorldPosition();
 
-		if (pos.y - playerPos.y > 40.0f)
-		{
-			tr.SetWorldPosition(pos.x, playerPos.y - 60.0f, pos.z);
-		}
-
-		//flt::Vector3f direction = flt::Vector3f{ playerPos.x, playerPos.y, playerPos.z } - (flt::Vector3f)tr.GetWorldPosition();
 		flt::Vector3f direction = flt::Vector3f{ playerPos.x, playerPos.y, playerPos.z } - (flt::Vector3f)tr.GetWorldPosition();
 		flt::Quaternion targetRotation{};
 		targetRotation.Look(direction);
+
+		if (pos.y - playerPos.y > 40.0f)
+		{
+			tr.SetWorldPosition(pos.x, playerPos.y - 60.0f, playerPos.z - 30.0f);
+			tr.SetRotation(targetRotation);
+		}
 
 		_currRotation = flt::Quaternion::Slerp(_currRotation, targetRotation, std::clamp(deltaSecond * _rotSpeed, 0.0f, 0.1f));
 
