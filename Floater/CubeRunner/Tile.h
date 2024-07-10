@@ -44,6 +44,6 @@ public:
 	float _fallDelay;
 	float _fallSpeed;
 
-	int _row;
-	int _col;
+	int _x;
+	int _z;
 };

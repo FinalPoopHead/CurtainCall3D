@@ -25,8 +25,8 @@ Tile::Tile(Board* board)
 	, _targetPos()
 	, _fallDelay()
 	, _fallSpeed()
-	, _row()
-	, _col()
+	, _x()
+	, _z()
 {
 	std::wstring filePath = L"..\\Resources\\Models\\BrickBlock.fbx";
 
@@ -68,7 +68,7 @@ void Tile::PreUpdate(float deltaSecond)
 {
 	if (_isMoving)
 	{
-		_elapsedTime += deltaSecond * _board->GetFFValue();
+		_elapsedTime += deltaSecond;
 
 		if (_elapsedTime >= _movingTime)
 		{
@@ -137,8 +137,8 @@ void Tile::StartAddRow(float movingTime, flt::Vector3f targetPos)
 
 void Tile::StartFall(float delay, int row, int col)
 {
-	_row = row;
-	_col = col;
+	_x = row;
+	_z = col;
 
 	DisableMine();
 	DisableAdvantageMine();
@@ -156,7 +156,7 @@ void Tile::Fall(float deltaSecond)
 		_fallDelay -= deltaSecond;
 		if (_fallDelay <= 0.0f)
 		{
-			_board->OnStartTileFall(_row,_col);
+			_board->OnStartTileFall(_x,_z);
 
 			if(_cube != nullptr)
 			{
@@ -173,6 +173,6 @@ void Tile::Fall(float deltaSecond)
 	if (tr.GetWorldPosition().y <= FALLHEIGHT)
 	{
 		_isFalling = false;
-		_board->OnEndTileFall(_row, _col);
+		_board->OnEndTileFall(_x, _z);
 	}
 }

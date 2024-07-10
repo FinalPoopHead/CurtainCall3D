@@ -49,7 +49,7 @@ void CubeController::PreUpdate(float deltaSecond)
 		Removing(deltaSecond * _board->GetFFValue());
 		break;
 	case eCUBESTATUS::GENERATING:
-		Generating(deltaSecond * _board->GetFFValue());
+		Generating(deltaSecond);
 		break;
 	}
 }
@@ -188,7 +188,7 @@ void CubeController::Fall(float deltaSecond)
 	if (IsFallEnough())
 	{
 		//_board->RemoveFromControllerList(this);
-		_board->BackToPool(_gameObject);
+		_board->ReturnCubeToPool(_gameObject);
 		_status = eCUBESTATUS::NONE;
 	}
 }
@@ -229,7 +229,7 @@ void CubeController::Removing(float deltaSecond)
 	if (pos.y <= 0.0f)	// 타일 높이보다 같거나 작아지면 제거
 	{
 		//_board->RemoveFromControllerList(this);
-		_board->BackToPool(_gameObject);
+		_board->ReturnCubeToPool(_gameObject);
 		_status = eCUBESTATUS::NONE;
 	}
 }
@@ -244,7 +244,7 @@ void CubeController::Generating(float deltaSecond)
 	{
 		_gameObject->tr.AddWorldPosition(0.0f, _generateSpeed * DISTANCE * deltaSecond, 0.0f);
 		flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
-		_board->AddTileState(pos.x, pos.z, eTileStateFlag::RISING);
+		_board->AddTileState(pos.x, pos.z, eTileStateFlag::GENERATING);
 
 		if (pos.y >= DISTANCE)	// 타일 높이보다 같거나 커지면 등장완료
 		{

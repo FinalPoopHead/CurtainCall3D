@@ -52,6 +52,7 @@ public:
 	void ProgressStage();				// 다음 스테이지로 넘어간다	
 
 	void OnEndLevel(int playerIndex);
+	Player* GetPlayer(int index);
 
 private:
 	void IncreasePlayerCount();
