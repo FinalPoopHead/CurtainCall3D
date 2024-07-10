@@ -31,8 +31,11 @@ constexpr float SLOWVALUE = 0.5f;
 constexpr float FFDEFAULT = 1.0f;
 constexpr float FFVALUE = 8.0f;
 
+std::unordered_map<std::string, int> soundIndex;
+
 Board::Board(GameManager* gameManager, int playerIndex, int width, int height, float offset /*= 4.00f*/) :
 	flt::GameObject()
+	, _soundComponent()
 	, _gameManager(gameManager)
 	, _playerIndex(playerIndex)
 	, _width(width)
@@ -64,6 +67,20 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _fallingTileCount()
 	, _addTiles()
 {
+	std::wstring path = L"../Resources/Sound/";
+	_soundComponent = AddComponent<flt::SoundComponent>(true);
+	_soundComponent->AddSound(path + L"GenerateFadeOut.mp3");
+	_soundComponent->AddSound(path + L"SetMine.mp3");
+	_soundComponent->AddSound(path + L"DetonateMine.mp3");
+	_soundComponent->AddSound(path + L"CubeRoll.mp3");
+
+	int index = 0;
+	soundIndex = std::unordered_map<std::string, int>();
+	soundIndex["Generate"] = index++;
+	soundIndex["SetMine"] = index++;
+	soundIndex["DetonateMine"] = index++;
+	soundIndex["CubeRoll"] = index++;
+
 	_testIndex = 0;
 	for (int i = 0; i < 5; i++)
 	{
@@ -701,6 +718,8 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 		player->camera->LookGenerating();
 		_isCameraWorking = true;
 	}
+
+	_soundComponent->Play(soundIndex["Generate"]);
 }
 
 void Board::TickCubesRolling(float rollingTime)
@@ -909,6 +928,8 @@ void Board::SetMine(float x, float z)
 	_tiles[tileX][tileZ]->EnableMine();
 
 	_minePos = { tileX, tileZ };
+
+	_soundComponent->Play(soundIndex["SetMine"]);
 }
 
 void Board::DetonateMine()
@@ -929,6 +950,7 @@ void Board::DetonateMine()
 	_tiles[x][y]->EnableDetonated();
 	_tileStates[x][y] = (int)_tileStates[x][y] & ~((int)eTileStateFlag::MINE);
 	_tileStates[x][y] = (int)_tileStates[x][y] | (int)eTileStateFlag::DETONATE;
+	_soundComponent->Play(soundIndex["DetonateMine"]);
 }
 
 void Board::DetonateAdvantageMine()
@@ -983,6 +1005,7 @@ void Board::OnEndCubeRoll()
 		}
 
 		SetDelay(delay);
+		_soundComponent->Play(soundIndex["CubeRoll"]);
 	}
 }
 
