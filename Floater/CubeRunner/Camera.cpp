@@ -40,8 +40,9 @@ void Camera::TracePlayer()
 	_isTweenMove = false;
 	_isTweenRotate = false;
 
-	_startPosition = (flt::Vector3f)tr.GetLocalPosition();
-	_startRotation = tr.GetLocalRotation();
+	//_currPosition = (flt::Vector3f)tr.GetWorldPosition();
+	_currPosition = (flt::Vector3f)tr.GetLocalPosition();
+	_currRotation = CalcTargetRotation();
 }
 
 void Camera::LookGenerating()
@@ -93,22 +94,7 @@ void Camera::TweenRotate(flt::Quaternion targetRot, float time, std::function<fl
 
 void Camera::PostUpdate(float deltaSecond)
 {
-	//flt::Vector3f targetPosition = CalcTargetPosition();
-	//tr.SetPosition(targetPosition);
-	//_currPosition = targetPosition;
-// 	if(flt::GetKeyDown(flt::KeyCode::mouseLButton))
-// 	{
-// 		if (_isPlayerLook)
-// 		{
-// 			TweenMove({ 0.0f, 0.0f, 0.0f }, 1.0f);
-// 			TweenRotate({ 0.0f, 0.0f, 0.0f, 1.0f }, 1.0f);
-// 		}
-// 		else
-// 		{
-// 			TracePlayer();
-// 		}
-// 	}
-
+	flt::Vector4f pos = tr.GetWorldPosition();
 	UpdateCameraMove(deltaSecond);
 }
 
