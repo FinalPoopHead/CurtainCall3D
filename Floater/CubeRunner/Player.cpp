@@ -12,8 +12,7 @@ Player::Player(Board* board)
 	: camera(nullptr)
 	, _model(nullptr)
 	, _board(board)
-	, _isGameOver(false)
-	, _isCrushed(false)
+	, _state(ePlayerState::PLAYING)
 	, _padIndex(-1)
 	, _speed(10.0f)
 {
@@ -39,26 +38,31 @@ void Player::Update(float deltaSecond)
 		flt::SetScene(scene);
 	}
 
-	if (_isGameOver)
+	switch (_state)
 	{
-		return;
+	case ePlayerState::PLAYING:
+		break;
+	case ePlayerState::CRUSHED:
+		break;
+	case ePlayerState::PUSHEDOUT:
+	{
+		flt::Vector4f pos = tr.GetWorldPosition();
+		flt::Vector4f nextPosOffset{};
+		nextPosOffset = { 0.0f, 0.0f, -30.0f * deltaSecond, 0.0f };
+		auto nextPos = pos + nextPosOffset;
+		tr.SetWorldPosition(nextPos);
+		nextPosOffset = { 0.0f,0.0f,0.0f,0.0f };
 	}
-
-	flt::Vector4f pos = tr.GetWorldPosition();
-	flt::Vector4f nextPosOffset{};
-
-	int tileState = _board->QueryTileState(pos.x, pos.z);
-	int nextTileState = _board->QueryNextTileState(pos.x, pos.z);
-	int blocked = BLOCKED_TILE;
-
-	_isCrushed = false;
-	if ((tileState & blocked) && (nextTileState & blocked))
+		break;
+	case ePlayerState::FALLING:
 	{
-		_isCrushed = true;
-	}
+		if (tr.GetWorldPosition().y < -180.0f)
+		{
+			camera->StopCamera();
+			_state = ePlayerState::GAMEOVER;
+			return;
+		}
 
-	if ((tileState == (int)eTileStateFlag::NONE))
-	{
 		camera->TraceFalling();
 		_fallSpeed += 9.8f * deltaSecond;
 		if (_fallSpeed >= 30.0f)
@@ -67,15 +71,41 @@ void Player::Update(float deltaSecond)
 		}
 
 		tr.AddWorldPosition(0.0f, -_fallSpeed * deltaSecond, 0.0f);
+	}
+		return;
+		break;
+	case ePlayerState::GAMEOVER:
+		return;
+		break;
+	default:
+		break;
+	}
+
+	_state = ePlayerState::PLAYING;
+
+	flt::Vector4f pos = tr.GetWorldPosition();
+	flt::Vector4f nextPosOffset{};
+
+	int tileState = _board->QueryTileState(pos.x, pos.z);
+	int nextTileState = _board->QueryNextTileState(pos.x, pos.z);
+	int blocked = BLOCKED_TILE;
+
+	if ((tileState & blocked) && (nextTileState & blocked))
+	{
+		_state = ePlayerState::CRUSHED;
+		return;
+	}
+
+	if ((tileState == (int)eTileStateFlag::NONE))
+	{
+		_board->SetGameOver();
+		_state = ePlayerState::FALLING;
 		return;
 	}
 
 	if (tileState & (int)eTileStateFlag::GENERATING)
 	{
-		nextPosOffset = { 0.0f, 0.0f, -30.0f * deltaSecond, 0.0f };
-		auto nextPos = pos + nextPosOffset;
-		tr.SetWorldPosition(nextPos);
-		nextPosOffset = { 0.0f,0.0f,0.0f,0.0f };
+		_state = ePlayerState::PUSHEDOUT;
 		return;
 	}
 
@@ -104,7 +134,7 @@ void Player::Update(float deltaSecond)
 	}
 
 	keyData = flt::GetKeyDown(flt::KeyCode::j);
-	if (keyData && !_isCrushed)
+	if (keyData)
 	{
 		if (!_board->IsMineSet())
 		{
@@ -117,7 +147,7 @@ void Player::Update(float deltaSecond)
 	}
 
 	keyData = flt::GetKeyDown(flt::KeyCode::k);
-	if (keyData && !_isCrushed)
+	if (keyData)
 	{
 		_board->DetonateAdvantageMine();
 	}
@@ -284,11 +314,6 @@ void Player::Update(float deltaSecond)
 			printf("Y Up\n");
 		}
 	}
-}
-
-void Player::SetGameOver()
-{
-	_isGameOver = true;
 }
 
 void Player::SetAlbedoPath(std::wstring path)

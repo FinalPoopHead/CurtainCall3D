@@ -291,6 +291,10 @@ void Board::PreUpdate(float deltaSecond)
 		}
 		return;
 		break;
+	case eBoardState::STAGECHANGING:
+		// TODO : 스테이지 변경 연출
+		return;
+		break;
 	case eBoardState::TILEDESTROYING:
 	case eBoardState::CUBEGENERATING:
 	case eBoardState::ADDTILE:
@@ -573,7 +577,7 @@ void Board::_TEST_GenerateRandomWave()
 	_boardState = eBoardState::CUBEGENERATING;
 }
 
-void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount)
+void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount, bool isFirst /*= false*/)
 {
 	_isGameOver = false;
 
@@ -585,7 +589,7 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 	int heightCount = 0;
 	std::list<CubeController*> waveCubes;
 	float startDelay = 0.15f;
-	float delayBase = 1.5f;
+	float delayBase = 0.5f;
 
 	for (int j = 0; j < height; ++j)
 	{
@@ -671,8 +675,32 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 	}
 
 	auto player = _gameManager->GetPlayer(_playerIndex);
-	player->camera->LookGenerating();
-	_isCameraWorking = true;
+	if (isFirst)
+	{
+		float time = 5.0f;
+		float x;
+		float z;
+		GetRatioPosition(1.0f, 0.1f, x, z);
+		auto startPos = flt::Vector3f(x + 20.0f, 0.0f, z);
+		flt::Quaternion startRot;
+		startRot.SetEuler({ 0.0f,-90.0f,0.0f });
+
+		GetRatioPosition(0.5f, 0.75f, x, z);
+		auto targetPos = flt::Vector3f(x, 20.0f, z - 40.0f);
+		flt::Quaternion targetRot;
+		targetRot.SetEuler({ 15.0f,0.0f,0.0f });
+
+		player->camera->tr.SetPosition(startPos);
+		player->camera->tr.SetRotation(startRot);
+		player->camera->TweenMove(targetPos, time);
+		player->camera->TweenRotate(targetRot, time);
+		_isCameraWorking = true;
+	}
+	else
+	{
+		player->camera->LookGenerating();
+		_isCameraWorking = true;
+	}
 }
 
 void Board::TickCubesRolling(float rollingTime)
@@ -1018,6 +1046,12 @@ void Board::OnEndTileFall(int x, int z)
 	{
 		_fallingTileCount[z] = 0;
 	}
+}
+
+void Board::AddColumn()
+{
+	// TODO : 구현 필요
+	ASSERT(false);
 }
 
 void Board::DestroyRow()
