@@ -101,71 +101,65 @@ void GameManager::Update(float deltaSecond)
 	flt::KeyData keyData = flt::GetKeyDown(flt::KeyCode::key1);
 	if (keyData)
 	{
+		ResetGame();
 		SetStage(1);
 	}
 
 	keyData = flt::GetKeyDown(flt::KeyCode::key2);
 	if (keyData)
 	{
+		ResetGame();
 		SetStage(2);
 	}
 
 	keyData = flt::GetKeyDown(flt::KeyCode::key3);
 	if (keyData)
 	{
+		ResetGame();
 		SetStage(3);
 	}
 
 	keyData = flt::GetKeyDown(flt::KeyCode::key4);
 	if (keyData)
 	{
+		ResetGame();
 		SetStage(4);
 	}
 
 	keyData = flt::GetKeyDown(flt::KeyCode::key5);
 	if (keyData)
 	{
+		ResetGame();
 		SetStage(5);
 	}
 
 	keyData = flt::GetKeyDown(flt::KeyCode::key6);
 	if (keyData)
 	{
+		ResetGame();
 		SetStage(6);
 	}
 
 	keyData = flt::GetKeyDown(flt::KeyCode::key7);
 	if (keyData)
 	{
+		ResetGame();
 		SetStage(7);
 	}
 
 	keyData = flt::GetKeyDown(flt::KeyCode::key8);
 	if (keyData)
 	{
+		ResetGame();
 		SetStage(8);
 	}
 
 	keyData = flt::GetKeyDown(flt::KeyCode::key9);
 	if (keyData)
 	{
+		ResetGame();
 		SetStage(9);
 	}
-
-	// 	keyData = flt::GetKeyDown(flt::KeyCode::g);
-	// 	if (keyData)
-	// 	{
-	// 		StageData currentStage = _stageData[_currentStage - 1];
-	// 
-	// 		for (int i = 0; i < MAXPLAYERCOUNT; i++)
-	// 		{
-	// 			if (_boards[i] != nullptr)
-	// 			{
-	// 				_boards[i]->Reset();
-	// 				_boards[i]->GenerateLevel(currentStage.level[0].levelLayout, currentStage.waveCount);
-	// 			}
-	// 		}
-	// 	}
 }
 
 void GameManager::PostUpdate(float deltaSecond)
@@ -391,8 +385,6 @@ void GameManager::SetStage(int stageNum)
 {
 	_currentStage = stageNum;
 
-	ResetGame();
-
 	StageData data = _stageData[_currentStage - 1];
 
 	for (int i = 0; i < _players.size(); i++)
@@ -401,7 +393,7 @@ void GameManager::SetStage(int stageNum)
 		{
 			_boards[i]->Resize(data.stageWidth, data.stageHeight);
 			_boards[i]->Reset();
-			_boards[i]->GenerateLevel(data.level[0].levelLayout, data.waveCount);
+			_boards[i]->GenerateLevel(data.level[0].levelLayout, data.waveCount, true);
 		}
 
 		if (_players[i] != nullptr)
@@ -416,10 +408,50 @@ void GameManager::SetStage(int stageNum)
 	}
 }
 
-void GameManager::ProgressStage()
+void GameManager::ProgressStage(int playerIndex)
 {
-	// TODO : 구현해야함.
-	ASSERT(false);
+	++_currentStage;
+
+	_isGameOver[playerIndex] = false;
+	_fallCount[playerIndex] = 0;
+	_currentLevel[playerIndex] = 1;
+
+	for (int j = 0; j < _fallCountMax[playerIndex]; ++j)
+	{
+		_fallCountRed[playerIndex][j]->Disable();
+	}
+
+	for (int j = 0; j < 4; j++)
+	{
+		_levelCountBlue[playerIndex][j]->Disable();
+	}
+
+	_levelCountBlue[playerIndex][0]->Enable();
+
+	for (auto& comboText : _liveComboTexts)
+	{
+		comboText->Disable();
+		_comboTextPool.push_back(comboText);
+	}
+	_liveComboTexts.clear();
+
+	StageData data = _stageData[_currentStage - 1];
+
+	if (_boards[playerIndex] != nullptr)
+	{
+		_boards[playerIndex]->Resize(data.stageWidth, data.stageHeight);
+		_boards[playerIndex]->Reset();
+		_boards[playerIndex]->GenerateLevel(data.level[0].levelLayout, data.waveCount, true);
+	}
+
+	if (_players[playerIndex] != nullptr)
+	{
+		_players[playerIndex]->SetPositionToRatioPosition(0.5f, 0.75f);
+	}
+
+	_stageCountText[playerIndex]->SetText(std::to_wstring(_currentStage));
+
+	ResizeFallCountUI(data.stageWidth - 1);
 }
 
 void GameManager::OnEndLevel(int playerIndex)
@@ -428,7 +460,7 @@ void GameManager::OnEndLevel(int playerIndex)
 	if (_currentLevel[playerIndex] > _stageData[_currentStage - 1].levelCount)
 	{
 		// TODO : 스테이지 클리어
-		_currentLevel[playerIndex] = 1;
+		ProgressStage(playerIndex);
 		return;
 	}
 
@@ -445,6 +477,16 @@ void GameManager::OnEndLevel(int playerIndex)
 			_levelCountBlue[playerIndex][i]->Enable();
 		}
 	}
+}
+
+Player* GameManager::GetPlayer(int index)
+{
+	if(index < 0 || index >= _players.size())
+	{
+		return nullptr;
+	}
+
+	return _players[index];
 }
 
 void GameManager::IncreasePlayerCount()

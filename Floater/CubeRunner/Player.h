@@ -5,6 +5,15 @@ class Board;
 class Camera;
 class PlayerModel;
 
+enum class ePlayerState
+{
+	PLAYING
+	, CRUSHED
+	, PUSHEDOUT
+	, FALLING
+	, GAMEOVER
+};
+
 class Player : public flt::GameObject
 {
 public:
@@ -17,7 +26,6 @@ protected:
 
 public:
 	void SetPadIndex(int padIndex) { _padIndex = padIndex; }
-	void SetGameOver();
 	void SetAlbedoPath(std::wstring path);
 	void SetPositionToRatioPosition(float ratioX, float ratioY);
 
@@ -27,8 +35,8 @@ public:
 private:
 	PlayerModel* _model;
 	Board* _board;
-	bool _isGameOver;
-	bool _isCrushed;
+	ePlayerState _state;
 	int _padIndex;
 	float _speed;
+	float _fallSpeed;
 };

@@ -2,6 +2,15 @@
 #include "../FloaterGameEngine/include/EngineMinimal.h"
 #include <functional>
 
+enum class eCameraState
+{
+	NONE
+	, TRACEPLAYER
+	, LOOKGENERATING
+	, FALL
+	, TWEEN
+};
+
 class Player;
 class Board;
 
@@ -10,7 +19,10 @@ class Camera : public flt::GameObject
 public:
 	Camera(Player* player, Board* board);
 
+	void StopCamera();
 	void TracePlayer();
+	void LookGenerating();
+	void TraceFalling();
 	void TweenMove(flt::Vector3f targetPos, float time, std::function<float(float)> ease = [](float t) { return t; });
 	void TweenRotate(flt::Quaternion targetRot, float time, std::function<float(float)> ease = [](float t) { return t; });
 
@@ -31,15 +43,13 @@ private:
 	float _height;
 	float _playHeight;
 	float _lookZOffset;
-	float _posZOffsest;
+	float _posZOffset;
 	float _playerDistance;
 	float _lookDegree;
 	float _movSpeed;
 	float _rotSpeed;
 
-	bool _isMoving;
-	bool _isPlayerLook;
-	bool _isReadyToPlayerLook;
+	eCameraState _state;
 
 	flt::Quaternion _currRotation;
 	flt::Vector3f _currPosition;

@@ -7,6 +7,8 @@
 #include "NormalCube.h"
 #include "CubeController.h"
 #include "GameManager.h"
+#include "Player.h"
+#include "Camera.h"
 
 constexpr int TILE_COUNT = 512;
 constexpr int CUBE_COUNT = 512;
@@ -14,7 +16,7 @@ constexpr int CUBE_COUNT = 512;
 constexpr float GENERATE_TIME = 1.0f;
 constexpr float ROLLING_TIME = 1.0f;
 constexpr float REMOVE_TIME = 0.5f;
-constexpr float ADDTILE_TIME = 2.0f;
+constexpr float ADDTILE_TIME = 1.0f;
 
 constexpr float GENERATE_DELAY = 3.0f;
 constexpr float ROLLING_DELAY = 0.5f;	// 아무것도 하지않고 굴러갈때의 딜레이
@@ -27,7 +29,7 @@ constexpr int CUBE_DAMAGE = 1;
 constexpr int DARKCUBE_DAMAGE = 1;
 constexpr float SLOWVALUE = 0.5f;
 constexpr float FFDEFAULT = 1.0f;
-constexpr float FFVALUE = 20.0f;
+constexpr float FFVALUE = 8.0f;
 
 Board::Board(GameManager* gameManager, int playerIndex, int width, int height, float offset /*= 4.00f*/) :
 	flt::GameObject()
@@ -50,16 +52,30 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _delayRemain(ROLLING_DELAY)
 	, _fastForwardValue(FFDEFAULT)
 	, _nowRollingCount(0)
-	, _nowRisingCount(0)
+	, _nowGeneratingCount(0)
 	, _nowFallingTileCount()
 	, _damageCount()
 	, _isPerfect(true)
+	, _isOnlyDarkRemain(false)
+	, _isCameraWorking(false)
 	, _nowAddTileCount()
 	, _nextDestroyRow()
 	, _minePos({ -1,-1 })
 	, _fallingTileCount()
 	, _addTiles()
 {
+	_testIndex = 0;
+	for (int i = 0; i < 5; i++)
+	{
+		_testValue[i] = 1.0f;
+	}
+
+	_testValue[0] = 0.5f;
+	_testValue[1] = 1.5f;
+	_testValue[2] = 1.0f;
+	_testValue[3] = 25.0f;
+	_testValue[4] = 20.0f;
+
 	// Create TilePool
 	for (int i = 0; i < TILE_COUNT; i++)
 	{
@@ -124,6 +140,71 @@ void Board::PreUpdate(float deltaSecond)
 		EndFastForward();
 	}
 
+	if (_fastForwardValue == FFVALUE)
+	{
+		OnFastForwarding();
+	}
+
+	keyData = flt::GetKeyDown(flt::KeyCode::tab);
+	if (keyData)
+	{
+		_testIndex = (_testIndex + 1) % 5;
+		std::string modeStr = "babo";
+		switch (_testIndex)
+		{
+		case 0:
+			modeStr = "X";
+			break;
+		case 1:
+			modeStr = "Y";
+			break;
+		case 2:
+			modeStr = "Z";
+			break;
+		case 3:
+			modeStr = "xAngle";
+			break;
+		case 4:
+			modeStr = "yAngle";
+			break;
+		default:
+			break;
+		}
+		std::cout << modeStr << std::endl;
+	}
+
+	float diff = 1.0f;
+
+	keyData = flt::GetKeyDown(flt::KeyCode::up);
+	if (keyData)
+	{
+		_testValue[_testIndex] += diff;
+		std::cout << "[X : " << _testValue[0] << "] [Y : " << _testValue[1] << "] [Z : " << _testValue[2] << "] [xAngle : " << _testValue[3] << "] [yAngle : " << _testValue[4] << "]" << std::endl;
+	}
+
+	keyData = flt::GetKeyDown(flt::KeyCode::down);
+	if (keyData)
+	{
+		_testValue[_testIndex] -= diff;
+		std::cout << "[X : " << _testValue[0] << "] [Y : " << _testValue[1] << "] [Z : " << _testValue[2] << "] [xAngle : " << _testValue[3] << "] [yAngle : " << _testValue[4] << "]" << std::endl;
+	}
+	
+	diff = 0.1f;
+
+	keyData = flt::GetKeyDown(flt::KeyCode::right);
+	if (keyData)
+	{
+		_testValue[_testIndex] += diff;
+		std::cout << "[X : " << _testValue[0] << "] [Y : " << _testValue[1] << "] [Z : " << _testValue[2] << "] [xAngle : " << _testValue[3] << "] [yAngle : " << _testValue[4] << "]" << std::endl;
+	}
+
+	keyData = flt::GetKeyDown(flt::KeyCode::left);
+	if (keyData)
+	{
+		_testValue[_testIndex] -= diff;
+		std::cout << "[X : " << _testValue[0] << "] [Y : " << _testValue[1] << "] [Z : " << _testValue[2] << "] [xAngle : " << _testValue[3] << "] [yAngle : " << _testValue[4] << "]" << std::endl;
+	}
+
 	// TODO : 슬로우모드임
 	keyData = flt::GetKeyDown(flt::KeyCode::o);
 	if (keyData)
@@ -137,14 +218,14 @@ void Board::PreUpdate(float deltaSecond)
 		EndFastForward();
 	}
 
-	// TODO : 치트키. 블랙큐브 빼고 전부 제거
+	// 치트키. 블랙큐브 빼고 전부 제거
 	keyData = flt::GetKeyDown(flt::KeyCode::p);
 	if (keyData)
 	{
 		std::list<CubeController*> removeList;
 		for (auto& cubeCtr : _runningCubeControllers)
 		{
-			if(cubeCtr->GetCubeType() == eCUBETYPE::DARK)
+			if (cubeCtr->GetCubeType() == eCUBETYPE::DARK)
 			{
 				continue;
 			}
@@ -176,10 +257,11 @@ void Board::PreUpdate(float deltaSecond)
 	case eBoardState::NONE:
 		if (!_isGameOver)
 		{
-			// TODO : 웨이브 클리어 연출 보여주고 다음 웨이브 출발
+			// 웨이브 클리어 연출 보여주고 다음 웨이브 출발
 			if (_runningCubeControllers.empty() && !_waveCubeControllers.empty())
 			{
 				_isPerfect = true;
+				_isOnlyDarkRemain = false;
 				_runningCubeControllers = _waveCubeControllers.front();
 				_waveCubeControllers.pop_front();
 				for (auto& cubeCtr : _runningCubeControllers)
@@ -209,8 +291,12 @@ void Board::PreUpdate(float deltaSecond)
 		}
 		return;
 		break;
+	case eBoardState::STAGECHANGING:
+		// TODO : 스테이지 변경 연출
+		return;
+		break;
 	case eBoardState::TILEDESTROYING:
-	case eBoardState::CUBERISING:
+	case eBoardState::CUBEGENERATING:
 	case eBoardState::ADDTILE:
 		return;
 		break;
@@ -481,17 +567,17 @@ void Board::_TEST_GenerateRandomWave()
 			cube->tr.SetPosition(x, 0.0f, z);
 			cube->Enable();
 			_tiles[i][j]->_cube = cube;
-			_nowRisingCount++;
+			_nowGeneratingCount++;
 			delayCount++;
 		}
 
 		delayCount = 0;
 	}
 
-	_boardState = eBoardState::CUBERISING;
+	_boardState = eBoardState::CUBEGENERATING;
 }
 
-void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount)
+void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount, bool isFirst /*= false*/)
 {
 	_isGameOver = false;
 
@@ -503,6 +589,7 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 	int heightCount = 0;
 	std::list<CubeController*> waveCubes;
 	float startDelay = 0.15f;
+	float delayBase = 0.5f;
 
 	for (int j = 0; j < height; ++j)
 	{
@@ -547,18 +634,18 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 				_darkCubePool.pop_front();
 				break;
 			default:
-				ASSERT(false, "Invalid Random Value");
+				ASSERT(false, "Invalid CubeType");
 				break;
 			}
 
 			auto cubeCtr = cube->GetComponent<CubeController>();
 			waveCubes.push_back(cubeCtr);
-			cubeCtr->StartGenerate(GENERATE_TIME, startDelay * j);
+			cubeCtr->StartGenerate(GENERATE_TIME, delayBase + startDelay * j);
 
 			cube->tr.SetPosition(x, 0.0f, z);
 			cube->Enable();
 			_tiles[i][j]->_cube = cube;
-			_nowRisingCount++;
+			_nowGeneratingCount++;
 		}
 
 		++heightCount;
@@ -571,7 +658,7 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 		}
 	}
 
-	_boardState = eBoardState::CUBERISING;
+	_boardState = eBoardState::CUBEGENERATING;
 	if (_height == 0)
 	{
 		_boardState = eBoardState::NONE;
@@ -580,10 +667,39 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 	_runningCubeControllers = _waveCubeControllers.front();
 	_waveCubeControllers.pop_front();
 	_isPerfect = true;
+	_isOnlyDarkRemain = false;
 
 	for (auto& cubeCtr : _runningCubeControllers)
 	{
 		cubeCtr->SetIsRunning(true);
+	}
+
+	auto player = _gameManager->GetPlayer(_playerIndex);
+	if (isFirst)
+	{
+		float time = 5.0f;
+		float x;
+		float z;
+		GetRatioPosition(1.0f, 0.1f, x, z);
+		auto startPos = flt::Vector3f(x + 20.0f, 0.0f, z);
+		flt::Quaternion startRot;
+		startRot.SetEuler({ 0.0f,-90.0f,0.0f });
+
+		GetRatioPosition(0.5f, 0.75f, x, z);
+		auto targetPos = flt::Vector3f(x, 20.0f, z - 40.0f);
+		flt::Quaternion targetRot;
+		targetRot.SetEuler({ 15.0f,0.0f,0.0f });
+
+		player->camera->tr.SetPosition(startPos);
+		player->camera->tr.SetRotation(startRot);
+		player->camera->TweenMove(targetPos, time);
+		player->camera->TweenRotate(targetRot, time);
+		_isCameraWorking = true;
+	}
+	else
+	{
+		player->camera->LookGenerating();
+		_isCameraWorking = true;
 	}
 }
 
@@ -630,6 +746,7 @@ void Board::OnEndWave()
 	if (_isPerfect)
 	{
 		AddRow();
+		MoveCameraToEnd();
 		// TODO : 상대방 공격하는게 되긴 하는데.. 좀 요상하다 ㅋㅋㅋㅋ
 		//			Board 코드도 조금바꿔서 행동에 우선순위를 정해주고 큐에 담아서 처리하는 식으로 해야될듯..
 		// _gameManager->AttackAnotherPlayer(_playerIndex);
@@ -638,6 +755,43 @@ void Board::OnEndWave()
 	{
 		SetDelay(WAVECLEAR_DELAY);
 	}
+}
+
+void Board::MoveCameraToEnd()
+{
+	float offsetX = 0.5f;
+	float offsetY = 1.5f;
+	float offsetZ = 1.0f;
+	float offsetAngleX = 25.0f;
+	float offsetAngleY = 20.0f;
+
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
+	ConvertToTilePosition(_width - 1, _height, x, z);
+	float tileWidth = 2.0f * _width;
+	float tileHeight = 2.0f * _height;
+
+	y += tileHeight / offsetY;
+	z -= tileHeight / offsetZ;
+
+	flt::Quaternion rot;
+
+	auto player = _gameManager->GetPlayer(_playerIndex);
+	if (player->camera->tr.GetWorldRotation().GetEuler().y < 0.0f)
+	{
+		x += tileWidth / offsetX;
+		rot.SetEuler(offsetAngleX, -offsetAngleY, 0.0f);
+	}
+	else
+	{
+		x -= tileWidth + tileWidth / offsetX;
+		rot.SetEuler(offsetAngleX, offsetAngleY, 0.0f);
+	}
+
+	player->camera->TweenMove({ x,y,z }, 0.5f);
+	player->camera->TweenRotate(rot, 0.5f);
+	_isCameraWorking = true;
 }
 
 Tile* Board::GetTileFromPool()
@@ -681,7 +835,7 @@ void Board::ReturnTileToPool(Tile* tile)
 	tile->Disable();
 }
 
-void Board::BackToPool(flt::GameObject* obj)
+void Board::ReturnCubeToPool(flt::GameObject* obj)
 {
 	std::string temp = typeid(*obj).name();
 	if (temp.compare(typeid(NormalCube).name()) == 0)
@@ -715,6 +869,8 @@ void Board::RemoveFromControllerList(CubeController* cubeCtr)
 	{
 		return;
 	}
+
+	CheckOnlyDarkRemain();
 
 	if (_runningCubeControllers.empty())
 	{
@@ -832,16 +988,16 @@ void Board::OnEndCubeRoll()
 
 void Board::OnEndCubeGenerate()
 {
-	_nowRisingCount--;
-	if (_nowRisingCount <= 0)
+	_nowGeneratingCount--;
+	if (_nowGeneratingCount <= 0)
 	{
-		_nowRisingCount = 0;
+		_nowGeneratingCount = 0;
 
 		for (auto& col : _tileStates)
 		{
 			for (auto& tileState : col)
 			{
-				tileState = tileState & ~(int)eTileStateFlag::RISING;
+				tileState = tileState & ~(int)eTileStateFlag::GENERATING;
 			}
 		}
 
@@ -856,11 +1012,15 @@ void Board::OnEndTileAdd(Tile* tile)
 	ReturnTileToPool(tile);
 	_addTiles.remove(tile);
 
-	if (_nowAddTileCount <= 0)
+	if (_nowAddTileCount == 0)
 	{
 		_nowAddTileCount = 0;
 		Resize(_width, _height + 1);
 		SetDelay(ADDTILE_DELAY);
+	}
+	else if (_nowAddTileCount < 0)
+	{
+		_nowAddTileCount = 0;
 	}
 }
 
@@ -875,12 +1035,23 @@ void Board::OnEndTileFall(int x, int z)
 	_fallingTileCount[z]--;
 	_nowFallingTileCount--;
 
-	if (_fallingTileCount[z] <= 0)
+	// TODO : 이거 0일대만 처리하고 0보다 작으면 아무것도 하지말고 0으로 쳐버리면 될듯?
+	if (_fallingTileCount[z] == 0)
 	{
 		_fallingTileCount[z] = 0;
 		Resize(_width, z);
 		SetDelay(FALLTILE_DELAY);
 	}
+	else if (_fallingTileCount[z] < 0)
+	{
+		_fallingTileCount[z] = 0;
+	}
+}
+
+void Board::AddColumn()
+{
+	// TODO : 구현 필요
+	ASSERT(false);
 }
 
 void Board::DestroyRow()
@@ -900,9 +1071,9 @@ void Board::DestroyRow()
 			_minePos.second = -1;
 		}
 
-		_tiles[i][_nextDestroyRow]->StartFall(delay + delayDelta * i, i, _nextDestroyRow);
 		_fallingTileCount[_nextDestroyRow]++;
 		_nowFallingTileCount++;
+		_tiles[i][_nextDestroyRow]->StartFall(delay + delayDelta * i, i, _nextDestroyRow);
 	}
 	--_nextDestroyRow;
 }
@@ -937,6 +1108,13 @@ void Board::FastForward()
 void Board::EndFastForward()
 {
 	_fastForwardValue = FFDEFAULT;
+
+	if (_isOnlyDarkRemain)
+	{
+		auto player = _gameManager->GetPlayer(_playerIndex);
+		player->camera->TracePlayer();
+		_isCameraWorking = false;
+	}
 }
 
 void Board::Resize(int newWidth, int newHeight)
@@ -1024,6 +1202,26 @@ void Board::Reset()
 	// 큐브풀로 다 갖고오고 타일풀로 다 갖고오고 진행중이던거 전부 제거하고..
 	// 조금 까다롭군
 
+	for (int i = 0; i < _width; ++i)
+	{
+		for (int j = 0; j < _height; ++j)
+		{
+			auto& tile = _tiles[i][j];
+
+			float x = 0.0f;
+			float z = 0.0f;
+			ConvertToTileLocalPosition(i, j, x, z);
+
+			tile->tr.SetPosition({ x, 0.0f, z });
+			tile->DisableAdvantageMine();
+			tile->DisableDetonated();
+			tile->DisableMine();
+			tile->_isFalling = false;
+			tile->_isMoving = false;
+			tile->_cube = nullptr;
+		}
+	}
+
 	for (auto& tileCol : _tileStates)
 	{
 		for (auto& tileState : tileCol)
@@ -1032,23 +1230,14 @@ void Board::Reset()
 		}
 	}
 
-	for (auto& tileCol : _tiles)
-	{
-		for (auto& tile : tileCol)
-		{
-			tile->DisableAdvantageMine();
-			tile->DisableDetonated();
-			tile->DisableMine();
-		}
-	}
-
 	_boardState = eBoardState::NONE;
 	_nowRollingCount = 0;
-	_nowRisingCount = 0;
+	_nowGeneratingCount = 0;
 	_nowFallingTileCount = 0;
+	_fallingTileCount.clear();
 	_nowAddTileCount = 0;
 	_nextDestroyRow = _height - 1;
-	
+
 	_minePos.first = -1;
 	_minePos.second = -1;
 
@@ -1056,14 +1245,14 @@ void Board::Reset()
 	{
 		for (auto& cubeCtr : wave)
 		{
-			BackToPool(cubeCtr->GetGameObject());
+			ReturnCubeToPool(cubeCtr->GetGameObject());
 		}
 	}
 	_waveCubeControllers.clear();
 
 	for (auto& cubeCtr : _runningCubeControllers)
 	{
-		BackToPool(cubeCtr->GetGameObject());
+		ReturnCubeToPool(cubeCtr->GetGameObject());
 	}
 	_runningCubeControllers.clear();
 
@@ -1098,6 +1287,7 @@ void Board::Wait(float deltaSecond)
 
 void Board::OnWaiting()
 {
+	// TODO : 상대방이 공격하면 여기서 처리하는건데.. 음..
 	if (_isAttacked)
 	{
 		_isAttacked = false;
@@ -1116,6 +1306,25 @@ void Board::OnEndWaiting()
 	else if (!_runningCubeControllers.empty())	// 폭파 된 것이 없다면 구르기 시작.
 	{
 		TickCubesRolling(ROLLING_TIME);
+	}
+
+	if (_isCameraWorking && !_isOnlyDarkRemain)
+	{
+		_fastForwardValue = FFDEFAULT;
+
+		auto player = _gameManager->GetPlayer(_playerIndex);
+		player->camera->TracePlayer();
+		_isCameraWorking = false;
+
+		SetDelay(0.5f);		// 카메라 워크가 끝나면서 갑자기 웨이브가 시작되므로
+	}
+}
+
+void Board::OnFastForwarding()
+{
+	if (_isOnlyDarkRemain)
+	{
+		MoveCameraToEnd();
 	}
 }
 
@@ -1239,4 +1448,28 @@ bool Board::UpdateDetonate()
 	_minePos.second = -1;
 
 	return result;
+}
+
+bool Board::CheckOnlyDarkRemain()
+{
+	if (_runningCubeControllers.empty())
+	{
+		_isOnlyDarkRemain = false;
+		return false;
+	}
+
+	for (auto& cubeCtr : _runningCubeControllers)
+	{
+		auto cubeType = cubeCtr->GetCubeType();
+
+		if (cubeType == eCUBETYPE::ADVANTAGE
+			|| cubeType == eCUBETYPE::NORMAL)
+		{
+			_isOnlyDarkRemain = false;
+			return false;
+		}
+	}
+
+	_isOnlyDarkRemain = true;
+	return true;
 }

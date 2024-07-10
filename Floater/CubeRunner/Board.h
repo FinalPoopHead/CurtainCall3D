@@ -11,6 +11,7 @@ class AdvantageCube;
 class DarkCube;
 class NormalCube;
 class GameManager;
+class Player;
 
 enum class eTileStateFlag
 {
@@ -23,7 +24,7 @@ enum class eTileStateFlag
 	, NORMALCUBE = 0x0100
 	, DARKCUBE = 0x0200
 	, ADVANTAGECUBE = 0x0400
-	, RISING = 0x0800
+	, GENERATING = 0x0800
 };
 
 enum class eBoardState
@@ -31,8 +32,9 @@ enum class eBoardState
 	NONE
 	, WAITING
 	, CUBEROLLING
+	, STAGECHANGING
 	, TILEDESTROYING
-	, CUBERISING
+	, CUBEGENERATING
 	, ADDTILE
 };
 
@@ -52,7 +54,7 @@ protected:
 	virtual void PostUpdate(float deltaSeoncd) override;
 
 public:
-	void Resize(int width, int height);
+	void Resize(int newWidth, int newHeight);
 	void Reset();
 	bool SetTileState(float x, float y, eTileStateFlag state);
 	bool AddTileState(float x, float y, eTileStateFlag state);
@@ -65,8 +67,8 @@ public:
 	void ConvertToTilePosition(int x, int z, float& outX, float& outZ);
 
 	void _TEST_GenerateRandomWave();		// 임시로 랜덤 생성 용
-	void GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount);
-	void BackToPool(flt::GameObject* obj);
+	void GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount, bool isFirst = false);
+	void ReturnCubeToPool(flt::GameObject* obj);
 	void RemoveFromControllerList(CubeController* cubeCtr);
 	void SetMine(float x, float z);			// position X,Z에 지뢰를 설치한다.
 	void DetonateMine();					// 지뢰를 폭파시킨다.
@@ -77,6 +79,7 @@ public:
 	void OnStartTileFall(int x, int z);		// x,z index의 타일이 떨어지기 시작함.
 	void OnEndTileFall(int x, int z);
 
+	void AddColumn();
 	void DestroyRow();
 	void DeferredDestroyRow();
 
@@ -97,15 +100,19 @@ private:
 	void Wait(float deltaSecond);
 	void OnWaiting();
 	void OnEndWaiting();
+	void OnFastForwarding();
 	void SetDelay(float second);
 	void AddDelay(float second);
 	
 	void UpdateBoard();
 	void SetTileStateWithCubeCtr(CubeController* cubeCtr);
 	bool UpdateDetonate();		// 수납된 큐브가 있으면 true 아니면 false
+	bool CheckOnlyDarkRemain();		// 다크큐브 제외하고 전부 제거됐는지 체크.
 	void TickCubesRolling(float rollingTime);			// 일괄적으로 굴리기 시작.
 	void AddRow();
 	void OnEndWave();
+
+	void MoveCameraToEnd();
 
 	Tile* GetTileFromPool();
 	void ReturnTileToPool(Tile* tile);
@@ -134,15 +141,20 @@ private:
 	float _delayRemain;
 	float _fastForwardValue;
 	int _nowRollingCount;
-	int _nowRisingCount;
+	int _nowGeneratingCount;
 	int _nowFallingTileCount;
 	int _damageCount;
 
 	bool _isPerfect;
+	bool _isOnlyDarkRemain;
+	bool _isCameraWorking;
 	int _nowAddTileCount;
 	int _nextDestroyRow;
 
 	std::pair<int, int> _minePos;
 	std::unordered_map<int,int> _fallingTileCount;	// key는 heightIndex
 	std::list<Tile*> _addTiles;
+
+	int _testIndex;
+	float _testValue[5];
 };
