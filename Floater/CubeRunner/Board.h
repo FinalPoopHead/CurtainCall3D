@@ -118,6 +118,8 @@ private:
 	void ReturnTileToPool(Tile* tile);
 
 private:
+	flt::SoundComponent* _soundComponent;
+
 	GameManager* _gameManager;
 	int _playerIndex;
 	int _width;
