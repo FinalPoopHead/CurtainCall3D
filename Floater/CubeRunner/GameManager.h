@@ -97,6 +97,6 @@ private:
 
 private:
 	std::vector<StageData> _stageData;
-	int _currentStage;
+	std::vector<int> _currentStage;
 	std::vector<int> _currentLevel;
 };

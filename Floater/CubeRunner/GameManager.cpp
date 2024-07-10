@@ -56,7 +56,7 @@ GameManager::GameManager() :
 	, _playerScore(std::vector<int>(MAXPLAYERCOUNT))
 	, _comboTextPos(std::vector<flt::Vector2f>(MAXPLAYERCOUNT))
 	, _stageData()
-	, _currentStage()
+	, _currentStage(std::vector<int>(MAXPLAYERCOUNT))
 	, _currentLevel(std::vector<int>(MAXPLAYERCOUNT))
 {
 	for (int i = 0; i < MAXPLAYERCOUNT; i++)
@@ -383,12 +383,12 @@ void GameManager::AttackAnotherPlayer(int playerIndex)
 
 void GameManager::SetStage(int stageNum)
 {
-	_currentStage = stageNum;
-
-	StageData data = _stageData[_currentStage - 1];
-
 	for (int i = 0; i < _players.size(); i++)
 	{
+		_currentStage[i] = stageNum;
+
+		StageData data = _stageData[_currentStage[i] - 1];
+
 		if (_boards[i] != nullptr)
 		{
 			_boards[i]->Resize(data.stageWidth, data.stageHeight);
@@ -410,7 +410,8 @@ void GameManager::SetStage(int stageNum)
 
 void GameManager::ProgressStage(int playerIndex)
 {
-	++_currentStage;
+	++_currentStage[playerIndex];
+	int curStage = _currentStage[playerIndex];
 
 	_isGameOver[playerIndex] = false;
 	_fallCount[playerIndex] = 0;
@@ -435,7 +436,7 @@ void GameManager::ProgressStage(int playerIndex)
 	}
 	_liveComboTexts.clear();
 
-	StageData data = _stageData[_currentStage - 1];
+	StageData data = _stageData[curStage - 1];
 
 	if (_boards[playerIndex] != nullptr)
 	{
@@ -449,7 +450,7 @@ void GameManager::ProgressStage(int playerIndex)
 		_players[playerIndex]->SetPositionToRatioPosition(0.5f, 0.75f);
 	}
 
-	_stageCountText[playerIndex]->SetText(std::to_wstring(_currentStage));
+	_stageCountText[playerIndex]->SetText(std::to_wstring(curStage));
 
 	ResizeFallCountUI(data.stageWidth - 1);
 }
@@ -457,7 +458,8 @@ void GameManager::ProgressStage(int playerIndex)
 void GameManager::OnEndLevel(int playerIndex)
 {
 	++_currentLevel[playerIndex];
-	if (_currentLevel[playerIndex] > _stageData[_currentStage - 1].levelCount)
+	int curStage = _currentStage[playerIndex];
+	if (_currentLevel[playerIndex] > _stageData[curStage - 1].levelCount)
 	{
 		// TODO : 스테이지 클리어
 		ProgressStage(playerIndex);
@@ -465,7 +467,7 @@ void GameManager::OnEndLevel(int playerIndex)
 	}
 
 	int levelIndex = _currentLevel[playerIndex] - 1;
-	auto currentStage = _stageData[_currentStage - 1];
+	auto currentStage = _stageData[curStage - 1];
 
 	if (_boards[playerIndex] != nullptr)
 	{

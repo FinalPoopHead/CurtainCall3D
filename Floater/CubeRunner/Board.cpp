@@ -70,16 +70,20 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	std::wstring path = L"../Resources/Sound/";
 	_soundComponent = AddComponent<flt::SoundComponent>(true);
 	_soundComponent->AddSound(path + L"GenerateFadeOut.mp3");
+	_soundComponent->AddSound(path + L"CubeRoll.mp3");
+	_soundComponent->AddSound(path + L"CubeDestroy.mp3");
 	_soundComponent->AddSound(path + L"SetMine.mp3");
 	_soundComponent->AddSound(path + L"DetonateMine.mp3");
-	_soundComponent->AddSound(path + L"CubeRoll.mp3");
+	_soundComponent->AddSound(path + L"DetonateAdvantage.mp3");
 
 	int index = 0;
 	soundIndex = std::unordered_map<std::string, int>();
 	soundIndex["Generate"] = index++;
+	soundIndex["CubeRoll"] = index++;
+	soundIndex["CubeDestroy"] = index++;
 	soundIndex["SetMine"] = index++;
 	soundIndex["DetonateMine"] = index++;
-	soundIndex["CubeRoll"] = index++;
+	soundIndex["DetonateAdvantage"] = index++;
 
 	_testIndex = 0;
 	for (int i = 0; i < 5; i++)
@@ -733,6 +737,7 @@ void Board::TickCubesRolling(float rollingTime)
 	}
 
 	_boardState = eBoardState::CUBEROLLING;
+	_soundComponent->Stop(soundIndex["CubeRoll"]);
 }
 
 void Board::AddRow()
@@ -988,6 +993,7 @@ void Board::DetonateAdvantageMine()
 
 		}
 	}
+	_soundComponent->Play(soundIndex["DetonateAdvantage"]);
 }
 
 void Board::OnEndCubeRoll()
@@ -1444,6 +1450,7 @@ bool Board::UpdateDetonate()
 				if ((int)cubeType)
 				{
 					result = true;
+					_soundComponent->Play(soundIndex["CubeDestroy"]);
 				}
 
 				_tileStates[i][j] = (int)_tileStates[i][j] & ~((int)eTileStateFlag::DETONATE);
