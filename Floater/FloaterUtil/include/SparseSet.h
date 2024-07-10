@@ -73,32 +73,32 @@ namespace flt
 				return _set != other._set || _denseIndex != other._denseIndex || _version != other._version;
 			}
 
-			constexpr [[nodiscard]] T& operator*() noexcept
+			[[nodiscard]] constexpr T& operator*() noexcept
 			{
 				ASSERT(_set != nullptr, "invaild iterator");
 				ASSERT(_version == _set->_version, "invaild iterator");
 				return _set->_dense[_denseIndex].value;
 			}
-			constexpr [[nodiscard]] const T& operator*() const noexcept
+			[[nodiscard]] constexpr const T& operator*() const noexcept
 			{
 				ASSERT(_set != nullptr, "invaild iterator");
 				ASSERT(_version == _set->_version, "invaild iterator");
 				return _set->_dense[_denseIndex].value;
 			}
-			constexpr [[nodiscard]] T* operator->() noexcept
+			[[nodiscard]] constexpr T* operator->() noexcept
 			{
 				ASSERT(_set != nullptr, "invaild iterator");
 				ASSERT(_version == _set->_version, "invaild iterator");
 				return &_set->_dense[_denseIndex].value;
 			}
-			constexpr [[nodiscard]] const T* operator->() const noexcept
+			[[nodiscard]] constexpr const T* operator->() const noexcept
 			{
 				ASSERT(_set != nullptr, "invaild iterator");
 				ASSERT(_version == _set->_version, "invaild iterator");
 				return &_set->_dense[_denseIndex].value;
 			}
 
-			constexpr [[nodiscard]] int GetIndex() const noexcept
+			[[nodiscard]] constexpr int GetIndex() const noexcept
 			{
 				ASSERT(_set != nullptr, "invaild iterator");
 				ASSERT(_version == _set->_version, "invaild iterator");
@@ -172,32 +172,32 @@ namespace flt
 				return _set != other._set || _denseIndex != other._denseIndex || _version != other._version;
 			}
 
-			constexpr [[nodiscard]] const T& operator*() noexcept
+			[[nodiscard]] constexpr const T& operator*() noexcept
 			{
 				ASSERT(_set != nullptr, "invaild iterator");
 				ASSERT(_version == _set->_version, "invaild iterator");
 				return _set->_dense[_denseIndex].value;
 			}
-			constexpr [[nodiscard]] const T& operator*() const noexcept
+			[[nodiscard]] constexpr const T& operator*() const noexcept
 			{
 				ASSERT(_set != nullptr, "invaild iterator");
 				ASSERT(_version == _set->_version, "invaild iterator");
 				return _set->_dense[_denseIndex].value;
 			}
-			constexpr [[nodiscard]] const T* operator->() noexcept
+			[[nodiscard]] constexpr const T* operator->() noexcept
 			{
 				ASSERT(_set != nullptr, "invaild iterator");
 				ASSERT(_version == _set->_version, "invaild iterator");
 				return &_set->_dense[_denseIndex].value;
 			}
-			constexpr [[nodiscard]] const T* operator->() const noexcept
+			[[nodiscard]] constexpr const T* operator->() const noexcept
 			{
 				ASSERT(_set != nullptr, "invaild iterator");
 				ASSERT(_version == _set->_version, "invaild iterator");
 				return &_set->_dense[_denseIndex].value;
 			}
 
-			constexpr [[nodiscard]] int GetIndex() const noexcept
+			[[nodiscard]] constexpr int GetIndex() const noexcept
 			{
 				ASSERT(_set != nullptr, "invaild iterator");
 				ASSERT(_version == _set->_version, "invaild iterator");
