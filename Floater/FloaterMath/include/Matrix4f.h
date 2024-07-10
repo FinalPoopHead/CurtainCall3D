@@ -431,7 +431,7 @@ namespace flt
 
 			return metrix;
 		}
-		[[nodiscard]] static Matrix4f Identity() noexcept
+		static [[nodiscard]] Matrix4f Identity() noexcept
 		{
 			Matrix4f temp
 			{
@@ -444,7 +444,7 @@ namespace flt
 			return temp;
 		}
 
-		[[nodiscard]] static Matrix4f Zero() noexcept
+		static [[nodiscard]] Matrix4f Zero() noexcept
 		{
 			Matrix4f temp
 			{

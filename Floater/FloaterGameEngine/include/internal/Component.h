@@ -1,7 +1,5 @@
 ﻿#pragma once
 #include <type_traits>
-#include "../../../FloaterUtil/include/FloaterType.h"
-
 
 namespace flt
 {
@@ -14,7 +12,7 @@ namespace flt
 		friend class Scene;
 		friend class GameObject;
 	public:
-		ComponentBase() :_gameObject(nullptr), _isEnable(false) {}
+		ComponentBase() : _isEnable(false), _gameObject(nullptr) {}
 		//ComponentBase(GameObject* gameObject) : _isEnable(false), _gameObject(gameObject) {}
 		virtual ~ComponentBase() {}
 
@@ -49,10 +47,10 @@ namespace flt
 		bool IsEnable() const { return _isEnable; }
 
 	private:
-		[[nodiscard]] virtual uint32 GetIndex() = 0;
+		virtual int GetIndex() = 0;
 
 	protected:
-		static uint32 GetComponentIndex()
+		static int GetComponentIndex()
 		{
 			return s_indexCounter++;
 		}
@@ -61,7 +59,7 @@ namespace flt
 		GameObject* _gameObject;
 
 	private:
-		static uint32 s_indexCounter;
+		static int s_indexCounter;
 		bool _isEnable;
 	};
 
@@ -78,10 +76,10 @@ namespace flt
 		//	std::cout << s_index << std::endl;
 		//}
 	protected:
-		static const inline uint32 s_index = ComponentBase::GetComponentIndex();
+		static const inline int s_index = ComponentBase::GetComponentIndex();
 
 	private:
-		[[nodiscard]] virtual uint32 GetIndex() final
+		virtual int GetIndex() final
 		{
 			return s_index;
 		}

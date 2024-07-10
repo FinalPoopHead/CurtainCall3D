@@ -89,7 +89,7 @@ namespace flt
 	T* flt::GameObject::AddComponent(bool isEnabled, TArgs&&... args)
 	{
 		ComponentBase* component = new T(std::forward<TArgs>(args)...);
-		uint32 index = component->GetIndex();
+		int index = component->GetIndex();
 		//component->_gameObject = this;
 
 		if (_components.Capacity() <= index)
@@ -113,7 +113,7 @@ namespace flt
 	template <typename T>
 	T* flt::GameObject::GetComponent()
 	{
-		uint32 index = T::s_index;
+		int index = T::s_index;
 		if (index < 0 || _components.Capacity() <= index)
 		{
 			return nullptr;

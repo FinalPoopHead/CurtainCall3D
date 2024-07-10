@@ -419,7 +419,7 @@ void GameManager::SetStage(int stageNum)
 void GameManager::ProgressStage()
 {
 	// TODO : 구현해야함.
-	ASSERT(false, "");
+	ASSERT(false);
 }
 
 void GameManager::OnEndLevel(int playerIndex)

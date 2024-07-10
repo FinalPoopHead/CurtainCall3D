@@ -102,28 +102,28 @@ namespace flt
 			z /= rhs;
 			return *this;
 		}
-		[[nodiscard]] constexpr Vector3f operator+(const Vector3f& rhs) const noexcept
+		constexpr [[nodiscard]] Vector3f operator+(const Vector3f& rhs) const noexcept
 		{
 			return Vector3f(*this) += rhs;
 		}
-		[[nodiscard]] constexpr Vector3f operator-(const Vector3f& rhs) const noexcept
+		constexpr [[nodiscard]] Vector3f operator-(const Vector3f& rhs) const noexcept
 		{
 			return Vector3f(*this) -= rhs;
 		}
-		[[nodiscard]] constexpr Vector3f operator*(const float rhs) const noexcept
+		constexpr [[nodiscard]] Vector3f operator*(const float rhs) const noexcept
 		{
 			return Vector3f(*this) *= rhs;
 		}
-		[[nodiscard]] constexpr Vector3f operator/(const float rhs) const noexcept
+		constexpr [[nodiscard]] Vector3f operator/(const float rhs) const noexcept
 		{
 			return Vector3f(*this) /= rhs;
 		}
 		constexpr Vector3f& operator*=(const Matrix3f& rhs) noexcept;
-		[[nodiscard]] constexpr Vector3f operator*(const Matrix3f& rhs) const noexcept
+		constexpr [[nodiscard]] Vector3f operator*(const Matrix3f& rhs) const noexcept
 		{
 			return Vector3f(*this) *= rhs;
 		}
-		[[nodiscard]] constexpr Vector3f operator-() const noexcept
+		constexpr [[nodiscard]] Vector3f operator-() const noexcept
 		{
 			return Vector3f(-x, -y, -z);
 		}
@@ -175,14 +175,14 @@ namespace flt
 			struct { float r, g, b; };
 		};
 
-		[[nodiscard]] static Vector3f Lerp(const Vector3f& v0, const Vector3f& v1, float t) noexcept;
+		static [[nodiscard]] Vector3f Lerp(const Vector3f& v0, const Vector3f& v1, float t) noexcept;
 
-		[[nodiscard]] static constexpr Vector3f Zero() noexcept
+		static constexpr [[nodiscard]] Vector3f Zero() noexcept
 		{
 			return Vector3f(0.0f, 0.0f, 0.0f);
 		}
 
-		[[nodiscard]] static constexpr Vector3f Up() noexcept
+		static constexpr [[nodiscard]] Vector3f Up() noexcept
 		{
 			return Vector3f(0.0f, 1.0f, 0.0f);
 		}

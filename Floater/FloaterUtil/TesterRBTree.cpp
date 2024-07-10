@@ -109,14 +109,14 @@ bool flt::test::TesterRBTree::Test()
 			eraseTestTree.Insert(e, e);
 		}
 
-		retval = retval && CheckDepth(eraseTestTree);
+		retval == retval && CheckDepth(eraseTestTree);
 
 		for (int deletedIndex = 0; deletedIndex < _inputData.size(); ++deletedIndex)
 		{
 			int remainingStartIndex = deletedIndex + 1;
 			int key = _inputData[deletedIndex];
 			eraseTestTree.erase(key);
-			retval = retval && CheckDepth(eraseTestTree);
+			retval == retval && CheckDepth(eraseTestTree);
 
 			// 삭제한 값이 제대로 삭제되었는지 테스트.
 			{

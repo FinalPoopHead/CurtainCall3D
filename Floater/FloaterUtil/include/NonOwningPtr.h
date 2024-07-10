@@ -19,9 +19,9 @@ namespace flt
 		constexpr NonOwningPtr& operator=(const OwningPtr<T>& other) noexcept { _ptr = other.get(); return *this; }
 		~NonOwningPtr() noexcept {}
 
-		[[nodiscard]] constexpr T* get() const noexcept { return _ptr; }
-		[[nodiscard]] constexpr T* operator->() const { return _ptr; }
-		[[nodiscard]] constexpr T& operator*() const { return *_ptr; }
+		constexpr [[nodiscard]] T* get() const noexcept { return _ptr; }
+		constexpr [[nodiscard]] T* operator->() const { return _ptr; }
+		constexpr [[nodiscard]] T& operator*() const { return *_ptr; }
 
 	private:
 		T* _ptr;

@@ -10,7 +10,6 @@
 #include <set>
 #include <string>
 
-
 namespace flt
 {
 	template<GameObjectDerived T, typename... TArgs>

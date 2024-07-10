@@ -13,4 +13,4 @@ void flt::ComponentBase::Disable()
 	_gameObject->_scene->AddEnableComponent(this, false);
 }
 
-uint32 flt::ComponentBase::s_indexCounter = 0;
+int flt::ComponentBase::s_indexCounter = 0;

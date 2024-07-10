@@ -117,8 +117,8 @@ namespace flt
 			return order;
 		}
 
-		[[nodiscard]] explicit operator Vector3f() const noexcept;
-		[[nodiscard]] explicit operator __m128() const noexcept;
+		explicit [[nodiscard]] operator Vector3f() const noexcept;
+		explicit [[nodiscard]] operator __m128() const noexcept;
 
 		Vector4f& operator+=(const Vector4f& rhs) noexcept
 		{
@@ -228,7 +228,7 @@ namespace flt
 		{
 			return Vector4f(*this).Vector3Normalize();
 		}
-		[[nodiscard]] constexpr Vector4f Vector3Cross(const Vector4f& rhs) const noexcept
+		constexpr [[nodiscard]] Vector4f Vector3Cross(const Vector4f& rhs) const noexcept
 		{
 			return Vector4f(
 				y * rhs.z - z * rhs.y,
