@@ -59,6 +59,7 @@ void Player::Update(float deltaSecond)
 	case ePlayerState::PLAYING:
 		break;
 	case ePlayerState::CRUSHED:
+		// TODO : 깔렸을때 자동으로 빨리감기해서 굴려버려야함.
 		break;
 	case ePlayerState::PUSHEDOUT:
 	{
@@ -76,6 +77,7 @@ void Player::Update(float deltaSecond)
 		{
 			camera->StopCamera();
 			_state = ePlayerState::GAMEOVER;
+			_board->OnEndPlayerFalling();
 			return;
 		}
 

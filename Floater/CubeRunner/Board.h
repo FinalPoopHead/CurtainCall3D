@@ -66,7 +66,6 @@ public:
 	void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
 	void ConvertToTilePosition(int x, int z, float& outX, float& outZ);
 
-	void _TEST_GenerateRandomWave();		// 임시로 랜덤 생성 용
 	void GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount, bool isFirst = false);
 	void ReturnCubeToPool(flt::GameObject* obj);
 	void RemoveFromControllerList(CubeController* cubeCtr);
@@ -85,6 +84,7 @@ public:
 
 	bool IsMineSet();
 
+	void OnEndPlayerFalling();
 	void SetGameOver();
 	void AddCubeFallCount();
 
@@ -151,6 +151,7 @@ private:
 	bool _isPerfect;
 	bool _isOnlyDarkRemain;
 	bool _isCameraWorking;
+	bool _isFirst;
 	int _nowAddTileCount;
 	int _nextDestroyRow;
 

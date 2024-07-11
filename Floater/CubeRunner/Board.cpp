@@ -60,6 +60,7 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _isPerfect(true)
 	, _isOnlyDarkRemain(false)
 	, _isCameraWorking(false)
+	, _isFirst(false)
 	, _nowAddTileCount()
 	, _nextDestroyRow()
 	, _minePos({ -1,-1 })
@@ -76,6 +77,8 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	_soundComponent->AddSound(path + L"DetonateAdvantage.mp3");
 	_soundComponent->AddSound(path + L"TileAdd.mp3");
 	_soundComponent->AddSound(path + L"TileDestroy.mp3");
+	_soundComponent->AddSound(path + L"MS02gameover.wav");
+	_soundComponent->AddSound(path + L"MS03discovery.wav");
 
 	int index = 0;
 	_soundIndex = std::unordered_map<std::string, int>();
@@ -87,6 +90,8 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	_soundIndex["DetonateAdvantage"] = index++;
 	_soundIndex["TileAdd"] = index++;
 	_soundIndex["TileDestroy"] = index++;
+	_soundIndex["GameOver"] = index++;
+	_soundIndex["StageClear"] = index++;
 
 	_testIndex = 0;
 	for (int i = 0; i < 5; i++)
@@ -521,86 +526,6 @@ void Board::ConvertToTilePosition(int x, int z, float& outX, float& outZ)
 	outZ += pos.z;
 }
 
-void Board::_TEST_GenerateRandomWave()
-{
-	if (_isGameOver)
-	{
-		return;
-	}
-
-	_isPerfect = true;
-
-	int _TEST_darkCount = 3;
-	float startDelay = 0.15f;
-
-	for (int i = 0; i < _width; ++i)
-	{
-		int delayCount = 0;
-		//if (i == _width / 2) continue;		// TEST 한 줄 비우기 위함
-		for (int j = 0; j < _width; ++j)
-		{
-			//if (j == _width / 2) continue;	// TEST 한 줄 비우기 위함
-			int randValue = rand() % 3;
-
-			float x = _tiles[i][j]->tr.GetWorldPosition().x;
-			float z = _tiles[i][j]->tr.GetWorldPosition().z;
-
-			flt::GameObject* cube = nullptr;
-
-			switch (randValue)
-			{
-			case 0:
-				if (_normalCubePool.empty())
-				{
-					ASSERT(false, "NormalCubePool is Empty");
-				}
-				cube = _normalCubePool.front();
-				_normalCubePool.pop_front();
-				break;
-			case 1:
-				if (_TEST_darkCount <= 0)
-				{
-					--j;
-					continue;
-				}
-				_TEST_darkCount--;
-				if (_darkCubePool.empty())
-				{
-					ASSERT(false, "DarkCubePool is Empty");
-				}
-				cube = _darkCubePool.front();
-				_darkCubePool.pop_front();
-				break;
-			case 2:
-				if (_advantageCubePool.empty())
-				{
-					ASSERT(false, "AdvantageCubePool is Empty");
-				}
-				cube = _advantageCubePool.front();
-				_advantageCubePool.pop_front();
-				break;
-			default:
-				ASSERT(false, "Invalid Random Value");
-				break;
-			}
-
-			auto cubeCtr = cube->GetComponent<CubeController>();
-			_runningCubeControllers.push_back(cubeCtr);
-			cubeCtr->StartGenerate(GENERATE_TIME, startDelay * delayCount);
-
-			cube->tr.SetPosition(x, 0.0f, z);
-			cube->Enable();
-			_tiles[i][j]->_cube = cube;
-			_nowGeneratingCount++;
-			delayCount++;
-		}
-
-		delayCount = 0;
-	}
-
-	_boardState = eBoardState::CUBEGENERATING;
-}
-
 void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount, bool isFirst /*= false*/)
 {
 	_isGameOver = false;
@@ -726,6 +651,7 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 		_isCameraWorking = true;
 	}
 
+	_isFirst = isFirst;
 	_soundComponent->Play(_soundIndex["Generate"]);
 }
 
@@ -1123,6 +1049,13 @@ bool Board::IsMineSet()
 	return x != -1 && y != -1;
 }
 
+void Board::OnEndPlayerFalling()
+{
+	// TODO : GameOver 연출
+
+	_soundComponent->Play(_soundIndex["GameOver"]);
+}
+
 void Board::SetGameOver()
 {
 	_isGameOver = true;
@@ -1340,6 +1273,12 @@ void Board::OnEndWaiting()
 	else if (!_runningCubeControllers.empty())	// 폭파 된 것이 없다면 구르기 시작.
 	{
 		TickCubesRolling(ROLLING_TIME);
+	}
+
+	if (_isFirst)
+	{
+		_gameManager->OnStageStart();
+		_isFirst = false;
 	}
 
 	if (_isCameraWorking && !_isOnlyDarkRemain)

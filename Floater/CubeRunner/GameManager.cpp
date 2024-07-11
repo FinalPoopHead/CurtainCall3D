@@ -36,7 +36,9 @@ std::wstring counterSlotPath = L"../Resources/Sprites/FallCounterSlot.png";
 std::wstring counterRedPath = L"../Resources/Sprites/FallCounterRed.png";
 
 GameManager::GameManager() :
-	_players()
+	_soundComponent()
+	, _soundIndex()
+	, _players()
 	, _boards()
 	, _stageInfoPanel()
 	, _levelCountSlot()
@@ -67,6 +69,20 @@ GameManager::GameManager() :
 		_playerScore[i] = 0;
 		_comboTextPos[i] = COMBOTEXTPOSITION;
 	}
+
+	std::wstring path = L"../Resources/Sound/";
+	_soundComponent = AddComponent<flt::SoundComponent>(true);
+	_soundComponent->AddSound(path + L"BGM01hero.wav");
+	_soundComponent->AddSound(path + L"BGM07battle.wav");
+	_soundComponent->AddSound(path + L"BGM14chase.wav");
+	_soundComponent->AddSound(path + L"BGM17battle2.wav");
+
+	int index = 0;
+	_soundIndex = std::unordered_map<std::string, int>();
+	_soundIndex["BGM1"] = index++;
+	_soundIndex["BGM2"] = index++;
+	_soundIndex["BGM3"] = index++;
+	_soundIndex["BGM4"] = index++;
 
 	std::wstring fontPath = L"../Resources/Fonts/LineSeedSansKR_KoreanCompatible_40.spritefont";
 	std::wstring smallFontPath = L"../Resources/Fonts/LineSeedSansKR_KoreanCompatible_25.spritefont";
@@ -455,6 +471,11 @@ void GameManager::ProgressStage(int playerIndex)
 	ResizeFallCountUI(data.stageWidth - 1);
 }
 
+void GameManager::OnStageStart()
+{
+	//_soundComponent->Play(_soundIndex["BGM3"]);
+}
+
 void GameManager::OnEndLevel(int playerIndex)
 {
 	++_currentLevel[playerIndex];
@@ -462,6 +483,7 @@ void GameManager::OnEndLevel(int playerIndex)
 	if (_currentLevel[playerIndex] > _stageData[curStage - 1].levelCount)
 	{
 		// TODO : 스테이지 클리어
+		//_soundComponent->Stop(_soundIndex["BGM3"]);
 		ProgressStage(playerIndex);
 		return;
 	}
