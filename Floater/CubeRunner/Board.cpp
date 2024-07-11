@@ -31,11 +31,10 @@ constexpr float SLOWVALUE = 0.5f;
 constexpr float FFDEFAULT = 1.0f;
 constexpr float FFVALUE = 8.0f;
 
-std::unordered_map<std::string, int> soundIndex;
-
 Board::Board(GameManager* gameManager, int playerIndex, int width, int height, float offset /*= 4.00f*/) :
 	flt::GameObject()
 	, _soundComponent()
+	, _soundIndex()
 	, _gameManager(gameManager)
 	, _playerIndex(playerIndex)
 	, _width(width)
@@ -69,21 +68,25 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 {
 	std::wstring path = L"../Resources/Sound/";
 	_soundComponent = AddComponent<flt::SoundComponent>(true);
-	_soundComponent->AddSound(path + L"GenerateFadeOut.mp3");
+	_soundComponent->AddSound(path + L"Generate.mp3");
 	_soundComponent->AddSound(path + L"CubeRoll.mp3");
 	_soundComponent->AddSound(path + L"CubeDestroy.mp3");
 	_soundComponent->AddSound(path + L"SetMine.mp3");
 	_soundComponent->AddSound(path + L"DetonateMine.mp3");
 	_soundComponent->AddSound(path + L"DetonateAdvantage.mp3");
+	_soundComponent->AddSound(path + L"TileAdd.mp3");
+	_soundComponent->AddSound(path + L"TileDestroy.mp3");
 
 	int index = 0;
-	soundIndex = std::unordered_map<std::string, int>();
-	soundIndex["Generate"] = index++;
-	soundIndex["CubeRoll"] = index++;
-	soundIndex["CubeDestroy"] = index++;
-	soundIndex["SetMine"] = index++;
-	soundIndex["DetonateMine"] = index++;
-	soundIndex["DetonateAdvantage"] = index++;
+	_soundIndex = std::unordered_map<std::string, int>();
+	_soundIndex["Generate"] = index++;
+	_soundIndex["CubeRoll"] = index++;
+	_soundIndex["CubeDestroy"] = index++;
+	_soundIndex["SetMine"] = index++;
+	_soundIndex["DetonateMine"] = index++;
+	_soundIndex["DetonateAdvantage"] = index++;
+	_soundIndex["TileAdd"] = index++;
+	_soundIndex["TileDestroy"] = index++;
 
 	_testIndex = 0;
 	for (int i = 0; i < 5; i++)
@@ -723,7 +726,7 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 		_isCameraWorking = true;
 	}
 
-	_soundComponent->Play(soundIndex["Generate"]);
+	_soundComponent->Play(_soundIndex["Generate"]);
 }
 
 void Board::TickCubesRolling(float rollingTime)
@@ -737,7 +740,6 @@ void Board::TickCubesRolling(float rollingTime)
 	}
 
 	_boardState = eBoardState::CUBEROLLING;
-	_soundComponent->Stop(soundIndex["CubeRoll"]);
 }
 
 void Board::AddRow()
@@ -934,7 +936,7 @@ void Board::SetMine(float x, float z)
 
 	_minePos = { tileX, tileZ };
 
-	_soundComponent->Play(soundIndex["SetMine"]);
+	_soundComponent->Play(_soundIndex["SetMine"]);
 }
 
 void Board::DetonateMine()
@@ -955,7 +957,7 @@ void Board::DetonateMine()
 	_tiles[x][y]->EnableDetonated();
 	_tileStates[x][y] = (int)_tileStates[x][y] & ~((int)eTileStateFlag::MINE);
 	_tileStates[x][y] = (int)_tileStates[x][y] | (int)eTileStateFlag::DETONATE;
-	_soundComponent->Play(soundIndex["DetonateMine"]);
+	_soundComponent->Play(_soundIndex["DetonateMine"]);
 }
 
 void Board::DetonateAdvantageMine()
@@ -993,7 +995,7 @@ void Board::DetonateAdvantageMine()
 
 		}
 	}
-	_soundComponent->Play(soundIndex["DetonateAdvantage"]);
+	_soundComponent->Play(_soundIndex["DetonateAdvantage"]);
 }
 
 void Board::OnEndCubeRoll()
@@ -1011,7 +1013,7 @@ void Board::OnEndCubeRoll()
 		}
 
 		SetDelay(delay);
-		_soundComponent->Play(soundIndex["CubeRoll"]);
+		_soundComponent->Play(_soundIndex["CubeRoll"]);
 	}
 }
 
@@ -1046,6 +1048,7 @@ void Board::OnEndTileAdd(Tile* tile)
 		_nowAddTileCount = 0;
 		Resize(_width, _height + 1);
 		SetDelay(ADDTILE_DELAY);
+		_soundComponent->Play(_soundIndex["TileAdd"]);
 	}
 	else if (_nowAddTileCount < 0)
 	{
@@ -1105,6 +1108,8 @@ void Board::DestroyRow()
 		_tiles[i][_nextDestroyRow]->StartFall(delay + delayDelta * i, i, _nextDestroyRow);
 	}
 	--_nextDestroyRow;
+
+	_soundComponent->Play(_soundIndex["TileDestroy"]);
 }
 
 void Board::DeferredDestroyRow()
@@ -1450,7 +1455,7 @@ bool Board::UpdateDetonate()
 				if ((int)cubeType)
 				{
 					result = true;
-					_soundComponent->Play(soundIndex["CubeDestroy"]);
+					_soundComponent->Play(_soundIndex["CubeDestroy"]);
 				}
 
 				_tileStates[i][j] = (int)_tileStates[i][j] & ~((int)eTileStateFlag::DETONATE);

@@ -8,14 +8,30 @@
 //TEST Include
 #include "MainMenuScene.h"
 
-Player::Player(Board* board)
-	: camera(nullptr)
+Player::Player(Board* board) :
+	camera(nullptr)
+	, _soundComponent()
+	, _soundIndex()
 	, _model(nullptr)
 	, _board(board)
 	, _state(ePlayerState::PLAYING)
 	, _padIndex(-1)
 	, _speed(10.0f)
 {
+	std::wstring path = L"../Resources/Sound/";
+	_soundComponent = AddComponent<flt::SoundComponent>(true);
+	_soundComponent->AddSound(path + L"PlayerWalk.mp3");
+	_soundComponent->AddSound(path + L"PlayerWalk1.mp3");
+	_soundComponent->AddSound(path + L"PlayerWalk2.mp3");
+	_soundComponent->AddSound(path + L"PlayerWalk3.mp3");
+
+	int index = 0;
+	_soundIndex = std::unordered_map<std::string, int>();
+	_soundIndex["PlayerWalk"] = index++;
+	_soundIndex["PlayerWalk1"] = index++;
+	_soundIndex["PlayerWalk2"] = index++;
+	_soundIndex["PlayerWalk3"] = index++;
+
 	_model = flt::CreateGameObject<PlayerModel>(true);
 	tr.AddChild(&_model->tr);
 	_model->tr.SetRotation(0.0f, 180.0f, 0.0f);
@@ -251,6 +267,8 @@ void Player::Update(float deltaSecond)
 	if (nextPosOffset.NormPow() > 0)
 	{
 		_model->PlayWalk();
+		_soundComponent->Play(_soundIndex["PlayerWalk"]);
+		_soundComponent->Play(_soundIndex["PlayerWalk1"]);
 	}
 	else
 	{

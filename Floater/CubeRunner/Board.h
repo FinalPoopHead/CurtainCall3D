@@ -119,6 +119,7 @@ private:
 
 private:
 	flt::SoundComponent* _soundComponent;
+	std::unordered_map<std::string, int> _soundIndex;
 
 	GameManager* _gameManager;
 	int _playerIndex;
