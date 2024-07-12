@@ -183,9 +183,9 @@ void Camera::UpdateCameraMove(float deltaSecond)
 		flt::Quaternion targetRotation{};
 		targetRotation.Look(direction);
 
-		if (pos.y - playerPos.y > 40.0f)
+		if (pos.y - playerPos.y > 80.0f)
 		{
-			tr.SetWorldPosition(pos.x, playerPos.y - 60.0f, playerPos.z - 30.0f);
+			tr.SetWorldPosition(pos.x, playerPos.y - 120.0f, playerPos.z - 30.0f);
 			tr.SetRotation(targetRotation);
 		}
 
