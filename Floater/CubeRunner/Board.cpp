@@ -1052,13 +1052,14 @@ bool Board::IsMineSet()
 void Board::OnEndPlayerFalling()
 {
 	// TODO : GameOver 연출
-
+	_gameManager->OnEndPlayerFall(_playerIndex);
 	_soundComponent->Play(_soundIndex["GameOver"]);
 }
 
 void Board::SetGameOver()
 {
 	_isGameOver = true;
+	_gameManager->OnStartPlayerFall(_playerIndex);
 }
 
 void Board::AddCubeFallCount()
