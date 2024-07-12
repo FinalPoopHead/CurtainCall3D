@@ -56,6 +56,9 @@ public:
 	void OnEndLevel(int playerIndex);
 	Player* GetPlayer(int index);
 
+	void OnStartPlayerFall(int index);
+	void OnEndPlayerFall(int index);
+
 private:
 	void IncreasePlayerCount();
 	void AddScore(int index, int score);
@@ -86,6 +89,7 @@ private:
 	std::vector<std::vector<SpriteObject*>> _fallCountSlot;
 	std::vector<std::vector<SpriteObject*>> _fallCountRed;
 	std::vector<TextObject*> _playTimeText;
+	std::vector<TextObject*> _gameoverText;
 
 	std::list<TextObject*> _liveComboTexts;
 

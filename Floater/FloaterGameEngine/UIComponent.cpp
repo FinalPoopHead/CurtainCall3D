@@ -168,6 +168,17 @@ flt::Vector2f flt::UIComponent::GetSize()
 	return _size;
 }
 
+void flt::UIComponent::SetTextAlignment(eTextAlignment alignMode)
+{
+	_rendererObject->text.textAlign = alignMode;
+
+	if (_isRegisted)
+	{
+		_renderer.DeregisterObject(_hObject);
+		_hObject = _renderer.RegisterObject(*_rendererObject);
+	}
+}
+
 void flt::UIComponent::SetText(const std::wstring& text)
 {
 	_rendererObject->text.data = text;
