@@ -17,22 +17,23 @@ int flt::SoundComponent::AddSound(std::wstring path)
 {
 	Sound* sound = new Sound();
 
-	void* buff;
-	std::fstream file(path);
-	file.seekg(0, file.end);
-	int length = static_cast<int>(file.tellg());
-	file.seekg(0, file.beg);
-	buff = malloc(length);
-	file.read((char*)buff, length);
-	file.close();
+	//void* buff;
+	//std::fstream file(path);
+	//file.seekg(0, file.end);
+	//int length = static_cast<int>(file.tellg());
+	//file.seekg(0, file.beg);
+	//buff = malloc(length);
+	//file.read((char*)buff, length);
+	//file.close();
 
-	sound->_buffer = buff;
+	//sound->_buffer = buff;
 
-	FMOD_CREATESOUNDEXINFO exinfo{};
-	exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
-	exinfo.length = length;
+	//FMOD_CREATESOUNDEXINFO exinfo{};
+	//exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
+	//exinfo.length = length;
 
 	//bool isSuccess = _soundEngine->CreateSound(buff, &exinfo, &sound->_fSound);
+
 	bool isSuccess = _soundEngine->CreateSound(ToString(path).c_str(), &sound->_fSound);
 	ASSERT(isSuccess, "Failed to create sound");
 
@@ -41,9 +42,9 @@ int flt::SoundComponent::AddSound(std::wstring path)
 	return (int)_sounds.size() - 1;
 }
 
-void flt::SoundComponent::Play(int index)
+void flt::SoundComponent::Play(int index, bool isLoop/*= false*/)
 {
-	_soundEngine->Play(_sounds[index]);
+	_soundEngine->Play(_sounds[index], isLoop);
 }
 
 void flt::SoundComponent::Pause(int index)

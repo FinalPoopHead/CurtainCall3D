@@ -8,6 +8,8 @@
 #pragma comment(lib, "../External/lib/x64/release/fmodL_vc.lib")
 
 flt::SoundEngine::SoundEngine()
+	: _system(nullptr)
+	, _channelGroups()
 {
 
 }
@@ -43,6 +45,11 @@ void flt::SoundEngine::Finalize()
 	_system->release();
 }
 
+void flt::SoundEngine::Update()
+{
+	_system->update();
+}
+
 bool flt::SoundEngine::CreateSound(void* buff, FMOD_CREATESOUNDEXINFO* exinfo, FMOD::Sound** sound)
 {
 	FMOD_RESULT result = _system->createSound((const char*)buff, FMOD_OPENMEMORY, exinfo, sound);
@@ -57,27 +64,33 @@ bool flt::SoundEngine::CreateSound(const char* name, FMOD::Sound** sound)
 	return result == FMOD_OK;
 }
 
-void flt::SoundEngine::Play(flt::Sound* sound)
+void flt::SoundEngine::Play(flt::Sound* sound, bool isLoop/*= false*/)
 {
-	if (sound->_channel)
+	sound->_fSound->setMode(isLoop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
+	sound->_isLoop = isLoop;
+
+	FMOD::Channel* channel = sound->_channel;
+	if (channel)
 	{
 		bool isPlaying = false;
-		sound->_channel->isPlaying(&isPlaying);
+		channel->isPlaying(&isPlaying);
 
 		if (isPlaying)
 		{
 			bool ispaused = false;
-			sound->_channel->getPaused(&ispaused);
+			channel->getPaused(&ispaused);
 
 			if (ispaused)
 			{
-				sound->_channel->setPaused(false);
+				channel->setPaused(false);
+				return;
 			}
 
-			return;
+			FMOD_RESULT result = sound->_channel->stop();
 		}
 	}
-	FMOD_RESULT result = _system->playSound(sound->_fSound, _channelGroups[sound->_category], false, &sound->_channel);
+
+	FMOD_RESULT result = _system->playSound(sound->_fSound, _channelGroups[sound->_category], false, &channel);
 	ASSERT(result == FMOD_OK, "재생 실패");
 }
 
