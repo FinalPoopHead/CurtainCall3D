@@ -94,6 +94,24 @@ void flt::SoundEngine::Play(flt::Sound* sound, bool isLoop/*= false*/)
 	ASSERT(result == FMOD_OK, "재생 실패");
 }
 
+bool flt::SoundEngine::isPlay(Sound* sound)
+{
+	ASSERT(sound, "sound is nullptr");
+
+	FMOD::Channel* channel = sound->_channel;
+	bool isPlaying = false;
+	if (channel)
+	{
+		channel->isPlaying(&isPlaying);
+		if (isPlaying)
+		{
+			channel->getPaused(&isPlaying);
+		}
+	}
+
+	return isPlaying;
+}
+
 void flt::SoundEngine::Pause(Sound* sound)
 {
 	FMOD_RESULT result = sound->_channel->setPaused(true);

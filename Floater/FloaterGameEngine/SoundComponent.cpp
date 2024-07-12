@@ -47,6 +47,11 @@ void flt::SoundComponent::Play(int index, bool isLoop/*= false*/)
 	_soundEngine->Play(_sounds[index], isLoop);
 }
 
+bool flt::SoundComponent::isPlay(int index)
+{
+	return _soundEngine->isPlay(_sounds[index]);
+}
+
 void flt::SoundComponent::Pause(int index)
 {
 	_soundEngine->Pause(_sounds[index]);
