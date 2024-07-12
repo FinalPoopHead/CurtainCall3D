@@ -36,8 +36,6 @@ namespace flt
 		FLTween();
 		FLTween(const FLTween& other);
 
-
-
 		T step(float dt);
 		T seek(float dt);
 		T peek() const;
@@ -98,6 +96,8 @@ namespace flt
 	template<typename T>
 	T flt::FLTween<T>::step(float dt)
 	{
+		ASSERT(_points.size() >= 2, "At least two points are required.");
+
 		if (_current >= _points.size())
 		{
 			return _points.back().value;

@@ -26,38 +26,57 @@ int main(int argc, char* argv[])
 	setlocale(LC_ALL, ".UTF8");
 	std::cout << std::boolalpha;
 
+	//자료구조 테스트
 	{
-		using namespace flt;
+		//using namespace flt;
 
-		StaticArray arr = { 1, 2, 3 };
-		StaticArray arr2(2, 3, 4);
+		//StaticArray arr = { 1, 2, 3 };
+		//StaticArray arr2(2, 3, 4);
 
-		StaticArray<int, 10> arr3{ 1, 2, };
+		//StaticArray<int, 10> arr3{ 1, 2, };
 
-		int test = arr[0];
-		test = arr.At(1);
-		test = arr[2];
-		test = arr.At(3);
+		//int test = arr[0];
+		//test = arr.At(1);
+		//test = arr[2];
+		//test = arr.At(3);
 
-		test = arr2[0];
-		test = arr2.At(1);
-		test = arr2[2];
-		test = arr2.At(3);
+		//test = arr2[0];
+		//test = arr2.At(1);
+		//test = arr2[2];
+		//test = arr2.At(3);
 
-		//std::array stdArr = { 1, 2, 3 };
-		//std::array staArr2(2, 3, 4);
+		////std::array stdArr = { 1, 2, 3 };
+		////std::array staArr2(2, 3, 4);
 
-		int i = 0;
+		//int i = 0;
 	}
 
-	//flt::Info(L"Hello {}!", L"World");
-
-	auto tween = flt::tween::from(0).to(100).during(100.0f);
-
-	for(int i = 0; i < 100; ++i)
+	// 로그 테스트
 	{
-		std::cout << tween.step(1.0f) << std::endl;
+		//flt::Info(L"Hello {}!", L"World");
 	}
+
+	// 트윈 테스트
+	{
+		flt::FLTween tween = flt::tween::from(0)
+			.to(0).during(10.0f)
+			.to(100).during(100.0f).easing(flt::Bezier::EaseInOut())
+			.to(0).during(100.0f).easing(flt::Bezier::EaseIn());
+
+		for (int i = 0; i < 210; ++i)
+		{
+			int value = tween.step(1.0f);
+			for (int j = 0; j < value; ++j)
+			{
+				std::cout << " ";
+			}
+			std::cout << "*\n";
+		}
+	}
+
+
+
+
 
 
 	std::filesystem::path path = std::filesystem::current_path();
