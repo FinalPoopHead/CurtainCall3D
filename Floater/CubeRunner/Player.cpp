@@ -83,9 +83,9 @@ void Player::Update(float deltaSecond)
 
 		camera->TraceFalling();
 		_fallSpeed += 9.8f * deltaSecond;
-		if (_fallSpeed >= 30.0f)
+		if (_fallSpeed >= 50.0f)
 		{
-			_fallSpeed = 30.0f;
+			_fallSpeed = 50.0f;
 		}
 
 		tr.AddWorldPosition(0.0f, -_fallSpeed * deltaSecond, 0.0f);
