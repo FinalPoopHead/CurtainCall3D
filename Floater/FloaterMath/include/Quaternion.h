@@ -43,7 +43,7 @@ namespace flt
 
 		void Look(Vector3f direction, Vector3f up = Vector3f(0.0f, 1.0f, 0.0f)) noexcept;
 
-		static [[nodiscard]] Quaternion Slerp(Quaternion q1, Quaternion q2, float t) noexcept
+		[[nodiscard]] static Quaternion Slerp(Quaternion q1, Quaternion q2, float t) noexcept
 		{
 			float dot = q1.Dot(q2);
 

@@ -229,11 +229,11 @@ Rocket::Core::RawNode* flt::ConvertfltRawNodeTorocketRawNodeRecursive(const flt:
 		for (const flt::RawVertex& vertex : mesh.vertices)
 		{
 			Rocket::Core::RawVertex rocketVertex;
-			rocketVertex.position = { vertex.pos.x, vertex.pos.y, vertex.pos.z };
-			rocketVertex.UV = { vertex.uvs[0].x, vertex.uvs[0].y };
-			rocketVertex.normal = { vertex.normal.x, vertex.normal.y, vertex.normal.z };
-			rocketVertex.tangent = { vertex.tangent.x, vertex.tangent.y, vertex.tangent.z };
-			rocketVertex.biTangent = { vertex.binormal.x, vertex.binormal.y, vertex.binormal.z };
+			rocketVertex.position = DirectX::SimpleMath::Vector3{ vertex.pos.x, vertex.pos.y, vertex.pos.z };
+			rocketVertex.UV = DirectX::SimpleMath::Vector2{ vertex.uvs[0].x, vertex.uvs[0].y };
+			rocketVertex.normal = DirectX::SimpleMath::Vector3{ vertex.normal.x, vertex.normal.y, vertex.normal.z };
+			rocketVertex.tangent = DirectX::SimpleMath::Vector3{ vertex.tangent.x, vertex.tangent.y, vertex.tangent.z };
+			rocketVertex.biTangent = DirectX::SimpleMath::Vector3{ vertex.binormal.x, vertex.binormal.y, vertex.binormal.z };
 			rocketVertex.nodeIndex = -1;
 			for (int i = 0; i < vertex.boneWeights.size(); ++i)
 			{

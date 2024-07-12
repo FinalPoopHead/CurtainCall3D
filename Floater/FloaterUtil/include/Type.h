@@ -4,15 +4,15 @@
 #define FLT_WSTRING_IMPL(x) L##x
 #define FLT_WSTRING(x) FLT_WSTRING_IMPL(x)
 
-namespace flt 
+namespace flt
 {
+//#if defined(_MSC_VER) && (_MSC_VER == 1940)
 	template<typename T>
 	constexpr std::wstring_view TypeName() noexcept
 	{
 		constexpr std::wstring_view full_name{ FLT_WSTRING(__FUNCSIG__) };
 		constexpr std::wstring_view prefix{ L"flt::TypeName<" };
 		constexpr std::wstring_view suffix{ L">(void) noexcept" };
-
 		constexpr auto left_marker_index = full_name.find(prefix);
 		static_assert(left_marker_index != std::wstring_view::npos);
 		constexpr auto start_index = left_marker_index + prefix.size();
@@ -22,5 +22,18 @@ namespace flt
 
 		return full_name.substr(start_index, length);
 	}
-
+//#elif defined(__clang__)
+//	template<typename T>
+//	constexpr std::wstring_view TypeName() noexcept
+//	{
+//		constexpr std::wstring_view full_name{ FLT_WSTRING(__FUNCSIG__) };
+//		constexpr std::wstring_view prefix{ L"T = " };
+//		constexpr auto left_marker_index = full_name.find(prefix);
+//		static_assert(left_marker_index != std::wstring_view::npos);
+//		constexpr auto start_index = left_marker_index + prefix.size();
+//		constexpr auto end_index = full_name.size() - 2;
+//		static_assert(end_index != std::wstring_view::npos);
+//		return full_name.substr(start_index, length);
+//	}
+//#endif
 }

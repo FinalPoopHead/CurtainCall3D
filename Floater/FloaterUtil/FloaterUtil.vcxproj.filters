@@ -96,18 +96,21 @@
     <ClInclude Include="LogFormatObject.h">
       <Filter>Logger</Filter>
     </ClInclude>
-    <ClInclude Include="Perlin.h" />
+    <ClInclude Include="include\Perlin.h" />
     <ClInclude Include="include\OwningPtr.h">
       <Filter>pointer</Filter>
     </ClInclude>
     <ClInclude Include="include\NonOwningPtr.h">
       <Filter>pointer</Filter>
     </ClInclude>
-    <ClInclude Include="FLTween.h">
+    <ClInclude Include="include\FLTween.h">
       <Filter>Tweening</Filter>
     </ClInclude>
-    <ClInclude Include="Expected.h">
+    <ClInclude Include="include\Expected.h">
       <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StaticArray.h">
+      <Filter>DataStructure</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

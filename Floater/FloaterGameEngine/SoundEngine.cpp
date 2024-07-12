@@ -34,6 +34,7 @@ void flt::SoundEngine::Initialize()
 		_channelGroups[Sound::Category::MASTER]->addGroup(_channelGroups[i]);
 	}
 
+	_system->setDSPBufferSize(512, 2);
 
 }
 
