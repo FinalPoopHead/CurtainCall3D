@@ -16,6 +16,7 @@ namespace flt
 
 		int AddSound(std::wstring path);
 		void Play(int index, bool isLoop = false);
+		bool isPlay(int index);
 		void Pause(int index);
 		void Stop(int index);
 

@@ -87,6 +87,20 @@ void MenuSelector::Update(float deltaSecond)
 	{
 		Select(flt::KeyCode::enter);
 	}
+
+	flt::GamePadState state;
+	bool isGamePadConnected = flt::GetGamePadState(0, &state);
+	if (isGamePadConnected)
+	{
+		if (state.buttonsDown & flt::GamePadState::ButtonFlag::UP)
+		{
+			prev();
+		}
+		if (state.buttonsDown & flt::GamePadState::ButtonFlag::DOWN)
+		{
+			next();
+		}
+	}
 }
 
 void MenuSelector::MoveSelectedItem()
