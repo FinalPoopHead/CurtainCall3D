@@ -14,6 +14,8 @@ namespace flt
 	public:
 		SoundComponent();
 
+		virtual void OnDestroy() override;
+
 		int AddSound(std::wstring path);
 		void Play(int index, bool isLoop = false);
 		bool isPlay(int index);
