@@ -8,14 +8,30 @@
 //TEST Include
 #include "MainMenuScene.h"
 
-Player::Player(Board* board)
-	: camera(nullptr)
+Player::Player(Board* board) :
+	camera(nullptr)
+	, _soundComponent()
+	, _soundIndex()
 	, _model(nullptr)
 	, _board(board)
 	, _state(ePlayerState::PLAYING)
 	, _padIndex(-1)
 	, _speed(10.0f)
 {
+	std::wstring path = L"../Resources/Sound/";
+	_soundComponent = AddComponent<flt::SoundComponent>(true);
+	_soundComponent->AddSound(path + L"PlayerWalk.mp3");
+	_soundComponent->AddSound(path + L"PlayerWalk1.mp3");
+	_soundComponent->AddSound(path + L"PlayerWalk2.mp3");
+	_soundComponent->AddSound(path + L"PlayerWalk3.mp3");
+
+	int index = 0;
+	_soundIndex = std::unordered_map<std::string, int>();
+	_soundIndex["PlayerWalk"] = index++;
+	_soundIndex["PlayerWalk1"] = index++;
+	_soundIndex["PlayerWalk2"] = index++;
+	_soundIndex["PlayerWalk3"] = index++;
+
 	_model = flt::CreateGameObject<PlayerModel>(true);
 	tr.AddChild(&_model->tr);
 	_model->tr.SetRotation(0.0f, 180.0f, 0.0f);
@@ -43,6 +59,7 @@ void Player::Update(float deltaSecond)
 	case ePlayerState::PLAYING:
 		break;
 	case ePlayerState::CRUSHED:
+		// TODO : 깔렸을때 자동으로 빨리감기해서 굴려버려야함.
 		break;
 	case ePlayerState::PUSHEDOUT:
 	{
@@ -60,14 +77,15 @@ void Player::Update(float deltaSecond)
 		{
 			camera->StopCamera();
 			_state = ePlayerState::GAMEOVER;
+			_board->OnEndPlayerFalling();
 			return;
 		}
 
 		camera->TraceFalling();
 		_fallSpeed += 9.8f * deltaSecond;
-		if (_fallSpeed >= 30.0f)
+		if (_fallSpeed >= 50.0f)
 		{
-			_fallSpeed = 30.0f;
+			_fallSpeed = 50.0f;
 		}
 
 		tr.AddWorldPosition(0.0f, -_fallSpeed * deltaSecond, 0.0f);
@@ -251,6 +269,9 @@ void Player::Update(float deltaSecond)
 	if (nextPosOffset.NormPow() > 0)
 	{
 		_model->PlayWalk();
+		// TODO : 현재 Play 중인지 아닌지 체크해서 재생시켜야함.
+// 		_soundComponent->Play(_soundIndex["PlayerWalk"]);
+// 		_soundComponent->Play(_soundIndex["PlayerWalk1"]);
 	}
 	else
 	{

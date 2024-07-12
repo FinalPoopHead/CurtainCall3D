@@ -33,6 +33,8 @@ public:
 	Camera* camera;
 
 private:
+	flt::SoundComponent* _soundComponent;
+	std::unordered_map<std::string, int> _soundIndex;
 	PlayerModel* _model;
 	Board* _board;
 	ePlayerState _state;
