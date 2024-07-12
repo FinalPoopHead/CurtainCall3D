@@ -39,7 +39,7 @@
     <ClInclude Include="include\Matrix3f.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Ease.h">
+    <ClInclude Include="include\Ease.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Bezier.h">
