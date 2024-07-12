@@ -269,8 +269,9 @@ void Player::Update(float deltaSecond)
 	if (nextPosOffset.NormPow() > 0)
 	{
 		_model->PlayWalk();
-		_soundComponent->Play(_soundIndex["PlayerWalk"]);
-		_soundComponent->Play(_soundIndex["PlayerWalk1"]);
+		// TODO : 현재 Play 중인지 아닌지 체크해서 재생시켜야함.
+// 		_soundComponent->Play(_soundIndex["PlayerWalk"]);
+// 		_soundComponent->Play(_soundIndex["PlayerWalk1"]);
 	}
 	else
 	{
