@@ -150,8 +150,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Expected.h" />
-    <ClInclude Include="FLTween.h" />
+    <ClInclude Include="include\Expected.h" />
+    <ClInclude Include="include\FLTween.h" />
     <ClInclude Include="include\Hash.h" />
     <ClInclude Include="include\HashTable.h" />
     <ClInclude Include="include\Allocator.h" />
@@ -177,7 +177,8 @@
     <ClInclude Include="LogFormatObject.h" />
     <ClInclude Include="include\NonOwningPtr.h" />
     <ClInclude Include="include\OwningPtr.h" />
-    <ClInclude Include="Perlin.h" />
+    <ClInclude Include="include\Perlin.h" />
+    <ClInclude Include="include\StaticArray.h" />
     <ClInclude Include="TesterFixedSizeMemoryPool.h" />
     <ClInclude Include="TesterRBTree.h" />
     <ClInclude Include="include\UUID.h" />

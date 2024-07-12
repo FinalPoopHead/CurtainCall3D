@@ -47,9 +47,9 @@ namespace flt
 		OwningPtr(const OwningPtr&) = delete;
 		OwningPtr& operator=(const OwningPtr&) = delete;
 
-		constexpr [[nodiscard]] T* get() const noexcept { return _ptr; }
-		constexpr [[nodiscard]] T* operator->() const { return _ptr; }
-		constexpr [[nodiscard]] T& operator*() const { return *_ptr; }
+		[[nodiscard]] constexpr T* get() const noexcept { return _ptr; }
+		[[nodiscard]] constexpr T* operator->() const { return _ptr; }
+		[[nodiscard]] constexpr T& operator*() const { return *_ptr; }
 
 	private:
 		T* _ptr;

@@ -1212,13 +1212,14 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 				// 디바이스가 연결되었을 때
 				if (wParam == DBT_DEVICEARRIVAL)
 				{
-					wchar_t* data = dif->dbcc_name;
-					size_t size = wcslen(data) * sizeof(wchar_t);
-					uint64 hash = flt::hash::xxh64::hash((char*)data, size, 0);
-					ASSERT(hash == 0, "해시값이 0이면 처음 연결되는것으로 세팅되어있음.");
+					std::wstring data = dif->dbcc_name;
+					std::locale loc;
+					std::transform(data.begin(), data.end(), data.begin(), [&loc](wchar_t c) { return std::tolower(c, loc); });
+					uint64 dataLen = wcslen(dif->dbcc_name) * sizeof(wchar_t);
+					uint64 hash = flt::hash::xxh64::hash((char*)data.data(), dataLen, 0);
+					ASSERT(hash != 0, "해시값이 0이면 처음 연결되는것으로 세팅되어있음. 값이 0이면 구분못하기 때문에 0이면 안됨.");
 
 					WinGamePad* emptyGamePad = thisPtr->FindEmptyGamePad(hash);
-
 
 					if (emptyGamePad == nullptr)
 					{
@@ -1226,7 +1227,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 					}
 					else
 					{
-						emptyGamePad->path = dif->dbcc_name;
+						emptyGamePad->path = std::move(data);
 						flt::Xbox::Connect(emptyGamePad);
 					}
 				}
@@ -1300,7 +1301,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 			// OsWindows객체의 thisPtr을 저장.
 			thisPtr = (OsWindows*)(((LPCREATESTRUCT)lParam)->lpCreateParams);
 
-			Xbox::Initialize(thisPtr->_pGamePads);
+			Xbox::Initialize(thisPtr->_pGamePads, sizeof(thisPtr->_pGamePads) / sizeof(thisPtr->_pGamePads[0]));
 
 			int result = 0;
 

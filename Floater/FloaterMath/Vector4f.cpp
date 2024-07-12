@@ -4,14 +4,24 @@
 
 namespace flt
 {
-	Vector4f::Vector4f(const Vector3f& v, float w) noexcept : m{ .m128_f32{v.x, v.y, v.z, w} }
+	//Vector4f::Vector4f(const Vector3f& v, float w) noexcept : m{ .m128_f32{v.x, v.y, v.z, w} }
+	//{
+
+	//}
+
+	//Vector4f::operator Vector3f() const noexcept
+	//{
+	//	return Vector3f(m.m128_f32[0], m.m128_f32[1], m.m128_f32[2]);
+	//}
+
+	Vector4f::Vector4f(const Vector3f& v, float w) noexcept : e{v.x, v.y, v.z, w}
 	{
 
 	}
 
 	Vector4f::operator Vector3f() const noexcept
 	{
-		return Vector3f(m.m128_f32[0], m.m128_f32[1], m.m128_f32[2]);
+		return Vector3f(e[0], e[1], e[2]);
 	}
 
 	Vector4f::operator __m128() const noexcept

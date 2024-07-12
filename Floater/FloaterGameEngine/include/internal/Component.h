@@ -12,7 +12,7 @@ namespace flt
 		friend class Scene;
 		friend class GameObject;
 	public:
-		ComponentBase() : _isEnable(false), _gameObject(nullptr) {}
+		ComponentBase() : _gameObject(nullptr), _isEnable(false) {}
 		//ComponentBase(GameObject* gameObject) : _isEnable(false), _gameObject(gameObject) {}
 		virtual ~ComponentBase() {}
 

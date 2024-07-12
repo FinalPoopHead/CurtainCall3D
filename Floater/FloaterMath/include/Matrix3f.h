@@ -178,7 +178,7 @@ namespace flt
 			};
 		}
 
-		static [[nodiscard]] Matrix3f Identity() noexcept
+		[[nodiscard]] static Matrix3f Identity() noexcept
 		{
 			return Matrix3f{ 1.0f, 0.0f, 0.0f,
 							 0.0f, 1.0f, 0.0f,

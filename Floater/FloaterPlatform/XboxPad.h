@@ -54,7 +54,7 @@ namespace flt
 			BYTE highFreq;
 		};
 
-		bool Initialize(WinGamePad* outGamePadArr);
+		bool Initialize(WinGamePad* outGamePadArr, uint32 arrLen);
 		bool Connect(WinGamePad* outGamePad);
 		bool Disconnect(WinGamePad* outGamePad);
 		bool Get(WinGamePad* outGamePad);
