@@ -209,6 +209,7 @@ bool flt::GameEngine::UpdateImpl(Scene* scene)
 	_timer.Update();
 	float deltaSecond = (float)_timer.GetDeltaSeconds();
 	bool isOnWindows = _platform->Update(deltaSecond);
+	_soundEngine->Update();
 
 	scene->StartFrame();
 

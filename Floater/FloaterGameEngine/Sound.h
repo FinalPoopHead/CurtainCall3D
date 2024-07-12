@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include <string>
+#include "../FloaterUtil/include/FloaterType.h"
+
 
 namespace FMOD
 {
@@ -37,6 +39,7 @@ namespace flt
 		};
 
 		Sound();
+		~Sound();
 
 		void SetLoop(bool isLoop);
 		bool IsLoop() const;

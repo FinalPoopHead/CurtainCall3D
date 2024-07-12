@@ -12,9 +12,12 @@ namespace flt
 	struct __declspec(dllexport) Vector4f
 	{
 	public:
-		constexpr Vector4f() noexcept : m{ .m128_f32{0.0f, 0.0f, 0.0f, 0.0f} } {}
-		constexpr Vector4f(float x, float y, float z, float w) noexcept : m{ .m128_f32{x, y, z, w} } {}
-		constexpr Vector4f(double x, double y, double z, double w) noexcept : m{ .m128_f32{static_cast<float>(x), static_cast<float>(y), static_cast<float>(z), static_cast<float>(w)} } {}
+		//constexpr Vector4f() noexcept : m{ .m128_f32{0.0f, 0.0f, 0.0f, 0.0f} } {}
+		//constexpr Vector4f(float x, float y, float z, float w) noexcept : m{ .m128_f32{x, y, z, w} } {}
+		//constexpr Vector4f(double x, double y, double z, double w) noexcept : m{ .m128_f32{static_cast<float>(x), static_cast<float>(y), static_cast<float>(z), static_cast<float>(w)} } {}
+		constexpr Vector4f() noexcept : e{0.0f, 0.0f, 0.0f, 0.0f} {}
+		constexpr Vector4f(float x, float y, float z, float w) noexcept : e{x, y, z, w} {}
+		constexpr Vector4f(double x, double y, double z, double w) noexcept : e{static_cast<float>(x), static_cast<float>(y), static_cast<float>(z), static_cast<float>(w)} {}
 		constexpr Vector4f(__m128 m) noexcept : m(m) {}
 		Vector4f(const Vector3f& v, float w) noexcept;
 		constexpr Vector4f(Vector4f&&) noexcept = default;
@@ -117,8 +120,8 @@ namespace flt
 			return order;
 		}
 
-		explicit [[nodiscard]] operator Vector3f() const noexcept;
-		explicit [[nodiscard]] operator __m128() const noexcept;
+		[[nodiscard]] explicit operator Vector3f() const noexcept;
+		[[nodiscard]] explicit operator __m128() const noexcept;
 
 		Vector4f& operator+=(const Vector4f& rhs) noexcept
 		{
@@ -228,7 +231,7 @@ namespace flt
 		{
 			return Vector4f(*this).Vector3Normalize();
 		}
-		constexpr [[nodiscard]] Vector4f Vector3Cross(const Vector4f& rhs) const noexcept
+		[[nodiscard]] constexpr Vector4f Vector3Cross(const Vector4f& rhs) const noexcept
 		{
 			return Vector4f(
 				y * rhs.z - z * rhs.y,
@@ -239,13 +242,13 @@ namespace flt
 		}
 		[[nodiscard]] float Vector3Dot(const Vector4f& rhs) const noexcept
 		{
-			return _mm_cvtss_f32(_mm_dp_ps(m, rhs.m, 0x71));
-			//__m128 tmp = _mm_mul_ps(m, rhs.m);
-			//return tmp.m128_f32[0] + tmp.m128_f32[1] + tmp.m128_f32[2];
+			//return _mm_cvtss_f32(_mm_dp_ps(m, rhs.m, 0x71));
+			return x * rhs.x + y * rhs.y + z * rhs.z;
 		}
 		[[nodiscard]] float Dot(const Vector4f& rhs) const noexcept
 		{
-			return _mm_cvtss_f32(_mm_dp_ps(m, rhs.m, 0xff));
+			//return _mm_cvtss_f32(_mm_dp_ps(m, rhs.m, 0xff));
+			return x * rhs.x + y * rhs.y + z * rhs.z + w * rhs.w;
 		}
 
 		union
@@ -253,6 +256,7 @@ namespace flt
 			__m128 m;
 			struct { float x, y, z, w; };
 			struct { float r, g, b, a; };
+			float e[4];
 		};
 	};
 }

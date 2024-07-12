@@ -4,12 +4,14 @@
 #include "../FloaterUtil/include/FloaterMacro.h"
 #include "../FloaterUtil/include/Hash.h"
 #include <winioctl.h>
+#include <algorithm>
+#include <locale>
 
 #include <setupapi.h>
 #pragma comment(lib, "setupapi.lib")
 
 
-bool flt::Xbox::Initialize(WinGamePad* outGamePadArr)
+bool flt::Xbox::Initialize(WinGamePad* outGamePadArr, uint32 arrLen)
 {
 	HDEVINFO dev = SetupDiGetClassDevsW(&guid, NULL, NULL, DIGCF_DEVICEINTERFACE | DIGCF_PRESENT);
 	if (dev != INVALID_HANDLE_VALUE)
@@ -20,7 +22,7 @@ bool flt::Xbox::Initialize(WinGamePad* outGamePadArr)
 		DWORD index = 0;
 		while (SetupDiEnumDeviceInterfaces(dev, NULL, &guid, index, &idata))
 		{
-			ASSERT(index < 16, "GamePad is full");
+			ASSERT(index < arrLen, "GamePad is full");
 			DWORD size;
 			SetupDiGetDeviceInterfaceDetailW(dev, &idata, NULL, 0, &size, NULL);
 
@@ -36,6 +38,13 @@ bool flt::Xbox::Initialize(WinGamePad* outGamePadArr)
 				{
 					//outGamePadArr[index] = new WinGamePad();
 					outGamePadArr[index].path = detail->DevicePath;
+					std::locale loc;
+					std::transform(outGamePadArr[index].path.begin(), outGamePadArr[index].path.end(), outGamePadArr[index].path.begin(), [&loc](wchar_t c) { return std::tolower(c, loc); });
+					uint64 dataLen = outGamePadArr[index].path.size() * sizeof(wchar_t);
+					uint64 hash = flt::hash::xxh64::hash((char*)outGamePadArr[index].path.data(), dataLen, 0);
+					ASSERT(hash != 0, "해시값이 0이면 처음 연결되는것으로 세팅되어있음. 값이 0이면 구분못하기 때문에 0이면 안됨.");
+					outGamePadArr[index].hash = hash;
+					
 					Connect(&outGamePadArr[index]);
 				}
 				LocalFree(detail);

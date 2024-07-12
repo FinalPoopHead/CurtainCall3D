@@ -10,17 +10,17 @@ namespace flt
 	class  Bezier
 	{
 	public:
-		__declspec(dllexport) static [[nodiscard]] Bezier Linear();
-		__declspec(dllexport) static [[nodiscard]] Bezier Ease();
-		__declspec(dllexport) static [[nodiscard]] Bezier EaseIn();
-		__declspec(dllexport) static [[nodiscard]] Bezier EaseOut();
-		__declspec(dllexport) static [[nodiscard]] Bezier EaseInOut();
+		[[nodiscard]] __declspec(dllexport) static Bezier Linear();
+		[[nodiscard]] __declspec(dllexport) static Bezier Ease();
+		[[nodiscard]] __declspec(dllexport) static Bezier EaseIn();
+		[[nodiscard]] __declspec(dllexport) static Bezier EaseOut();
+		[[nodiscard]] __declspec(dllexport) static Bezier EaseInOut();
 
 	public:
 		__declspec(dllexport) Bezier();
 		__declspec(dllexport) ~Bezier() {}
 
-		__declspec(dllexport) [[nodiscard]] Vector2f Evaluate(float t) const;
+		[[nodiscard]] __declspec(dllexport) Vector2f Evaluate(float t) const;
 		__declspec(dllexport) void AddControlPoint(const Vector2f& controlPoint);
 
 		__declspec(dllexport) float operator()(float y) const;

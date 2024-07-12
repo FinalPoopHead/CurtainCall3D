@@ -38,7 +38,7 @@ namespace flt
 			TestData* pTestData;
 		};
 
-		template struct Resource<BuilderTest>;
+		//template struct Resource<BuilderTest>;
 
 		struct BuilderTestBuilder : public IBuilder<BuilderTest>
 		{

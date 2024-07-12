@@ -12,6 +12,19 @@ flt::Sound::Sound() :
 {
 }
 
+flt::Sound::~Sound()
+{
+	if (_fSound)
+	{
+		_fSound->release();
+	}
+
+	if(_buffer)
+	{
+		free(_buffer);
+	}
+}
+
 void flt::Sound::SetLoop(bool isLoop)
 {
 	_isLoop = isLoop;

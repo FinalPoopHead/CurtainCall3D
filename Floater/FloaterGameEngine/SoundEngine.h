@@ -30,9 +30,11 @@ namespace flt
 		void Initialize();
 		void Finalize();
 
+		void Update();
+
 		bool CreateSound(void* buff, FMOD_CREATESOUNDEXINFO* exinfo, FMOD::Sound** sound);
 		bool CreateSound(const char* name, FMOD::Sound** sound);
-		void Play(Sound* sound);
+		void Play(Sound* sound, bool isLoop = false);
 		void Pause(Sound* sound);
 		void Stop(Sound* sound);
 
@@ -40,8 +42,8 @@ namespace flt
 		FMOD::System* _system;
 		std::vector<FMOD::ChannelGroup*> _channelGroups;
 
-		const float DISTANCEFACTOR = 1.0f;
-		const int   INTERFACE_UPDATETIME = 50; // ms
+		inline static constexpr float DISTANCEFACTOR = 1.0f;
+		inline static constexpr int   INTERFACE_UPDATETIME = 50; // ms
 	};
 }
 
