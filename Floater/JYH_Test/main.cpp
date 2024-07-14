@@ -28,9 +28,9 @@ int main(int argc, char* argv[])
 
 	//자료구조 테스트
 	{
-		//using namespace flt;
+		using namespace flt;
 
-		//StaticArray arr = { 1, 2, 3 };
+		StaticArray arr = { 1, 2, 3 };
 		//StaticArray arr2(2, 3, 4);
 
 		//StaticArray<int, 10> arr3{ 1, 2, };
@@ -57,7 +57,15 @@ int main(int argc, char* argv[])
 	}
 
 	// 트윈 테스트
+	int value = 0;
+	int valueRef = 0;
 	{
+		auto ret = flt::defaultLerp(1, 3, 0.5f);
+		int i = 2;
+		int j = 6;
+		ret = flt::defaultLerp(i, j, 0.5f);
+		int xx = 0;
+
 		flt::FLTween tween = flt::tween::from(0)
 			.to(0).during(10.0f)
 			.to(100).during(100.0f).easing(flt::Bezier::EaseInOut())
@@ -72,12 +80,41 @@ int main(int argc, char* argv[])
 			}
 			std::cout << "*\n";
 		}
+
+		std::cout << "------------------\n";
+
+		flt::FLTween tweenPtr = flt::tween::from(&value)
+			.to(0).during(10.0f)
+			.to(100).during(100.0f).easing(flt::Bezier::EaseInOut())
+			.to(0).during(100.0f).easing(flt::Bezier::EaseIn());
+
+		for (int i = 0; i < 210; ++i)
+		{
+			int* temp = tweenPtr.step(1.0f);
+			for (int j = 0; j < *temp; ++j)
+			{
+				std::cout << " ";
+			}
+			std::cout << "*\n";
+		}
+
+		std::cout << "------------------\n";
+
+		flt::FLTween tweenRef = flt::tween::from<int&>(valueRef)
+			.to(0).during(10.0f)
+			.to(100).during(100.0f).easing(flt::Bezier::EaseInOut())
+			.to(0).during(100.0f).easing(flt::Bezier::EaseIn());
+
+		for (int i = 0; i < 210; ++i)
+		{
+			int temp = tweenRef.step(1.0f);
+			for (int j = 0; j < temp; ++j)
+			{
+				std::cout << " ";
+			}
+			std::cout << "*\n";
+		}
 	}
-
-
-
-
-
 
 	std::filesystem::path path = std::filesystem::current_path();
 
