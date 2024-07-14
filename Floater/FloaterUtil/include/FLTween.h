@@ -14,7 +14,7 @@ namespace flt
 	template<typename T>
 	T defaultLerp(const T& a, const T& b, float t)
 	{
-		return a + t * (b - a);
+		return a + (b - a) * t;
 	}
 
 	template<typename T>
@@ -47,7 +47,9 @@ namespace flt
 
 	public:
 		FLTween(T target, LerpFunction<ValueType> lerp);
-		FLTween(const FLTween& other);
+		FLTween(const FLTween<T>& other);
+
+		bool isEnd() const { return _current >= _points.size(); }
 
 		virtual bool Update(float dt) override;
 
@@ -67,9 +69,9 @@ namespace flt
 		FLTween<T>& postDelay(float duration);
 		FLTween<T>& easing(std::function<float(float)> easing);
 
-		FLTween& onStart(std::function<void()> callback);
-		FLTween& onStep(std::function<void(const ValueType&)> callback);
-		FLTween& onEnd(std::function<void()> callback);
+		FLTween<T>& onStart(std::function<void()> callback);
+		FLTween<T>& onStep(std::function<void(const ValueType&)> callback);
+		FLTween<T>& onEnd(std::function<void()> callback);
 
 	private:
 		float _elapsed;

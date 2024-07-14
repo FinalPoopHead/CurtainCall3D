@@ -45,6 +45,9 @@ namespace flt
 		void EndScene();
 
 		void AddTween(IFLTween* tween);
+		void AddPosTween(FLTween<Vector4f>* tween, Transform* tr);
+		void AddScaleTween(FLTween<Vector4f>* tween, Transform* tr);
+		void AddRotTween(FLTween<Quaternion>* tween, Transform* tr);
 
 		//std::vector<GameObject*> GetGameObjects() const { return _gameObjects; }
 		std::vector<GameObject*> GetGameObjects(const std::wstring& name) const;
@@ -53,6 +56,8 @@ namespace flt
 		void AddEnableGameObject(GameObject* gameObject, bool isEnable);
 		void AddEnableComponent(ComponentBase* component, bool isEnable);
 		void AddDestroyGameObject(GameObject* gameObject);
+
+		void TweenUpdate(float deltaSecond);
 
 	private:
 		template<GameObjectDerived T, typename... TArgs>
@@ -80,6 +85,10 @@ namespace flt
 
 		SparseSet<IFLTween*> _tweens;
 		std::vector<uint32> _tweensToDelete;
+
+		std::list<std::pair<FLTween<Vector4f>*, Transform*>> _posTweens;
+		std::list<std::pair<FLTween<Vector4f>*, Transform*>> _scaleTweens;
+		std::list<std::pair<FLTween<Quaternion>*, Transform*>> _rotTweens;
 	};
 
 	template<GameObjectDerived T, typename... TArgs>

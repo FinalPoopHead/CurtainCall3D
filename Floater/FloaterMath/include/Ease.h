@@ -6,7 +6,7 @@ namespace flt
 {
 	namespace Ease
 	{
-		const Bezier& bezierLinear = Bezier::Linear();
+		//const Bezier& bezierLinear = Bezier::Linear();
 	}
 	//class Ease
 	//{

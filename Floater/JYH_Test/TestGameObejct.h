@@ -7,6 +7,7 @@ public:
 	TestGameObejct();
 	virtual ~TestGameObejct();
 
+	void OnEnable() override;
 	void Update(float deltaTime) override;
 
 private:

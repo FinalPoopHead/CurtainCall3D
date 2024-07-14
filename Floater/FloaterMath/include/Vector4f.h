@@ -12,6 +12,9 @@ namespace flt
 	struct __declspec(dllexport) Vector4f
 	{
 	public:
+		[[nodiscard]] static Vector4f Lerp(const Vector4f& a, const Vector4f& b, float t) noexcept;
+
+	public:
 		//constexpr Vector4f() noexcept : m{ .m128_f32{0.0f, 0.0f, 0.0f, 0.0f} } {}
 		//constexpr Vector4f(float x, float y, float z, float w) noexcept : m{ .m128_f32{x, y, z, w} } {}
 		//constexpr Vector4f(double x, double y, double z, double w) noexcept : m{ .m128_f32{static_cast<float>(x), static_cast<float>(y), static_cast<float>(z), static_cast<float>(w)} } {}

@@ -26,8 +26,8 @@ int main(int argc, char* argv[])
 	setlocale(LC_ALL, ".UTF8");
 	std::cout << std::boolalpha;
 
-	//자료구조 테스트
-	{
+	///자료구조 테스트
+	/*{
 		using namespace flt;
 
 		StaticArray arr = { 1, 2, 3 };
@@ -49,17 +49,18 @@ int main(int argc, char* argv[])
 		////std::array staArr2(2, 3, 4);
 
 		//int i = 0;
-	}
+	}*/
 
-	// 로그 테스트
-	{
-		//flt::Info(L"Hello {}!", L"World");
-	}
+	/// 로그 테스트
+	/*{
+		flt::Info(L"Hello {}!", L"World");
+	}*/
 
-	// 트윈 테스트
-	int value = 100;
-	int valueRef = 100;
-	{
+	/// 트윈 테스트
+	/*{
+		int value = 100;
+		int valueRef = 100;
+
 		auto ret = flt::defaultLerp(1, 3, 0.5f);
 		int i = 2;
 		int j = 6;
@@ -113,7 +114,7 @@ int main(int argc, char* argv[])
 			}
 			std::cout << "*\n";
 		}
-	}
+	}*/
 
 	std::filesystem::path path = std::filesystem::current_path();
 

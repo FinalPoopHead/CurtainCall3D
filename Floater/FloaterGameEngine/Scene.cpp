@@ -90,6 +90,70 @@ void flt::Scene::AddDestroyGameObject(GameObject* gameObject)
 	_gameObjectsToDestroy.push_back(gameObject);
 }
 
+void flt::Scene::TweenUpdate(float deltaSecond)
+{
+	for (auto iter = _tweens.begin(); iter != _tweens.end(); ++iter)
+	{
+		bool isFinished = (*iter)->Update(deltaSecond);
+
+		if (isFinished)
+		{
+			_tweensToDelete.push_back(iter.GetIndex());
+		}
+	}
+
+	for (auto& index : _tweensToDelete)
+	{
+		_tweens.Erase(index);
+	}
+	_tweensToDelete.clear();
+
+	for(auto iter = _posTweens.begin(); iter != _posTweens.end();)
+	{
+		Vector4f pos = iter->first->step(deltaSecond);
+		iter->second->SetPosition(pos);
+
+		if(iter->first->isEnd())
+		{
+			iter = _posTweens.erase(iter);
+		}
+		else
+		{
+			++iter;
+		}
+	}
+
+	for(auto iter = _scaleTweens.begin(); iter != _scaleTweens.end();)
+	{
+		Vector4f scale = iter->first->step(deltaSecond);
+		iter->second->SetScale(scale);
+
+		if(iter->first->isEnd())
+		{
+			iter = _scaleTweens.erase(iter);
+		}
+		else
+		{
+			++iter;
+		}
+	}
+
+	for(auto iter = _rotTweens.begin(); iter != _rotTweens.end();)
+	{
+		Quaternion rot = iter->first->step(deltaSecond);
+		iter->second->SetRotation(rot);
+
+		if(iter->first->isEnd())
+		{
+			iter = _rotTweens.erase(iter);
+		}
+		else
+		{
+			++iter;
+		}
+	}
+}
+
 void flt::Scene::CallCollisionEvent()
 {
 	//bool nextFlag = !_collisionFlag;
@@ -299,21 +363,7 @@ void flt::Scene::Update(float deltaSecond)
 		}
 	}
 
-	for(auto iter = _tweens.begin(); iter != _tweens.end(); ++iter)
-	{
-		bool isFinished = (*iter)->Update(deltaSecond);
-
-		if (isFinished)
-		{
-			_tweensToDelete.push_back(iter.GetIndex());
-		}
-	}
-
-	for (auto& index : _tweensToDelete)
-	{
-		_tweens.Erase(index);
-	}
-	_tweensToDelete.clear();
+	TweenUpdate(deltaSecond);
 
 	for (auto& object : _activeGameObjects)
 	{
@@ -554,4 +604,19 @@ void flt::Scene::EndScene()
 void flt::Scene::AddTween(IFLTween* tween)
 {
 	_tweens.EmplaceBack(tween);
+}
+
+void flt::Scene::AddPosTween(FLTween<Vector4f>* tween, Transform* tr)
+{
+	_posTweens.emplace_back(tween, tr);
+}
+
+void flt::Scene::AddScaleTween(FLTween<Vector4f>* tween, Transform* tr)
+{
+	_scaleTweens.emplace_back(tween, tr);
+}
+
+void flt::Scene::AddRotTween(FLTween<Quaternion>* tween, Transform* tr)
+{
+	_rotTweens.emplace_back(tween, tr);
 }
