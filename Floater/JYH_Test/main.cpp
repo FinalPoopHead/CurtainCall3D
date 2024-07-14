@@ -66,36 +66,35 @@ int main(int argc, char* argv[])
 		ret = flt::defaultLerp(i, j, 0.5f);
 		int xx = 0;
 
+		auto onStepFunc = [](const int& value)
+			{ 
+				for (int j = 0; j < value; ++j)
+				{
+					std::cout << " ";
+				}
+				std::cout << "*\n";
+			};
+
 		flt::FLTween tween = flt::tween::from(0)
 			.to(0).during(10.0f)
-			.to(100).during(100.0f).easing(flt::Bezier::EaseInOut())
+			.to(100).during(100.0f).easing(flt::Bezier::EaseInOut()).onStart([]() { std::cout << "Start\n"; }).onStep(onStepFunc).onEnd([]() { std::cout << "End\n"; })
 			.to(0).during(100.0f).easing(flt::Bezier::EaseIn());
 
 		for (int i = 0; i < 210; ++i)
 		{
 			int value = tween.step(1.0f);
-			for (int j = 0; j < value; ++j)
-			{
-				std::cout << " ";
-			}
-			std::cout << "*\n";
 		}
 
 		std::cout << "------------------\n";
 
 		flt::FLTween tweenPtr = flt::tween::from(&value)
 			.from(0)
-			.to(100).preDelay(10.0f).during(10.0f).postDelay(3.0f).easing(flt::Bezier::EaseInOut())
-			.to(0).preDelay(2.0f).during(100.0f).easing(flt::Bezier::EaseIn());
+			.to(100).preDelay(10.0f).during(10.0f).postDelay(3.0f).easing(flt::Bezier::EaseInOut()).onStep(onStepFunc)
+			.to(0).preDelay(2.0f).during(100.0f).easing(flt::Bezier::EaseIn()).onStep(onStepFunc);
 
 		for (int i = 0; i < 110; ++i)
 		{
 			tweenPtr.step(1.0f);
-			for (int j = 0; j < value; ++j)
-			{
-				std::cout << " ";
-			}
-			std::cout << "*\n";
 		}
 
 		std::cout << "------------------\n";

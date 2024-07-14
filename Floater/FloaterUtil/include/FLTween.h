@@ -50,6 +50,7 @@ namespace flt
 		FLTween(const FLTween& other);
 
 		virtual bool Update(float dt) override;
+
 		T step(float dt);
 		T seek(float dt);
 		T peek() const;
@@ -65,6 +66,10 @@ namespace flt
 		FLTween<T>& preDelay(float duration);
 		FLTween<T>& postDelay(float duration);
 		FLTween<T>& easing(std::function<float(float)> easing);
+
+		FLTween& onStart(std::function<void()> callback);
+		FLTween& onStep(std::function<void(const ValueType&)> callback);
+		FLTween& onEnd(std::function<void()> callback);
 
 	private:
 		float _elapsed;
@@ -124,6 +129,27 @@ namespace flt
 	flt::FLTween<T>& flt::FLTween<T>::postDelay(float duration)
 	{
 		_points[_points.size() - 2].postDelay = duration;
+		return *this;
+	}
+
+	template<typename T>
+	FLTween<T>& flt::FLTween<T>::onStart(std::function<void()> callback)
+	{
+		_points[_points.size() - 2].onStart = callback;
+		return *this;
+	}
+
+	template<typename T>
+	FLTween<T>& flt::FLTween<T>::onStep(std::function<void(const ValueType&)> callback)
+	{
+		_points[_points.size() - 2].onStep = callback;
+		return *this;
+	}
+
+	template<typename T>
+	FLTween<T>& flt::FLTween<T>::onEnd(std::function<void()> callback)
+	{
+		_points[_points.size() - 2].onEnd = callback;
 		return *this;
 	}
 
