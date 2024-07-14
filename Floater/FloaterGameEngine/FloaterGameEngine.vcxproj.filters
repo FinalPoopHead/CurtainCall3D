@@ -107,6 +107,9 @@
     <ClInclude Include="include\internal\DirectionalLight.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="include\internal\MakeTween.h">
+      <Filter>fltween</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -168,6 +171,9 @@
     </ClCompile>
     <ClCompile Include="DirectionalLight.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="MakeTween.cpp">
+      <Filter>fltween</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

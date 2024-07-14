@@ -258,6 +258,7 @@ namespace flt
 		//void Remove(const T& value) noexcept;
 		//void Remove(const iterator& it) noexcept;
 		void Erase(uint32 index) noexcept;
+		void Erase(const iterator& it) noexcept;
 		void Clear() noexcept;
 		iterator PushBack(T&& value) noexcept;
 		template<typename... Args>
@@ -414,6 +415,15 @@ namespace flt
 		_dense.pop_back();
 		_free.push_back(sparseIndex);
 	}
+
+
+	template<typename T>
+	void flt::SparseSet<T>::Erase(const iterator& it) noexcept
+	{
+		uint32 sparseIndex = _dense[it._denseIndex].sparseIndex;
+		Erase(sparseIndex);
+	}
+
 
 	template<typename T>
 	void flt::SparseSet<T>::Clear() noexcept

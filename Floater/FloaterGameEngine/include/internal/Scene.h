@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "GameObject.h"
 #include "Component.h"
+#include "../../../FloaterUtil/include/FLTween.h"
 #include "../../CollisionPair.h"
 #include "../../../FloaterUtil/include/Timer.h"
 #include "../../../FloaterUtil/include/SparseSet.h"
@@ -43,6 +44,7 @@ namespace flt
 		void StartScene();
 		void EndScene();
 
+		void AddTween(IFLTween* tween);
 
 		//std::vector<GameObject*> GetGameObjects() const { return _gameObjects; }
 		std::vector<GameObject*> GetGameObjects(const std::wstring& name) const;
@@ -75,6 +77,9 @@ namespace flt
 		//std::unordered_set<CollisionPair> _collisionSet;
 		bool _collisionFlag;
 		bool _isActive;
+
+		SparseSet<IFLTween*> _tweens;
+		std::vector<uint32> _tweensToDelete;
 	};
 
 	template<GameObjectDerived T, typename... TArgs>

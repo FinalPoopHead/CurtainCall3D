@@ -35,6 +35,7 @@
     <ClInclude Include="include\internal\DirectionalLight.h" />
     <ClInclude Include="include\internal\Scene.h" />
     <ClInclude Include="include\internal\RendererComponent.h" />
+    <ClInclude Include="include\internal\MakeTween.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="include\internal\SoundComponent.h" />
     <ClInclude Include="include\internal\RendererNode.h" />
@@ -55,6 +56,7 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="MakeTween.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="RendererNode.cpp" />
     <ClCompile Include="RendererComponent.cpp" />

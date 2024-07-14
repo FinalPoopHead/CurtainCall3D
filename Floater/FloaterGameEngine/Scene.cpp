@@ -299,6 +299,22 @@ void flt::Scene::Update(float deltaSecond)
 		}
 	}
 
+	for(auto iter = _tweens.begin(); iter != _tweens.end(); ++iter)
+	{
+		bool isFinished = (*iter)->Update(deltaSecond);
+
+		if (isFinished)
+		{
+			_tweensToDelete.push_back(iter.GetIndex());
+		}
+	}
+
+	for (auto& index : _tweensToDelete)
+	{
+		_tweens.Erase(index);
+	}
+	_tweensToDelete.clear();
+
 	for (auto& object : _activeGameObjects)
 	{
 		object->PostUpdate(deltaSecond);
@@ -533,4 +549,9 @@ void flt::Scene::EndScene()
 	_componentsToEnable.clear();
 	_componentsToDisable.clear();
 	_collisionPairs.clear();
+}
+
+void flt::Scene::AddTween(IFLTween* tween)
+{
+	_tweens.EmplaceBack(tween);
 }

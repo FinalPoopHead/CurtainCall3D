@@ -57,8 +57,8 @@ int main(int argc, char* argv[])
 	}
 
 	// 트윈 테스트
-	int value = 0;
-	int valueRef = 0;
+	int value = 100;
+	int valueRef = 100;
 	{
 		auto ret = flt::defaultLerp(1, 3, 0.5f);
 		int i = 2;
@@ -84,14 +84,14 @@ int main(int argc, char* argv[])
 		std::cout << "------------------\n";
 
 		flt::FLTween tweenPtr = flt::tween::from(&value)
-			.to(0).during(10.0f)
-			.to(100).during(100.0f).easing(flt::Bezier::EaseInOut())
-			.to(0).during(100.0f).easing(flt::Bezier::EaseIn());
+			.from(0)
+			.to(100).preDelay(10.0f).during(10.0f).postDelay(3.0f).easing(flt::Bezier::EaseInOut())
+			.to(0).preDelay(2.0f).during(100.0f).easing(flt::Bezier::EaseIn());
 
-		for (int i = 0; i < 210; ++i)
+		for (int i = 0; i < 110; ++i)
 		{
-			int* temp = tweenPtr.step(1.0f);
-			for (int j = 0; j < *temp; ++j)
+			tweenPtr.step(1.0f);
+			for (int j = 0; j < value; ++j)
 			{
 				std::cout << " ";
 			}
@@ -101,14 +101,14 @@ int main(int argc, char* argv[])
 		std::cout << "------------------\n";
 
 		flt::FLTween tweenRef = flt::tween::from<int&>(valueRef)
-			.to(0).during(10.0f)
-			.to(100).during(100.0f).easing(flt::Bezier::EaseInOut())
-			.to(0).during(100.0f).easing(flt::Bezier::EaseIn());
+			.from(50)
+			.to(100).preDelay(100.0f).during(10.0f).easing(flt::Bezier::EaseInOut())
+			.to(0).during(10.0f).easing(flt::Bezier::EaseIn());
 
-		for (int i = 0; i < 210; ++i)
+		for (int i = 0; i < 310; ++i)
 		{
-			int temp = tweenRef.step(1.0f);
-			for (int j = 0; j < temp; ++j)
+			tweenRef.step(1.0f);
+			for (int j = 0; j < valueRef; ++j)
 			{
 				std::cout << " ";
 			}
