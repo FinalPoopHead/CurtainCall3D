@@ -31,6 +31,7 @@ namespace Rocket::Core
 		virtual void SetText(const std::string& str) override;
 		virtual void SetColor(Color color) override;
 		virtual void SetTargetCameraIndex(int cameraIndex) override;
+		virtual void SetTextAlignment(eTextAlignment alignment) override;
 
 public:
 		void Render(DirectX::SpriteBatch* spriteBatch);
@@ -48,5 +49,6 @@ public:
 		Color _color;
 		Matrix _worldTM;
 		int _targetCameraIndex;
+		eTextAlignment _textAlignment;
 	};
 }

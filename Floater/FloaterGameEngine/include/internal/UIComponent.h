@@ -10,6 +10,7 @@ namespace flt
 	class IRenderer;
 	struct RendererObject;
 	class Image;
+	enum class eTextAlignment;
 
 	class UIComponent : public Component<UIComponent>
 	{
@@ -36,6 +37,7 @@ namespace flt
 		flt::Vector2f GetImageSize();
 		void SetSize(flt::Vector2f imgSize);
 		flt::Vector2f GetSize();
+		void SetTextAlignment(eTextAlignment alignMode);
 
 		void SetText(const std::wstring& text);
 		void SetFont(const std::wstring& fontPath);
@@ -61,6 +63,7 @@ namespace flt
 		flt::Vector2f _position;
 		flt::Vector2f _offsetPosition;
 		float _zOrder;
+		eTextAlignment _textAlignment;
 	};
 }
 

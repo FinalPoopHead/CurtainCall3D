@@ -301,6 +301,7 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 
 		rocketObject->textRenderer->SetFontwithPath(ToString(renderable.text.font));
 		rocketObject->textRenderer->SetColor({ renderable.text.color.r, renderable.text.color.g, renderable.text.color.b, renderable.text.color.a });
+		rocketObject->textRenderer->SetTextAlignment((Rocket::Core::eTextAlignment)renderable.text.textAlign);
 	}
 
 	Rocket::Core::ReleaseFactory(factory);

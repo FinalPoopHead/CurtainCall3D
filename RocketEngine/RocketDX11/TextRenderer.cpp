@@ -11,6 +11,7 @@ namespace Rocket::Core
 		, _color(DirectX::Colors::White)
 		, _worldTM(Matrix::Identity)
 		, _targetCameraIndex(0)
+		, _textAlignment(eTextAlignment::LEFT)
 	{
 
 	}
@@ -54,27 +55,45 @@ namespace Rocket::Core
 
 		std::wstring wstr(_text.begin(), _text.end());
 
-		Vector2 pos = Vector2(_worldTM.m[3][0], _worldTM.m[3][1]);
+		Vector3 pos;
+		Quaternion rot;
+		Vector3 scale;
+		_worldTM.Decompose(scale, rot, pos);
 
-		// TODO : 240617 현재 임시로 텍스트의 중앙이 좌표점이 되게끔 설정해놨음.
-		Vector2 origin = _font->MeasureString(wstr.c_str());
-		// origin /= 2.0f;
-		origin = { 0.0f,0.0f };	// TODO : 240617 임시로 좌측상단으로 롤백함.
+		float rot2D = rot.ToEuler().z;
+
+		Vector2 origin = { 0.0f,0.0f };
+
+		switch (_textAlignment)
+		{
+		case Rocket::Core::eTextAlignment::LEFT:
+			break;
+		case Rocket::Core::eTextAlignment::CENTER:
+			origin = _font->MeasureString(wstr.c_str(), false);
+			origin /= 2.0f;
+			break;
+		case Rocket::Core::eTextAlignment::RIGHT:
+			origin = _font->MeasureString(wstr.c_str(), false);
+			break;
+		default:
+			break;
+		}
 
 		// TODO : 240617 현재 임시로 테두리 모드를 기본으로 그리게 해놨음.
 		float borderSize = 1.0f;
-		_font->DrawString(spriteBatch, wstr.c_str(), pos + Vector2(borderSize, borderSize), DirectX::Colors::Black, 0.0f, origin);
-		_font->DrawString(spriteBatch, wstr.c_str(), pos + Vector2(-borderSize, borderSize), DirectX::Colors::Black, 0.0f, origin);
-		_font->DrawString(spriteBatch, wstr.c_str(), pos + Vector2(-borderSize, -borderSize), DirectX::Colors::Black, 0.0f, origin);
-		_font->DrawString(spriteBatch, wstr.c_str(), pos + Vector2(borderSize, -borderSize), DirectX::Colors::Black, 0.0f, origin);
+		_font->DrawString(spriteBatch, wstr.c_str(), pos + Vector2(borderSize, borderSize), DirectX::Colors::Black, rot2D, origin, scale);
+		_font->DrawString(spriteBatch, wstr.c_str(), pos + Vector2(-borderSize, borderSize), DirectX::Colors::Black, rot2D, origin, scale);
+		_font->DrawString(spriteBatch, wstr.c_str(), pos + Vector2(-borderSize, -borderSize), DirectX::Colors::Black, rot2D, origin, scale);
+		_font->DrawString(spriteBatch, wstr.c_str(), pos + Vector2(borderSize, -borderSize), DirectX::Colors::Black, rot2D, origin, scale);
 
 		_font->DrawString(
 			spriteBatch
 			, wstr.c_str()
 			, pos
 			, _color
-			, 0.0f
+			, rot2D
 			, origin
+			, scale
 		);
 	}
 
@@ -106,6 +125,11 @@ namespace Rocket::Core
 	void TextRenderer::SetTargetCameraIndex(int cameraIndex)
 	{
 		_targetCameraIndex = cameraIndex;
+	}
+
+	void TextRenderer::SetTextAlignment(eTextAlignment alignment)
+	{
+		_textAlignment = alignment;
 	}
 
 }

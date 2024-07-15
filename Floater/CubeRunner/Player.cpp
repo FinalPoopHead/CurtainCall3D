@@ -73,7 +73,7 @@ void Player::Update(float deltaSecond)
 		break;
 	case ePlayerState::FALLING:
 	{
-		if (tr.GetWorldPosition().y < -180.0f)
+		if (tr.GetWorldPosition().y < -400.0f)
 		{
 			camera->StopCamera();
 			_state = ePlayerState::GAMEOVER;
@@ -83,9 +83,9 @@ void Player::Update(float deltaSecond)
 
 		camera->TraceFalling();
 		_fallSpeed += 9.8f * deltaSecond;
-		if (_fallSpeed >= 50.0f)
+		if (_fallSpeed >= 60.0f)
 		{
-			_fallSpeed = 50.0f;
+			_fallSpeed = 60.0f;
 		}
 
 		tr.AddWorldPosition(0.0f, -_fallSpeed * deltaSecond, 0.0f);

@@ -35,6 +35,11 @@ void TextObject::SetTextColor(float r, float g, float b)
 	_uiRenderer->SetTextColor(r, g, b);
 }
 
+void TextObject::SetTextAlignment(eTextAlignment alignment)
+{
+	_uiRenderer->SetTextAlignment((flt::eTextAlignment)alignment);
+}
+
 void TextObject::SetPosition(flt::Vector2f pos)
 {
 	_uiRenderer->SetPosition(pos);

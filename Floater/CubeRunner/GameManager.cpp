@@ -20,6 +20,7 @@ constexpr flt::Vector2f COMBOTEXTPOSITION = { 0.05f,0.85f };
 constexpr flt::Vector2f HPPANEL_OFFSETPOS = { 0.9f,0.95f };
 constexpr flt::Vector2f TIMEPANEL_OFFSETPOS = { 0.8f,0.05f };
 constexpr flt::Vector2f STAGEINFOPANEL_OFFSETPOS = { 0.05f,0.1f };
+constexpr flt::Vector2f GAMEOVERPANEL_OFFSETPOS = { 0.5f,0.5f };
 
 constexpr float STAGESLOTZORDER = 0.2f;
 
@@ -49,6 +50,7 @@ GameManager::GameManager() :
 	, _fallCountSlot()
 	, _fallCountRed()
 	, _playTimeText()
+	, _gameoverText()
 	, _comboTextPool()
 	, _liveComboTexts()
 	, _isGameOver(std::vector<bool>(MAXPLAYERCOUNT))
@@ -108,6 +110,14 @@ GameManager::~GameManager()
 
 void GameManager::Update(float deltaSecond)
 {
+	for (auto& gameoverText : _gameoverText)
+	{
+		if (gameoverText->IsEnable())
+		{
+
+		}
+	}
+
 	for (auto& comboText : _liveComboTexts)
 	{
 		auto originOffset = comboText->GetOffsetPosition();
@@ -266,7 +276,7 @@ void GameManager::CreateUI(int index)
 		levelCounterSlot->tr.SetParent(&stageInfoPanel->tr);
 		levelCounterSlot->SetSprite(levelCounterSlotPath);
 		levelCounterSlot->SetZOrder(LEVELSLOTZORDER);
-		levelCounterSlot->SetPosition({ 62.0f + 50.0f * i, -18.0f});
+		levelCounterSlot->SetPosition({ 62.0f + 50.0f * i, -18.0f });
 
 		SpriteObject* levelCounterBlue = flt::CreateGameObject<SpriteObject>(false);
 		levelCounterBlue->tr.SetParent(&stageInfoPanel->tr);
@@ -303,6 +313,14 @@ void GameManager::CreateUI(int index)
 		_fallCountSlot[index].push_back(fallCountSlot);
 		_fallCountRed[index].push_back(hpRed);
 	}
+
+	TextObject* gameoverText = flt::CreateGameObject<TextObject>(false);
+	gameoverText->SetOffsetPosition(GAMEOVERPANEL_OFFSETPOS);
+	gameoverText->SetText(L"GAME OVER");
+	gameoverText->SetFont(fontPath);
+	gameoverText->SetTextColor(TextColor);
+	gameoverText->SetTextAlignment(eTextAlignment::CENTER);
+	_gameoverText.push_back(gameoverText);
 }
 
 void GameManager::SetBoardAndPlayer(int index, Board* board, Player* player)
@@ -495,7 +513,7 @@ void GameManager::OnEndLevel(int playerIndex)
 	{
 		_boards[playerIndex]->Reset();
 		_boards[playerIndex]->GenerateLevel(currentStage.level[levelIndex].levelLayout, currentStage.waveCount);
-		
+
 		for (int i = 0; i < _currentLevel[playerIndex]; ++i)
 		{
 			_levelCountBlue[playerIndex][i]->Enable();
@@ -505,12 +523,28 @@ void GameManager::OnEndLevel(int playerIndex)
 
 Player* GameManager::GetPlayer(int index)
 {
-	if(index < 0 || index >= _players.size())
+	if (index < 0 || index >= _players.size())
 	{
 		return nullptr;
 	}
 
 	return _players[index];
+}
+
+void GameManager::OnStartPlayerFall(int index)
+{
+	// TODO : UI 전부 끄고 UI 관련된거 전부 멈춰라.
+	
+	_stageInfoPanel[index]->Disable();
+	_fallCountPanel[index]->Disable();
+	_playTimeText[index]->Disable();
+	_isGameOver[index] = true;
+}
+
+void GameManager::OnEndPlayerFall(int index)
+{
+	_gameoverText[index]->Enable();
+	_gameoverText[index]->tr.SetScale({5.0f,5.0f,5.0f});
 }
 
 void GameManager::IncreasePlayerCount()
@@ -545,6 +579,12 @@ void GameManager::IncreasePlayerCount()
 			{
 				auto originOffset = _stageInfoPanel[i]->GetOffsetPosition();
 				_stageInfoPanel[i]->SetOffsetPosition({ offSetBase + originOffset.x / MAXPLAYERCOUNT, originOffset.y });
+			}
+
+			if (_gameoverText[i] != nullptr)
+			{
+				auto originOffset = _gameoverText[i]->GetOffsetPosition();
+				_gameoverText[i]->SetOffsetPosition({ offSetBase + originOffset.x / MAXPLAYERCOUNT, originOffset.y });
 			}
 
 			_comboTextPos[i] = { offSetBase + COMBOTEXTPOSITION.x / MAXPLAYERCOUNT, COMBOTEXTPOSITION.y };
