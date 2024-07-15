@@ -606,6 +606,8 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 			_waveCubeControllers.push_front(waveCubes);
 			waveCubes.clear();
 		}
+
+		_soundComponent->Play(_soundIndex["Generate"]);
 	}
 
 	_boardState = eBoardState::CUBEGENERATING;
@@ -653,7 +655,6 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 	}
 
 	_isFirst = isFirst;
-	_soundComponent->Play(_soundIndex["Generate"]);
 }
 
 void Board::GenerateGarbageLine(int lineCount)
@@ -723,6 +724,8 @@ void Board::GenerateGarbageLine(int lineCount)
 			_tiles[i][j]->_cube = cube;
 			_nowGeneratingCount++;
 		}
+
+		_soundComponent->Play(_soundIndex["Generate"]);
 	}
 
 	_boardState = eBoardState::CUBEGENERATING;
@@ -744,7 +747,6 @@ void Board::GenerateGarbageLine(int lineCount)
 	_isCameraWorking = true;
 
 	_isFirst = false;
-	_soundComponent->Play(_soundIndex["Generate"]);
 }
 
 void Board::TickCubesRolling(float rollingTime)
@@ -983,6 +985,8 @@ void Board::DetonateAdvantageMine()
 		return;
 	}
 
+	bool isSuccess = false;
+
 	for (int i = 0; i < _width; i++)
 	{
 		for (int j = 0; j < _height; j++)
@@ -1007,11 +1011,17 @@ void Board::DetonateAdvantageMine()
 						_tiles[nextX][nextY]->EnableDetonated();
 					}
 				}
+
+				isSuccess = true;
 			}
 
 		}
 	}
-	_soundComponent->Play(_soundIndex["DetonateAdvantage"]);
+
+	if (isSuccess)
+	{
+		_soundComponent->Play(_soundIndex["DetonateAdvantage"]);
+	}
 }
 
 void Board::OnEndCubeRoll()
@@ -1098,8 +1108,31 @@ void Board::OnEndTileFall(int x, int z)
 
 void Board::AddColumn()
 {
-	// TODO : 구현 필요
 	ASSERT(false, "not Implemented");
+
+	// TODO : 구현 필요
+	_nowAddTileCount = _width;
+	++_nextDestroyRow;
+	_boardState = eBoardState::ADDTILE;
+
+	for (int i = 0; i < _width; i++)
+	{
+		Tile* tile = GetTileFromPool();
+		_addTiles.push_back(tile);
+
+		float x = 0.0f;
+		float z = 0.0f;
+		ConvertToTileLocalPosition(i, _height + 16, x, z);
+
+		tile->tr.SetPosition({ x, 0.0f, z });
+
+		ConvertToTileLocalPosition(i, _height, x, z);
+		x += tr.GetWorldPosition().x;
+		z += tr.GetWorldPosition().z;
+
+		// TODO : StartAddComlumn이라고 하나 더 만들어야겠네? 이게 맞나?!
+		tile->StartAddRow(ADDTILE_TIME, { x,0.0f,z });
+	}
 }
 
 void Board::DestroyRow()
