@@ -1,17 +1,20 @@
 ﻿#pragma once
 #include <vector>
 #include <functional>
+#include <type_traits>
+#include <algorithm>
+#include "FloaterMacro.h"
 
 
 namespace flt
 {
 	template<typename T>
-	class FLTween;
+	using LerpFunction = T(*)(const T& a, const T& b, float t);
 
-	namespace tween
+	template<typename T>
+	T defaultLerp(const T& a, const T& b, float t)
 	{
-		template<typename T>
-		FLTween<T> from(const T& value);
+		return a + (b - a) * t;
 	}
 
 	template<typename T>
@@ -22,21 +25,33 @@ namespace flt
 
 		T value;
 		float duration;
+		float preDelay;
+		float postDelay;
 		std::function<float(float)> easing;
+
+		std::function<void()> onStart;
+		std::function<void(const T&)> onStep;
+		std::function<void()> onEnd;
+	};
+
+	class IFLTween
+	{
+	public:
+		virtual bool Update(float dt) = 0;
 	};
 
 	template<typename T>
-	class FLTween
+	class FLTween : public IFLTween
 	{
-		//template<typename U>
-		//friend FLTween<U> tween::from(const U& value);
+		using ValueType = std::remove_pointer_t<std::remove_reference_t<T>>;
 
-		friend FLTween<T> tween::from<T>(const T& value);
 	public:
-		FLTween();
-		FLTween(const FLTween& other);
+		FLTween(T target, LerpFunction<ValueType> lerp);
+		FLTween(const FLTween<T>& other);
 
+		bool isEnd() const { return _current >= _points.size(); }
 
+		virtual bool Update(float dt) override;
 
 		T step(float dt);
 		T seek(float dt);
@@ -47,24 +62,33 @@ namespace flt
 		//FLTween& onStep(std::function<bool(T)> callback);
 		//FLTween& onStep(std::function<bool()> callback);
 
-		static FLTween<T> from(T value);
+		FLTween<T>& from(const ValueType& value);
+		FLTween<T>& to(const ValueType& value);
+		FLTween<T>& during(float duration);
+		FLTween<T>& preDelay(float duration);
+		FLTween<T>& postDelay(float duration);
+		FLTween<T>& easing(std::function<float(float)> easing);
 
-		FLTween& to(const T& value);
-		FLTween& during(float duration);
-		FLTween& easing(std::function<float(float)> easing);
+		FLTween<T>& onStart(std::function<void()> callback);
+		FLTween<T>& onStep(std::function<void(const ValueType&)> callback);
+		FLTween<T>& onEnd(std::function<void()> callback);
 
 	private:
 		float _elapsed;
 		int _current;
-		std::vector<FLTweenPoint<T>> _points;
+		std::vector<FLTweenPoint<ValueType>> _points;
+		LerpFunction<ValueType> _lerp;
+		T _target;
 	};
 
-	template<typename T>
-	FLTween<T> tween::from(const T& value)
+	namespace tween
 	{
-		FLTween<T> tween;
-		tween._points.emplace_back(value);
-		return tween;
+		template<typename T>
+		FLTween<T> from(const T& value)
+		{
+			FLTween<T> tween{ value, defaultLerp<std::remove_pointer_t<std::remove_cvref_t<T>>> };
+			return tween;
+		}
 	}
 
 	template<typename T>
@@ -77,8 +101,8 @@ namespace flt
 	template<typename T>
 	T flt::FLTween<T>::peek() const
 	{
-		float t = _points[_current].easing(_elapsed / _points[_current].duration);
-		return _points[_current].value * (1.0f - t) + _points[_current + 1].value * t;
+		ASSERT(false, "Not implemented");
+		return T{};
 	}
 
 	template<typename T>
@@ -95,69 +119,187 @@ namespace flt
 		return *this;
 	}
 
-	template<typename T>
-	T flt::FLTween<T>::step(float dt)
-	{
-		if (_current >= _points.size())
-		{
-			return _points.back().value;
-		}
-
-		_elapsed += dt;
-
-		while (_elapsed >= _points[_current].duration)
-		{
-			_elapsed -= _points[_current].duration;
-			_current++;
-			if (_current >= _points.size())
-			{
-				return _points.back().value;
-			}
-		}
-
-		float t = _points[_current].easing(_elapsed / _points[_current].duration);
-
-		return _points[_current].value * (1.0f - t) + _points[_current + 1].value * t;
-	}
 
 	template<typename T>
-	FLTween<T>& FLTween<T>::to(const T& value)
+	flt::FLTween<T>& flt::FLTween<T>::preDelay(float duration)
 	{
-		_points.push_back(FLTweenPoint<T>(value));
+		_points[_points.size() - 2].preDelay = duration;
 		return *this;
 	}
 
 	template<typename T>
-	flt::FLTween<T> flt::FLTween<T>::from(T value)
+	flt::FLTween<T>& flt::FLTween<T>::postDelay(float duration)
 	{
-		FLTween<T> tween;
-		tween._points.push_back(FLTweenPoint<T>(value));
-		return tween;
+		_points[_points.size() - 2].postDelay = duration;
+		return *this;
 	}
 
 	template<typename T>
-	flt::FLTweenPoint<T>::FLTweenPoint() : value(), duration(0.0f), easing([](float t) {return t; })
+	FLTween<T>& flt::FLTween<T>::onStart(std::function<void()> callback)
+	{
+		_points[_points.size() - 2].onStart = callback;
+		return *this;
+	}
+
+	template<typename T>
+	FLTween<T>& flt::FLTween<T>::onStep(std::function<void(const ValueType&)> callback)
+	{
+		_points[_points.size() - 2].onStep = callback;
+		return *this;
+	}
+
+	template<typename T>
+	FLTween<T>& flt::FLTween<T>::onEnd(std::function<void()> callback)
+	{
+		_points[_points.size() - 2].onEnd = callback;
+		return *this;
+	}
+
+	template<typename T>
+	bool flt::FLTween<T>::Update(float dt)
+	{
+		step(dt);
+
+		return _current >= _points.size();
+	}
+
+	template<typename T>
+	T flt::FLTween<T>::step(float dt)
+	{
+		ASSERT(_points.size() >= 2, "At least two points are required.");
+
+		//가장 마지막을 지난다면 마지막 값을 반환
+		if (_current >= _points.size())
+		{
+			if constexpr (std::is_pointer_v<T>)
+			{
+				*_target = _points.back().value;
+			}
+			else
+			{
+				_target = _points.back().value;
+			}
+
+			return _target;
+		}
+
+		_elapsed += dt;
+
+		float pointTime = _points[_current].preDelay + _points[_current].duration + _points[_current].postDelay;
+		while (_elapsed >= pointTime)
+		{
+			_elapsed -= pointTime;
+			_points[_current].onEnd();
+			_current++;
+
+			// 가장 마지막을 지난다면 마지막 값을 반환
+			if (_current >= _points.size())
+			{
+				if constexpr (std::is_pointer_v<T>)
+				{
+					*_target = _points.back().value;
+				}
+				else
+				{
+					_target = _points.back().value;
+				}
+
+				return _target;
+			}
+
+			_points[_current].onStart();
+			pointTime = _points[_current].preDelay + _points[_current].duration + _points[_current].postDelay;
+		}
+
+		float t = (_elapsed - _points[_current].preDelay) / _points[_current].duration;
+		t = std::clamp(t, 0.0f, 1.0f);
+		t = _points[_current].easing(t);
+
+		if constexpr (std::is_pointer_v<T>)
+		{
+			*_target = _lerp(_points[_current].value, _points[_current + 1].value, t);
+			_points[_current].onStep(*_target);
+		}
+		else
+		{
+			_target = _lerp(_points[_current].value, _points[_current + 1].value, t);
+			_points[_current].onStep(_target);
+		}
+
+		return _target;
+	}
+
+	template<typename T>
+	FLTween<T>& flt::FLTween<T>::from(const ValueType& value)
+	{
+		_points[0].value = value;
+		return *this;
+	}
+
+
+	template<typename T>
+	FLTween<T>& FLTween<T>::to(const ValueType& value)
+	{
+		_points.push_back(FLTweenPoint<ValueType>(value));
+		return *this;
+	}
+
+	//template<typename T, auto Lerp>
+	//flt::FLTween<T, Lerp> flt::FLTween<T, Lerp>::from(const T& value)
+	//{
+	//	FLTween<T> tween{ value };
+	//	if constexpr (std::is_pointer_v<T>)
+	//	{
+	//		tween._points.emplace_back(*value);
+	//	}
+	//	else
+	//	{
+	//		tween._points.emplace_back(value);
+	//	}
+	//	return tween;
+	//}
+
+	template<typename T>
+	flt::FLTweenPoint<T>::FLTweenPoint()
+		: value()
+		, duration(0.0f), preDelay(0.0f), postDelay(0.0f)
+		, easing([](float t) { return t; })
+		, onStart([]() {}), onStep([](const T&) {}), onEnd([]() {})
 	{
 
 	}
 
 	template<typename T>
-	flt::FLTweenPoint<T>::FLTweenPoint(const T& value) : value(value), duration(0.0f), easing([](float t) {return t; })
+	flt::FLTweenPoint<T>::FLTweenPoint(const T& value)
+		: value(value)
+		, duration(0.0f), preDelay(0.0f), postDelay(0.0f)
+		, easing([](float t) {return t; })
+		, onStart([]() {}), onStep([](const T&) {}), onEnd([]() {})
 	{
 
 	}
 
 
 	template<typename T>
-	flt::FLTween<T>::FLTween() : _elapsed(0.0f), _current(0), _points()
+	flt::FLTween<T>::FLTween(T target, LerpFunction<ValueType> lerp) : _elapsed(0.0f), _current(0), _points(), _lerp(lerp), _target(target)
 	{
-
+		if constexpr (std::is_pointer_v<T>)
+		{
+			to(*target);
+		}
+		else
+		{
+			to(target);
+		}
 	}
 
 
 	template<typename T>
-	flt::FLTween<T>::FLTween(const FLTween& other) : _elapsed(other._elapsed), _current(other._current), _points(other._points)
+	flt::FLTween<T>::FLTween(const FLTween& other) : _elapsed(other._elapsed), _current(other._current), _points(other._points), _lerp(other._lerp), _target(other._target)
 	{
 
 	}
+
+	//template <typename T, auto Lerp>
+	//FLTween<T, Lerp>(const FLTween<T, Lerp>& other) -> FLTween<T, Lerp>;
 }

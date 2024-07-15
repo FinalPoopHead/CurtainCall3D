@@ -160,7 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\Bezier.h" />
-    <ClInclude Include="Ease.h" />
+    <ClInclude Include="include\Ease.h" />
     <ClInclude Include="include\Common.h" />
     <ClInclude Include="include\FloaterMath.h" />
     <ClInclude Include="include\Matrix4f.h" />
@@ -173,6 +173,7 @@
   <ItemGroup>
     <ClCompile Include="Bezier.cpp" />
     <ClCompile Include="Common.cpp" />
+    <ClCompile Include="Ease.cpp" />
     <ClCompile Include="Matrix3f.cpp" />
     <ClCompile Include="Matrix4f.cpp" />
     <ClCompile Include="Quaternion.cpp" />

@@ -26,39 +26,95 @@ int main(int argc, char* argv[])
 	setlocale(LC_ALL, ".UTF8");
 	std::cout << std::boolalpha;
 
-	{
+	///자료구조 테스트
+	/*{
 		using namespace flt;
 
 		StaticArray arr = { 1, 2, 3 };
-		StaticArray arr2(2, 3, 4);
+		//StaticArray arr2(2, 3, 4);
 
-		StaticArray<int, 10> arr3{ 1, 2, };
+		//StaticArray<int, 10> arr3{ 1, 2, };
 
-		int test = arr[0];
-		test = arr.At(1);
-		test = arr[2];
-		test = arr.At(3);
+		//int test = arr[0];
+		//test = arr.At(1);
+		//test = arr[2];
+		//test = arr.At(3);
 
-		test = arr2[0];
-		test = arr2.At(1);
-		test = arr2[2];
-		test = arr2.At(3);
+		//test = arr2[0];
+		//test = arr2.At(1);
+		//test = arr2[2];
+		//test = arr2.At(3);
 
-		//std::array stdArr = { 1, 2, 3 };
-		//std::array staArr2(2, 3, 4);
+		////std::array stdArr = { 1, 2, 3 };
+		////std::array staArr2(2, 3, 4);
 
-		int i = 0;
-	}
+		//int i = 0;
+	}*/
 
-	//flt::Info(L"Hello {}!", L"World");
+	/// 로그 테스트
+	/*{
+		flt::Info(L"Hello {}!", L"World");
+	}*/
 
-	auto tween = flt::tween::from(0).to(100).during(100.0f);
+	/// 트윈 테스트
+	/*{
+		int value = 100;
+		int valueRef = 100;
 
-	for(int i = 0; i < 100; ++i)
-	{
-		std::cout << tween.step(1.0f) << std::endl;
-	}
+		auto ret = flt::defaultLerp(1, 3, 0.5f);
+		int i = 2;
+		int j = 6;
+		ret = flt::defaultLerp(i, j, 0.5f);
+		int xx = 0;
 
+		auto onStepFunc = [](const int& value)
+			{ 
+				for (int j = 0; j < value; ++j)
+				{
+					std::cout << " ";
+				}
+				std::cout << "*\n";
+			};
+
+		flt::FLTween tween = flt::tween::from(0)
+			.to(0).during(10.0f)
+			.to(100).during(100.0f).easing(flt::Bezier::EaseInOut()).onStart([]() { std::cout << "Start\n"; }).onStep(onStepFunc).onEnd([]() { std::cout << "End\n"; })
+			.to(0).during(100.0f).easing(flt::Bezier::EaseIn());
+
+		for (int i = 0; i < 210; ++i)
+		{
+			int value = tween.step(1.0f);
+		}
+
+		std::cout << "------------------\n";
+
+		flt::FLTween tweenPtr = flt::tween::from(&value)
+			.from(0)
+			.to(100).preDelay(10.0f).during(10.0f).postDelay(3.0f).easing(flt::Bezier::EaseInOut()).onStep(onStepFunc)
+			.to(0).preDelay(2.0f).during(100.0f).easing(flt::Bezier::EaseIn()).onStep(onStepFunc);
+
+		for (int i = 0; i < 110; ++i)
+		{
+			tweenPtr.step(1.0f);
+		}
+
+		std::cout << "------------------\n";
+
+		flt::FLTween tweenRef = flt::tween::from<int&>(valueRef)
+			.from(50)
+			.to(100).preDelay(100.0f).during(10.0f).easing(flt::Bezier::EaseInOut())
+			.to(0).during(10.0f).easing(flt::Bezier::EaseIn());
+
+		for (int i = 0; i < 310; ++i)
+		{
+			tweenRef.step(1.0f);
+			for (int j = 0; j < valueRef; ++j)
+			{
+				std::cout << " ";
+			}
+			std::cout << "*\n";
+		}
+	}*/
 
 	std::filesystem::path path = std::filesystem::current_path();
 
