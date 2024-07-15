@@ -107,7 +107,7 @@
     <ClInclude Include="include\internal\DirectionalLight.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="include\internal\MakeTween.h">
+    <ClInclude Include="include\MakeTween.h">
       <Filter>fltween</Filter>
     </ClInclude>
   </ItemGroup>

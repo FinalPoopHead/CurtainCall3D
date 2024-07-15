@@ -163,6 +163,7 @@
     <ClInclude Include="include\Ease.h" />
     <ClInclude Include="include\Common.h" />
     <ClInclude Include="include\FloaterMath.h" />
+    <ClInclude Include="include\FloaterMathDefine.h" />
     <ClInclude Include="include\Matrix4f.h" />
     <ClInclude Include="include\Quaternion.h" />
     <ClInclude Include="include\Vector2f.h" />

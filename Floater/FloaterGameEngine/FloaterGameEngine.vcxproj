@@ -35,7 +35,7 @@
     <ClInclude Include="include\internal\DirectionalLight.h" />
     <ClInclude Include="include\internal\Scene.h" />
     <ClInclude Include="include\internal\RendererComponent.h" />
-    <ClInclude Include="include\internal\MakeTween.h" />
+    <ClInclude Include="include\MakeTween.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="include\internal\SoundComponent.h" />
     <ClInclude Include="include\internal\RendererNode.h" />

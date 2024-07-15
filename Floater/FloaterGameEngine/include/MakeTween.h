@@ -1,8 +1,8 @@
 ﻿#pragma once
-#include "Scene.h"
-#include "../../../FloaterUtil/include/FLTween.h"
-#include "../../../FloaterRendererCommon/include/Transform.h"
-#include "../../../FloaterMath/include/Ease.h"
+#include "./internal/Scene.h"
+#include "../../FloaterUtil/include/FLTween.h"
+#include "../../FloaterRendererCommon/include/Transform.h"
+#include "../../FloaterMath/include/Ease.h"
 #include <type_traits>
 
 namespace flt
