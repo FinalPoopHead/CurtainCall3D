@@ -697,6 +697,7 @@ void Board::OnEndWave()
 {
 	if (_isPerfect)
 	{
+		_fastForwardValue = FFDEFAULT;
 		AddRow();
 		MoveCameraToEnd();
 		// TODO : 상대방 공격하는게 되긴 하는데.. 좀 요상하다 ㅋㅋㅋㅋ
