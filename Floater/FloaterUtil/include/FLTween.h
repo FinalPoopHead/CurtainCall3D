@@ -14,7 +14,7 @@ namespace flt
 	template<typename T>
 	T defaultLerp(const T& a, const T& b, float t)
 	{
-		return a + (b - a) * t;
+		return static_cast<T>(a + (b - a) * t);
 	}
 
 	template<typename T>
@@ -37,7 +37,10 @@ namespace flt
 	class IFLTween
 	{
 	public:
+		virtual ~IFLTween() = default;
+
 		virtual bool Update(float dt) = 0;
+		virtual void ResetProgress() = 0;
 	};
 
 	template<typename T>
@@ -52,6 +55,7 @@ namespace flt
 		bool isEnd() const { return _current >= _points.size(); }
 
 		virtual bool Update(float dt) override;
+		virtual void ResetProgress() override { _current = 0; _elapsed = 0.0f; }
 
 		T step(float dt);
 		T seek(float dt);

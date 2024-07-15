@@ -141,7 +141,7 @@ void flt::GameObject::Destroy()
 
 bool flt::GameObject::AddComponent(ComponentBase* component)
 {
-	int index = component->GetIndex();
+	uint32 index = component->GetIndex();
 
 	if (_components.Capacity() <= index)
 	{
@@ -229,7 +229,7 @@ bool flt::GameObject::CheckEnableRecursive() const
 
 void flt::GameObject::RemoveComponent(ComponentBase* component)
 {
-	int index = component->GetIndex();
+	uint32 index = component->GetIndex();
 	if (_components.Capacity() <= index)
 	{
 		return;

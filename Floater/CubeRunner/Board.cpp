@@ -1010,7 +1010,7 @@ void Board::OnEndTileFall(int x, int z)
 void Board::AddColumn()
 {
 	// TODO : 구현 필요
-	ASSERT(false);
+	ASSERT(false, "not Implemented");
 }
 
 void Board::DestroyRow()

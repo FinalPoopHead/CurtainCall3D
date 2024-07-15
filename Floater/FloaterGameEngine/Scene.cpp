@@ -1,23 +1,22 @@
 ﻿#include "./include/internal/Scene.h"
 
 
-flt::Scene::Scene() :
-	_gameObjects(),
-	_activeGameObjects(),
-	_stagingActiveGameObjects(),
-	_gameObjectsToCreate(),
-	_gameObjectsToDestroy(),
-	_componentsToEnable(),
-	_componentsToDisable(),
-	_collisionPairs(),
-	_collisionFlag(false),
-	_isActive(false)
+flt::Scene::Scene()
+	: _gameObjects()
+	, _activeGameObjects()
+	, _stagingActiveGameObjects()
+	, _gameObjectsToCreate()
+	, _gameObjectsToDestroy()
+	//,_componentsToEnable()
+	//,_componentsToDisable()
+	, _collisionPairs()
+	, _collisionFlag(false)
+	, _isActive(false)
 {
 }
 
 flt::Scene::~Scene()
 {
-	
 }
 
 std::vector<flt::GameObject*> flt::Scene::GetGameObjects(const std::wstring& name) const
@@ -62,18 +61,6 @@ void flt::Scene::AddEnableGameObject(GameObject* gameObject, bool isEnable)
 	_stagingActiveGameObjects[gameObject] = isEnable;
 }
 
-void flt::Scene::AddEnableComponent(ComponentBase* component, bool isEnable)
-{
-	if (isEnable)
-	{
-		_componentsToEnable.emplace_back(component);
-	}
-	else
-	{
-		_componentsToDisable.emplace_back(component);
-	}
-}
-
 void flt::Scene::AddDestroyGameObject(GameObject* gameObject)
 {
 	bool isExist = false;
@@ -92,64 +79,61 @@ void flt::Scene::AddDestroyGameObject(GameObject* gameObject)
 
 void flt::Scene::TweenUpdate(float deltaSecond)
 {
-	for (auto iter = _tweens.begin(); iter != _tweens.end(); ++iter)
+	for (uint32 i = 0; i < _tweens.Size();)
 	{
-		bool isFinished = (*iter)->Update(deltaSecond);
-
+		bool isFinished = _tweens[i]->Update(deltaSecond);
 		if (isFinished)
 		{
-			_tweensToDelete.push_back(iter.GetIndex());
-		}
-	}
-
-	for (auto& index : _tweensToDelete)
-	{
-		_tweens.Erase(index);
-	}
-	_tweensToDelete.clear();
-
-	for(auto iter = _posTweens.begin(); iter != _posTweens.end();)
-	{
-		Vector4f pos = iter->first->step(deltaSecond);
-		iter->second->SetPosition(pos);
-
-		if(iter->first->isEnd())
-		{
-			iter = _posTweens.erase(iter);
+			_tweens.Erase(i);
 		}
 		else
 		{
-			++iter;
+			++i;
 		}
 	}
 
-	for(auto iter = _scaleTweens.begin(); iter != _scaleTweens.end();)
+	for (uint32 i = 0; i < _posTweens.Size();)
 	{
-		Vector4f scale = iter->first->step(deltaSecond);
-		iter->second->SetScale(scale);
+		Vector4f pos = _posTweens[i].first->step(deltaSecond);
+		_posTweens[i].second->SetPosition(pos);
 
-		if(iter->first->isEnd())
+		if (_posTweens[i].first->isEnd())
 		{
-			iter = _scaleTweens.erase(iter);
+			_posTweens.Erase(i);
 		}
 		else
 		{
-			++iter;
+			++i;
 		}
 	}
 
-	for(auto iter = _rotTweens.begin(); iter != _rotTweens.end();)
+	for (uint32 i = 0; i < _scaleTweens.Size();)
 	{
-		Quaternion rot = iter->first->step(deltaSecond);
-		iter->second->SetRotation(rot);
+		Vector4f scale = _scaleTweens[i].first->step(deltaSecond);
+		_scaleTweens[i].second->SetScale(scale);
 
-		if(iter->first->isEnd())
+		if (_scaleTweens[i].first->isEnd())
 		{
-			iter = _rotTweens.erase(iter);
+			_scaleTweens.Erase(i);
 		}
 		else
 		{
-			++iter;
+			++i;
+		}
+	}
+
+	for (uint32 i = 0; i < _rotTweens.Size();)
+	{
+		Quaternion rot = _rotTweens[i].first->step(deltaSecond);
+		_rotTweens[i].second->SetRotation(rot);
+
+		if (_rotTweens[i].first->isEnd())
+		{
+			_rotTweens.Erase(i);
+		}
+		else
+		{
+			++i;
 		}
 	}
 }
@@ -440,19 +424,19 @@ void flt::Scene::StartFrame()
 		}
 	}
 
-	while (!_componentsToEnable.empty())
-	{
-		ComponentBase* component = _componentsToEnable.back();
-		_componentsToEnable.pop_back();
+	//while (!_componentsToEnable.empty())
+	//{
+	//	ComponentBase* component = _componentsToEnable.back();
+	//	_componentsToEnable.pop_back();
 
-		if (component->_isEnable == true)
-		{
-			continue;
-		}
+	//	if (component->_isEnable == true)
+	//	{
+	//		continue;
+	//	}
 
-		component->_isEnable = true;
-		component->OnEnable();
-	}
+	//	component->_isEnable = true;
+	//	component->OnEnable();
+	//}
 
 	for (int i = 0; i < _gameObjectsToDestroy.size(); ++i)
 	{
@@ -460,19 +444,19 @@ void flt::Scene::StartFrame()
 		object->Disable();
 	}
 
-	while (!_componentsToDisable.empty())
-	{
-		ComponentBase* component = _componentsToDisable.back();
-		_componentsToDisable.pop_back();
+	//while (!_componentsToDisable.empty())
+	//{
+	//	ComponentBase* component = _componentsToDisable.back();
+	//	_componentsToDisable.pop_back();
 
-		if (component->_isEnable == false)
-		{
-			continue;
-		}
+	//	if (component->_isEnable == false)
+	//	{
+	//		continue;
+	//	}
 
-		component->_isEnable = false;
-		component->OnDisable();
-	}
+	//	component->_isEnable = false;
+	//	component->OnDisable();
+	//}
 
 	// Destroy 처리
 	while (!_gameObjectsToDestroy.empty())
@@ -481,7 +465,7 @@ void flt::Scene::StartFrame()
 		_gameObjectsToDestroy.pop_back();
 
 		int index = object->_index;
-		if(index == -1)
+		if (index == -1)
 		{
 			continue;
 		}
@@ -519,7 +503,7 @@ void flt::Scene::StartFrame()
 		_stagingActiveGameObjects.erase(iter);
 	}
 
-	while(!_gameObjectsToDelete.empty())
+	while (!_gameObjectsToDelete.empty())
 	{
 		GameObject* object = _gameObjectsToDelete.back();
 		_gameObjectsToDelete.pop_back();
@@ -596,27 +580,132 @@ void flt::Scene::EndScene()
 	_activeGameObjects.Clear();
 	_stagingActiveGameObjects.clear();
 	_gameObjectsToDestroy.clear();
-	_componentsToEnable.clear();
-	_componentsToDisable.clear();
 	_collisionPairs.clear();
 }
 
 void flt::Scene::AddTween(IFLTween* tween)
 {
-	_tweens.EmplaceBack(tween);
+	//_tweens.emplace_back(tween);
+	_tweenMap[tween] = { TweenType::none, UINT_MAX, nullptr };
 }
 
 void flt::Scene::AddPosTween(FLTween<Vector4f>* tween, Transform* tr)
 {
-	_posTweens.emplace_back(tween, tr);
+	//_posTweens.emplace_back(tween, tr);
+	_tweenMap[static_cast<IFLTween*>(tween)] = { TweenType::pos, UINT_MAX, tr };
 }
 
 void flt::Scene::AddScaleTween(FLTween<Vector4f>* tween, Transform* tr)
 {
-	_scaleTweens.emplace_back(tween, tr);
+	//_scaleTweens.emplace_back(tween, tr);
+	_tweenMap[static_cast<IFLTween*>(tween)] = { TweenType::scale, UINT_MAX, tr };
 }
 
 void flt::Scene::AddRotTween(FLTween<Quaternion>* tween, Transform* tr)
 {
-	_rotTweens.emplace_back(tween, tr);
+	//_rotTweens.emplace_back(tween, tr);
+	_tweenMap[static_cast<IFLTween*>(tween)] = { TweenType::rot, UINT_MAX, tr };
+}
+
+void flt::Scene::StartTween(IFLTween* tween)
+{
+	auto iter = _tweenMap.find(tween);
+	if (iter == _tweenMap.end())
+	{
+		ASSERT(false, "Not exist tween");
+		return;
+	}
+
+	if(iter->second.index != UINT_MAX)
+	{
+		ASSERT(false, "Already Activated");
+		return;
+	}
+
+	uint32 index = UINT_MAX;
+	switch (iter->second.type)
+	{
+		case flt::Scene::TweenType::none:
+		{
+			index = _tweens.EmplaceBack(tween).GetIndex();
+		}
+		break;
+		case flt::Scene::TweenType::pos:
+		{
+			index = _posTweens.EmplaceBack(static_cast<FLTween<Vector4f>*>(tween), iter->second.tr).GetIndex();
+		}
+		break;
+		case flt::Scene::TweenType::scale:
+		{
+			index = _scaleTweens.EmplaceBack(static_cast<FLTween<Vector4f>*>(tween), iter->second.tr).GetIndex();
+		}
+		break;
+		case flt::Scene::TweenType::rot:
+		{
+			index = _rotTweens.EmplaceBack(static_cast<FLTween<Quaternion>*>(tween), iter->second.tr).GetIndex();
+
+		}
+		break;
+		default:
+			break;
+	}
+	iter->first->ResetProgress();
+	iter->second.index = index;
+}
+
+void flt::Scene::StopTween(IFLTween* tween)
+{
+	auto iter = _tweenMap.find(tween);
+	if (iter == _tweenMap.end())
+	{
+		ASSERT(false, "Not exist tween");
+		return;
+	}
+
+	if (iter->second.index == UINT_MAX)
+	{
+		ASSERT(false, "Not Activated");
+		return;
+	}
+
+	switch (iter->second.type)
+	{
+		case flt::Scene::TweenType::none:
+		{
+			_tweens.Erase(iter->second.index);
+		}
+		break;
+		case flt::Scene::TweenType::pos:
+		{
+			_posTweens.Erase(iter->second.index);
+		}
+		break;
+		case flt::Scene::TweenType::scale:
+		{
+			_scaleTweens.Erase(iter->second.index);
+		}
+		break;
+		case flt::Scene::TweenType::rot:
+		{
+			_rotTweens.Erase(iter->second.index);
+		}
+		break;
+		default:
+			break;
+	}
+
+	iter->second.index = UINT_MAX;
+}
+
+void flt::Scene::ReleaseTween(IFLTween* tween)
+{
+	auto iter = _tweenMap.find(tween);
+	if (iter == _tweenMap.end())
+	{
+		ASSERT(false, "Not exist tween");
+		return;
+	}
+
+	StopTween(iter->first);
+	_tweenMap.erase(iter);
 }
