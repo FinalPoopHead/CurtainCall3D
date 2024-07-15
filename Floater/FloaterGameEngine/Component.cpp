@@ -5,12 +5,33 @@
 
 void flt::ComponentBase::Enable()
 {
-	_gameObject->_scene->AddEnableComponent(this, true);
+	//_gameObject->_scene->AddEnableComponent(this, true);
+	if (_isEnable)
+	{
+		return;
+	}
+
+	_isEnable = true;
+
+	if (_gameObject->IsEnable())
+	{
+		OnEnable();
+	}
 }
 
 void flt::ComponentBase::Disable()
 {
-	_gameObject->_scene->AddEnableComponent(this, false);
+	//_gameObject->_scene->AddEnableComponent(this, false);
+	if (!_isEnable)
+	{
+		return;
+	}
+
+	if (_gameObject->IsEnable())
+	{
+		OnDisable();
+	}
+	_isEnable = false;
 }
 
-int flt::ComponentBase::s_indexCounter = 0;
+uint32 flt::ComponentBase::s_indexCounter = 0;

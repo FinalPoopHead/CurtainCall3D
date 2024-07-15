@@ -44,6 +44,8 @@ void TestGameObejct::OnEnable()
 		.to({ 0.0f, 0.0f, 100.0f, 1.0f }).during(5.0f).easing(flt::ease::easeInOut)
 		.to({ 0.0f, 0.0f, 0.0f, 1.0f }).during(5.0f).easing(flt::ease::easeInOut).onEnd([this]() {std::cout << "end move\n"; });
 
+	StartTween(tween);
+
 	auto tweenRot = flt::MakeRotTween(&tr);
 	flt::Quaternion q{0.0f, 0.0f, 0.0f};
 	tweenRot->from(q);
@@ -55,6 +57,8 @@ void TestGameObejct::OnEnable()
 	tweenRot->to(q).during(5.0f).easing(flt::ease::easeInOut);
 	q.SetEuler({ 0.0f, 0.0f, 0.0f });
 	tweenRot->to(q).during(5.0f).easing(flt::ease::easeInOut).onEnd([this]() {std::cout << "End Rot\n"; });
+
+	StartTween(tweenRot);
 }
 
 void TestGameObejct::Update(float deltaTime)

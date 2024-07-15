@@ -271,6 +271,9 @@ namespace flt
 		[[nodiscard]] const T& At(uint32 sparseIndex) const noexcept { return _dense[_sparse[sparseIndex]].value; }
 		[[nodiscard]] T& At(uint32 sparseIndex) noexcept { return _dense[_sparse[sparseIndex]].value; }
 
+		[[nodiscard]] const T& AtDense(uint32 denseIndex) const noexcept { return _dense[denseIndex].value; }
+		[[nodiscard]] T& AtDense(uint32 denseIndex) noexcept { return _dense[denseIndex].value; }
+
 		[[nodiscard]] const T& Front() const noexcept { return _dense.front().value; }
 		[[nodiscard]] T& Front() noexcept { return _dense.front().value; }
 		[[nodiscard]] T& Back() noexcept { return _dense.back().value; }

@@ -32,6 +32,12 @@ namespace flt
 	FLTween<Quaternion>* MakeRotTween(Transform* target);
 	//FLTween<Transform>* MakeTransformTween(Transform* target);
 
+	void ReleaseTween(IFLTween* tween);
+
+	void StartTween(IFLTween* tween);
+	void StopTween(IFLTween* tween);
+
+
 	template<typename T>
 	FLTween<T>* MakeTween(T target)
 	{

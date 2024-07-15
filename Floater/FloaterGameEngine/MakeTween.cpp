@@ -68,6 +68,22 @@ flt::FLTween<flt::Quaternion>* flt::MakeRotTween(Transform* target)
 	return tween;
 }
 
+void flt::ReleaseTween(IFLTween* tween)
+{
+	g_engine->GetCurrentScene()->ReleaseTween(tween);
+	delete tween;
+}
+
+void flt::StartTween(IFLTween* tween)
+{
+	g_engine->GetCurrentScene()->StartTween(tween);
+}
+
+void flt::StopTween(IFLTween* tween)
+{
+	g_engine->GetCurrentScene()->StopTween(tween);
+}
+
 //template<>
 //flt::FLTween<flt::Transform*>* flt::MakeTween(flt::Transform* target)
 //{

@@ -62,6 +62,19 @@ int main(int argc, char* argv[])
 		flt::Info(L"Hello {}!", L"World");
 	}*/
 
+	/// 베지어 테스트
+	/*{
+		auto inout = flt::Bezier::EaseInOut();
+
+		for (int i = 0; i < 100; ++i)
+		{
+			float t = i / 100.0f;
+			auto result = inout.Evaluate(t);
+
+			std::cout << result.x << ", " << result.y << std::endl;
+		}
+	}*/
+
 	/// 트윈 테스트
 	{
 		int value = 100;
@@ -83,8 +96,8 @@ int main(int argc, char* argv[])
 			};
 
 		flt::FLTween tween = flt::tween::from(0)
-			.to(100).during(100.0f).easing(flt::ease::easeInOutElastic).onStart([]() { std::cout << "Start\n"; }).onStep(onStepFunc).onEnd([]() { std::cout << "End\n"; })
-			.to(0).during(100.0f).easing(flt::ease::easeInOutBounce).onStep(onStepFunc)
+			.to(100).during(100.0f).easing(flt::Bezier::EaseInOut()).onStart([]() { std::cout << "Start\n"; }).onStep(onStepFunc).onEnd([]() { std::cout << "End\n"; })
+			.to(0).during(100.0f).easing(flt::ease::easeInOut).onStep(onStepFunc)
 			.to(100).during(100.0f).easing(flt::ease::easeInOutExpo).onStep(onStepFunc);
 
 		for (int i = 0; i < 300; ++i)
