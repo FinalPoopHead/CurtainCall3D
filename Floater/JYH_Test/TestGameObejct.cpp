@@ -37,13 +37,24 @@ void TestGameObejct::OnEnable()
 	//	.to({ 0.0f, 0.0f, 0.0f, 1.0f }).during(20.0f).easing(flt::Bezier::EaseInOut());
 	//
 	//auto tween2 = flt::MakeTween(tr.GetLocalRotation());
-
 	auto tween = flt::MakePosTween(&tr);
-	tween->from({ 0.0f, 0.0f, 0.0f, 1.0f })
-		.to({ 0.0f, 0.0f, 100.0f, 1.0f }).during(5.0f).easing(flt::Bezier::EaseInOut())
+	(*tween).from({ 0.0f, 0.0f, 0.0f, 1.0f })
+		.to({ 0.0f, 0.0f, 100.0f, 1.0f }).during(5.0f).easing(flt::Bezier::EaseInOut()).preDelay(5.0f)
 		.to({ 0.0f, 0.0f, 0.0f, 1.0f }).during(5.0f).easing(flt::Bezier::EaseInOut())
 		.to({ 0.0f, 0.0f, 100.0f, 1.0f }).during(5.0f).easing(flt::Bezier::EaseInOut())
-		.to({ 0.0f, 0.0f, 0.0f, 1.0f }).during(5.0f).easing(flt::Bezier::EaseInOut());
+		.to({ 0.0f, 0.0f, 0.0f, 1.0f }).during(5.0f).easing(flt::Bezier::EaseInOut()).onEnd([this]() {std::cout << "end move\n"; });
+
+	auto tweenRot = flt::MakeRotTween(&tr);
+	flt::Quaternion q{0.0f, 0.0f, 0.0f};
+	tweenRot->from(q);
+	q.SetEuler({ 0.0f, 90.0f, 0.0f });
+	tweenRot->to(q).during(5.0f).easing(flt::Bezier::EaseInOut());
+	q.SetEuler({ 0.0f, 180.0f, 0.0f });
+	tweenRot->to(q).during(5.0f).easing(flt::Bezier::EaseInOut());
+	q.SetEuler({ 0.0f, 270.0f, 0.0f });
+	tweenRot->to(q).during(5.0f).easing(flt::Bezier::EaseInOut());
+	q.SetEuler({ 0.0f, 0.0f, 0.0f });
+	tweenRot->to(q).during(5.0f).easing(flt::Bezier::EaseInOut()).onEnd([this]() {std::cout << "End Rot\n"; });
 }
 
 void TestGameObejct::Update(float deltaTime)
