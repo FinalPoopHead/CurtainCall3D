@@ -2,7 +2,7 @@
 #include "../FloaterRendererCommon/include/ModelLoader.h"
 #include "../FloaterGameEngine/include/EngineMinimal.h"
 #include "../FloaterGameEngine/include/Input.h"
-#include "../FloaterGameEngine/include/internal/MakeTween.h"
+#include "../FloaterGameEngine/include/MakeTween.h"
 #include <iostream>
 
 
