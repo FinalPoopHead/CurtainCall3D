@@ -8,14 +8,20 @@
 #include <iostream>
 #include <filesystem>
 
-#include "../FloaterMath/include/Bezier.h"
+
 #include "../FloaterMath/include/floaterMath.h"
 #include "../FloaterUtil/include/Log.h"
 #include "../FloaterUtil/include/OwningPtr.h"
 #include "../FloaterUtil/include/NonOwningPtr.h"
-#include "../FloaterUtil/include/FLTween.h"
+
+/// 자료구조 테스트용 헤더
 #include "../FloaterUtil/include/SparseSet.h"
 #include "../FloaterUtil/include/StaticArray.h"
+
+/// 트윈 테스트용 헤더
+#include "../FloaterUtil/include/FLTween.h"
+#include "../FloaterMath/include/Ease.h"
+#include "../FloaterMath/include/Bezier.h"
 
 #include <array>
 
@@ -57,7 +63,7 @@ int main(int argc, char* argv[])
 	}*/
 
 	/// 트윈 테스트
-	/*{
+	{
 		int value = 100;
 		int valueRef = 100;
 
@@ -77,9 +83,8 @@ int main(int argc, char* argv[])
 			};
 
 		flt::FLTween tween = flt::tween::from(0)
-			.to(0).during(10.0f)
-			.to(100).during(100.0f).easing(flt::Bezier::EaseInOut()).onStart([]() { std::cout << "Start\n"; }).onStep(onStepFunc).onEnd([]() { std::cout << "End\n"; })
-			.to(0).during(100.0f).easing(flt::Bezier::EaseIn());
+			.to(100).during(100.0f).easing(flt::ease::easeInOut).onStart([]() { std::cout << "Start\n"; }).onStep(onStepFunc).onEnd([]() { std::cout << "End\n"; })
+			.to(0).during(100.0f).easing(flt::ease::bezierEaseInOut).onStep(onStepFunc);
 
 		for (int i = 0; i < 210; ++i)
 		{
@@ -114,7 +119,7 @@ int main(int argc, char* argv[])
 			}
 			std::cout << "*\n";
 		}
-	}*/
+	}
 
 	std::filesystem::path path = std::filesystem::current_path();
 

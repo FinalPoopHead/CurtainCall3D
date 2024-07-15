@@ -2,7 +2,7 @@
 #include "../FloaterRendererCommon/include/ModelLoader.h"
 #include "../FloaterGameEngine/include/EngineMinimal.h"
 #include "../FloaterGameEngine/include/Input.h"
-#include "../FloaterGameEngine/include/internal/MakeTween.h"
+#include "../FloaterGameEngine/include/MakeTween.h"
 #include <iostream>
 
 
@@ -39,22 +39,22 @@ void TestGameObejct::OnEnable()
 	//auto tween2 = flt::MakeTween(tr.GetLocalRotation());
 	auto tween = flt::MakePosTween(&tr);
 	(*tween).from({ 0.0f, 0.0f, 0.0f, 1.0f })
-		.to({ 0.0f, 0.0f, 100.0f, 1.0f }).during(5.0f).easing(flt::Bezier::EaseInOut()).preDelay(5.0f)
-		.to({ 0.0f, 0.0f, 0.0f, 1.0f }).during(5.0f).easing(flt::Bezier::EaseInOut())
-		.to({ 0.0f, 0.0f, 100.0f, 1.0f }).during(5.0f).easing(flt::Bezier::EaseInOut())
-		.to({ 0.0f, 0.0f, 0.0f, 1.0f }).during(5.0f).easing(flt::Bezier::EaseInOut()).onEnd([this]() {std::cout << "end move\n"; });
+		.to({ 0.0f, 0.0f, 100.0f, 1.0f }).during(5.0f).easing(flt::ease::easeInOut).preDelay(5.0f)
+		.to({ 0.0f, 0.0f, 0.0f, 1.0f }).during(5.0f).easing(flt::ease::easeInOut)
+		.to({ 0.0f, 0.0f, 100.0f, 1.0f }).during(5.0f).easing(flt::ease::easeInOut)
+		.to({ 0.0f, 0.0f, 0.0f, 1.0f }).during(5.0f).easing(flt::ease::easeInOut).onEnd([this]() {std::cout << "end move\n"; });
 
 	auto tweenRot = flt::MakeRotTween(&tr);
 	flt::Quaternion q{0.0f, 0.0f, 0.0f};
 	tweenRot->from(q);
 	q.SetEuler({ 0.0f, 90.0f, 0.0f });
-	tweenRot->to(q).during(5.0f).easing(flt::Bezier::EaseInOut());
+	tweenRot->to(q).during(5.0f).easing(flt::ease::easeInOut);
 	q.SetEuler({ 0.0f, 180.0f, 0.0f });
-	tweenRot->to(q).during(5.0f).easing(flt::Bezier::EaseInOut());
+	tweenRot->to(q).during(5.0f).easing(flt::ease::easeInOut);
 	q.SetEuler({ 0.0f, 270.0f, 0.0f });
-	tweenRot->to(q).during(5.0f).easing(flt::Bezier::EaseInOut());
+	tweenRot->to(q).during(5.0f).easing(flt::ease::easeInOut);
 	q.SetEuler({ 0.0f, 0.0f, 0.0f });
-	tweenRot->to(q).during(5.0f).easing(flt::Bezier::EaseInOut()).onEnd([this]() {std::cout << "End Rot\n"; });
+	tweenRot->to(q).during(5.0f).easing(flt::ease::easeInOut).onEnd([this]() {std::cout << "End Rot\n"; });
 }
 
 void TestGameObejct::Update(float deltaTime)

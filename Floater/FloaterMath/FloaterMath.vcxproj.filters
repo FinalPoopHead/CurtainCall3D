@@ -45,6 +45,9 @@
     <ClInclude Include="include\Bezier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\FloaterMathDefine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common.cpp">
