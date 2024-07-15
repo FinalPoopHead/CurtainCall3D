@@ -38,7 +38,6 @@ while (false)
 #ifdef _DEBUG
 
 //#include <intrin.h>
-
 #define ASSERT(condition, message) \
 do \
 { \

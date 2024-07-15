@@ -48,6 +48,9 @@ namespace flt
 		void AddPosTween(FLTween<Vector4f>* tween, Transform* tr);
 		void AddScaleTween(FLTween<Vector4f>* tween, Transform* tr);
 		void AddRotTween(FLTween<Quaternion>* tween, Transform* tr);
+		void StartTween(IFLTween* tween);
+		void StopTween(IFLTween* tween);
+		void ReleaseTween(IFLTween* tween);
 
 		//std::vector<GameObject*> GetGameObjects() const { return _gameObjects; }
 		std::vector<GameObject*> GetGameObjects(const std::wstring& name) const;
@@ -75,20 +78,31 @@ namespace flt
 		std::vector<GameObject*> _gameObjectsToDestroy;
 		std::vector<GameObject*> _gameObjectsToDelete;
 
-		std::vector<ComponentBase*> _componentsToEnable;
-		std::vector<ComponentBase*> _componentsToDisable;
-
 		std::vector<CollisionPair> _collisionPairs;
 		//std::unordered_set<CollisionPair> _collisionSet;
 		bool _collisionFlag;
 		bool _isActive;
 
 		SparseSet<IFLTween*> _tweens;
-		std::vector<uint32> _tweensToDelete;
+		SparseSet<std::pair<FLTween<Vector4f>*, Transform*>> _posTweens;
+		SparseSet<std::pair<FLTween<Vector4f>*, Transform*>> _scaleTweens;
+		SparseSet<std::pair<FLTween<Quaternion>*, Transform*>> _rotTweens;
 
-		std::list<std::pair<FLTween<Vector4f>*, Transform*>> _posTweens;
-		std::list<std::pair<FLTween<Vector4f>*, Transform*>> _scaleTweens;
-		std::list<std::pair<FLTween<Quaternion>*, Transform*>> _rotTweens;
+		enum class TweenType
+		{
+			none,
+			pos,
+			scale,
+			rot
+		};
+		struct TweenInfo
+		{
+			TweenType type;
+			uint32 index;
+			Transform* tr;
+		};
+
+		std::unordered_map<IFLTween*, TweenInfo> _tweenMap;
 	};
 
 	template<GameObjectDerived T, typename... TArgs>
