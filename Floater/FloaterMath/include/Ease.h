@@ -1,11 +1,22 @@
 ﻿#pragma once
-#include <functional>
+#include "FloaterMathDefine.h"
 
 namespace flt
 {
-	namespace Ease
+	namespace ease
 	{
-		extern const std::function<float(float)> bezierLinear;
+		using EaseFunction = float(*)(float);
+
+		FLOATER_MATH_API extern const EaseFunction linear;
+		FLOATER_MATH_API extern const EaseFunction ease;
+		FLOATER_MATH_API extern const EaseFunction easeIn;
+		FLOATER_MATH_API extern const EaseFunction easeOut;
+		FLOATER_MATH_API extern const EaseFunction easeInOut;
+
+		FLOATER_MATH_API extern const EaseFunction bezierEase;
+		FLOATER_MATH_API extern const EaseFunction bezierEaseIn;
+		FLOATER_MATH_API extern const EaseFunction bezierEaseOut;
+		FLOATER_MATH_API extern const EaseFunction bezierEaseInOut;
 	}
 	//class Ease
 	//{
