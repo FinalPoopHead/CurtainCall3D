@@ -2,6 +2,7 @@
 #include <sstream>
 #include "GameManager.h"
 #include "../FloaterGameEngine/include/Input.h"
+#include "../FloaterGameEngine/include/MakeTween.h"
 
 #include "Player.h"
 #include "Board.h"
@@ -231,6 +232,7 @@ void GameManager::CreateUI(int index)
 	std::wstring stageCounterSlotPath = L"../Resources/Sprites/StageCounterSlot.png";
 	std::wstring levelCounterSlotPath = L"../Resources/Sprites/LevelCounterSlot.png";
 	std::wstring levelCounterBluePath = L"../Resources/Sprites/LevelCounterBlue.png";
+	std::wstring bigFontPath = L"../Resources/Fonts/LineSeedSansKR_KoreanCompatible_55.spritefont";
 	std::wstring fontPath = L"../Resources/Fonts/LineSeedSansKR_KoreanCompatible_40.spritefont";
 	std::wstring smallFontPath = L"../Resources/Fonts/LineSeedSansKR_KoreanCompatible_25.spritefont";
 
@@ -317,7 +319,7 @@ void GameManager::CreateUI(int index)
 	TextObject* gameoverText = flt::CreateGameObject<TextObject>(false);
 	gameoverText->SetOffsetPosition(GAMEOVERPANEL_OFFSETPOS);
 	gameoverText->SetText(L"GAME OVER");
-	gameoverText->SetFont(fontPath);
+	gameoverText->SetFont(bigFontPath);
 	gameoverText->SetTextColor(TextColor);
 	gameoverText->SetTextAlignment(eTextAlignment::CENTER);
 	_gameoverText.push_back(gameoverText);
@@ -544,10 +546,16 @@ void GameManager::OnStartPlayerFall(int index)
 void GameManager::OnEndPlayerFall(int index)
 {
 	_gameoverText[index]->Enable();
-	_gameoverText[index]->tr.SetScale({5.0f,5.0f,5.0f});
+	
+	float startScale = 10.0f;
+	float endScale = 2.0f;
+
+	auto tweenScale = flt::MakeScaleTween(&_gameoverText[index]->tr);
+	tweenScale->from({ startScale,startScale,startScale,1.0f})
+		.to({ endScale,endScale,endScale,1.0f }).during(1.5f).easing(flt::ease::easeInOut);
 }
 
-void GameManager::IncreasePlayerCount()
+void GameManager::IncreasePlayerCount() 
 {
 	if (_players.size() >= MAXPLAYERCOUNT)
 	{
