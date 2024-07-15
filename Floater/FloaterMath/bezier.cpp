@@ -67,19 +67,37 @@ void flt::Bezier::AddControlPoint(const Vector2f& controlPoint)
 	_controlPoints.push_back({1.0f, 1.0f});
 }
 
-float flt::Bezier::operator()(float y) const
+float flt::Bezier::operator()(float x) const
 {
+	//float t = 0.5f;
+	//constexpr int maxIterations = 100;
+	//for (int i = 0; i < maxIterations; ++i)
+	//{
+	//	float calcY = CalcY(t);
+	//	float calcYPrime = CalcYPrime(t);
+	//	float nextT = t - (calcY - y) / calcYPrime;
+
+	//	//float epsilon = std::max(std::fabsf(nextT), std::fabsf(t)) * flt::FLOAT_EPSILON;
+	//	float epsilon = flt::FLOAT_EPSILON;
+	//	if(std::fabsf(nextT - t) < epsilon)
+	//	{
+	//		t = nextT;
+	//		break;
+	//	}
+	//	t = nextT;
+	//}
+
+	//return CalcX(t);
 	float t = 0.5f;
 	constexpr int maxIterations = 100;
 	for (int i = 0; i < maxIterations; ++i)
 	{
-		float calcY = CalcY(t);
-		float calcYPrime = CalcYPrime(t);
-		float nextT = t - (calcY - y) / calcYPrime;
+		float calcX = CalcX(t);
+		float calcXPrime = CalcXPrime(t);
+		float nextT = t - (calcX - x) / calcXPrime;
 
-		//float epsilon = std::max(std::fabsf(nextT), std::fabsf(t)) * flt::FLOAT_EPSILON;
 		float epsilon = flt::FLOAT_EPSILON;
-		if(std::fabsf(nextT - t) < epsilon)
+		if (std::fabsf(nextT - t) < epsilon)
 		{
 			t = nextT;
 			break;
@@ -87,7 +105,7 @@ float flt::Bezier::operator()(float y) const
 		t = nextT;
 	}
 
-	return CalcX(t);
+	return CalcY(t);
 }
 
 std::array<std::array<float, 16>, 16> flt::Bezier::s_binomialCoefficients = std::array<std::array<float, 16>, 16>{std::array<float, 16>{0.0f} };
@@ -125,6 +143,19 @@ float flt::Bezier::CalcX(float t) const
 	}
 
 	return x;
+}
+
+float flt::Bezier::CalcXPrime(float t) const
+{
+	float xPrime = 0.0f;
+	int n = (int)_controlPoints.size() - 1;
+	for (int i = 0; i < n; ++i)
+	{
+		float term = _controlPoints[i + 1].x - _controlPoints[i].x;
+		xPrime += binomialCoefficient(n - 1, i) * std::powf(1.0f - t, (float)(n - i - 1)) * std::powf(t, (float)i) * term;
+	}
+
+	return xPrime * (float)n;
 }
 
 float flt::Bezier::CalcY(float t) const

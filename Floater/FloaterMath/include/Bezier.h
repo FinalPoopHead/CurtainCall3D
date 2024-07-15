@@ -21,9 +21,8 @@ namespace flt
 		__declspec(dllexport) ~Bezier() {}
 
 		[[nodiscard]] __declspec(dllexport) Vector2f Evaluate(float t) const;
+		[[nodiscard]] __declspec(dllexport) float operator()(float x) const;
 		__declspec(dllexport) void AddControlPoint(const Vector2f& controlPoint);
-
-		__declspec(dllexport) float operator()(float y) const;
 
 	private:
 		static std::array<std::array<float, 16>, 16> s_binomialCoefficients;
@@ -31,6 +30,7 @@ namespace flt
 
 	private:
 		float CalcX(float t) const;
+		float CalcXPrime(float t) const;
 		float CalcY(float t) const;
 		float CalcYPrime(float t) const;
 
