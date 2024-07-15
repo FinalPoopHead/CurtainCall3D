@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 		int xx = 0;
 
 		auto onStepFunc = [](const int& value)
-			{ 
+			{
 				for (int j = 0; j < value; ++j)
 				{
 					std::cout << " ";
@@ -83,10 +83,11 @@ int main(int argc, char* argv[])
 			};
 
 		flt::FLTween tween = flt::tween::from(0)
-			.to(100).during(100.0f).easing(flt::ease::easeInOut).onStart([]() { std::cout << "Start\n"; }).onStep(onStepFunc).onEnd([]() { std::cout << "End\n"; })
-			.to(0).during(100.0f).easing(flt::ease::bezierEaseInOut).onStep(onStepFunc);
+			.to(100).during(100.0f).easing(flt::ease::easeInOutElastic).onStart([]() { std::cout << "Start\n"; }).onStep(onStepFunc).onEnd([]() { std::cout << "End\n"; })
+			.to(0).during(100.0f).easing(flt::ease::easeInOutBounce).onStep(onStepFunc)
+			.to(100).during(100.0f).easing(flt::ease::easeInOutExpo).onStep(onStepFunc);
 
-		for (int i = 0; i < 210; ++i)
+		for (int i = 0; i < 300; ++i)
 		{
 			int value = tween.step(1.0f);
 		}
@@ -125,9 +126,9 @@ int main(int argc, char* argv[])
 
 	////cpu 캐시 크기 가져오기
 	////std::cout << std::hardware_destructive_interference_size << std::endl;
-	  
+
 	flt::GameEngine* pGameEngine = flt::GameEngine::Instance();
-	
+
 	//UnityLoadScene unityLoadScene(L"..\\x64\\data\\SoaringMap.json");
 	//pGameEngine->SetScene(&unityLoadScene);
 

@@ -115,6 +115,7 @@ void flt::Scene::TweenUpdate(float deltaSecond)
 
 		if(iter->first->isEnd())
 		{
+			delete iter->first;
 			iter = _posTweens.erase(iter);
 		}
 		else
@@ -130,6 +131,7 @@ void flt::Scene::TweenUpdate(float deltaSecond)
 
 		if(iter->first->isEnd())
 		{
+			delete iter->first;
 			iter = _scaleTweens.erase(iter);
 		}
 		else
@@ -145,6 +147,7 @@ void flt::Scene::TweenUpdate(float deltaSecond)
 
 		if(iter->first->isEnd())
 		{
+			delete iter->first;
 			iter = _rotTweens.erase(iter);
 		}
 		else
