@@ -173,6 +173,7 @@
   <ItemGroup>
     <ClCompile Include="Bezier.cpp" />
     <ClCompile Include="Common.cpp" />
+    <ClCompile Include="Ease.cpp" />
     <ClCompile Include="Matrix3f.cpp" />
     <ClCompile Include="Matrix4f.cpp" />
     <ClCompile Include="Quaternion.cpp" />

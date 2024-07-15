@@ -1,12 +1,11 @@
 ﻿#pragma once
-#include "Bezier.h"
-
+#include <functional>
 
 namespace flt
 {
 	namespace Ease
 	{
-		//const Bezier& bezierLinear = Bezier::Linear();
+		extern const std::function<float(float)> bezierLinear;
 	}
 	//class Ease
 	//{
