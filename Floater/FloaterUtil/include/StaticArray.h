@@ -61,12 +61,12 @@ namespace flt
 		T _data[N];
 	};
 
-	template<typename T>
-	class StaticArray<T, 0>
-	{
-	public:
-		static_assert(false, "Array size must be greater than 0");
-	};
+	//template<typename T>
+	//class StaticArray<T, 0>
+	//{
+	//public:
+	//	static_assert(false, "Array size must be greater than 0");
+	//};
 
 	template<typename T, typename... U>
 	StaticArray(T, U...) -> StaticArray<T, sizeof...(U) + 1>;

@@ -9,6 +9,11 @@ namespace flt
 
 	//}
 
+	Vector4f Vector4f::Lerp(const Vector4f& a, const Vector4f& b, float t) noexcept
+	{
+		return a + (b - a) * t;
+	}
+
 	//Vector4f::operator Vector3f() const noexcept
 	//{
 	//	return Vector3f(m.m128_f32[0], m.m128_f32[1], m.m128_f32[2]);
