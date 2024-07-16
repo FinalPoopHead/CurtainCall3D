@@ -48,3 +48,38 @@ flt::Matrix4f flt::Camera::GetProjectionMatrix() const noexcept
 		};
 	}
 }
+
+flt::Transform* flt::Camera::SetTransform(Transform* transform)
+{
+	Transform* old = _pTransform;
+	_pTransform = transform;
+	return old;
+}
+
+float flt::Camera::SetFov(float fovRadY) noexcept
+{
+	float old = _fieldOfView;
+	_fieldOfView = fovRadY;
+	return old;
+}
+
+float flt::Camera::SetNearZ(float nearZ) noexcept
+{
+	float old = _near;
+	_near = nearZ;
+	return old;
+}
+
+float flt::Camera::SetFarZ(float farZ) noexcept
+{
+	float old = _far;
+	_far = farZ;
+	return old;
+}
+
+flt::Vector2f flt::Camera::SetViewRectAspect(float width, float height) noexcept
+{
+	Vector2f old = _viewRect;
+	_viewRect = Vector2f(width, height);
+	return old;
+}

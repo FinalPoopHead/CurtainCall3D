@@ -11,7 +11,7 @@ flt::CameraComponent::CameraComponent()
 	, _hObject()
 	, _isDraw(true)
 {
-	_rendererObject->camera = new flt::Camera(&_gameObject->transform);
+	_rendererObject->camera = new flt::Camera(nullptr);
 }
 
 flt::CameraComponent::~CameraComponent()
@@ -33,9 +33,20 @@ uint32 flt::CameraComponent::SetIndex(uint32 priority)
 	return (uint32)oldIndex;
 }
 
+flt::Matrix4f flt::CameraComponent::GetViewMatrix() const
+{
+	return _rendererObject->camera->GetViewMatrix();
+}
+
+flt::Matrix4f flt::CameraComponent::GetProjectionMatrix() const
+{
+	return _rendererObject->camera->GetProjectionMatrix();
+}
+
 void flt::CameraComponent::OnCreate()
 {
 	_rendererObject->transform = &_gameObject->transform;
+	_rendererObject->camera->SetTransform(&_gameObject->transform);
 }
 
 void flt::CameraComponent::OnEnable()

@@ -165,6 +165,26 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 		rocketObject->camera->AddToMainCamera();
 		rocketObject->camera->BindTransform(&rocketObject->rocketTransform);
 		rocketObject->camera->SetMainCameraIndex(renderable.camera->priority);
+
+
+		_cameraObjects[&renderable] = rocketObject;
+
+		for (auto& [cameraObject, rocketCamera] : _cameraObjects)
+		{
+			float outNearZ;
+			float outFarZ;
+			float outAspect;
+			float outFovY;
+			DirectX::XMFLOAT4X4 outViewMatrix;
+			DirectX::XMFLOAT4X4 outProjectionMatrix;
+			cameraObject->camera;
+			rocketCamera->camera->GetAllValues(outNearZ, outFarZ, outAspect, outFovY, outViewMatrix, outProjectionMatrix);
+
+			cameraObject->camera->SetNearZ(outNearZ);
+			cameraObject->camera->SetFarZ(outFarZ);
+			cameraObject->camera->SetViewRectAspect(outAspect, 1.0f);
+			cameraObject->camera->SetFov(DegToRad(outFovY));
+		}
 	}
 
 	if (renderable.node != nullptr)
@@ -319,6 +339,12 @@ bool flt::RocketAdapter::DeregisterObject(HOBJECT renderable)
 	if (iter == _objects.end())
 	{
 		return false;
+	}
+
+	RendererObject* rendererObject = iter->second.first;
+	if (rendererObject->camera)
+	{
+		_cameraObjects.erase(rendererObject);
 	}
 
 	delete rocketObject;
