@@ -12,7 +12,7 @@ namespace Rocket::Core
 
 	Camera::Camera()
 		: _isActive(true)
-		,_nearZ(0.01f), _farZ(1500.0f), _aspect(16.0f / 9.0f), _fovY(70.0f),
+		,_nearZ(0.01f), _farZ(1500.0f), _aspect(16.0f / 9.0f), _fovY(40.0f),
 		_viewMatrix(), _projectionMatrix()
 		, _boundingFrustum()
 	{
@@ -21,7 +21,7 @@ namespace Rocket::Core
 
 	Camera::Camera(float width, float height)
 		: _isActive(true)
-		, _nearZ(0.01f), _farZ(1500.0f), _aspect(width / height), _fovY(70.0f),
+		, _nearZ(0.01f), _farZ(1500.0f), _aspect(width / height), _fovY(40.0f),
 		_viewMatrix(), _projectionMatrix()
 		, _boundingFrustum()
 	{
@@ -85,10 +85,10 @@ namespace Rocket::Core
 
 	void Camera::UpdateProjectionMatrix()
 	{
-		DirectX::XMMATRIX temp = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(_fovY / 2), _aspect, _nearZ, _farZ);
+		DirectX::XMMATRIX temp = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(_fovY), _aspect, _nearZ, _farZ);
 		DirectX::XMStoreFloat4x4(&_projectionMatrix, temp);
 
-		DirectX::XMMATRIX boundingFrustumMatrix = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(_fovY / 2 * 1.0f), _aspect * 1.0f, _nearZ, _farZ);
+		DirectX::XMMATRIX boundingFrustumMatrix = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(_fovY), _aspect, _nearZ, _farZ);
 		_boundingFrustum = DirectX::BoundingFrustum(boundingFrustumMatrix);		// boundingFrustum도 갱신해준다.
 	}
 
@@ -221,7 +221,7 @@ namespace Rocket::Core
 		return true;
 	}
 
-	void Camera::GetAllValues(float& outNearZ, float& outFarZ, float& outAspect, float& outFovY, DirectX::XMFLOAT4X4& outViewMatrix, DirectX::XMFLOAT4X4 outProjectionMatrix)
+	void Camera::GetAllValues(float& outNearZ, float& outFarZ, float& outAspect, float& outFovY, DirectX::XMFLOAT4X4& outViewMatrix, DirectX::XMFLOAT4X4& outProjectionMatrix)
 	{
 		outNearZ = _nearZ;
 		outFarZ = _farZ;
