@@ -37,6 +37,7 @@ namespace Rocket::Core
 		virtual void AddToMainCamera() override;
 		virtual bool SetMainCameraIndex(int index) override;
 		virtual void BindTransform(RocketTransform* transform) override;
+		virtual void GetAllValues(float& outNearZ, float& outFarZ, float& outAspect, float& outFovY, DirectX::XMFLOAT4X4& outViewMatrix, DirectX::XMFLOAT4X4 outProjectionMatrix) override;
 
 		/// Static
 	public:
