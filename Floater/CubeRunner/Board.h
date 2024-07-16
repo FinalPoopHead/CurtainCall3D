@@ -66,8 +66,8 @@ public:
 	void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
 	void ConvertToTilePosition(int x, int z, float& outX, float& outZ);
 
-	void _TEST_GenerateRandomWave();		// 임시로 랜덤 생성 용
 	void GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount, bool isFirst = false);
+	void GenerateGarbageLine(int lineCount);
 	void ReturnCubeToPool(flt::GameObject* obj);
 	void RemoveFromControllerList(CubeController* cubeCtr);
 	void SetMine(float x, float z);			// position X,Z에 지뢰를 설치한다.
@@ -81,10 +81,10 @@ public:
 
 	void AddColumn();
 	void DestroyRow();
-	void DeferredDestroyRow();
 
 	bool IsMineSet();
 
+	void OnEndPlayerFalling();
 	void SetGameOver();
 	void AddCubeFallCount();
 
@@ -119,6 +119,7 @@ private:
 
 private:
 	flt::SoundComponent* _soundComponent;
+	std::unordered_map<std::string, int> _soundIndex;
 
 	GameManager* _gameManager;
 	int _playerIndex;
@@ -150,6 +151,7 @@ private:
 	bool _isPerfect;
 	bool _isOnlyDarkRemain;
 	bool _isCameraWorking;
+	bool _isFirst;
 	int _nowAddTileCount;
 	int _nextDestroyRow;
 

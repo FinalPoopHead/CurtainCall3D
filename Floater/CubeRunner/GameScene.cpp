@@ -39,7 +39,14 @@ void GameScene::Initialize()
 	}
 
 	gameManager->ResetGame();
-	gameManager->SetStage(g_StageNum);		// TEST : 임시
+	if (g_PlayerNum < 2)
+	{
+		gameManager->SetStage(g_StageNum);		// TEST : 임시
+	}
+	else
+	{
+		gameManager->SetBattleMode();
+	}
 }
 
 void GameScene::Finalize()

@@ -6,6 +6,13 @@
 
 namespace Rocket::Core
 {
+	enum class eTextAlignment
+	{
+		LEFT
+		, CENTER
+		, RIGHT
+	};
+
 	class ITextRenderer : public IGraphicsObject
 	{
 	public:
@@ -15,5 +22,6 @@ namespace Rocket::Core
 		virtual void SetText(const std::string& str) = 0;
 		virtual void SetColor(Color color) = 0;
 		virtual void SetTargetCameraIndex(int cameraIndex) = 0;
+		virtual void SetTextAlignment(eTextAlignment alignment) = 0;
 	};
 }

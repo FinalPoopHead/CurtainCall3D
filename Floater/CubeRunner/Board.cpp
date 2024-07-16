@@ -1,4 +1,5 @@
-﻿#include "Board.h"
+﻿#include <random>
+#include "Board.h"
 #include "../FloaterGameEngine/include/Input.h"
 
 #include "Tile.h"
@@ -31,11 +32,10 @@ constexpr float SLOWVALUE = 0.5f;
 constexpr float FFDEFAULT = 1.0f;
 constexpr float FFVALUE = 8.0f;
 
-std::unordered_map<std::string, int> soundIndex;
-
 Board::Board(GameManager* gameManager, int playerIndex, int width, int height, float offset /*= 4.00f*/) :
 	flt::GameObject()
 	, _soundComponent()
+	, _soundIndex()
 	, _gameManager(gameManager)
 	, _playerIndex(playerIndex)
 	, _width(width)
@@ -61,6 +61,7 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _isPerfect(true)
 	, _isOnlyDarkRemain(false)
 	, _isCameraWorking(false)
+	, _isFirst(false)
 	, _nowAddTileCount()
 	, _nextDestroyRow()
 	, _minePos({ -1,-1 })
@@ -69,17 +70,29 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 {
 	std::wstring path = L"../Resources/Sound/";
 	_soundComponent = AddComponent<flt::SoundComponent>(true);
-	_soundComponent->AddSound(path + L"GenerateFadeOut.mp3");
+	_soundComponent->AddSound(path + L"Generate.mp3");
+	_soundComponent->AddSound(path + L"CubeRoll.mp3");
+	_soundComponent->AddSound(path + L"CubeDestroy.mp3");
 	_soundComponent->AddSound(path + L"SetMine.mp3");
 	_soundComponent->AddSound(path + L"DetonateMine.mp3");
-	_soundComponent->AddSound(path + L"CubeRoll.mp3");
+	_soundComponent->AddSound(path + L"DetonateAdvantage.mp3");
+	_soundComponent->AddSound(path + L"TileAdd.mp3");
+	_soundComponent->AddSound(path + L"TileDestroy.mp3");
+	_soundComponent->AddSound(path + L"MS02gameover.wav");
+	_soundComponent->AddSound(path + L"MS03discovery.wav");
 
 	int index = 0;
-	soundIndex = std::unordered_map<std::string, int>();
-	soundIndex["Generate"] = index++;
-	soundIndex["SetMine"] = index++;
-	soundIndex["DetonateMine"] = index++;
-	soundIndex["CubeRoll"] = index++;
+	_soundIndex = std::unordered_map<std::string, int>();
+	_soundIndex["Generate"] = index++;
+	_soundIndex["CubeRoll"] = index++;
+	_soundIndex["CubeDestroy"] = index++;
+	_soundIndex["SetMine"] = index++;
+	_soundIndex["DetonateMine"] = index++;
+	_soundIndex["DetonateAdvantage"] = index++;
+	_soundIndex["TileAdd"] = index++;
+	_soundIndex["TileDestroy"] = index++;
+	_soundIndex["GameOver"] = index++;
+	_soundIndex["StageClear"] = index++;
 
 	_testIndex = 0;
 	for (int i = 0; i < 5; i++)
@@ -205,7 +218,7 @@ void Board::PreUpdate(float deltaSecond)
 		_testValue[_testIndex] -= diff;
 		std::cout << "[X : " << _testValue[0] << "] [Y : " << _testValue[1] << "] [Z : " << _testValue[2] << "] [xAngle : " << _testValue[3] << "] [yAngle : " << _testValue[4] << "]" << std::endl;
 	}
-	
+
 	diff = 0.1f;
 
 	keyData = flt::GetKeyDown(flt::KeyCode::right);
@@ -514,86 +527,6 @@ void Board::ConvertToTilePosition(int x, int z, float& outX, float& outZ)
 	outZ += pos.z;
 }
 
-void Board::_TEST_GenerateRandomWave()
-{
-	if (_isGameOver)
-	{
-		return;
-	}
-
-	_isPerfect = true;
-
-	int _TEST_darkCount = 3;
-	float startDelay = 0.15f;
-
-	for (int i = 0; i < _width; ++i)
-	{
-		int delayCount = 0;
-		//if (i == _width / 2) continue;		// TEST 한 줄 비우기 위함
-		for (int j = 0; j < _width; ++j)
-		{
-			//if (j == _width / 2) continue;	// TEST 한 줄 비우기 위함
-			int randValue = rand() % 3;
-
-			float x = _tiles[i][j]->tr.GetWorldPosition().x;
-			float z = _tiles[i][j]->tr.GetWorldPosition().z;
-
-			flt::GameObject* cube = nullptr;
-
-			switch (randValue)
-			{
-			case 0:
-				if (_normalCubePool.empty())
-				{
-					ASSERT(false, "NormalCubePool is Empty");
-				}
-				cube = _normalCubePool.front();
-				_normalCubePool.pop_front();
-				break;
-			case 1:
-				if (_TEST_darkCount <= 0)
-				{
-					--j;
-					continue;
-				}
-				_TEST_darkCount--;
-				if (_darkCubePool.empty())
-				{
-					ASSERT(false, "DarkCubePool is Empty");
-				}
-				cube = _darkCubePool.front();
-				_darkCubePool.pop_front();
-				break;
-			case 2:
-				if (_advantageCubePool.empty())
-				{
-					ASSERT(false, "AdvantageCubePool is Empty");
-				}
-				cube = _advantageCubePool.front();
-				_advantageCubePool.pop_front();
-				break;
-			default:
-				ASSERT(false, "Invalid Random Value");
-				break;
-			}
-
-			auto cubeCtr = cube->GetComponent<CubeController>();
-			_runningCubeControllers.push_back(cubeCtr);
-			cubeCtr->StartGenerate(GENERATE_TIME, startDelay * delayCount);
-
-			cube->tr.SetPosition(x, 0.0f, z);
-			cube->Enable();
-			_tiles[i][j]->_cube = cube;
-			_nowGeneratingCount++;
-			delayCount++;
-		}
-
-		delayCount = 0;
-	}
-
-	_boardState = eBoardState::CUBEGENERATING;
-}
-
 void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount, bool isFirst /*= false*/)
 {
 	_isGameOver = false;
@@ -673,6 +606,8 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 			_waveCubeControllers.push_front(waveCubes);
 			waveCubes.clear();
 		}
+
+		_soundComponent->Play(_soundIndex["Generate"]);
 	}
 
 	_boardState = eBoardState::CUBEGENERATING;
@@ -719,7 +654,99 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 		_isCameraWorking = true;
 	}
 
-	_soundComponent->Play(soundIndex["Generate"]);
+	_isFirst = isFirst;
+}
+
+void Board::GenerateGarbageLine(int lineCount)
+{
+	_isGameOver = false;
+
+	int width = _width;
+	int height = lineCount;
+
+	_waveCubeControllers.clear();
+	int waveHeight = height;
+	int heightCount = 0;
+	float startDelay = 0.15f;
+	float delayBase = 0.5f;
+
+	/// 100 중에 20 20 60
+	int darkCube = 15;
+	int advantageCube = 15;
+	int normalCube = 70;
+
+	std::random_device rd;
+
+	for (int j = 0; j < height; ++j)
+	{
+		for (int i = 0; i < width; ++i)
+		{
+			float x = _tiles[i][j]->tr.GetWorldPosition().x;
+			float z = _tiles[i][j]->tr.GetWorldPosition().z;
+
+			flt::GameObject* cube = nullptr;
+
+			int randomValue = rd() % 100;
+
+			if (randomValue < darkCube)
+			{
+				if (_darkCubePool.empty())
+				{
+					ASSERT(false, "DarkCubePool is Empty");
+				}
+				cube = _darkCubePool.front();
+				_darkCubePool.pop_front();
+			}
+			else if (randomValue < darkCube + advantageCube)
+			{
+				if (_advantageCubePool.empty())
+				{
+					ASSERT(false, "AdvantageCubePool is Empty");
+				}
+				cube = _advantageCubePool.front();
+				_advantageCubePool.pop_front();
+			}
+			else
+			{
+				if (_normalCubePool.empty())
+				{
+					ASSERT(false, "NormalCubePool is Empty");
+				}
+				cube = _normalCubePool.front();
+				_normalCubePool.pop_front();
+			}
+
+			auto cubeCtr = cube->GetComponent<CubeController>();
+			cubeCtr->StartGenerate(GENERATE_TIME, delayBase + startDelay * j);
+			_runningCubeControllers.push_back(cubeCtr);
+			cube->tr.SetPosition(x, 0.0f, z);
+			cube->Enable();
+			_tiles[i][j]->_cube = cube;
+			_nowGeneratingCount++;
+		}
+
+		_soundComponent->Play(_soundIndex["Generate"]);
+	}
+
+	_boardState = eBoardState::CUBEGENERATING;
+	if (_height == 0)
+	{
+		_boardState = eBoardState::NONE;
+	}
+
+	_isPerfect = true;
+	_isOnlyDarkRemain = false;
+
+	for (auto& cubeCtr : _runningCubeControllers)
+	{
+		cubeCtr->SetIsRunning(true);
+	}
+
+	auto player = _gameManager->GetPlayer(_playerIndex);
+	player->camera->LookGenerating();
+	_isCameraWorking = true;
+
+	_isFirst = false;
 }
 
 void Board::TickCubesRolling(float rollingTime)
@@ -764,11 +791,9 @@ void Board::OnEndWave()
 {
 	if (_isPerfect)
 	{
+		_fastForwardValue = FFDEFAULT;
 		AddRow();
 		MoveCameraToEnd();
-		// TODO : 상대방 공격하는게 되긴 하는데.. 좀 요상하다 ㅋㅋㅋㅋ
-		//			Board 코드도 조금바꿔서 행동에 우선순위를 정해주고 큐에 담아서 처리하는 식으로 해야될듯..
-		// _gameManager->AttackAnotherPlayer(_playerIndex);
 	}
 	else
 	{
@@ -929,7 +954,7 @@ void Board::SetMine(float x, float z)
 
 	_minePos = { tileX, tileZ };
 
-	_soundComponent->Play(soundIndex["SetMine"]);
+	_soundComponent->Play(_soundIndex["SetMine"]);
 }
 
 void Board::DetonateMine()
@@ -950,7 +975,7 @@ void Board::DetonateMine()
 	_tiles[x][y]->EnableDetonated();
 	_tileStates[x][y] = (int)_tileStates[x][y] & ~((int)eTileStateFlag::MINE);
 	_tileStates[x][y] = (int)_tileStates[x][y] | (int)eTileStateFlag::DETONATE;
-	_soundComponent->Play(soundIndex["DetonateMine"]);
+	_soundComponent->Play(_soundIndex["DetonateMine"]);
 }
 
 void Board::DetonateAdvantageMine()
@@ -959,6 +984,8 @@ void Board::DetonateAdvantageMine()
 	{
 		return;
 	}
+
+	bool isSuccess = false;
 
 	for (int i = 0; i < _width; i++)
 	{
@@ -984,9 +1011,16 @@ void Board::DetonateAdvantageMine()
 						_tiles[nextX][nextY]->EnableDetonated();
 					}
 				}
+
+				isSuccess = true;
 			}
 
 		}
+	}
+
+	if (isSuccess)
+	{
+		_soundComponent->Play(_soundIndex["DetonateAdvantage"]);
 	}
 }
 
@@ -1005,7 +1039,7 @@ void Board::OnEndCubeRoll()
 		}
 
 		SetDelay(delay);
-		_soundComponent->Play(soundIndex["CubeRoll"]);
+		_soundComponent->Play(_soundIndex["CubeRoll"]);
 	}
 }
 
@@ -1040,6 +1074,7 @@ void Board::OnEndTileAdd(Tile* tile)
 		_nowAddTileCount = 0;
 		Resize(_width, _height + 1);
 		SetDelay(ADDTILE_DELAY);
+		_soundComponent->Play(_soundIndex["TileAdd"]);
 	}
 	else if (_nowAddTileCount < 0)
 	{
@@ -1073,8 +1108,31 @@ void Board::OnEndTileFall(int x, int z)
 
 void Board::AddColumn()
 {
-	// TODO : 구현 필요
 	ASSERT(false, "not Implemented");
+
+	// TODO : 구현 필요
+	_nowAddTileCount = _width;
+	++_nextDestroyRow;
+	_boardState = eBoardState::ADDTILE;
+
+	for (int i = 0; i < _width; i++)
+	{
+		Tile* tile = GetTileFromPool();
+		_addTiles.push_back(tile);
+
+		float x = 0.0f;
+		float z = 0.0f;
+		ConvertToTileLocalPosition(i, _height + 16, x, z);
+
+		tile->tr.SetPosition({ x, 0.0f, z });
+
+		ConvertToTileLocalPosition(i, _height, x, z);
+		x += tr.GetWorldPosition().x;
+		z += tr.GetWorldPosition().z;
+
+		// TODO : StartAddComlumn이라고 하나 더 만들어야겠네? 이게 맞나?!
+		tile->StartAddRow(ADDTILE_TIME, { x,0.0f,z });
+	}
 }
 
 void Board::DestroyRow()
@@ -1099,11 +1157,8 @@ void Board::DestroyRow()
 		_tiles[i][_nextDestroyRow]->StartFall(delay + delayDelta * i, i, _nextDestroyRow);
 	}
 	--_nextDestroyRow;
-}
 
-void Board::DeferredDestroyRow()
-{
-	_isAttacked = true;
+	_soundComponent->Play(_soundIndex["TileDestroy"]);
 }
 
 bool Board::IsMineSet()
@@ -1112,9 +1167,17 @@ bool Board::IsMineSet()
 	return x != -1 && y != -1;
 }
 
+void Board::OnEndPlayerFalling()
+{
+	// TODO : GameOver 연출
+	_gameManager->OnEndPlayerFall(_playerIndex);
+	_soundComponent->Play(_soundIndex["GameOver"]);
+}
+
 void Board::SetGameOver()
 {
 	_isGameOver = true;
+	_gameManager->OnStartPlayerFall(_playerIndex);
 }
 
 void Board::AddCubeFallCount()
@@ -1331,6 +1394,12 @@ void Board::OnEndWaiting()
 		TickCubesRolling(ROLLING_TIME);
 	}
 
+	if (_isFirst)
+	{
+		_gameManager->OnStageStart();
+		_isFirst = false;
+	}
+
 	if (_isCameraWorking && !_isOnlyDarkRemain)
 	{
 		_fastForwardValue = FFDEFAULT;
@@ -1444,6 +1513,7 @@ bool Board::UpdateDetonate()
 				if ((int)cubeType)
 				{
 					result = true;
+					_soundComponent->Play(_soundIndex["CubeDestroy"]);
 				}
 
 				_tileStates[i][j] = (int)_tileStates[i][j] & ~((int)eTileStateFlag::DETONATE);
@@ -1455,7 +1525,7 @@ bool Board::UpdateDetonate()
 		}
 	}
 
-	_gameManager->IncreaseScore(_playerIndex, destroyCount);
+	_gameManager->OnDestroyCubes(_playerIndex, destroyCount);
 
 	for (int i = 0; i < _width; i++)
 	{

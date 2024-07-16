@@ -13,6 +13,14 @@ flt::SoundComponent::SoundComponent() :
 
 }
 
+void flt::SoundComponent::OnDestroy()
+{
+	for (auto& sound : _sounds)
+	{
+		_soundEngine->Stop(sound);
+	}
+}
+
 int flt::SoundComponent::AddSound(std::wstring path)
 {
 	Sound* sound = new Sound();
