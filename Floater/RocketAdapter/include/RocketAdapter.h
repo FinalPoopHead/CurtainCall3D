@@ -3,6 +3,8 @@
 #include <windows.h>
 #include <set>
 #include <unordered_map>
+#include <unordered_set>
+
 
 namespace Rocket::Core
 {
@@ -33,5 +35,6 @@ namespace flt
 		Rocket::Core::IDX11Renderer* _impl;
 
 		std::unordered_map<RocketObject*, std::pair<RendererObject*, AnimState>> _objects;
+		std::unordered_map<RendererObject*, RocketObject*> _cameraObjects;
 	};
 }

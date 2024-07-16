@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Component.h"
 #include "../../../FloaterUtil/include/FloaterType.h"
+#include "../../../FloaterMath/include/Matrix4f.h"
 
 
 namespace flt
@@ -16,6 +17,9 @@ namespace flt
 		~CameraComponent();
 
 		uint32 SetIndex(uint32 priority);
+		Matrix4f GetViewMatrix() const;
+		Matrix4f GetProjectionMatrix() const;
+
 	protected:
 		virtual void OnCreate() override;
 		virtual void OnEnable() override;
