@@ -10,9 +10,9 @@ namespace flt
 	{
 	public:
 		Camera(Transform* pTransform) : Camera(pTransform, DegToRad(60.f), 0.01f, 1000.f, 3.2f, 1.8f, false) {}
-		Camera(Transform* pTransform, float fieldOfView, float nearZ, float farZ, float viewWidth, float viewHeight, bool isOrtho) noexcept :
+		Camera(Transform* pTransform, float fovRadY, float nearZ, float farZ, float viewWidth, float viewHeight, bool isOrtho) noexcept :
 			_pTransform(pTransform),
-			_fieldOfView(fieldOfView),
+			_fieldOfView(fovRadY),
 			_near(nearZ),
 			_far(farZ),
 			_viewRect(viewWidth, viewHeight),
@@ -23,6 +23,12 @@ namespace flt
 		Matrix4f GetViewMatrix() const noexcept;
 		Matrix4f GetProjectionMatrix() const noexcept;
 		const Transform* GetTransform() const noexcept { return _pTransform; }
+
+		Transform* SetTransform(Transform* transform);
+		float SetFov(float fovRadY) noexcept;
+		float SetNearZ(float nearZ) noexcept;
+		float SetFarZ(float farZ) noexcept;
+		Vector2f SetViewRectAspect(float width, float height) noexcept;
 
 	public:
 		int priority;

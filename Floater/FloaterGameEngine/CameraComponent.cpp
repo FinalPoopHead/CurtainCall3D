@@ -11,7 +11,7 @@ flt::CameraComponent::CameraComponent()
 	, _hObject()
 	, _isDraw(true)
 {
-	_rendererObject->camera = new flt::Camera(&_gameObject->transform);
+	_rendererObject->camera = new flt::Camera(nullptr);
 }
 
 flt::CameraComponent::~CameraComponent()
@@ -46,6 +46,7 @@ flt::Matrix4f flt::CameraComponent::GetProjectionMatrix() const
 void flt::CameraComponent::OnCreate()
 {
 	_rendererObject->transform = &_gameObject->transform;
+	_rendererObject->camera->SetTransform(&_gameObject->transform);
 }
 
 void flt::CameraComponent::OnEnable()

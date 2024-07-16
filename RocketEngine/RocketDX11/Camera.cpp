@@ -221,7 +221,7 @@ namespace Rocket::Core
 		return true;
 	}
 
-	void Camera::GetAllValues(float& outNearZ, float& outFarZ, float& outAspect, float& outFovY, DirectX::XMFLOAT4X4& outViewMatrix, DirectX::XMFLOAT4X4 outProjectionMatrix)
+	void Camera::GetAllValues(float& outNearZ, float& outFarZ, float& outAspect, float& outFovY, DirectX::XMFLOAT4X4& outViewMatrix, DirectX::XMFLOAT4X4& outProjectionMatrix)
 	{
 		outNearZ = _nearZ;
 		outFarZ = _farZ;

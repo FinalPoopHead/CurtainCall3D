@@ -19,7 +19,7 @@ namespace Rocket::Core
 		virtual void AddToMainCamera() = 0;			// MainCamera 리스트에 추가한다. (현재는 2개짜리 배열)
 		virtual bool SetMainCameraIndex(int index) = 0;	// MainCamera 리스트에서 몇번째에 있는지 설정한다.
 		virtual void BindTransform(RocketTransform* transform) = 0;
-		virtual void GetAllValues(float& outNearZ, float& outFarZ, float& outAspect, float& outFovY, DirectX::XMFLOAT4X4& outViewMatrix, DirectX::XMFLOAT4X4 outProjectionMatrix) = 0;
+		virtual void GetAllValues(float& outNearZ, float& outFarZ, float& outAspect, float& outFovY, DirectX::XMFLOAT4X4& outViewMatrix, DirectX::XMFLOAT4X4& outProjectionMatrix) = 0;
 
 		// Resize? viewport 사이즈 관리
 		// 뷰포트 사이즈 변경 -> width, height
