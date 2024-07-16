@@ -184,11 +184,6 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 			cameraObject->camera->SetFarZ(outFarZ);
 			cameraObject->camera->SetViewRectAspect(outAspect, 1.0f);
 			cameraObject->camera->SetFov(DegToRad(outFovY));
-
-			auto view = cameraObject->camera->GetViewMatrix();
-			auto proj = cameraObject->camera->GetProjectionMatrix();
-			int i = 0;
-
 		}
 	}
 
