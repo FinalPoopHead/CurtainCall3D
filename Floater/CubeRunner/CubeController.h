@@ -64,6 +64,7 @@ private:
 	float _removeSpeed;		// 제거 속도 -> 주어진 제거시간의 역수
 	float _generateSpeed;		// 상승 속도 -> 주어진 상승시간의 역수
 	float _generateDelay;		// 상승 딜레이
+	float _dropDelay;		// 떨어지기 딜레이
 	float _elapsedTime;
 	float _currentAngle;	// 현재 회전 각도
 	flt::Vector3f _rotatePivot;	// 회전 중심

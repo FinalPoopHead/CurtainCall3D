@@ -52,6 +52,7 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _normalCubePool()
 	, _isGameOver(true)
 	, _isAttacked(false)
+	, _isBattleMode(false)
 	, _delayRemain(ROLLING_DELAY)
 	, _fastForwardValue(FFDEFAULT)
 	, _nowRollingCount(0)
@@ -64,6 +65,7 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _isFirst(false)
 	, _nowAddTileCount()
 	, _nextDestroyRow()
+	, _minHeight()
 	, _minePos({ -1,-1 })
 	, _fallingTileCount()
 	, _addTiles()
@@ -73,6 +75,7 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	_soundComponent->AddSound(path + L"Generate.mp3");
 	_soundComponent->AddSound(path + L"CubeRoll.mp3");
 	_soundComponent->AddSound(path + L"CubeDestroy.mp3");
+	_soundComponent->AddSound(path + L"CubeDrop.mp3");
 	_soundComponent->AddSound(path + L"SetMine.mp3");
 	_soundComponent->AddSound(path + L"DetonateMine.mp3");
 	_soundComponent->AddSound(path + L"DetonateAdvantage.mp3");
@@ -86,6 +89,7 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	_soundIndex["Generate"] = index++;
 	_soundIndex["CubeRoll"] = index++;
 	_soundIndex["CubeDestroy"] = index++;
+	_soundIndex["CubeDrop"] = index++;
 	_soundIndex["SetMine"] = index++;
 	_soundIndex["DetonateMine"] = index++;
 	_soundIndex["DetonateAdvantage"] = index++;
@@ -590,12 +594,11 @@ void Board::DropGarbageLine(int lineCount)
 	int height = lineCount;
 
 	float heightDelay = 0.15f;
-	float randomDelayValue = 0.02f;
+	float randomDelayValue = 0.08f;
 
-	/// 100 중에 20 20 60
-	int darkCube = 5;
-	int advantageCube = 10;
-	int normalCube = 85;
+	int darkCube = 7;
+	int advantageCube = 15;
+	int normalCube = 78;
 
 	std::random_device rd;
 
@@ -641,27 +644,14 @@ void Board::DropGarbageLine(int lineCount)
 			float delayVar = randomDelayValue * (rd() % 5);
 
 			auto cubeCtr = cube->GetComponent<CubeController>();
+			cube->tr.SetPosition(x, 4.0f, z);		// 높이는 StartDrop에서 수정함
 			cubeCtr->StartDrop(delayVar + heightDelay * j);
 			_nowDropCubeCtrs.push_back(cubeCtr);
-			cube->tr.SetPosition(x, 50.0f, z);
-			cube->Enable();
+			_runningCubeControllers.push_back(cubeCtr);
 			_tiles[i][j]->_cube = cube;
+			cube->Enable();
 		}
 	}
-
-	_isPerfect = true;
-	_isOnlyDarkRemain = false;
-
-	for (auto& cubeCtr : _runningCubeControllers)
-	{
-		cubeCtr->SetIsRunning(true);
-	}
-
-	auto player = _gameManager->GetPlayer(_playerIndex);
-	player->camera->LookGenerating();
-	_isCameraWorking = true;
-
-	_isFirst = false;
 }
 
 void Board::TickCubesRolling(float rollingTime)
@@ -792,6 +782,26 @@ void Board::ReturnTileToPool(Tile* tile)
 
 	_tilePool.push_back(tile);
 	tile->Disable();
+}
+
+void Board::CheckMinHeight()
+{
+	_minHeight = 1000000;
+
+	for (auto& cubeCtr : _runningCubeControllers)
+	{
+		auto pos = cubeCtr->GetPosition();
+		int x = 0;
+		int z = 0;
+		ConvertToTileIndex(pos.x, pos.z, x, z);
+
+		if (z < _minHeight)
+		{
+			_minHeight = z;
+		}
+	}
+
+	_gameManager->OnCheckMinHeight(_playerIndex, _minHeight);
 }
 
 void Board::ReturnCubeToPool(flt::GameObject* obj)
@@ -1021,25 +1031,20 @@ void Board::OnEndTileFall(int x, int z)
 	}
 }
 
-void Board::OnEndCubeDrop()
+void Board::OnEndCubeDrop(CubeController* cubeCtr)
 {
-	// TODO : 구현해야함.
-// 	_nowGeneratingCount--;
-// 	if (_nowGeneratingCount <= 0)
-// 	{
-// 		_nowGeneratingCount = 0;
-// 
-// 		for (auto& col : _tileStates)
-// 		{
-// 			for (auto& tileState : col)
-// 			{
-// 				tileState = tileState & ~(int)eTileStateFlag::GENERATING;
-// 			}
-// 		}
-// 
-// 		UpdateBoard();
-// 		SetDelay(GENERATE_DELAY);
-// 	}
+	auto temp = _nowDropCubeCtrs.remove(cubeCtr);
+
+	if (_nowDropCubeCtrs.empty())
+	{
+		for (auto& cubeCtr : _runningCubeControllers)
+		{
+			cubeCtr->SetIsRunning(true);
+		}
+
+		UpdateBoard();
+		_soundComponent->Play(_soundIndex["CubeDrop"]);
+	}
 }
 
 void Board::AddColumn()
@@ -1216,6 +1221,8 @@ void Board::Resize(int newWidth, int newHeight)
 
 	_width = newWidth;
 	_height = newHeight;
+
+	_gameManager->OnHeightChange(_playerIndex, _height);
 }
 
 void Board::Reset()
@@ -1391,6 +1398,11 @@ void Board::UpdateBoard()
 	{
 		SetTileStateWithCubeCtr(cubeCtr);
 	}
+
+	if (_isBattleMode)
+	{
+		CheckMinHeight();
+	}
 }
 
 bool Board::UpdateDetonate()
@@ -1462,6 +1474,11 @@ bool Board::UpdateDetonate()
 	}
 
 	_gameManager->OnDestroyCubes(_playerIndex, destroyCount);
+
+	if (_isBattleMode)
+	{
+		CheckMinHeight();
+	}
 
 	for (int i = 0; i < _width; i++)
 	{
