@@ -67,7 +67,7 @@ public:
 	void ConvertToTilePosition(int x, int z, float& outX, float& outZ);
 
 	void GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount, bool isFirst = false);
-	void GenerateGarbageLine(int lineCount);
+	void DropGarbageLine(int lineCount);
 	void ReturnCubeToPool(flt::GameObject* obj);
 	void RemoveFromControllerList(CubeController* cubeCtr);
 	void SetMine(float x, float z);			// position X,Z에 지뢰를 설치한다.
@@ -78,6 +78,7 @@ public:
 	void OnEndTileAdd(Tile* tile);
 	void OnStartTileFall(int x, int z);		// x,z index의 타일이 떨어지기 시작함.
 	void OnEndTileFall(int x, int z);
+	void OnEndCubeDrop();
 
 	void AddColumn();
 	void DestroyRow();
@@ -135,6 +136,7 @@ private:
 
 	std::list<std::list<CubeController*>> _waveCubeControllers;	// 웨이브별 큐브들
 	std::list<CubeController*> _runningCubeControllers;	// 현재 보드 위에 굴러가는 큐브들
+	std::list<CubeController*> _nowDropCubeCtrs;	// 현재 보드 위로 쏟아지는 큐브들
 	std::list<AdvantageCube*> _advantageCubePool;								// 어드밴티지 큐브 풀
 	std::list<DarkCube*> _darkCubePool;											// 다크 큐브 풀
 	std::list<NormalCube*> _normalCubePool;										// 노말 큐브 풀
@@ -158,7 +160,4 @@ private:
 	std::pair<int, int> _minePos;
 	std::unordered_map<int,int> _fallingTileCount;	// key는 heightIndex
 	std::list<Tile*> _addTiles;
-
-	int _testIndex;
-	float _testValue[5];
 };
