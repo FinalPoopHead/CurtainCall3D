@@ -10,11 +10,12 @@ enum class eCUBETYPE
 
 enum class eCUBESTATUS
 {
-	NONE,
-	ROLLING,
-	FALLING,
-	REMOVING,
-	GENERATING		// 등장 연출
+	NONE
+	, ROLLING
+	, FALLING
+	, REMOVING
+	, GENERATING		// 등장 연출
+	, DROPPING
 };
 
 class Board;
@@ -34,6 +35,7 @@ public:
 	void StartFall(bool withDamage = true);
 	void StartRemove(float removeTime);
 	void StartGenerate(float riseTime, float delay);
+	void StartDrop(float delay);
 	bool IsRolling() { return _status == eCUBESTATUS::ROLLING; }
 	flt::Vector4f GetPosition() { return _gameObject->tr.GetWorldPosition(); }
 	eCUBETYPE GetCubeType() { return _cubeType; }
@@ -47,8 +49,10 @@ private:
 	void Fall(float deltaSecond);
 	bool IsOutofBoard();			// 보드를 벗어나는지 체크
 	bool IsFallEnough();			// 충분히 떨어졌는지 체크
+	bool IsDropEnough();
 	void Removing(float deltaSecond);
 	void Generating(float deltaSecond);
+	void Dropping(float deltaSecond);
 
 private:
 	Board* _board;			// 게임의 바닥 보드.

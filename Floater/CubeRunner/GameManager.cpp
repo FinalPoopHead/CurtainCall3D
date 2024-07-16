@@ -637,7 +637,7 @@ void GameManager::OnEndLevel(int playerIndex)
 		if (_boards[playerIndex] != nullptr)
 		{
 			_boards[playerIndex]->Reset();
-			_boards[playerIndex]->GenerateGarbageLine(_attackedLineCount[playerIndex]);
+			_boards[playerIndex]->DropGarbageLine(_attackedLineCount[playerIndex]);
 			SetAttackedLineCount(playerIndex, 0);
 		}
 	}
