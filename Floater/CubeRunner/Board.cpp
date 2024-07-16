@@ -1,4 +1,5 @@
-﻿#include "Board.h"
+﻿#include <random>
+#include "Board.h"
 #include "../FloaterGameEngine/include/Input.h"
 
 #include "Tile.h"
@@ -217,7 +218,7 @@ void Board::PreUpdate(float deltaSecond)
 		_testValue[_testIndex] -= diff;
 		std::cout << "[X : " << _testValue[0] << "] [Y : " << _testValue[1] << "] [Z : " << _testValue[2] << "] [xAngle : " << _testValue[3] << "] [yAngle : " << _testValue[4] << "]" << std::endl;
 	}
-	
+
 	diff = 0.1f;
 
 	keyData = flt::GetKeyDown(flt::KeyCode::right);
@@ -605,6 +606,8 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 			_waveCubeControllers.push_front(waveCubes);
 			waveCubes.clear();
 		}
+
+		_soundComponent->Play(_soundIndex["Generate"]);
 	}
 
 	_boardState = eBoardState::CUBEGENERATING;
@@ -652,7 +655,98 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 	}
 
 	_isFirst = isFirst;
-	_soundComponent->Play(_soundIndex["Generate"]);
+}
+
+void Board::GenerateGarbageLine(int lineCount)
+{
+	_isGameOver = false;
+
+	int width = _width;
+	int height = lineCount;
+
+	_waveCubeControllers.clear();
+	int waveHeight = height;
+	int heightCount = 0;
+	float startDelay = 0.15f;
+	float delayBase = 0.5f;
+
+	/// 100 중에 20 20 60
+	int darkCube = 15;
+	int advantageCube = 15;
+	int normalCube = 70;
+
+	std::random_device rd;
+
+	for (int j = 0; j < height; ++j)
+	{
+		for (int i = 0; i < width; ++i)
+		{
+			float x = _tiles[i][j]->tr.GetWorldPosition().x;
+			float z = _tiles[i][j]->tr.GetWorldPosition().z;
+
+			flt::GameObject* cube = nullptr;
+
+			int randomValue = rd() % 100;
+
+			if (randomValue < darkCube)
+			{
+				if (_darkCubePool.empty())
+				{
+					ASSERT(false, "DarkCubePool is Empty");
+				}
+				cube = _darkCubePool.front();
+				_darkCubePool.pop_front();
+			}
+			else if (randomValue < darkCube + advantageCube)
+			{
+				if (_advantageCubePool.empty())
+				{
+					ASSERT(false, "AdvantageCubePool is Empty");
+				}
+				cube = _advantageCubePool.front();
+				_advantageCubePool.pop_front();
+			}
+			else
+			{
+				if (_normalCubePool.empty())
+				{
+					ASSERT(false, "NormalCubePool is Empty");
+				}
+				cube = _normalCubePool.front();
+				_normalCubePool.pop_front();
+			}
+
+			auto cubeCtr = cube->GetComponent<CubeController>();
+			cubeCtr->StartGenerate(GENERATE_TIME, delayBase + startDelay * j);
+			_runningCubeControllers.push_back(cubeCtr);
+			cube->tr.SetPosition(x, 0.0f, z);
+			cube->Enable();
+			_tiles[i][j]->_cube = cube;
+			_nowGeneratingCount++;
+		}
+
+		_soundComponent->Play(_soundIndex["Generate"]);
+	}
+
+	_boardState = eBoardState::CUBEGENERATING;
+	if (_height == 0)
+	{
+		_boardState = eBoardState::NONE;
+	}
+
+	_isPerfect = true;
+	_isOnlyDarkRemain = false;
+
+	for (auto& cubeCtr : _runningCubeControllers)
+	{
+		cubeCtr->SetIsRunning(true);
+	}
+
+	auto player = _gameManager->GetPlayer(_playerIndex);
+	player->camera->LookGenerating();
+	_isCameraWorking = true;
+
+	_isFirst = false;
 }
 
 void Board::TickCubesRolling(float rollingTime)
@@ -697,11 +791,9 @@ void Board::OnEndWave()
 {
 	if (_isPerfect)
 	{
+		_fastForwardValue = FFDEFAULT;
 		AddRow();
 		MoveCameraToEnd();
-		// TODO : 상대방 공격하는게 되긴 하는데.. 좀 요상하다 ㅋㅋㅋㅋ
-		//			Board 코드도 조금바꿔서 행동에 우선순위를 정해주고 큐에 담아서 처리하는 식으로 해야될듯..
-		// _gameManager->AttackAnotherPlayer(_playerIndex);
 	}
 	else
 	{
@@ -893,6 +985,8 @@ void Board::DetonateAdvantageMine()
 		return;
 	}
 
+	bool isSuccess = false;
+
 	for (int i = 0; i < _width; i++)
 	{
 		for (int j = 0; j < _height; j++)
@@ -917,11 +1011,17 @@ void Board::DetonateAdvantageMine()
 						_tiles[nextX][nextY]->EnableDetonated();
 					}
 				}
+
+				isSuccess = true;
 			}
 
 		}
 	}
-	_soundComponent->Play(_soundIndex["DetonateAdvantage"]);
+
+	if (isSuccess)
+	{
+		_soundComponent->Play(_soundIndex["DetonateAdvantage"]);
+	}
 }
 
 void Board::OnEndCubeRoll()
@@ -1008,8 +1108,31 @@ void Board::OnEndTileFall(int x, int z)
 
 void Board::AddColumn()
 {
-	// TODO : 구현 필요
 	ASSERT(false, "not Implemented");
+
+	// TODO : 구현 필요
+	_nowAddTileCount = _width;
+	++_nextDestroyRow;
+	_boardState = eBoardState::ADDTILE;
+
+	for (int i = 0; i < _width; i++)
+	{
+		Tile* tile = GetTileFromPool();
+		_addTiles.push_back(tile);
+
+		float x = 0.0f;
+		float z = 0.0f;
+		ConvertToTileLocalPosition(i, _height + 16, x, z);
+
+		tile->tr.SetPosition({ x, 0.0f, z });
+
+		ConvertToTileLocalPosition(i, _height, x, z);
+		x += tr.GetWorldPosition().x;
+		z += tr.GetWorldPosition().z;
+
+		// TODO : StartAddComlumn이라고 하나 더 만들어야겠네? 이게 맞나?!
+		tile->StartAddRow(ADDTILE_TIME, { x,0.0f,z });
+	}
 }
 
 void Board::DestroyRow()
@@ -1036,11 +1159,6 @@ void Board::DestroyRow()
 	--_nextDestroyRow;
 
 	_soundComponent->Play(_soundIndex["TileDestroy"]);
-}
-
-void Board::DeferredDestroyRow()
-{
-	_isAttacked = true;
 }
 
 bool Board::IsMineSet()
@@ -1407,7 +1525,7 @@ bool Board::UpdateDetonate()
 		}
 	}
 
-	_gameManager->IncreaseScore(_playerIndex, destroyCount);
+	_gameManager->OnDestroyCubes(_playerIndex, destroyCount);
 
 	for (int i = 0; i < _width; i++)
 	{

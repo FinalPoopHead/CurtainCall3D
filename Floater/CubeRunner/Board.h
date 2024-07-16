@@ -67,6 +67,7 @@ public:
 	void ConvertToTilePosition(int x, int z, float& outX, float& outZ);
 
 	void GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount, bool isFirst = false);
+	void GenerateGarbageLine(int lineCount);
 	void ReturnCubeToPool(flt::GameObject* obj);
 	void RemoveFromControllerList(CubeController* cubeCtr);
 	void SetMine(float x, float z);			// position X,Z에 지뢰를 설치한다.
@@ -80,7 +81,6 @@ public:
 
 	void AddColumn();
 	void DestroyRow();
-	void DeferredDestroyRow();
 
 	bool IsMineSet();
 
