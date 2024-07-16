@@ -58,6 +58,8 @@ public:
 
 	void OnStartPlayerFall(int index);
 	void OnEndPlayerFall(int index);
+	void OnCheckMinHeight(int index, int height);
+	void OnHeightChange(int index, int height);
 
 private:
 	void IncreasePlayerCount();
@@ -69,6 +71,7 @@ private:
 	void SetPlayTimeText(int index, float time);
 	void AddAttackedLineCount(int index, int count);
 	void SetAttackedLineCount(int index, int count);
+	void ChangeHeightCountText(int index, int height);
 
 	/// 사운드 관련
 private:
@@ -90,6 +93,7 @@ private:
 	std::vector<SpriteObject*> _fallCountPanel;
 	std::vector<std::vector<SpriteObject*>> _fallCountSlot;
 	std::vector<std::vector<SpriteObject*>> _fallCountRed;
+	std::vector<TextObject*> _heightCountText;
 	std::vector<TextObject*> _playTimeText;
 	std::vector<TextObject*> _gameoverTextPanel;
 	std::vector<std::vector<TextObject*>> _gameoverText;
@@ -112,6 +116,6 @@ private:
 	std::vector<int> _currentStage;
 	std::vector<int> _currentLevel;
 
-	std::vector<int> _attackedLineCount;
+	std::vector<int> _garbageLineCount;
 	std::vector<bool> _isBacktoBack;
 };

@@ -78,7 +78,7 @@ public:
 	void OnEndTileAdd(Tile* tile);
 	void OnStartTileFall(int x, int z);		// x,z index의 타일이 떨어지기 시작함.
 	void OnEndTileFall(int x, int z);
-	void OnEndCubeDrop();
+	void OnEndCubeDrop(CubeController* cubeCtr);
 
 	void AddColumn();
 	void DestroyRow();
@@ -93,6 +93,8 @@ public:
 	void EndFastForward();
 
 	const float& GetFFValue() { return _fastForwardValue; }
+
+	void SetBattleMode() { _isBattleMode = true; }
 
 private:
 	//void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
@@ -117,6 +119,8 @@ private:
 
 	Tile* GetTileFromPool();
 	void ReturnTileToPool(Tile* tile);
+
+	void CheckMinHeight();
 
 private:
 	flt::SoundComponent* _soundComponent;
@@ -143,6 +147,7 @@ private:
 
 	bool _isGameOver;
 	bool _isAttacked;
+	bool _isBattleMode;
 	float _delayRemain;
 	float _fastForwardValue;
 	int _nowRollingCount;
@@ -156,6 +161,7 @@ private:
 	bool _isFirst;
 	int _nowAddTileCount;
 	int _nextDestroyRow;
+	int _minHeight;
 
 	std::pair<int, int> _minePos;
 	std::unordered_map<int,int> _fallingTileCount;	// key는 heightIndex

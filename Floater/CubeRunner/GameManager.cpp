@@ -50,6 +50,7 @@ GameManager::GameManager() :
 	, _fallCountPanel()
 	, _fallCountSlot()
 	, _fallCountRed()
+	, _heightCountText()
 	, _playTimeText()
 	, _gameoverTextPanel()
 	, _comboTextPool()
@@ -63,7 +64,7 @@ GameManager::GameManager() :
 	, _stageData()
 	, _currentStage(std::vector<int>(MAXPLAYERCOUNT))
 	, _currentLevel(std::vector<int>(MAXPLAYERCOUNT))
-	, _attackedLineCount(std::vector<int>(MAXPLAYERCOUNT))
+	, _garbageLineCount(std::vector<int>(MAXPLAYERCOUNT))
 {
 	for (int i = 0; i < MAXPLAYERCOUNT; i++)
 	{
@@ -312,6 +313,15 @@ void GameManager::CreateUI(int index)
 		_fallCountRed[index].push_back(hpRed);
 	}
 
+	TextObject* heightCountText = flt::CreateGameObject<TextObject>(true);
+	heightCountText->SetParent(fallCountPanel);
+	heightCountText->SetPosition({ 0.0f, -25.0f });
+	heightCountText->SetFont(smallFontPath);
+	heightCountText->SetText(L"0");
+	heightCountText->SetTextColor(TextColor);
+	heightCountText->SetTextAlignment(eTextAlignment::RIGHT);
+	_heightCountText.push_back(heightCountText);
+
 	TextObject* gameoverTextPanel = flt::CreateGameObject<TextObject>(false);
 	gameoverTextPanel->SetOffsetPosition(GAMEOVERPANEL_OFFSETPOS);
 	_gameoverTextPanel.push_back(gameoverTextPanel);
@@ -499,25 +509,21 @@ void GameManager::OnDestroyCubes(int playerIndex, int count)
 	case 3:
 		break;
 	case 4:
+	case 5:
 		damage = 1;
 		break;
-	case 5:
+	case 6:
+	case 7:
 		damage = 2;
 		break;
-	case 6:
+	case 8:
 		damage = 3;
 		break;
-	case 7:
+	case 9:
 		damage = 4;
 		break;
-	case 8:
-		damage = 5;
-		break;
-	case 9:
-		damage = 6;
-		break;
 	default:
-		damage = 8;
+		damage = 6;
 		break;
 	}
 
@@ -605,7 +611,6 @@ void GameManager::OnStageStart()
 
 void GameManager::OnEndLevel(int playerIndex)
 {
-	// TODO : 이런식으로 나눠두는거 진짜 아닌 것 같다.
 	if (_players.size() == 1)
 	{
 		++_currentLevel[playerIndex];
@@ -634,12 +639,8 @@ void GameManager::OnEndLevel(int playerIndex)
 	}
 	else if (_players.size() == 2)
 	{
-		if (_boards[playerIndex] != nullptr)
-		{
-			_boards[playerIndex]->Reset();
-			_boards[playerIndex]->DropGarbageLine(_attackedLineCount[playerIndex]);
-			SetAttackedLineCount(playerIndex, 0);
-		}
+		// TODO : 웨이브가 끝나면 퍼펙트라고 해줄까? 흠.. 흠.. 흠.. 흠..
+
 	}
 }
 
@@ -682,6 +683,23 @@ void GameManager::OnEndPlayerFall(int index)
 
 		flt::StartTween(tweenScale);
 	}
+}
+
+void GameManager::OnCheckMinHeight(int index, int height)
+{
+	// TODO : 오? 높이가 됐네? 그러면 가비지 라인 출발~
+	int garbageCount = _garbageLineCount[index];
+
+	if (height > garbageCount)
+	{
+		_boards[index]->DropGarbageLine(garbageCount);
+		SetAttackedLineCount(index, 0);
+	}
+}
+
+void GameManager::OnHeightChange(int index, int height)
+{
+	ChangeHeightCountText(index, height);
 }
 
 void GameManager::IncreasePlayerCount()
@@ -918,11 +936,15 @@ void GameManager::SetBattleMode()
 {
 	StageData data = _stageData[0];
 
+	int width = 4;
+	int height = 30;
+
 	for (int i = 0; i < _players.size(); i++)
 	{
 		if (_boards[i] != nullptr)
 		{
-			_boards[i]->Resize(data.stageWidth, data.stageHeight);
+			_boards[i]->SetBattleMode();
+			_boards[i]->Resize(width, height);
 			_boards[i]->Reset();
 			_boards[i]->GenerateLevel(data.level[0].levelLayout, 1, true);
 		}
@@ -999,12 +1021,26 @@ void GameManager::SetPlayTimeText(int index, float time)
 
 void GameManager::AddAttackedLineCount(int index, int count)
 {
-	_attackedLineCount[index] += count;
+	_garbageLineCount[index] += count;
 	// TODO : 어택 라인카운트 트윈애니메이션 재생해야함.
 }
 
 void GameManager::SetAttackedLineCount(int index, int count)
 {
-	_attackedLineCount[index] = count;
+	_garbageLineCount[index] = count;
 	// TODO : ui 갱신
+}
+
+void GameManager::ChangeHeightCountText(int index, int height)
+{
+	auto& textObj = _heightCountText[index];
+
+	textObj->SetText(std::to_wstring(height) + L" lines");
+
+	auto tweenScale = flt::MakeScaleTween(&textObj->tr);
+
+	tweenScale->from({ 2.0f,2.0f,2.0f,1.0f })
+		.to({ 1.0f,1.0f,1.0f,1.0f }).during(0.5f).easing(flt::ease::easeOutBack);
+
+	flt::StartTween(tweenScale);
 }
