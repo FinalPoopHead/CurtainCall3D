@@ -94,18 +94,6 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	_soundIndex["GameOver"] = index++;
 	_soundIndex["StageClear"] = index++;
 
-	_testIndex = 0;
-	for (int i = 0; i < 5; i++)
-	{
-		_testValue[i] = 1.0f;
-	}
-
-	_testValue[0] = 0.5f;
-	_testValue[1] = 1.5f;
-	_testValue[2] = 1.0f;
-	_testValue[3] = 25.0f;
-	_testValue[4] = 20.0f;
-
 	// Create TilePool
 	for (int i = 0; i < TILE_COUNT; i++)
 	{
@@ -175,67 +163,6 @@ void Board::PreUpdate(float deltaSecond)
 		OnFastForwarding();
 	}
 
-	keyData = flt::GetKeyDown(flt::KeyCode::tab);
-	if (keyData)
-	{
-		_testIndex = (_testIndex + 1) % 5;
-		std::string modeStr = "babo";
-		switch (_testIndex)
-		{
-		case 0:
-			modeStr = "X";
-			break;
-		case 1:
-			modeStr = "Y";
-			break;
-		case 2:
-			modeStr = "Z";
-			break;
-		case 3:
-			modeStr = "xAngle";
-			break;
-		case 4:
-			modeStr = "yAngle";
-			break;
-		default:
-			break;
-		}
-		std::cout << modeStr << std::endl;
-	}
-
-	float diff = 1.0f;
-
-	keyData = flt::GetKeyDown(flt::KeyCode::up);
-	if (keyData)
-	{
-		_testValue[_testIndex] += diff;
-		std::cout << "[X : " << _testValue[0] << "] [Y : " << _testValue[1] << "] [Z : " << _testValue[2] << "] [xAngle : " << _testValue[3] << "] [yAngle : " << _testValue[4] << "]" << std::endl;
-	}
-
-	keyData = flt::GetKeyDown(flt::KeyCode::down);
-	if (keyData)
-	{
-		_testValue[_testIndex] -= diff;
-		std::cout << "[X : " << _testValue[0] << "] [Y : " << _testValue[1] << "] [Z : " << _testValue[2] << "] [xAngle : " << _testValue[3] << "] [yAngle : " << _testValue[4] << "]" << std::endl;
-	}
-
-	diff = 0.1f;
-
-	keyData = flt::GetKeyDown(flt::KeyCode::right);
-	if (keyData)
-	{
-		_testValue[_testIndex] += diff;
-		std::cout << "[X : " << _testValue[0] << "] [Y : " << _testValue[1] << "] [Z : " << _testValue[2] << "] [xAngle : " << _testValue[3] << "] [yAngle : " << _testValue[4] << "]" << std::endl;
-	}
-
-	keyData = flt::GetKeyDown(flt::KeyCode::left);
-	if (keyData)
-	{
-		_testValue[_testIndex] -= diff;
-		std::cout << "[X : " << _testValue[0] << "] [Y : " << _testValue[1] << "] [Z : " << _testValue[2] << "] [xAngle : " << _testValue[3] << "] [yAngle : " << _testValue[4] << "]" << std::endl;
-	}
-
-	// TODO : 슬로우모드임
 	keyData = flt::GetKeyDown(flt::KeyCode::o);
 	if (keyData)
 	{
@@ -657,23 +584,18 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 	_isFirst = isFirst;
 }
 
-void Board::GenerateGarbageLine(int lineCount)
+void Board::DropGarbageLine(int lineCount)
 {
-	_isGameOver = false;
-
 	int width = _width;
 	int height = lineCount;
 
-	_waveCubeControllers.clear();
-	int waveHeight = height;
-	int heightCount = 0;
-	float startDelay = 0.15f;
-	float delayBase = 0.5f;
+	float heightDelay = 0.15f;
+	float randomDelayValue = 0.02f;
 
 	/// 100 중에 20 20 60
-	int darkCube = 15;
-	int advantageCube = 15;
-	int normalCube = 70;
+	int darkCube = 5;
+	int advantageCube = 10;
+	int normalCube = 85;
 
 	std::random_device rd;
 
@@ -716,22 +638,15 @@ void Board::GenerateGarbageLine(int lineCount)
 				_normalCubePool.pop_front();
 			}
 
+			float delayVar = randomDelayValue * (rd() % 5);
+
 			auto cubeCtr = cube->GetComponent<CubeController>();
-			cubeCtr->StartGenerate(GENERATE_TIME, delayBase + startDelay * j);
-			_runningCubeControllers.push_back(cubeCtr);
-			cube->tr.SetPosition(x, 0.0f, z);
+			cubeCtr->StartDrop(delayVar + heightDelay * j);
+			_nowDropCubeCtrs.push_back(cubeCtr);
+			cube->tr.SetPosition(x, 50.0f, z);
 			cube->Enable();
 			_tiles[i][j]->_cube = cube;
-			_nowGeneratingCount++;
 		}
-
-		_soundComponent->Play(_soundIndex["Generate"]);
-	}
-
-	_boardState = eBoardState::CUBEGENERATING;
-	if (_height == 0)
-	{
-		_boardState = eBoardState::NONE;
 	}
 
 	_isPerfect = true;
@@ -1104,6 +1019,27 @@ void Board::OnEndTileFall(int x, int z)
 	{
 		_fallingTileCount[z] = 0;
 	}
+}
+
+void Board::OnEndCubeDrop()
+{
+	// TODO : 구현해야함.
+// 	_nowGeneratingCount--;
+// 	if (_nowGeneratingCount <= 0)
+// 	{
+// 		_nowGeneratingCount = 0;
+// 
+// 		for (auto& col : _tileStates)
+// 		{
+// 			for (auto& tileState : col)
+// 			{
+// 				tileState = tileState & ~(int)eTileStateFlag::GENERATING;
+// 			}
+// 		}
+// 
+// 		UpdateBoard();
+// 		SetDelay(GENERATE_DELAY);
+// 	}
 }
 
 void Board::AddColumn()

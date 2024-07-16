@@ -105,8 +105,7 @@ private:
 	std::vector<int> _fallCountMax;
 	std::vector<float> _playTime;
 	std::vector<int> _playerScore;
-
-	std::vector<flt::Vector2f> _comboTextPos;		// 플레이어 별 콤보 텍스트 위치
+		std::vector<flt::Vector2f> _comboTextPos;		// 플레이어 별 콤보 텍스트 위치
 
 private:
 	std::vector<StageData> _stageData;

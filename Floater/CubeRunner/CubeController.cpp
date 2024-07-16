@@ -11,6 +11,9 @@ constexpr float STARTFALLSPEED = 20.0f;
 constexpr float FALLHEIGHT = -50.0f;
 constexpr float DISTANCE = 4.0f;
 constexpr double OVERLAPSCALE = 0.975;
+constexpr float DROPSTARTHEIGHT = 50.0f;
+constexpr float DROPENDHEIGHT = 4.0f;
+constexpr float STARTDROPSPEED = 30.0f;
 
 CubeController::CubeController()
 	: _board(nullptr)
@@ -51,6 +54,10 @@ void CubeController::PreUpdate(float deltaSecond)
 	case eCUBESTATUS::GENERATING:
 		Generating(deltaSecond);
 		break;
+	case eCUBESTATUS::DROPPING:
+		Dropping(deltaSecond);
+		break;
+
 	}
 }
 
@@ -134,6 +141,17 @@ void CubeController::StartGenerate(float riseTime, float delay)
 	_gameObject->tr.SetWorldRotation({ 0.0f,0.0f,0.0f,1.0f });
 
 	_status = eCUBESTATUS::GENERATING;
+}
+
+void CubeController::StartDrop(float delay)
+{
+	if (_status != eCUBESTATUS::NONE)
+	{
+		return;
+	}
+
+	_status = eCUBESTATUS::DROPPING;
+	_fallSpeed = STARTDROPSPEED;
 }
 
 void CubeController::Roll(float deltaSecond)
@@ -220,6 +238,18 @@ bool CubeController::IsFallEnough()
 	}
 }
 
+bool CubeController::IsDropEnough()
+{
+	if (_gameObject->tr.GetWorldPosition().y <= DROPENDHEIGHT)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 void CubeController::Removing(float deltaSecond)
 {
 	_gameObject->tr.AddWorldPosition(0.0f, -_removeSpeed * DISTANCE * deltaSecond, 0.0f);
@@ -231,6 +261,7 @@ void CubeController::Removing(float deltaSecond)
 		//_board->RemoveFromControllerList(this);
 		_board->ReturnCubeToPool(_gameObject);
 		_status = eCUBESTATUS::NONE;
+		_gameObject->tr.SetScale(1.0, 1.0, 1.0);
 	}
 }
 
@@ -253,5 +284,24 @@ void CubeController::Generating(float deltaSecond)
 			_gameObject->tr.SetScale(1.0, 1.0, 1.0);
 			_gameObject->tr.SetWorldPosition(pos.x, DISTANCE, pos.z);
 		}
+	}
+}
+
+void CubeController::Dropping(float deltaSecond)
+{
+	_fallSpeed += GRAVITY * deltaSecond;
+	_gameObject->tr.AddWorldPosition(0.0f, -_fallSpeed * deltaSecond, 0.0f);
+
+	if (IsDropEnough())
+	{
+		//_board->RemoveFromControllerList(this);
+		//_board->ReturnCubeToPool(_gameObject);
+		_status = eCUBESTATUS::NONE;
+
+		_board->OnEndCubeDrop();
+
+		flt::Vector4f pos = _gameObject->tr.GetWorldPosition();
+		_gameObject->tr.SetWorldPosition(pos.x, DROPENDHEIGHT, pos.z);
+		_gameObject->tr.SetScale(1.0, 1.0, 1.0);
 	}
 }
