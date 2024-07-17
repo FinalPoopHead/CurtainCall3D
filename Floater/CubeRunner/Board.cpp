@@ -596,9 +596,11 @@ void Board::DropGarbageLine(int lineCount)
 	float heightDelay = 0.15f;
 	float randomDelayValue = 0.08f;
 
+	int dropChance = 50;
+
 	int darkCube = 7;
 	int advantageCube = 15;
-	int normalCube = 78;
+	int normalCube = 100 - darkCube - advantageCube;
 
 	std::random_device rd;
 
@@ -606,6 +608,12 @@ void Board::DropGarbageLine(int lineCount)
 	{
 		for (int i = 0; i < width; ++i)
 		{
+			int dropValue = rd() % 100;
+			if (dropValue >= dropChance)
+			{
+				continue;
+			}
+
 			float x = _tiles[i][j]->tr.GetWorldPosition().x;
 			float z = _tiles[i][j]->tr.GetWorldPosition().z;
 
