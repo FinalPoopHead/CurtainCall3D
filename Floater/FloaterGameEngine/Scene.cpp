@@ -81,10 +81,14 @@ void flt::Scene::TweenUpdate(float deltaSecond)
 {
 	for (uint32 denseIndex = 0; denseIndex < _tweens.Size();)
 	{
-		bool isFinished = _tweens.AtDense(denseIndex)->Update(deltaSecond);
+		IFLTween* tween = _tweens.AtDense(denseIndex);
+
+		// 업데이트 이후 이 트윈이 이미 자료구조에서 없을 수 있음.
+		bool isFinished = tween->Update(deltaSecond);
 		if (isFinished)
 		{
-			_tweens.EraseDense(denseIndex);
+			StopTween(tween);
+			//_tweens.EraseDense(denseIndex);
 		}
 		else
 		{
@@ -94,15 +98,16 @@ void flt::Scene::TweenUpdate(float deltaSecond)
 
 	for (uint32 denseIndex = 0; denseIndex < _posTweens.Size();)
 	{
-		FLTween<Vector4f>*& tween = _posTweens.AtDense(denseIndex).first;
+		FLTween<Vector4f>* tween = _posTweens.AtDense(denseIndex).first;
 		Vector4f pos = tween->step(deltaSecond);
 
-		Transform*& target = _posTweens.AtDense(denseIndex).second;
+		Transform* target = _posTweens.AtDense(denseIndex).second;
 		target->SetPosition(pos);
 
 		if (tween->isEnd())
 		{
-			_posTweens.EraseDense(denseIndex);
+			StopTween(tween);
+			//_posTweens.EraseDense(denseIndex);
 		}
 		else
 		{
@@ -112,15 +117,16 @@ void flt::Scene::TweenUpdate(float deltaSecond)
 
 	for (uint32 denseIndex = 0; denseIndex < _scaleTweens.Size();)
 	{
-		FLTween<Vector4f>*& tween = _scaleTweens.AtDense(denseIndex).first;
+		FLTween<Vector4f>* tween = _scaleTweens.AtDense(denseIndex).first;
 		Vector4f scale = tween->step(deltaSecond);
 
-		Transform*& target = _scaleTweens.AtDense(denseIndex).second;
+		Transform* target = _scaleTweens.AtDense(denseIndex).second;
 		target->SetScale(scale);
 
 		if (tween->isEnd())
 		{
-			_scaleTweens.EraseDense(denseIndex);
+			StopTween(tween);
+			//_scaleTweens.EraseDense(denseIndex);
 		}
 		else
 		{
@@ -138,13 +144,40 @@ void flt::Scene::TweenUpdate(float deltaSecond)
 
 		if (tween->isEnd())
 		{
-			_rotTweens.EraseDense(denseIndex);
+			StopTween(tween);
+			//_rotTweens.EraseDense(denseIndex);
 		}
 		else
 		{
 			++denseIndex;
 		}
 	}
+}
+
+void flt::Scene::DeleteTweensDeferred()
+{
+	for (auto& tween : _tweensToDelete)
+	{
+		delete tween;
+	}
+
+	_tweensToDelete.clear();
+}
+
+void flt::Scene::ClearTweens()
+{
+	_tweens.Clear();
+	_posTweens.Clear();
+	_scaleTweens.Clear();
+	_rotTweens.Clear();
+
+	for (auto& [tween, TweenInfo] : _tweenMap)
+	{
+		delete tween;
+	}
+	_tweenMap.clear();
+	
+	DeleteTweensDeferred();
 }
 
 void flt::Scene::CallCollisionEvent()
@@ -433,39 +466,11 @@ void flt::Scene::StartFrame()
 		}
 	}
 
-	//while (!_componentsToEnable.empty())
-	//{
-	//	ComponentBase* component = _componentsToEnable.back();
-	//	_componentsToEnable.pop_back();
-
-	//	if (component->_isEnable == true)
-	//	{
-	//		continue;
-	//	}
-
-	//	component->_isEnable = true;
-	//	component->OnEnable();
-	//}
-
 	for (int i = 0; i < _gameObjectsToDestroy.size(); ++i)
 	{
 		GameObject* object = _gameObjectsToDestroy[i];
 		object->Disable();
 	}
-
-	//while (!_componentsToDisable.empty())
-	//{
-	//	ComponentBase* component = _componentsToDisable.back();
-	//	_componentsToDisable.pop_back();
-
-	//	if (component->_isEnable == false)
-	//	{
-	//		continue;
-	//	}
-
-	//	component->_isEnable = false;
-	//	component->OnDisable();
-	//}
 
 	// Destroy 처리
 	while (!_gameObjectsToDestroy.empty())
@@ -524,8 +529,9 @@ void flt::Scene::StartFrame()
 		}
 		delete object;
 	}
-}
 
+	DeleteTweensDeferred();
+}
 
 void flt::Scene::EndFrame()
 {
@@ -590,6 +596,8 @@ void flt::Scene::EndScene()
 	_stagingActiveGameObjects.clear();
 	_gameObjectsToDestroy.clear();
 	_collisionPairs.clear();
+
+	ClearTweens();
 }
 
 void flt::Scene::AddTween(IFLTween* tween)
@@ -625,7 +633,7 @@ void flt::Scene::StartTween(IFLTween* tween)
 		return;
 	}
 
-	if(iter->second.sparseIndex != UINT_MAX)
+	if (iter->second.sparseIndex != UINT_MAX)
 	{
 		ASSERT(false, "Already Activated");
 		return;
@@ -667,13 +675,13 @@ void flt::Scene::StopTween(IFLTween* tween)
 	auto iter = _tweenMap.find(tween);
 	if (iter == _tweenMap.end())
 	{
-		ASSERT(false, "Not exist tween");
+		//ASSERT(false, "Not exist tween");
 		return;
 	}
 
 	if (iter->second.sparseIndex == UINT_MAX)
 	{
-		ASSERT(false, "Not Activated");
+		//ASSERT(false, "Not Activated");
 		return;
 	}
 
@@ -714,7 +722,8 @@ void flt::Scene::ReleaseTween(IFLTween* tween)
 		ASSERT(false, "Not exist tween");
 		return;
 	}
-
-	StopTween(iter->first);
+	StopTween(tween);
 	_tweenMap.erase(iter);
+
+	_tweensToDelete.push_back(tween);
 }
