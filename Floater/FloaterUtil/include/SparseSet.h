@@ -265,14 +265,14 @@ namespace flt
 		iterator EmplaceBack(Args&&... args) noexcept;
 		void PopBack() noexcept;
 
-		//[[nodiscard]] const T& operator[](uint32 sparseIndex) const noexcept { return _dense[_sparse[sparseIndex]].value; }
+		[[nodiscard]] const T& operator[](uint32 sparseIndex) const noexcept { ASSERT(_sparse[sparseIndex] < _dense.size(), "Invalid index"); return _dense[_sparse[sparseIndex]].value; }
 		[[nodiscard]] T& operator[](uint32 sparseIndex) noexcept;
 
-		[[nodiscard]] const T& At(uint32 sparseIndex) const noexcept { return _dense[_sparse[sparseIndex]].value; }
-		[[nodiscard]] T& At(uint32 sparseIndex) noexcept { return _dense[_sparse[sparseIndex]].value; }
+		[[nodiscard]] const T& At(uint32 sparseIndex) const noexcept { ASSERT(_sparse[sparseIndex] < _dense.size(), "Invalid index"); return _dense[_sparse[sparseIndex]].value; }
+		[[nodiscard]] T& At(uint32 sparseIndex) noexcept { ASSERT(_sparse[sparseIndex] < _dense.size(), "Invalid index"); return _dense[_sparse[sparseIndex]].value; }
 
-		[[nodiscard]] const T& AtDense(uint32 denseIndex) const noexcept { return _dense[denseIndex].value; }
-		[[nodiscard]] T& AtDense(uint32 denseIndex) noexcept { return _dense[denseIndex].value; }
+		[[nodiscard]] const T& AtDense(uint32 denseIndex) const noexcept { ASSERT(denseIndex < _dense.size(), "Invalid index"); return _dense[denseIndex].value; }
+		[[nodiscard]] T& AtDense(uint32 denseIndex) noexcept { ASSERT(denseIndex < _dense.size(), "Invalid index"); return _dense[denseIndex].value; }
 
 		[[nodiscard]] const T& Front() const noexcept { return _dense.front().value; }
 		[[nodiscard]] T& Front() noexcept { return _dense.front().value; }

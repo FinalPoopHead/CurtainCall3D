@@ -81,7 +81,7 @@ void flt::Scene::TweenUpdate(float deltaSecond)
 {
 	for (uint32 i = 0; i < _tweens.Size();)
 	{
-		bool isFinished = _tweens[i]->Update(deltaSecond);
+		bool isFinished = _tweens.AtDense(i)->Update(deltaSecond);
 		if (isFinished)
 		{
 			_tweens.Erase(i);
@@ -94,10 +94,10 @@ void flt::Scene::TweenUpdate(float deltaSecond)
 
 	for (uint32 i = 0; i < _posTweens.Size();)
 	{
-		Vector4f pos = _posTweens[i].first->step(deltaSecond);
-		_posTweens[i].second->SetPosition(pos);
+		Vector4f pos = _posTweens.AtDense(i).first->step(deltaSecond);
+		_posTweens.AtDense(i).second->SetPosition(pos);
 
-		if (_posTweens[i].first->isEnd())
+		if (_posTweens.AtDense(i).first->isEnd())
 		{
 			_posTweens.Erase(i);
 		}
@@ -109,10 +109,10 @@ void flt::Scene::TweenUpdate(float deltaSecond)
 
 	for (uint32 i = 0; i < _scaleTweens.Size();)
 	{
-		Vector4f scale = _scaleTweens[i].first->step(deltaSecond);
-		_scaleTweens[i].second->SetScale(scale);
+		Vector4f scale = _scaleTweens.AtDense(i).first->step(deltaSecond);
+		_scaleTweens.AtDense(i).second->SetScale(scale);
 
-		if (_scaleTweens[i].first->isEnd())
+		if (_scaleTweens.AtDense(i).first->isEnd())
 		{
 			_scaleTweens.Erase(i);
 		}
@@ -124,10 +124,10 @@ void flt::Scene::TweenUpdate(float deltaSecond)
 
 	for (uint32 i = 0; i < _rotTweens.Size();)
 	{
-		Quaternion rot = _rotTweens[i].first->step(deltaSecond);
-		_rotTweens[i].second->SetRotation(rot);
+		Quaternion rot = _rotTweens.AtDense(i).first->step(deltaSecond);
+		_rotTweens.AtDense(i).second->SetRotation(rot);
 
-		if (_rotTweens[i].first->isEnd())
+		if (_rotTweens.AtDense(i).first->isEnd())
 		{
 			_rotTweens.Erase(i);
 		}
