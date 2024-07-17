@@ -49,3 +49,4 @@ namespace flt
 			return t * t * t * (t * (t * 6.0f - 15.0f) + 10.0f);
 		}
 	}
+}

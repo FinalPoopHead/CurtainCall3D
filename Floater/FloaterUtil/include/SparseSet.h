@@ -257,8 +257,9 @@ namespace flt
 
 		//void Remove(const T& value) noexcept;
 		//void Remove(const iterator& it) noexcept;
-		void Erase(uint32 index) noexcept;
 		void Erase(const iterator& it) noexcept;
+		void EraseSparse(uint32 sparseIndex) noexcept;
+		void EraseDense(uint32 denseIndex) noexcept;
 		void Clear() noexcept;
 		iterator PushBack(T&& value) noexcept;
 		template<typename... Args>
@@ -280,7 +281,7 @@ namespace flt
 		[[nodiscard]] const T& Back() const noexcept { return _dense.back().value; }
 
 		[[nodiscard]] bool Empty() const noexcept { return _dense.size() == 0; }
-		[[nodiscard]] uint32 Size() const noexcept { return _dense.size(); }
+		[[nodiscard]] uint32 Size() const noexcept { return (uint32)_dense.size(); }
 		[[nodiscard]] uint32 Capacity() const noexcept { return _capacity; }
 
 		[[nodiscard]] const_iterator begin() const noexcept;
@@ -398,13 +399,16 @@ namespace flt
 	//}
 
 	template<typename T>
-	void flt::SparseSet<T>::Erase(uint32 sparseIndex) noexcept
+	void flt::SparseSet<T>::Erase(const iterator& it) noexcept
 	{
-		if (sparseIndex < 0 || sparseIndex > _capacity)
-		{
-			ASSERT(false, "invaild index");
-			return;
-		}
+		uint32 sparseIndex = _dense[it._denseIndex].sparseIndex;
+		Erase(sparseIndex);
+	}
+
+	template<typename T>
+	void flt::SparseSet<T>::EraseSparse(uint32 sparseIndex) noexcept
+	{
+		ASSERT(sparseIndex < _capacity, "invaild index");
 
 		++_version;
 		uint32 denseIndex = _sparse[sparseIndex];
@@ -419,12 +423,12 @@ namespace flt
 		_free.push_back(sparseIndex);
 	}
 
-
 	template<typename T>
-	void flt::SparseSet<T>::Erase(const iterator& it) noexcept
+	void flt::SparseSet<T>::EraseDense(uint32 denseIndex) noexcept
 	{
-		uint32 sparseIndex = _dense[it._denseIndex].sparseIndex;
-		Erase(sparseIndex);
+		ASSERT(denseIndex < _dense.size(), "invaild index");
+		uint32 sparseIndex = _dense[denseIndex].sparseIndex;
+		EraseSparse(sparseIndex);
 	}
 
 

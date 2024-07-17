@@ -5,7 +5,7 @@
 #include <iostream>
 
 
-MenuSelector::MenuSelector(Menu* menu) 
+MenuSelector::MenuSelector(Menu* menu)
 	: _menu(menu)
 	, _selectedItem(nullptr)
 	, _ui(nullptr)
@@ -19,7 +19,7 @@ MenuSelector::MenuSelector(Menu* menu)
 void MenuSelector::SetMenu(Menu* menu)
 {
 	_menu = menu;
-	
+
 	if (_selectedItem)
 	{
 		_selectedItem->OnUnpointed();
@@ -83,7 +83,7 @@ void MenuSelector::Update(float deltaSecond)
 	{
 		prev();
 	}
-	if(flt::GetKeyDown(flt::KeyCode::enter))
+	if (flt::GetKeyDown(flt::KeyCode::enter))
 	{
 		Select(flt::KeyCode::enter);
 	}
@@ -99,6 +99,10 @@ void MenuSelector::Update(float deltaSecond)
 		if (state.buttonsDown & flt::GamePadState::ButtonFlag::DOWN)
 		{
 			next();
+		}
+		if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
+		{
+			Select(flt::KeyCode::enter);
 		}
 	}
 }
