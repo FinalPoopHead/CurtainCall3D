@@ -62,19 +62,20 @@ GameManager::GameManager() :
 	, _isGameOver(std::vector<bool>(MAXPLAYERCOUNT))
 	, _fallCount(std::vector<int>(MAXPLAYERCOUNT))
 	, _fallCountMax(std::vector<int>(MAXPLAYERCOUNT))
-	, _playTime(std::vector<float>(MAXPLAYERCOUNT))
+	, _playTime()
+	, _columnTime()
 	, _playerScore(std::vector<int>(MAXPLAYERCOUNT))
 	, _comboTextPos(std::vector<flt::Vector2f>(MAXPLAYERCOUNT))
 	, _stageData()
 	, _currentStage(std::vector<int>(MAXPLAYERCOUNT))
 	, _currentLevel(std::vector<int>(MAXPLAYERCOUNT))
 	, _garbageLineCount(std::vector<int>(MAXPLAYERCOUNT))
+	, _nextWaveIndex(std::vector<int>(MAXPLAYERCOUNT))
 {
 	for (int i = 0; i < MAXPLAYERCOUNT; i++)
 	{
 		_isGameOver[i] = false;
 		_fallCount[i] = 0;
-		_playTime[i] = 0.0f;
 		_playerScore[i] = 0;
 		_comboTextPos[i] = COMBOTEXTPOSITION;
 	}
@@ -226,15 +227,7 @@ void GameManager::PostUpdate(float deltaSecond)
 		}
 	}
 
-	for (int i = 0; i < _players.size(); i++)
-	{
-		if (_isGameOver[i])
-		{
-			continue;
-		}
-
-		AddPlayTime(i, deltaSecond);
-	}
+	AddPlayTime(deltaSecond);
 }
 
 void GameManager::CreateUI(int index)
@@ -248,7 +241,7 @@ void GameManager::CreateUI(int index)
 	std::wstring fontPath = L"../Resources/Fonts/LineSeedSansKR_KoreanCompatible_40.spritefont";
 	std::wstring smallFontPath = L"../Resources/Fonts/LineSeedSansKR_KoreanCompatible_25.spritefont";
 
-	TextObject* garbageLineText = flt::CreateGameObject<TextObject>(true);
+	TextObject* garbageLineText = flt::CreateGameObject<TextObject>(false);
 	garbageLineText->SetOffsetPosition(GARBAGEPANEL_OFFSETPOS);
 	garbageLineText->SetText(L"0");
 	garbageLineText->SetFont(bigFontPath);
@@ -683,8 +676,7 @@ void GameManager::OnEndLevel(int playerIndex)
 	}
 	else if (_players.size() == 2)
 	{
-		// TODO : 웨이브가 끝나면 퍼펙트라고 해줄까? 흠.. 흠.. 흠.. 흠..
-
+		// OnCheckMinHeight 때 처리해준다. 공격받은게 없다면 Generate 고고씽.
 	}
 }
 
@@ -700,8 +692,6 @@ Player* GameManager::GetPlayer(int index)
 
 void GameManager::OnStartPlayerFall(int index)
 {
-	// TODO : UI 전부 끄고 UI 관련된거 전부 멈춰라.
-
 	_stageInfoPanel[index]->Disable();
 	_fallCountPanel[index]->Disable();
 	_garbageLineText[index]->Disable();
@@ -729,8 +719,34 @@ void GameManager::OnEndPlayerFall(int index)
 	}
 }
 
-void GameManager::OnCheckMinHeight(int index, int height)
+void GameManager::OnCheckMinHeight(int index, int height, bool isOnlyDark)
 {
+	if (isOnlyDark)
+	{
+		// TODO : 웨이브가 끝나면 퍼펙트라고 해줄까? 흠.. 흠.. 흠.. 흠..
+		std::random_device rd;
+		int width = _boards[index]->GetWidth();
+		int randomIndex;
+
+		while (true)
+		{
+			randomIndex = rd() % _battleWaveData.at(width).size();
+
+			if (height > _battleWaveData.at(width)[randomIndex].height)
+			{
+				break;
+			}
+		}
+
+		if (_boards[index] != nullptr)
+		{
+			std::cout << index << "번 플레이어는 소환했다." << std::endl;
+			_boards[index]->GenerateWave(_battleWaveData.at(width)[randomIndex].waveLayout);
+		}
+
+		return;
+	}
+
 	if (_garbageLineCount[index] == 0)
 	{
 		return;
@@ -766,7 +782,6 @@ void GameManager::IncreasePlayerCount()
 		_players[1]->SetAlbedoPath(blueAlbedoPath);
 
 		constexpr float offSetDelta = 0.5f;
-		// TODO : UI 배치 적절히 나눠야 함
 
 		for (int i = 0; i < _players.size(); i++)
 		{
@@ -782,6 +797,7 @@ void GameManager::IncreasePlayerCount()
 			{
 				auto originOffset = _garbageLineText[i]->GetOffsetPosition();
 				_garbageLineText[i]->SetOffsetPosition({ offSetBase + originOffset.x / MAXPLAYERCOUNT, originOffset.y });
+				_garbageLineText[i]->Enable();
 			}
 
 			if (_stageInfoPanel[i] != nullptr)
@@ -831,14 +847,26 @@ void GameManager::PrintComboText(int index, int count, int score)
 	}
 }
 
-void GameManager::AddPlayTime(int index, float time)
+void GameManager::AddPlayTime(float time)
 {
-	if (_players[index] == nullptr)
+	_playTime += time;
+	_columnTime += time;
+
+	if (_boards[0]->GetWidth() >= 7)
 	{
 		return;
 	}
 
-	_playTime[index] += time;
+	constexpr float addColumnTime = 45.0f;
+	if (_columnTime >= addColumnTime)
+	{
+		for (int i = 0; i < _players.size(); i++)
+		{
+			_boards[i]->AddColumn();
+		}
+
+		_columnTime -= addColumnTime;
+	}
 }
 
 void GameManager::ReadStageFile()
@@ -957,7 +985,6 @@ void GameManager::ResetGame()
 	{
 		_isGameOver[i] = false;
 		_fallCount[i] = 0;
-		_playTime[i] = 0.0f;
 		_playerScore[i] = 0;
 		_currentLevel[i] = 1;
 
@@ -1007,6 +1034,49 @@ void GameManager::SetBattleMode()
 		_stageCountText[i]->SetText(std::to_wstring(1));
 
 		ResizeFallCountUI(data.stageWidth - 1);
+	}
+
+	/// Battle 용 Wave 데이터 추출.
+	for (auto& stage : _stageData)
+	{
+		int width = stage.stageWidth;
+
+		for (auto& level : stage.level)
+		{
+			int currentY = 0;
+			int waveHeight = level.height / stage.waveCount;
+
+			for (int y = 0; y < level.height; ++y)
+			{
+				if (currentY == 0)
+				{
+					_battleWaveData[width].emplace_back();
+
+					Wave& wave = _battleWaveData[width].back();
+
+					wave.width = width;
+					wave.height = waveHeight;
+
+					wave.waveLayout.resize(width);
+					for (int x = 0; x < width; ++x)
+					{
+						wave.waveLayout[x].resize(waveHeight);
+					}
+				}
+
+				for (int x = 0; x < width; ++x)
+				{
+					_battleWaveData[width].back().waveLayout[x][currentY] = level.levelLayout[x][y];
+				}
+
+				++currentY;
+
+				if (currentY >= waveHeight)
+				{
+					currentY = 0;
+				}
+			}
+		}
 	}
 }
 

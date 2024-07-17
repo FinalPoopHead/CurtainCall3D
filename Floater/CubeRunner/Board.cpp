@@ -218,8 +218,12 @@ void Board::PreUpdate(float deltaSecond)
 	case eBoardState::NONE:
 		if (!_isGameOver)
 		{
+			if (_isBattleMode)
+			{
+				CheckMinHeight();
+			}
 			// 웨이브 클리어 연출 보여주고 다음 웨이브 출발
-			if (_runningCubeControllers.empty() && !_waveCubeControllers.empty())
+			else if (_runningCubeControllers.empty() && !_waveCubeControllers.empty())
 			{
 				_isPerfect = true;
 				_isOnlyDarkRemain = false;
@@ -232,9 +236,12 @@ void Board::PreUpdate(float deltaSecond)
 			}
 			else if (_waveCubeControllers.empty())
 			{
-				// TODO : 레벨 끝! 다음 레벨로 넘어가야함
 				_gameManager->OnEndLevel(_playerIndex);
 			}
+		}
+		else
+		{
+			break;
 		}
 
 		if (!_runningCubeControllers.empty())
@@ -588,6 +595,91 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 	_isFirst = isFirst;
 }
 
+void Board::GenerateWave(std::vector<std::vector<int>> waveLayout)
+{
+	int width = waveLayout.size();
+	int height = waveLayout[0].size();
+
+	float startDelay = 0.15f;
+	float delayBase = 0.5f;
+
+	for (int j = 0; j < height; ++j)
+	{
+		if (j >= _height)
+		{
+			break;
+		}
+
+		for (int i = 0; i < width; ++i)
+		{
+			float x = _tiles[i][j]->tr.GetWorldPosition().x;
+			float z = _tiles[i][j]->tr.GetWorldPosition().z;
+
+			flt::GameObject* cube = nullptr;
+
+			switch (waveLayout[i][j])
+			{
+			case 1:
+				if (_normalCubePool.empty())
+				{
+					ASSERT(false, "NormalCubePool is Empty");
+				}
+				cube = _normalCubePool.front();
+				_normalCubePool.pop_front();
+				break;
+			case 2:
+				if (_advantageCubePool.empty())
+				{
+					ASSERT(false, "AdvantageCubePool is Empty");
+				}
+				cube = _advantageCubePool.front();
+				_advantageCubePool.pop_front();
+				break;
+			case 3:
+				if (_darkCubePool.empty())
+				{
+					ASSERT(false, "DarkCubePool is Empty");
+				}
+				cube = _darkCubePool.front();
+				_darkCubePool.pop_front();
+				break;
+			default:
+				ASSERT(false, "Invalid CubeType");
+				break;
+			}
+
+			auto cubeCtr = cube->GetComponent<CubeController>();
+			_runningCubeControllers.push_back(cubeCtr);
+			cubeCtr->StartGenerate(GENERATE_TIME, delayBase + startDelay * j);
+
+			cube->tr.SetPosition(x, 0.0f, z);
+			cube->Enable();
+			_tiles[i][j]->_cube = cube;
+			_nowGeneratingCount++;
+		}
+
+		_soundComponent->Play(_soundIndex["Generate"]);
+	}
+
+	_boardState = eBoardState::CUBEGENERATING;
+	if (_height == 0)
+	{
+		_boardState = eBoardState::NONE;
+	}
+
+	_isOnlyDarkRemain = false;
+
+	for (auto& cubeCtr : _runningCubeControllers)
+	{
+		cubeCtr->SetIsRunning(true);
+	}
+
+	auto player = _gameManager->GetPlayer(_playerIndex);
+
+	player->camera->LookGenerating();
+	_isCameraWorking = true;
+}
+
 void Board::DropGarbageLine(int lineCount)
 {
 	int width = _width;
@@ -606,6 +698,11 @@ void Board::DropGarbageLine(int lineCount)
 
 	for (int j = 0; j < height; ++j)
 	{
+		if (j >= _height)
+		{
+			break;
+		}
+
 		for (int i = 0; i < width; ++i)
 		{
 			int dropValue = rd() % 100;
@@ -673,7 +770,10 @@ void Board::TickCubesRolling(float rollingTime)
 		}
 	}
 
-	_boardState = eBoardState::CUBEROLLING;
+	if (_nowRollingCount > 0)
+	{
+		_boardState = eBoardState::CUBEROLLING;
+	}
 }
 
 void Board::AddRow()
@@ -697,7 +797,7 @@ void Board::AddRow()
 		x += tr.GetWorldPosition().x;
 		z += tr.GetWorldPosition().z;
 
-		tile->StartAddRow(ADDTILE_TIME, { x,0.0f,z });
+		tile->StartAdd(ADDTILE_TIME, { x,0.0f,z });
 	}
 }
 
@@ -715,7 +815,7 @@ void Board::OnEndWave()
 	}
 }
 
-void Board::MoveCameraToEnd()
+void Board::MoveCameraToEnd(bool onlyRight /*= false*/)
 {
 	float offsetX = 0.5f;
 	float offsetY = 1.5f;
@@ -736,7 +836,8 @@ void Board::MoveCameraToEnd()
 	flt::Quaternion rot;
 
 	auto player = _gameManager->GetPlayer(_playerIndex);
-	if (player->camera->tr.GetWorldRotation().GetEuler().y < 0.0f)
+
+	if (onlyRight || player->camera->tr.GetWorldRotation().GetEuler().y < 0.0f)
 	{
 		x += tileWidth / offsetX;
 		rot.SetEuler(offsetAngleX, -offsetAngleY, 0.0f);
@@ -812,7 +913,7 @@ void Board::CheckMinHeight()
 
 	std::cout << "MinHeight : " << _minHeight << std::endl;
 
-	_gameManager->OnCheckMinHeight(_playerIndex, _minHeight);
+	_gameManager->OnCheckMinHeight(_playerIndex, _minHeight, CheckOnlyDarkRemain());
 }
 
 void Board::ReturnCubeToPool(flt::GameObject* obj)
@@ -852,7 +953,7 @@ void Board::RemoveFromControllerList(CubeController* cubeCtr)
 
 	CheckOnlyDarkRemain();
 
-	if (_runningCubeControllers.empty())
+	if (_runningCubeControllers.empty() && !_isBattleMode)
 	{
 		OnEndWave();
 	}
@@ -999,7 +1100,7 @@ void Board::OnEndCubeGenerate()
 	}
 }
 
-void Board::OnEndTileAdd(Tile* tile)
+void Board::OnEndAddRowTile(Tile* tile)
 {
 	--_nowAddTileCount;
 	ReturnTileToPool(tile);
@@ -1009,6 +1110,25 @@ void Board::OnEndTileAdd(Tile* tile)
 	{
 		_nowAddTileCount = 0;
 		Resize(_width, _height + 1);
+		SetDelay(ADDTILE_DELAY);
+		_soundComponent->Play(_soundIndex["TileAdd"]);
+	}
+	else if (_nowAddTileCount < 0)
+	{
+		_nowAddTileCount = 0;
+	}
+}
+
+void Board::OnEndAddColumnTile(Tile* tile)
+{
+	--_nowAddTileCount;
+	ReturnTileToPool(tile);
+	_addTiles.remove(tile);
+
+	if (_nowAddTileCount == 0)
+	{
+		_nowAddTileCount = 0;
+		Resize(_width + 1, _height);
 		SetDelay(ADDTILE_DELAY);
 		_soundComponent->Play(_soundIndex["TileAdd"]);
 	}
@@ -1060,30 +1180,25 @@ void Board::OnEndCubeDrop(CubeController* cubeCtr)
 
 void Board::AddColumn()
 {
-	ASSERT(false, "not Implemented");
-
-	// TODO : 구현 필요
-	_nowAddTileCount = _width;
-	++_nextDestroyRow;
+	_nowAddTileCount = _height;
 	_boardState = eBoardState::ADDTILE;
 
-	for (int i = 0; i < _width; i++)
+	for (int i = 0; i < _height; i++)
 	{
 		Tile* tile = GetTileFromPool();
 		_addTiles.push_back(tile);
 
 		float x = 0.0f;
 		float z = 0.0f;
-		ConvertToTileLocalPosition(i, _height + 16, x, z);
+		ConvertToTileLocalPosition(_width + 16, i, x, z);
 
 		tile->tr.SetPosition({ x, 0.0f, z });
 
-		ConvertToTileLocalPosition(i, _height, x, z);
+		ConvertToTileLocalPosition(_width, i, x, z);
 		x += tr.GetWorldPosition().x;
 		z += tr.GetWorldPosition().z;
 
-		// TODO : StartAddComlumn이라고 하나 더 만들어야겠네? 이게 맞나?!
-		tile->StartAddRow(ADDTILE_TIME, { x,0.0f,z });
+		tile->StartAdd(ADDTILE_TIME, { x,0.0f,z }, eAddType::COLUMN);
 	}
 }
 
@@ -1230,10 +1345,15 @@ void Board::Resize(int newWidth, int newHeight)
 		}
 	}
 
+	bool isHeightChange = _height != newHeight;
+
 	_width = newWidth;
 	_height = newHeight;
 
-	_gameManager->OnHeightChange(_playerIndex, _height);
+	if (isHeightChange)
+	{
+		_gameManager->OnHeightChange(_playerIndex, _height);
+	}
 }
 
 void Board::Reset()

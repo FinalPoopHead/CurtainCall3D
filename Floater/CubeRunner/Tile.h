@@ -3,6 +3,12 @@
 
 class Board;
 
+enum class eAddType
+{
+	ROW
+	, COLUMN
+};
+
 class Tile : public flt::GameObject
 {
 public:
@@ -23,7 +29,7 @@ public:
 	void EnableAdvantageMine();
 	void DisableAdvantageMine();
 
-	void StartAddRow(float movingTime, flt::Vector3f targetPos);
+	void StartAdd(float movingTime, flt::Vector3f targetPos, eAddType type = eAddType::ROW);
 	void StartFall(float delay, int row, int col);
 
 private:
@@ -43,6 +49,7 @@ public:
 	flt::Vector3f _targetPos;			// 이동할 위치
 	float _fallDelay;
 	float _fallSpeed;
+	eAddType _addType;
 
 	int _x;
 	int _z;

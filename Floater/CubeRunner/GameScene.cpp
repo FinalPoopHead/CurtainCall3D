@@ -42,7 +42,7 @@ void GameScene::Initialize()
 	gameManager->ResetGame();
 	if (g_PlayerNum < 2)
 	{
-		gameManager->SetStage(g_StageNum);		// TEST : 임시
+		gameManager->SetStage(g_StageNum);
 	}
 	else
 	{

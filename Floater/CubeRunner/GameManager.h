@@ -8,6 +8,14 @@ class Board;
 class SpriteObject;
 class TextObject;
 
+struct Wave
+{
+	int width;
+	int height;
+
+	std::vector<std::vector<int>> waveLayout;
+};
+
 struct Level
 {
 	int stageNum;
@@ -58,7 +66,7 @@ public:
 
 	void OnStartPlayerFall(int index);
 	void OnEndPlayerFall(int index);
-	void OnCheckMinHeight(int index, int height);
+	void OnCheckMinHeight(int index, int height, bool isOnlyDark);
 	void OnHeightChange(int index, int height);
 	
 	void ReturnMissile(SpriteObject* missile);
@@ -67,7 +75,7 @@ private:
 	void IncreasePlayerCount();
 	void AddScore(int index, int score);
 	void PrintComboText(int index, int count, int score);
-	void AddPlayTime(int index, float time);
+	void AddPlayTime(float time);
 	void ReadStageFile();
 	void ResizeFallCountUI(int nextCount); 
 	void AddAttackedLineCount(int index, int count);
@@ -109,15 +117,18 @@ private:
 	std::vector<bool> _isGameOver;
 	std::vector<int> _fallCount;	
 	std::vector<int> _fallCountMax;
-	std::vector<float> _playTime;
+	float _playTime;
+	float _columnTime;
 	std::vector<int> _playerScore;
 		std::vector<flt::Vector2f> _comboTextPos;		// 플레이어 별 콤보 텍스트 위치
 
 private:
 	std::vector<StageData> _stageData;
+	std::unordered_map<int,std::vector<Wave>> _battleWaveData;
 	std::vector<int> _currentStage;
 	std::vector<int> _currentLevel;
 
 	std::vector<int> _garbageLineCount;
 	std::vector<bool> _isBacktoBack;
+	std::vector<int> _nextWaveIndex;
 };
