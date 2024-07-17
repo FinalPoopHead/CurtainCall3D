@@ -18,6 +18,7 @@ flt::UIComponent::UIComponent()
 	, _size(0.0f, 0.0f)
 	, _position(0.0f, 0.0f)
 	, _zOrder(0.0f)
+	, _textAlignment(eTextAlignment::LEFT)
 {
 }
 
