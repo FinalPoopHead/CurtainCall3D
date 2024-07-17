@@ -83,7 +83,7 @@ void flt::Scene::TweenUpdate(float deltaSecond)
 	{
 		IFLTween* tween = _tweens.AtDense(denseIndex);
 
-		// 업데이트 이후 이 트윈이 이미 자료구조에서 없을 수 있음.
+		// 업데이트 이후 이 트윈이 이미 _tweens에서 없을 수 있음.
 		bool isFinished = tween->Update(deltaSecond);
 		if (isFinished)
 		{
@@ -99,12 +99,14 @@ void flt::Scene::TweenUpdate(float deltaSecond)
 	for (uint32 denseIndex = 0; denseIndex < _posTweens.Size();)
 	{
 		FLTween<Vector4f>* tween = _posTweens.AtDense(denseIndex).first;
+		Transform* target = _posTweens.AtDense(denseIndex).second;
+
+		// 업데이트 이후 이 트윈이 이미 _posTweens에서 없을 수 있음.
 		Vector4f pos = tween->step(deltaSecond);
 
-		Transform* target = _posTweens.AtDense(denseIndex).second;
 		target->SetPosition(pos);
 
-		if (tween->isEnd())
+		if (tween->IsFinished())
 		{
 			StopTween(tween);
 			//_posTweens.EraseDense(denseIndex);
@@ -118,12 +120,14 @@ void flt::Scene::TweenUpdate(float deltaSecond)
 	for (uint32 denseIndex = 0; denseIndex < _scaleTweens.Size();)
 	{
 		FLTween<Vector4f>* tween = _scaleTweens.AtDense(denseIndex).first;
+		Transform* target = _scaleTweens.AtDense(denseIndex).second;
+
+		// 업데이트 이후 이 트윈이 이미 _scaleTweens에서 없을 수 있음.
 		Vector4f scale = tween->step(deltaSecond);
 
-		Transform* target = _scaleTweens.AtDense(denseIndex).second;
 		target->SetScale(scale);
 
-		if (tween->isEnd())
+		if (tween->IsFinished())
 		{
 			StopTween(tween);
 			//_scaleTweens.EraseDense(denseIndex);
@@ -137,12 +141,14 @@ void flt::Scene::TweenUpdate(float deltaSecond)
 	for (uint32 denseIndex = 0; denseIndex < _rotTweens.Size();)
 	{
 		FLTween<Quaternion>*& tween = _rotTweens.AtDense(denseIndex).first;
+		Transform*& target = _rotTweens.AtDense(denseIndex).second;
+
+		// 업데이트 이후 이 트윈이 이미 _rotTweens에서 없을 수 있음.
 		Quaternion rot = tween->step(deltaSecond);
 
-		Transform*& target = _rotTweens.AtDense(denseIndex).second;
 		target->SetRotation(rot);
 
-		if (tween->isEnd())
+		if (tween->IsFinished())
 		{
 			StopTween(tween);
 			//_rotTweens.EraseDense(denseIndex);
