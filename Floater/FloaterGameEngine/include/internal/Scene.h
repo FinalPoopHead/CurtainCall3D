@@ -98,7 +98,7 @@ namespace flt
 		struct TweenInfo
 		{
 			TweenType type;
-			uint32 index;
+			uint32 sparseIndex;
 			Transform* tr;
 		};
 

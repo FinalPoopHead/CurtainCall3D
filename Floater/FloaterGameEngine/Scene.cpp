@@ -79,61 +79,70 @@ void flt::Scene::AddDestroyGameObject(GameObject* gameObject)
 
 void flt::Scene::TweenUpdate(float deltaSecond)
 {
-	for (uint32 i = 0; i < _tweens.Size();)
+	for (uint32 denseIndex = 0; denseIndex < _tweens.Size();)
 	{
-		bool isFinished = _tweens.AtDense(i)->Update(deltaSecond);
+		bool isFinished = _tweens.AtDense(denseIndex)->Update(deltaSecond);
 		if (isFinished)
 		{
-			_tweens.Erase(i);
+			_tweens.EraseDense(denseIndex);
 		}
 		else
 		{
-			++i;
+			++denseIndex;
 		}
 	}
 
-	for (uint32 i = 0; i < _posTweens.Size();)
+	for (uint32 denseIndex = 0; denseIndex < _posTweens.Size();)
 	{
-		Vector4f pos = _posTweens.AtDense(i).first->step(deltaSecond);
-		_posTweens.AtDense(i).second->SetPosition(pos);
+		FLTween<Vector4f>*& tween = _posTweens.AtDense(denseIndex).first;
+		Vector4f pos = tween->step(deltaSecond);
 
-		if (_posTweens.AtDense(i).first->isEnd())
+		Transform*& target = _posTweens.AtDense(denseIndex).second;
+		target->SetPosition(pos);
+
+		if (tween->isEnd())
 		{
-			_posTweens.Erase(i);
+			_posTweens.EraseDense(denseIndex);
 		}
 		else
 		{
-			++i;
+			++denseIndex;
 		}
 	}
 
-	for (uint32 i = 0; i < _scaleTweens.Size();)
+	for (uint32 denseIndex = 0; denseIndex < _scaleTweens.Size();)
 	{
-		Vector4f scale = _scaleTweens.AtDense(i).first->step(deltaSecond);
-		_scaleTweens.AtDense(i).second->SetScale(scale);
+		FLTween<Vector4f>*& tween = _scaleTweens.AtDense(denseIndex).first;
+		Vector4f scale = tween->step(deltaSecond);
 
-		if (_scaleTweens.AtDense(i).first->isEnd())
+		Transform*& target = _scaleTweens.AtDense(denseIndex).second;
+		target->SetScale(scale);
+
+		if (tween->isEnd())
 		{
-			_scaleTweens.Erase(i);
+			_scaleTweens.EraseDense(denseIndex);
 		}
 		else
 		{
-			++i;
+			++denseIndex;
 		}
 	}
 
-	for (uint32 i = 0; i < _rotTweens.Size();)
+	for (uint32 denseIndex = 0; denseIndex < _rotTweens.Size();)
 	{
-		Quaternion rot = _rotTweens.AtDense(i).first->step(deltaSecond);
-		_rotTweens.AtDense(i).second->SetRotation(rot);
+		FLTween<Quaternion>*& tween = _rotTweens.AtDense(denseIndex).first;
+		Quaternion rot = tween->step(deltaSecond);
 
-		if (_rotTweens.AtDense(i).first->isEnd())
+		Transform*& target = _rotTweens.AtDense(denseIndex).second;
+		target->SetRotation(rot);
+
+		if (tween->isEnd())
 		{
-			_rotTweens.Erase(i);
+			_rotTweens.EraseDense(denseIndex);
 		}
 		else
 		{
-			++i;
+			++denseIndex;
 		}
 	}
 }
@@ -470,7 +479,7 @@ void flt::Scene::StartFrame()
 			continue;
 		}
 
-		_gameObjects.Erase(index);
+		_gameObjects.EraseSparse(index);
 		object->_index = -1;
 		DestroyGameObjectRecursive(object);
 	}
@@ -495,7 +504,7 @@ void flt::Scene::StartFrame()
 			// 이미 활성화 되어있는 경우에만 처리
 			if (object->_updateIndex != -1)
 			{
-				_activeGameObjects.Erase(object->_updateIndex);
+				_activeGameObjects.EraseSparse(object->_updateIndex);
 				object->_updateIndex = -1;
 			}
 		}
@@ -616,33 +625,33 @@ void flt::Scene::StartTween(IFLTween* tween)
 		return;
 	}
 
-	if(iter->second.index != UINT_MAX)
+	if(iter->second.sparseIndex != UINT_MAX)
 	{
 		ASSERT(false, "Already Activated");
 		return;
 	}
 
-	uint32 index = UINT_MAX;
+	uint32 sparseIndex = UINT_MAX;
 	switch (iter->second.type)
 	{
 		case flt::Scene::TweenType::none:
 		{
-			index = _tweens.EmplaceBack(tween).GetIndex();
+			sparseIndex = _tweens.EmplaceBack(tween).GetIndex();
 		}
 		break;
 		case flt::Scene::TweenType::pos:
 		{
-			index = _posTweens.EmplaceBack(static_cast<FLTween<Vector4f>*>(tween), iter->second.tr).GetIndex();
+			sparseIndex = _posTweens.EmplaceBack(static_cast<FLTween<Vector4f>*>(tween), iter->second.tr).GetIndex();
 		}
 		break;
 		case flt::Scene::TweenType::scale:
 		{
-			index = _scaleTweens.EmplaceBack(static_cast<FLTween<Vector4f>*>(tween), iter->second.tr).GetIndex();
+			sparseIndex = _scaleTweens.EmplaceBack(static_cast<FLTween<Vector4f>*>(tween), iter->second.tr).GetIndex();
 		}
 		break;
 		case flt::Scene::TweenType::rot:
 		{
-			index = _rotTweens.EmplaceBack(static_cast<FLTween<Quaternion>*>(tween), iter->second.tr).GetIndex();
+			sparseIndex = _rotTweens.EmplaceBack(static_cast<FLTween<Quaternion>*>(tween), iter->second.tr).GetIndex();
 
 		}
 		break;
@@ -650,7 +659,7 @@ void flt::Scene::StartTween(IFLTween* tween)
 			break;
 	}
 	iter->first->ResetProgress();
-	iter->second.index = index;
+	iter->second.sparseIndex = sparseIndex;
 }
 
 void flt::Scene::StopTween(IFLTween* tween)
@@ -662,7 +671,7 @@ void flt::Scene::StopTween(IFLTween* tween)
 		return;
 	}
 
-	if (iter->second.index == UINT_MAX)
+	if (iter->second.sparseIndex == UINT_MAX)
 	{
 		ASSERT(false, "Not Activated");
 		return;
@@ -672,29 +681,29 @@ void flt::Scene::StopTween(IFLTween* tween)
 	{
 		case flt::Scene::TweenType::none:
 		{
-			_tweens.Erase(iter->second.index);
+			_tweens.EraseSparse(iter->second.sparseIndex);
 		}
 		break;
 		case flt::Scene::TweenType::pos:
 		{
-			_posTweens.Erase(iter->second.index);
+			_posTweens.EraseSparse(iter->second.sparseIndex);
 		}
 		break;
 		case flt::Scene::TweenType::scale:
 		{
-			_scaleTweens.Erase(iter->second.index);
+			_scaleTweens.EraseSparse(iter->second.sparseIndex);
 		}
 		break;
 		case flt::Scene::TweenType::rot:
 		{
-			_rotTweens.Erase(iter->second.index);
+			_rotTweens.EraseSparse(iter->second.sparseIndex);
 		}
 		break;
 		default:
 			break;
 	}
 
-	iter->second.index = UINT_MAX;
+	iter->second.sparseIndex = UINT_MAX;
 }
 
 void flt::Scene::ReleaseTween(IFLTween* tween)
