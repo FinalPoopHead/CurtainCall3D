@@ -1,5 +1,6 @@
 ﻿#include <fstream>
 #include <sstream>
+#include <random>
 #include "GameManager.h"
 #include "../FloaterGameEngine/include/Input.h"
 #include "../FloaterGameEngine/include/MakeTween.h"
@@ -14,14 +15,14 @@ constexpr int MAXPLAYERCOUNT = 2;
 constexpr int MAXSTAGECOUNT = 9;
 constexpr int CUBESCORE = 100;
 constexpr int COMBOTEXTPOOLCOUNT = 20;
-constexpr int MISSILEPOOLCOUNT = 10;
+constexpr int MISSILEPOOLCOUNT = 32;
 constexpr int MAXFALLCOUNT = 6;			// 최대 fallcount 개수
 constexpr float COMBOTEXTSPEED = 0.2f;
 constexpr flt::Vector2f COMBOTEXTPOSITION = { 0.05f,0.85f };
 
 // UI 관련
 constexpr flt::Vector2f HPPANEL_OFFSETPOS = { 0.9f,0.95f };
-constexpr flt::Vector2f TIMEPANEL_OFFSETPOS = { 0.8f,0.1f };
+constexpr flt::Vector2f GARBAGEPANEL_OFFSETPOS = { 0.8f,0.1f };
 constexpr flt::Vector2f STAGEINFOPANEL_OFFSETPOS = { 0.05f,0.1f };
 constexpr flt::Vector2f GAMEOVERPANEL_OFFSETPOS = { 0.5f,0.5f };
 
@@ -114,7 +115,6 @@ GameManager::GameManager() :
 		SpriteObject* missileObj = flt::CreateGameObject<SpriteObject>(false);
 		missileObj->SetSprite(missilePath);
 		missileObj->SetZOrder(0.8f);
-		missileObj->tr.SetScale(10.0f, 10.0f, 10.0f);
 		_missilePool.push_back(missileObj);
 	}
 
@@ -249,11 +249,11 @@ void GameManager::CreateUI(int index)
 	std::wstring smallFontPath = L"../Resources/Fonts/LineSeedSansKR_KoreanCompatible_25.spritefont";
 
 	TextObject* garbageLineText = flt::CreateGameObject<TextObject>(true);
-	garbageLineText->SetOffsetPosition(TIMEPANEL_OFFSETPOS);
+	garbageLineText->SetOffsetPosition(GARBAGEPANEL_OFFSETPOS);
 	garbageLineText->SetText(L"0");
 	garbageLineText->SetFont(bigFontPath);
 	garbageLineText->SetTextColor(whiteColor);
-	garbageLineText->SetTextAlignment(eTextAlignment::CENTER);
+	garbageLineText->SetTextAlignment(eTextAlignment::LEFT);
 	_garbageLineText.push_back(garbageLineText);
 
 	SpriteObject* stageInfoPanel = flt::CreateGameObject<SpriteObject>(true);
@@ -543,20 +543,36 @@ void GameManager::OnDestroyCubes(int playerIndex, int count, flt::Vector3f pos /
 		break;
 	}
 
-	if (damage > 0)
-	{
-		AddAttackedLineCount(targetIndex, damage);
+	float delay = 0.1f;
 
-		// TODO : 공격하는 UI 출력해야함.. 골치아프네..
+	for (int i = 0; i < damage; ++i)
+	{
 		auto missile = _missilePool.front();
 		_missilePool.pop_front();
-
-		auto screenPos = _players[playerIndex]->camera->ToScreenSpace(pos);
-
-		missile->SetPosition({ screenPos.x, screenPos.y });
-
-
 		missile->Enable();
+
+		std::random_device rd;
+		float randomX = fmodf(rd(), 200.0f) - 100.0f;
+		float randomY = fmodf(rd(), 200.0f) - 100.0f;
+
+		auto startPos = _gameoverTextPanel[playerIndex]->GetPosition();
+		auto popupPos = startPos + flt::Vector2f(randomX, randomY);
+		auto endPos = _garbageLineText[targetIndex]->GetPosition();
+
+		missile->SetPosition(startPos);
+
+		auto scaleTween = flt::MakeScaleTween(&missile->tr);
+		scaleTween->from({ 0.0f,0.0f,0.0f,1.0f })
+			.to({ 2.0f,2.0f,2.0f,1.0f }).during(0.5f).easing(flt::ease::easeOutBack).preDelay(delay * i).postDelay(0.5f)
+			.to({ 0.0f,0.0f,0.0f,1.0f }).during(0.1f).onEnd([this, missile]() {this->ReturnMissile(missile); });
+
+		auto posTween = flt::MakePosTween(&missile->tr);
+		posTween->from({ startPos.x, startPos.y, 0.0f, 1.0f })
+			.to({ popupPos.x, popupPos.y, 0.0f, 1.0f }).during(0.5f).easing(flt::ease::easeOutExpo).preDelay(delay * i)
+			.to({ endPos.x,endPos.y, 0.0f, 1.0f }).during(0.5f).easing(flt::ease::easeOutExpo).onEnd([this, targetIndex, damage]() {this->AddAttackedLineCount(targetIndex, 1); });
+
+		flt::StartTween(scaleTween);
+		flt::StartTween(posTween);
 	}
 }
 
@@ -734,6 +750,12 @@ void GameManager::OnCheckMinHeight(int index, int height)
 void GameManager::OnHeightChange(int index, int height)
 {
 	ChangeHeightCountText(index, height);
+}
+
+void GameManager::ReturnMissile(SpriteObject* missile)
+{
+	_missilePool.push_back(missile);
+	missile->Disable();
 }
 
 void GameManager::IncreasePlayerCount()

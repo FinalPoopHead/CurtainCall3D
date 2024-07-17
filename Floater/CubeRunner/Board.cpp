@@ -612,6 +612,7 @@ void Board::DropGarbageLine(int lineCount)
 			flt::GameObject* cube = nullptr;
 
 			int randomValue = rd() % 100;
+			ASSERT(randomValue < 100, "buggggggg");
 
 			if (randomValue < darkCube)
 			{

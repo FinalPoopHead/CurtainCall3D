@@ -60,6 +60,8 @@ public:
 	void OnEndPlayerFall(int index);
 	void OnCheckMinHeight(int index, int height);
 	void OnHeightChange(int index, int height);
+	
+	void ReturnMissile(SpriteObject* missile);
 
 private:
 	void IncreasePlayerCount();
