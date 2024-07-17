@@ -51,6 +51,7 @@ namespace flt
 		void StartTween(IFLTween* tween);
 		void StopTween(IFLTween* tween);
 		void ReleaseTween(IFLTween* tween);
+		bool IsActiveTween(IFLTween* tween);
 
 		//std::vector<GameObject*> GetGameObjects() const { return _gameObjects; }
 		std::vector<GameObject*> GetGameObjects(const std::wstring& name) const;
