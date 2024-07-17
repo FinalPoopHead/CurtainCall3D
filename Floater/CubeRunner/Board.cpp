@@ -596,7 +596,7 @@ void Board::DropGarbageLine(int lineCount)
 	float heightDelay = 0.15f;
 	float randomDelayValue = 0.08f;
 
-	int dropChance = 50;
+	int dropChance = 65;
 
 	int darkCube = 7;
 	int advantageCube = 15;
@@ -809,6 +809,8 @@ void Board::CheckMinHeight()
 			_minHeight = z;
 		}
 	}
+
+	std::cout << "MinHeight : " << _minHeight << std::endl;
 
 	_gameManager->OnCheckMinHeight(_playerIndex, _minHeight);
 }
