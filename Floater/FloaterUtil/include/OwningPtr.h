@@ -27,7 +27,7 @@ namespace flt
 		constexpr OwningPtr() noexcept : _ptr(nullptr) {}
 		constexpr OwningPtr(T* ptr) noexcept : _ptr(ptr) {}
 		constexpr OwningPtr(OwningPtr&& other) noexcept : _ptr(other._ptr) { other._ptr = nullptr; }
-		~OwningPtr() { _destructor(_ptr); }
+		~OwningPtr() { if(_ptr) { _destructor(_ptr); } }
 		constexpr OwningPtr& operator=(OwningPtr&& other) noexcept
 		{
 			if (this != &other)

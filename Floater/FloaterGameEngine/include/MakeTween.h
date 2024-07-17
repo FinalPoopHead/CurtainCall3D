@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "./internal/Scene.h"
 #include "../../FloaterUtil/include/FLTween.h"
+#include "../../FloaterUtil/include/OwningPtr.h"
 #include "../../FloaterRendererCommon/include/Transform.h"
 #include "../../FloaterMath/include/Ease.h"
 #include <type_traits>
@@ -16,7 +17,6 @@ namespace flt
 
 		flt::Transform TrLerpFunc (const Transform& a, const Transform& b, float t);
 		flt::Quaternion QuatLerpFunc(const Quaternion& a, const Quaternion& b, float t);
-
 	}
 
 	//template<typename T>
@@ -36,6 +36,14 @@ namespace flt
 
 	void StartTween(IFLTween* tween);
 	void StopTween(IFLTween* tween);
+
+	//struct TweenDestructor
+	//{
+	//	constexpr void operator()(IFLTween* ptr) const noexcept
+	//	{
+	//		ReleaseTween(ptr);
+	//	}
+	//};
 
 
 	template<typename T>

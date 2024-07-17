@@ -29,9 +29,9 @@ namespace flt
 		float postDelay;
 		std::function<float(float)> easing;
 
-		std::function<void()> onStart;
-		std::function<void(const T&)> onStep;
-		std::function<void()> onEnd;
+		std::vector<std::function<void()>> onStart;
+		std::vector<std::function<void(const T&)>> onStep;
+		std::vector<std::function<void()>> onEnd;
 	};
 
 	class IFLTween
@@ -42,6 +42,7 @@ namespace flt
 
 		virtual bool Update(float dt) = 0;
 		virtual void ResetProgress() = 0;
+		virtual bool IsFinished() const = 0;
 	};
 
 	template<typename T>
@@ -53,7 +54,7 @@ namespace flt
 		FLTween(T target, LerpFunction<ValueType> lerp);
 		FLTween(const FLTween<T>& other);
 
-		bool isEnd() const { return _current >= _points.size() - 1; }
+		virtual bool IsFinished() const override { return InFinishedinternal(); }
 
 		virtual bool Update(float dt) override;
 		virtual void ResetProgress() override { _current = 0; _elapsed = 0.0f; }
@@ -77,6 +78,9 @@ namespace flt
 		FLTween<T>& onStart(std::function<void()> callback);
 		FLTween<T>& onStep(std::function<void(const ValueType&)> callback);
 		FLTween<T>& onEnd(std::function<void()> callback);
+
+	private:
+		bool InFinishedinternal() const { return _current >= _points.size() - 1; }
 
 	private:
 		float _elapsed;
@@ -142,21 +146,21 @@ namespace flt
 	template<typename T>
 	FLTween<T>& flt::FLTween<T>::onStart(std::function<void()> callback)
 	{
-		_points[_points.size() - 2].onStart = callback;
+		_points[_points.size() - 2].onStart.emplace_back(callback);
 		return *this;
 	}
 
 	template<typename T>
 	FLTween<T>& flt::FLTween<T>::onStep(std::function<void(const ValueType&)> callback)
 	{
-		_points[_points.size() - 2].onStep = callback;
+		_points[_points.size() - 2].onStep.emplace_back(callback);
 		return *this;
 	}
 
 	template<typename T>
 	FLTween<T>& flt::FLTween<T>::onEnd(std::function<void()> callback)
 	{
-		_points[_points.size() - 2].onEnd = callback;
+		_points[_points.size() - 2].onEnd.emplace_back(callback);
 		return *this;
 	}
 
@@ -165,7 +169,7 @@ namespace flt
 	{
 		step(dt);
 
-		return isEnd();
+		return InFinishedinternal();
 	}
 
 	template<typename T>
@@ -174,7 +178,7 @@ namespace flt
 		ASSERT(_points.size() >= 2, "At least two points are required.");
 
 		//가장 마지막을 지난다면 마지막 값을 반환
-		if (isEnd())
+		if (InFinishedinternal())
 		{
 			if constexpr (std::is_pointer_v<T>)
 			{
@@ -194,11 +198,14 @@ namespace flt
 		while (_elapsed >= pointTime)
 		{
 			_elapsed -= pointTime;
-			_points[_current].onEnd();
+			for (int i = 0; i < _points[_current].onEnd.size(); ++i)
+			{
+				_points[_current].onEnd[i]();
+			}
 			_current++;
 
 			// 가장 마지막을 지난다면 마지막 값을 반환
-			if (isEnd())
+			if (InFinishedinternal())
 			{
 				if constexpr (std::is_pointer_v<T>)
 				{
@@ -212,7 +219,10 @@ namespace flt
 				return _target;
 			}
 
-			_points[_current].onStart();
+			for (int i = 0; i < _points[_current].onStart.size(); ++i)
+			{
+				_points[_current].onStart[i]();
+			}
 			pointTime = _points[_current].preDelay + _points[_current].duration + _points[_current].postDelay;
 		}
 
@@ -220,15 +230,23 @@ namespace flt
 		t = std::clamp(t, 0.0f, 1.0f);
 		t = _points[_current].easing(t);
 
+		ASSERT(_current + 1 < _points.size(), "Invalid index");
+
 		if constexpr (std::is_pointer_v<T>)
 		{
 			*_target = _lerp(_points[_current].value, _points[_current + 1].value, t);
-			_points[_current].onStep(*_target);
+			for (int i = 0; i < _points[_current].onStep.size(); ++i)
+			{
+				_points[_current].onStep[i](*_target);
+			}
 		}
 		else
 		{
 			_target = _lerp(_points[_current].value, _points[_current + 1].value, t);
-			_points[_current].onStep(_target);
+			for (int i = 0; i < _points[_current].onStep.size(); ++i)
+			{
+				_points[_current].onStep[i](_target);
+			}
 		}
 
 		return _target;
@@ -266,10 +284,7 @@ namespace flt
 
 	template<typename T>
 	flt::FLTweenPoint<T>::FLTweenPoint()
-		: value()
-		, duration(0.0f), preDelay(0.0f), postDelay(0.0f)
-		, easing([](float t) { return t; })
-		, onStart([]() {}), onStep([](const T&) {}), onEnd([]() {})
+		: FLTweenPoint(T{})
 	{
 
 	}
@@ -279,11 +294,10 @@ namespace flt
 		: value(value)
 		, duration(0.0f), preDelay(0.0f), postDelay(0.0f)
 		, easing([](float t) {return t; })
-		, onStart([]() {}), onStep([](const T&) {}), onEnd([]() {})
+		, onStart(), onStep(), onEnd()
 	{
 
 	}
-
 
 	template<typename T>
 	flt::FLTween<T>::FLTween(T target, LerpFunction<ValueType> lerp) : _elapsed(0.0f), _current(0), _points(), _lerp(lerp), _target(target)

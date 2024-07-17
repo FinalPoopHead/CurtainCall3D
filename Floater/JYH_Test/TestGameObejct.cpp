@@ -130,13 +130,13 @@ void TestGameObejct::Update(float deltaTime)
 		auto tween = flt::MakeTween(i);
 		(*tween).from(10)
 			.to(0).during(1.0f).easing(flt::ease::easeInOut)
-			.to(10).during(1.0f).easing(flt::ease::easeInOut)
-			.to(0).during(1.0f).easing(flt::ease::easeInOut)
+			.to(10).during(1.0f).easing(flt::ease::easeInOut).onEnd([]() {std::cout << "secondPoint\n"; })
+			.to(0).during(1.0f).easing(flt::ease::easeInOut).onEnd([tween]() {ReleaseTween(tween); })
 			.to(10).during(1.0f).easing(flt::ease::easeInOut).onEnd([this, tween]() 
 				{ 
 					std::cout << "Call ReleaseTween\n"; 
 					ReleaseTween(tween); 
-				});
+				}).onEnd([]() {std::cout << "post COUT test tween\n"; });
 
 		StartTween(tween);
 	}
