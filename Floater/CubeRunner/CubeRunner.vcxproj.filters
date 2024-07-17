@@ -112,7 +112,9 @@
     <ClCompile Include="DirectionalLight.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
-    <ClCompile Include="Shaker.cpp" />
+    <ClCompile Include="Shaker.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h">
@@ -182,6 +184,8 @@
     <ClInclude Include="DirectionalLight.h">
       <Filter>GameObject</Filter>
     </ClInclude>
-    <ClInclude Include="Shaker.h" />
+    <ClInclude Include="Shaker.h">
+      <Filter>Component</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
