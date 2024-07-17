@@ -9,7 +9,7 @@
 namespace flt
 {
 	template<typename T>
-	using LerpFunction = T(*)(const T& a, const T& b, float t);
+	using LerpFunction_t = T(*)(const T& a, const T& b, float t);
 
 	template<typename T>
 	T defaultLerp(const T& a, const T& b, float t)
@@ -51,7 +51,7 @@ namespace flt
 		using ValueType = std::remove_pointer_t<std::remove_reference_t<T>>;
 
 	public:
-		FLTween(T target, LerpFunction<ValueType> lerp);
+		FLTween(T target, LerpFunction_t<ValueType> lerp = flt::defaultLerp<ValueType>);
 		FLTween(const FLTween<T>& other);
 
 		virtual bool IsFinished() const override { return InFinishedinternal(); }
@@ -86,7 +86,7 @@ namespace flt
 		float _elapsed;
 		int _current;
 		std::vector<FLTweenPoint<ValueType>> _points;
-		LerpFunction<ValueType> _lerp;
+		LerpFunction_t<ValueType> _lerp;
 		T _target;
 	};
 
@@ -300,7 +300,7 @@ namespace flt
 	}
 
 	template<typename T>
-	flt::FLTween<T>::FLTween(T target, LerpFunction<ValueType> lerp) : _elapsed(0.0f), _current(0), _points(), _lerp(lerp), _target(target)
+	flt::FLTween<T>::FLTween(T target, LerpFunction_t<ValueType> lerp) : _elapsed(0.0f), _current(0), _points(), _lerp(lerp), _target(target)
 	{
 		if constexpr (std::is_pointer_v<T>)
 		{
