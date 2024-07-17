@@ -133,5 +133,8 @@
       <Filter>Logger</Filter>
     </ClCompile>
     <ClCompile Include="Perlin.cpp" />
+    <ClCompile Include="FLTween.cpp">
+      <Filter>Tweening</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

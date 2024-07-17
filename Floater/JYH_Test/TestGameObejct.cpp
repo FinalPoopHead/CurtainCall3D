@@ -19,7 +19,7 @@ TestGameObejct::TestGameObejct()
 	boxCollider->SetSize({ 100.0f, 100.0f, 100.0f });
 
 	flt::SoundComponent* sound = AddComponent<flt::SoundComponent>(true);
-	sound->AddSound(L"..\\Resources\\sound\\door.mp3");
+	sound->AddSound(L"..\\Resources\\sound\\SetMine.mp3");
 }
 
 TestGameObejct::~TestGameObejct()
@@ -29,36 +29,28 @@ TestGameObejct::~TestGameObejct()
 
 void TestGameObejct::OnEnable()
 {
-	//auto tween = flt::MakeTween(tr.GetLocalPosition());
-	//tween->from({ 0.0f, 0.0f, 0.0f, 1.0f })
-	//	.to({ 0.0f, 0.0f, 100.0f, 1.0f }).during(20.0f).easing(flt::Bezier::EaseInOut())
-	//	.to({ 0.0f, 0.0f, 0.0f, 1.0f }).during(20.0f).easing(flt::Bezier::EaseInOut())
-	//	.to({ 0.0f, 0.0f, 100.0f, 1.0f }).during(20.0f).easing(flt::Bezier::EaseInOut())
-	//	.to({ 0.0f, 0.0f, 0.0f, 1.0f }).during(20.0f).easing(flt::Bezier::EaseInOut());
-	//
-	//auto tween2 = flt::MakeTween(tr.GetLocalRotation());
-	auto tween = flt::MakePosTween(&tr);
-	(*tween).from({ 0.0f, 0.0f, 0.0f, 1.0f })
-		.to({ 0.0f, 0.0f, 100.0f, 1.0f }).during(5.0f).easing(flt::ease::easeInOut).preDelay(5.0f)
-		.to({ 0.0f, 0.0f, 0.0f, 1.0f }).during(5.0f).easing(flt::ease::easeInOut)
-		.to({ 0.0f, 0.0f, 100.0f, 1.0f }).during(5.0f).easing(flt::ease::easeInOut)
-		.to({ 0.0f, 0.0f, 0.0f, 1.0f }).during(5.0f).easing(flt::ease::easeInOut).onEnd([this]() {std::cout << "end move\n"; });
+	//auto tween = flt::MakePosTween(&tr);
+	//(*tween).from({ 0.0f, 0.0f, 0.0f, 1.0f })
+	//	.to({ 0.0f, 0.0f, 100.0f, 1.0f }).during(5.0f).easing(flt::ease::easeInOut).preDelay(5.0f)
+	//	.to({ 0.0f, 0.0f, 0.0f, 1.0f }).during(5.0f).easing(flt::ease::easeInOut)
+	//	.to({ 0.0f, 0.0f, 100.0f, 1.0f }).during(5.0f).easing(flt::ease::easeInOut)
+	//	.to({ 0.0f, 0.0f, 0.0f, 1.0f }).during(5.0f).easing(flt::ease::easeInOut).onEnd([this]() {std::cout << "end move\n"; });
 
-	StartTween(tween);
+	//StartTween(tween);
 
-	auto tweenRot = flt::MakeRotTween(&tr);
-	flt::Quaternion q{0.0f, 0.0f, 0.0f};
-	tweenRot->from(q);
-	q.SetEuler({ 0.0f, 90.0f, 0.0f });
-	tweenRot->to(q).during(5.0f).easing(flt::ease::easeInOut);
-	q.SetEuler({ 0.0f, 180.0f, 0.0f });
-	tweenRot->to(q).during(5.0f).easing(flt::ease::easeInOut);
-	q.SetEuler({ 0.0f, 270.0f, 0.0f });
-	tweenRot->to(q).during(5.0f).easing(flt::ease::easeInOut);
-	q.SetEuler({ 0.0f, 0.0f, 0.0f });
-	tweenRot->to(q).during(5.0f).easing(flt::ease::easeInOut).onEnd([this]() {std::cout << "End Rot\n"; });
+	//auto tweenRot = flt::MakeRotTween(&tr);
+	//flt::Quaternion q{ 0.0f, 0.0f, 0.0f };
+	//tweenRot->from(q);
+	//q.SetEuler({ 0.0f, 90.0f, 0.0f });
+	//tweenRot->to(q).during(5.0f).easing(flt::ease::easeInOut);
+	//q.SetEuler({ 0.0f, 180.0f, 0.0f });
+	//tweenRot->to(q).during(5.0f).easing(flt::ease::easeInOut);
+	//q.SetEuler({ 0.0f, 270.0f, 0.0f });
+	//tweenRot->to(q).during(5.0f).easing(flt::ease::easeInOut);
+	//q.SetEuler({ 0.0f, 0.0f, 0.0f });
+	//tweenRot->to(q).during(5.0f).easing(flt::ease::easeInOut).onEnd([this]() {std::cout << "End Rot\n"; });
 
-	StartTween(tweenRot);
+	//StartTween(tweenRot);
 }
 
 void TestGameObejct::Update(float deltaTime)
@@ -129,5 +121,23 @@ void TestGameObejct::Update(float deltaTime)
 	if (keyData)
 	{
 		std::cout << "KeyUp: f" << std::endl;
+	}
+
+	keyData = GetKeyDown(flt::KeyCode::spacebar);
+	if (keyData)
+	{
+		int i = 0;
+		auto tween = flt::MakeTween(i);
+		(*tween).from(10)
+			.to(0).during(1.0f).easing(flt::ease::easeInOut)
+			.to(10).during(1.0f).easing(flt::ease::easeInOut)
+			.to(0).during(1.0f).easing(flt::ease::easeInOut)
+			.to(10).during(1.0f).easing(flt::ease::easeInOut).onEnd([this, tween]() 
+				{ 
+					std::cout << "Call ReleaseTween\n"; 
+					ReleaseTween(tween); 
+				});
+
+		StartTween(tween);
 	}
 }

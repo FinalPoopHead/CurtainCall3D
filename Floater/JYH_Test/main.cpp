@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 	}*/
 
 	/// 트윈 테스트
-	{
+	/*{
 		int value = 100;
 		int valueRef = 100;
 
@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
 			}
 			std::cout << "*\n";
 		}
-	}
+	}*/
 
 	std::filesystem::path path = std::filesystem::current_path();
 
