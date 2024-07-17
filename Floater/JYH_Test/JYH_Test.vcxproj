@@ -131,7 +131,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <OpenMPSupport>true</OpenMPSupport>
-      <AdditionalOptions>/Zo %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zo /MP %(AdditionalOptions)</AdditionalOptions>
       <AssemblerOutput>All</AssemblerOutput>
       <AdditionalIncludeDirectories>..\..\assimpInc;..\..\eigen-3.4.0;..\..\DirectXTex\Inc;..\..\ZeldaGraphics\header</AdditionalIncludeDirectories>
     </ClCompile>

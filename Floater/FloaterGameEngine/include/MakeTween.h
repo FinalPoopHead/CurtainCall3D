@@ -37,15 +37,6 @@ namespace flt
 	void StartTween(IFLTween* tween);
 	void StopTween(IFLTween* tween);
 
-	//struct TweenDestructor
-	//{
-	//	constexpr void operator()(IFLTween* ptr) const noexcept
-	//	{
-	//		ReleaseTween(ptr);
-	//	}
-	//};
-
-
 	template<typename T>
 	FLTween<T>* MakeTween(T target)
 	{
