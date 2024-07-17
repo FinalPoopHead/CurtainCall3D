@@ -47,30 +47,35 @@ flt::Quaternion flt::internal::QuatLerpFunc(const Quaternion& a, const Quaternio
 	return result;
 }
 
-flt::FLTween<flt::Vector4f>* flt::MakePosTween(Transform* target)
+flt::TweenPtr<flt::Vector4f> flt::MakePosTween(Transform* target)
 {
 	FLTween<flt::Vector4f>* tween = new FLTween<flt::Vector4f>(target->GetLocalPosition(), flt::defaultLerp<flt::Vector4f>);
 	internal::RegistPosTween(tween, target);
-	return tween;
+	return flt::TweenPtr<flt::Vector4f>{tween};
 }
 
-flt::FLTween<flt::Vector4f>* flt::MakeScaleTween(Transform* target)
+flt::TweenPtr<flt::Vector4f> flt::MakeScaleTween(Transform* target)
 {
 	FLTween<flt::Vector4f>* tween = new FLTween<flt::Vector4f>(target->GetLocalScale(), flt::defaultLerp<flt::Vector4f>);
 	internal::RegistScaleTween(tween, target);
-	return tween;
+	return flt::TweenPtr<flt::Vector4f>{tween};
 }
 
-flt::FLTween<flt::Quaternion>* flt::MakeRotTween(Transform* target)
+flt::TweenPtr<flt::Quaternion> flt::MakeRotTween(Transform* target)
 {
 	FLTween<flt::Quaternion>* tween = new FLTween<flt::Quaternion>(target->GetLocalRotation(), internal::QuatLerpFunc);
 	internal::RegistRotTween(tween, target);
-	return tween;
+	return flt::TweenPtr<flt::Quaternion>{tween};
 }
 
 void flt::ReleaseTween(IFLTween* tween)
 {
 	g_engine->GetCurrentScene()->ReleaseTween(tween);
+}
+
+bool flt::IsActiveTween(IFLTween* tween)
+{
+	return g_engine->GetCurrentScene()->IsActiveTween(tween);
 }
 
 void flt::StartTween(IFLTween* tween)
