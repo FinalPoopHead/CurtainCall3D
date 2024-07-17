@@ -612,6 +612,7 @@ void Board::DropGarbageLine(int lineCount)
 			flt::GameObject* cube = nullptr;
 
 			int randomValue = rd() % 100;
+			ASSERT(randomValue < 100, "buggggggg");
 
 			if (randomValue < darkCube)
 			{
@@ -1410,6 +1411,8 @@ bool Board::UpdateDetonate()
 	bool result = false;
 	int destroyCount = 0;
 
+	std::list<flt::Vector3f> cubePos;
+
 	for (int i = 0; i < _width; i++)
 	{
 		for (int j = 0; j < _height; j++)
@@ -1433,6 +1436,10 @@ bool Board::UpdateDetonate()
 					{
 						destroyCount++;
 						cubeCtr->StartRemove(REMOVE_TIME);
+
+						float x = 0.0f, y = 0.0f, z = 0.0f;
+						ConvertToTilePosition(i, j, x, z);
+						cubePos.push_back({ x,y,z });
 					}
 					break;
 				case eTileStateFlag::DARKCUBE:
@@ -1452,6 +1459,10 @@ bool Board::UpdateDetonate()
 						_tiles[i][j]->EnableAdvantageMine();
 						destroyCount++;
 						cubeCtr->StartRemove(REMOVE_TIME);
+
+						float x = 0.0f, y = 0.0f, z = 0.0f;
+						ConvertToTilePosition(i, j, x, z);
+						cubePos.push_back({ x,y,z });
 					}
 					break;
 				default:
@@ -1473,7 +1484,16 @@ bool Board::UpdateDetonate()
 		}
 	}
 
-	_gameManager->OnDestroyCubes(_playerIndex, destroyCount);
+	flt::Vector3f averagePos = {0.0f,0.0f,0.0f};
+
+	for (auto& pos : cubePos)
+	{
+		averagePos += pos;
+	}
+
+	averagePos /= destroyCount;
+
+	_gameManager->OnDestroyCubes(_playerIndex, destroyCount, averagePos);
 
 	if (_isBattleMode)
 	{

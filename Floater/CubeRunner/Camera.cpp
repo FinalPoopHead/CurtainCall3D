@@ -5,8 +5,9 @@
 #include "../FloaterGameEngine/include/Input.h"
 
 
-Camera::Camera(Player* player, Board* board)
-	: _player(player)
+Camera::Camera(Player* player, Board* board) :
+	_cameraComp()
+	, _player(player)
 	, _board(board)
 	, _height(10.0f)
 	, _playHeight(40.0f)
@@ -18,7 +19,7 @@ Camera::Camera(Player* player, Board* board)
 	, _rotSpeed(15.0f)
 	, _state(eCameraState::TRACEPLAYER)
 {
-	AddComponent<flt::CameraComponent>(true);
+	_cameraComp = AddComponent<flt::CameraComponent>(true);
 
 	_currPosition = CalcTargetPosition();
 	tr.SetPosition(_currPosition);
@@ -90,6 +91,13 @@ void Camera::TweenRotate(flt::Quaternion targetRot, float time, std::function<fl
 	_rotateTime = time;
 	_rotateTimeElapsed = 0.0f;
 	_rotateEase = ease;
+}
+
+flt::Vector3f Camera::ToScreenSpace(flt::Vector3f pos)
+{
+	flt::Vector4f temp = { pos.x,pos.y,pos.z,1.0f };
+	flt::Vector4f result = temp * _cameraComp->GetViewMatrix() * _cameraComp->GetProjectionMatrix();
+	return { result.x, result.y, result.z };
 }
 
 void Camera::PostUpdate(float deltaSecond)
