@@ -25,6 +25,7 @@ public:
 	void TraceFalling();
 	void TweenMove(flt::Vector3f targetPos, float time, std::function<float(float)> ease = [](float t) { return t; });
 	void TweenRotate(flt::Quaternion targetRot, float time, std::function<float(float)> ease = [](float t) { return t; });
+	flt::Vector3f ToScreenSpace(flt::Vector3f pos);
 
 protected:
 	virtual void PostUpdate(float deltaSecond) override;
@@ -38,6 +39,7 @@ private:
 	void UpdateCameraMove(float deltaSecond);
 
 private:
+	flt::CameraComponent* _cameraComp;
 	Player* _player;
 	Board* _board;
 	float _height;
