@@ -559,17 +559,15 @@ void GameManager::OnDestroyCubes(int playerIndex, int count, flt::Vector3f pos /
 		auto popupPos = startPos + flt::Vector2f(randomX, randomY);
 		auto endPos = _garbageLineText[targetIndex]->GetPosition();
 
-		missile->SetPosition(startPos);
-
 		auto scaleTween = flt::MakeScaleTween(&missile->tr);
 		scaleTween->from({ 0.0f,0.0f,0.0f,1.0f })
 			.to({ 2.0f,2.0f,2.0f,1.0f }).during(0.5f).easing(flt::ease::easeOutBack).preDelay(delay * i).postDelay(0.5f)
-			.to({ 0.0f,0.0f,0.0f,1.0f }).during(0.1f).onEnd([this, missile]() {this->ReturnMissile(missile); });
+			.to({ 0.0f,0.0f,0.0f,1.0f }).during(0.1f).onEnd([this, missile, targetIndex, damage]() {this->ReturnMissile(missile); this->AddAttackedLineCount(targetIndex, 1); });
 
 		auto posTween = flt::MakePosTween(&missile->tr);
 		posTween->from({ startPos.x, startPos.y, 0.0f, 1.0f })
 			.to({ popupPos.x, popupPos.y, 0.0f, 1.0f }).during(0.5f).easing(flt::ease::easeOutExpo).preDelay(delay * i)
-			.to({ endPos.x,endPos.y, 0.0f, 1.0f }).during(0.5f).easing(flt::ease::easeOutExpo).onEnd([this, targetIndex, damage]() {this->AddAttackedLineCount(targetIndex, 1); });
+			.to({ endPos.x,endPos.y, 0.0f, 1.0f }).during(0.5f).easing(flt::ease::easeOutExpo);
 
 		flt::StartTween(scaleTween);
 		flt::StartTween(posTween);
