@@ -186,6 +186,7 @@
   <ItemGroup>
     <ClCompile Include="ConvString.cpp" />
     <ClCompile Include="FixedSizeMemoryPool.cpp" />
+    <ClCompile Include="FLTween.cpp" />
     <ClCompile Include="LogFormatObject.cpp" />
     <ClCompile Include="Perlin.cpp" />
     <ClCompile Include="TesterFixedSizeMemoryPool.cpp" />

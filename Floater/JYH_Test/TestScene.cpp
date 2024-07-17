@@ -21,7 +21,7 @@ void TestScene::Initialize()
 	TestGameObejct* tObject = flt::CreateGameObject<TestGameObejct>(true);
 	tObject->tr.SetPosition(0.0f, 0.0f, 0.0f);
 
-	HierarachyMgr* mgr = flt::CreateGameObject<HierarachyMgr>(true);
+	//HierarachyMgr* mgr = flt::CreateGameObject<HierarachyMgr>(true);
 
 	//TestGameObejct* tObject2 = flt::CreateGameObject<TestGameObejct>(true);
 	//tObject2->tr.SetPosition(0.0f, 0.0f, 0.0f);

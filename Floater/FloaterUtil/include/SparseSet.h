@@ -409,11 +409,13 @@ namespace flt
 	void flt::SparseSet<T>::EraseSparse(uint32 sparseIndex) noexcept
 	{
 		ASSERT(sparseIndex < _capacity, "invaild index");
+		ASSERT(_sparse[sparseIndex] != -1, "incaild index");
 
 		++_version;
-		uint32 denseIndex = _sparse[sparseIndex];
+		uint32 denseIndex = (uint32)_sparse[sparseIndex];
 		_sparse[sparseIndex] = -1;
 
+		// 스왑을 해야 할 경우
 		if (denseIndex < _dense.size() - 1)
 		{
 			_dense[denseIndex] = _dense.back();

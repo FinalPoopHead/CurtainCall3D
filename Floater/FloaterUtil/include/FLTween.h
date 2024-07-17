@@ -37,7 +37,8 @@ namespace flt
 	class IFLTween
 	{
 	public:
-		virtual ~IFLTween() = default;
+		IFLTween();
+		virtual ~IFLTween();
 
 		virtual bool Update(float dt) = 0;
 		virtual void ResetProgress() = 0;
@@ -52,7 +53,7 @@ namespace flt
 		FLTween(T target, LerpFunction<ValueType> lerp);
 		FLTween(const FLTween<T>& other);
 
-		bool isEnd() const { return _current >= _points.size(); }
+		bool isEnd() const { return _current >= _points.size() - 1; }
 
 		virtual bool Update(float dt) override;
 		virtual void ResetProgress() override { _current = 0; _elapsed = 0.0f; }
@@ -164,7 +165,7 @@ namespace flt
 	{
 		step(dt);
 
-		return _current >= _points.size();
+		return isEnd();
 	}
 
 	template<typename T>
@@ -173,7 +174,7 @@ namespace flt
 		ASSERT(_points.size() >= 2, "At least two points are required.");
 
 		//가장 마지막을 지난다면 마지막 값을 반환
-		if (_current >= _points.size())
+		if (isEnd())
 		{
 			if constexpr (std::is_pointer_v<T>)
 			{
@@ -197,7 +198,7 @@ namespace flt
 			_current++;
 
 			// 가장 마지막을 지난다면 마지막 값을 반환
-			if (_current >= _points.size())
+			if (isEnd())
 			{
 				if constexpr (std::is_pointer_v<T>)
 				{

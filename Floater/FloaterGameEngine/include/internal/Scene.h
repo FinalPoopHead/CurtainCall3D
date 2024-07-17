@@ -57,10 +57,12 @@ namespace flt
 
 	private:
 		void AddEnableGameObject(GameObject* gameObject, bool isEnable);
-		void AddEnableComponent(ComponentBase* component, bool isEnable);
+		//void AddEnableComponent(ComponentBase* component, bool isEnable);
 		void AddDestroyGameObject(GameObject* gameObject);
 
 		void TweenUpdate(float deltaSecond);
+		void DeleteTweensDeferred();
+		void ClearTweens();
 
 	private:
 		template<GameObjectDerived T, typename... TArgs>
@@ -103,6 +105,7 @@ namespace flt
 		};
 
 		std::unordered_map<IFLTween*, TweenInfo> _tweenMap;
+		std::vector<IFLTween*> _tweensToDelete;
 	};
 
 	template<GameObjectDerived T, typename... TArgs>
