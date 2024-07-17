@@ -48,6 +48,17 @@ void Player::OnEnable()
 
 void Player::Update(float deltaSecond)
 {
+	flt::GamePadState state;
+	bool isGamePadConnected = flt::GetGamePadState(_padIndex, &state);
+	if (isGamePadConnected)
+	{
+		if (state.buttonsDown & flt::GamePadState::ButtonFlag::BACK)
+		{
+			static MainMenuScene* scene = flt::CreateScene<MainMenuScene>();
+			flt::SetScene(scene);
+		}
+	}
+
 	if (flt::GetKeyDown(flt::KeyCode::backspace))
 	{
 		static MainMenuScene* scene = flt::CreateScene<MainMenuScene>();
@@ -170,8 +181,6 @@ void Player::Update(float deltaSecond)
 		_board->DetonateAdvantageMine();
 	}
 
-	flt::GamePadState state;
-	bool isGamePadConnected = flt::GetGamePadState(_padIndex, &state);
 	if (isGamePadConnected)
 	{
 		nextPosOffset.z += state.lStickY;
