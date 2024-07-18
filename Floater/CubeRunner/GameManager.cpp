@@ -752,6 +752,8 @@ void GameManager::OnStartPlayerFall(int index)
 	_fallCountPanel[index]->Disable();
 	_garbageLineText[index]->Disable();
 	_isGameOver[index] = true;
+
+	// TODO : index는 패배고 index가 아닌 사람은 승리?
 }
 
 void GameManager::OnEndPlayerFall(int index)
@@ -767,6 +769,8 @@ void GameManager::OnEndPlayerFall(int index)
 		// 	tweenScale->from({ startScale,startScale,startScale,1.0f})
 		// 		.to({ endScale,endScale,endScale,1.0f }).during(1.5f).easing(flt::ease::easeInOut);
 
+		// TODO : 싱글모드면 점수기입하고 끝내기? 멀티모드면 다른플레이어 승리 보여주고 끝내기?
+		
 		tweenScale->from({ 0.0f,1.0f,1.0f,1.0f })
 			.to({ 1.0f,1.0f,1.0f,1.0f }).during(2.0f).easing(flt::ease::linear).postDelay(2.0f)
 			.to({ 0.0f,1.0f,1.0f,1.0f }).during(2.0f).easing(flt::ease::linear).onEnd([&tweenScale]() {flt::ReleaseTween(tweenScale); });
@@ -779,7 +783,6 @@ void GameManager::OnCheckMinHeight(int index, int height, bool doGenerate)
 {
 	if (doGenerate)
 	{
-		// TODO : 웨이브가 끝나면 퍼펙트라고 해줄까? 흠.. 흠.. 흠.. 흠..
 		std::random_device rd;
 		int width = _boards[index]->GetWidth();
 		int randomIndex;
@@ -929,7 +932,7 @@ void GameManager::PrintComboText(int index, int count, int score)
 void GameManager::AddPlayTime(float time)
 {
 	_playTime += time;
-	_accelTime += time;			// TODO : 배틀모드는 Column추가 하지 말까?
+	_accelTime += time;
 
 	if (_boards[0]->GetWidth() >= 7)
 	{
