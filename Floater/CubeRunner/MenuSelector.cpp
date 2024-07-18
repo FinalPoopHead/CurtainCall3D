@@ -9,6 +9,7 @@ MenuSelector::MenuSelector(Menu* menu)
 	: _menu(menu)
 	, _selectedItem(nullptr)
 	, _ui(nullptr)
+	, _lastLStickY(0.0f)
 {
 	//_ui = AddComponent<flt::UIComponent>(true);
 	//_ui->SetImage(L"../Resources/Sprites/abcd.jpg");
@@ -104,6 +105,20 @@ void MenuSelector::Update(float deltaSecond)
 		{
 			Select(flt::KeyCode::enter);
 		}
+
+		if (fabsf(_lastLStickY) < 0.5f)
+		{
+			if (state.lStickY > 0.5f)
+			{
+				prev();
+			}
+			else if (state.lStickY < -0.5f)
+			{
+				next();
+			}
+		}
+
+		_lastLStickY = state.lStickY;
 	}
 }
 

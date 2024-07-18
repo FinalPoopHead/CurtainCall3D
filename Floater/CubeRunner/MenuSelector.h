@@ -26,5 +26,6 @@ private:
 	Menu* _menu;
 	MenuItem* _selectedItem;
 	flt::UIComponent* _ui;
+	float _lastLStickY;
 };
 
