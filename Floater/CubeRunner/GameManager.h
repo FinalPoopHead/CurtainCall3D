@@ -66,7 +66,7 @@ public:
 
 	void OnStartPlayerFall(int index);
 	void OnEndPlayerFall(int index);
-	void OnCheckMinHeight(int index, int height, bool isOnlyDark);
+	void OnCheckMinHeight(int index, int height, bool isGenerate);
 	void OnHeightChange(int index, int height);
 	
 	void ReturnMissile(SpriteObject* missile);

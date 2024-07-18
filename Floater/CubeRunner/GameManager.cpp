@@ -719,9 +719,9 @@ void GameManager::OnEndPlayerFall(int index)
 	}
 }
 
-void GameManager::OnCheckMinHeight(int index, int height, bool isOnlyDark)
+void GameManager::OnCheckMinHeight(int index, int height, bool isGenerate)
 {
-	if (isOnlyDark)
+	if (isGenerate)
 	{
 		// TODO : 웨이브가 끝나면 퍼펙트라고 해줄까? 흠.. 흠.. 흠.. 흠..
 		std::random_device rd;
@@ -853,6 +853,11 @@ void GameManager::AddPlayTime(float time)
 	_columnTime += time;
 
 	if (_boards[0]->GetWidth() >= 7)
+	{
+		return;
+	}
+
+	if (_boards.size() == 1)
 	{
 		return;
 	}

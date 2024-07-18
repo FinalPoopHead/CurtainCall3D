@@ -669,11 +669,6 @@ void Board::GenerateWave(std::vector<std::vector<int>> waveLayout)
 
 	_isOnlyDarkRemain = false;
 
-	for (auto& cubeCtr : _runningCubeControllers)
-	{
-		cubeCtr->SetIsRunning(true);
-	}
-
 	auto player = _gameManager->GetPlayer(_playerIndex);
 
 	player->camera->LookGenerating();
@@ -913,7 +908,9 @@ void Board::CheckMinHeight()
 
 	std::cout << "MinHeight : " << _minHeight << std::endl;
 
-	_gameManager->OnCheckMinHeight(_playerIndex, _minHeight, CheckOnlyDarkRemain());
+	bool isGenerate = CheckOnlyDarkRemain() || _runningCubeControllers.empty();
+
+	_gameManager->OnCheckMinHeight(_playerIndex, _minHeight, isGenerate);
 }
 
 void Board::ReturnCubeToPool(flt::GameObject* obj)
@@ -1097,6 +1094,11 @@ void Board::OnEndCubeGenerate()
 
 		UpdateBoard();
 		SetDelay(GENERATE_DELAY);
+
+		for (auto& cubeCtr : _runningCubeControllers)
+		{
+			cubeCtr->SetIsRunning(true);
+		}
 	}
 }
 
