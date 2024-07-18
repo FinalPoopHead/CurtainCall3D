@@ -67,6 +67,7 @@ public:
 	void ConvertToTilePosition(int x, int z, float& outX, float& outZ);
 
 	void GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount, bool isFirst = false);
+	void GenerateWave(std::vector<std::vector<int>> waveLayout);
 	void DropGarbageLine(int lineCount);
 	void ReturnCubeToPool(flt::GameObject* obj);
 	void RemoveFromControllerList(CubeController* cubeCtr);
@@ -75,10 +76,13 @@ public:
 	void DetonateAdvantageMine();			// 어드밴티지 지뢰를 폭파시킨다.
 	void OnEndCubeRoll();					// 큐브 1개가 rolling 끝나면 호출할 함수.
 	void OnEndCubeGenerate();						// 큐브 1개가 rising 끝나면 호출할 함수.
-	void OnEndTileAdd(Tile* tile);
+	void OnEndAddRowTile(Tile* tile);
+	void OnEndAddColumnTile(Tile* tile);
 	void OnStartTileFall(int x, int z);		// x,z index의 타일이 떨어지기 시작함.
 	void OnEndTileFall(int x, int z);
 	void OnEndCubeDrop(CubeController* cubeCtr);
+
+	void AddBattleModeSpeed(float value);
 
 	void AddColumn();
 	void DestroyRow();
@@ -92,9 +96,11 @@ public:
 	void FastForward();
 	void EndFastForward();
 
-	const float& GetFFValue() { return _fastForwardValue; }
+	const float& GetGameSpeed() { return _gameSpeed; }
+	const float& GetBattleSpeed() { return _battleModeSpeed; }
 
 	void SetBattleMode() { _isBattleMode = true; }
+	int GetWidth() const { return _width; }
 
 private:
 	//void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
@@ -115,7 +121,7 @@ private:
 	void AddRow();
 	void OnEndWave();
 
-	void MoveCameraToEnd();
+	void MoveCameraToEnd(bool onlyRight = false);
 
 	Tile* GetTileFromPool();
 	void ReturnTileToPool(Tile* tile);
@@ -149,7 +155,8 @@ private:
 	bool _isAttacked;
 	bool _isBattleMode;
 	float _delayRemain;
-	float _fastForwardValue;
+	float _gameSpeed;
+	float _battleModeSpeed;
 	int _nowRollingCount;
 	int _nowGeneratingCount;
 	int _nowFallingTileCount;

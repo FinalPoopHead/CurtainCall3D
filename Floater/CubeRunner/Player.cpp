@@ -76,7 +76,7 @@ void Player::Update(float deltaSecond)
 	{
 		flt::Vector4f pos = tr.GetWorldPosition();
 		flt::Vector4f nextPosOffset{};
-		nextPosOffset = { 0.0f, 0.0f, -30.0f * deltaSecond, 0.0f };
+		nextPosOffset = { 0.0f, 0.0f, -30.0f * deltaSecond * _board->GetBattleSpeed(), 0.0f };
 		auto nextPos = pos + nextPosOffset;
 		tr.SetWorldPosition(nextPos);
 		nextPosOffset = { 0.0f,0.0f,0.0f,0.0f };
@@ -240,7 +240,7 @@ void Player::Update(float deltaSecond)
 		nextPosOffset.Normalize();
 	}
 
-	nextPosOffset *= _speed * deltaSecond;
+	nextPosOffset *= _speed * deltaSecond * _board->GetBattleSpeed();
 	flt::Vector4f nextPos = nextPosOffset + pos;
 
 	tr.LookAt(nextPos);

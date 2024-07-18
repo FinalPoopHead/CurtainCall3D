@@ -56,13 +56,16 @@ GameManager::GameManager() :
 	, _heightCountText()
 	, _garbageLineText()
 	, _gameoverTextPanel()
-	, _missilePool()
+	, _gameoverText()
+	, _roundText()
 	, _liveComboTexts()
 	, _comboTextPool()
+	, _missilePool()
 	, _isGameOver(std::vector<bool>(MAXPLAYERCOUNT))
 	, _fallCount(std::vector<int>(MAXPLAYERCOUNT))
 	, _fallCountMax(std::vector<int>(MAXPLAYERCOUNT))
-	, _playTime(std::vector<float>(MAXPLAYERCOUNT))
+	, _playTime()
+	, _accelTime()
 	, _playerScore(std::vector<int>(MAXPLAYERCOUNT))
 	, _comboTextPos(std::vector<flt::Vector2f>(MAXPLAYERCOUNT))
 	, _stageData()
@@ -74,7 +77,6 @@ GameManager::GameManager() :
 	{
 		_isGameOver[i] = false;
 		_fallCount[i] = 0;
-		_playTime[i] = 0.0f;
 		_playerScore[i] = 0;
 		_comboTextPos[i] = COMBOTEXTPOSITION;
 	}
@@ -95,6 +97,7 @@ GameManager::GameManager() :
 
 	std::wstring fontPath = L"../Resources/Fonts/LineSeedSansKR_KoreanCompatible_40.spritefont";
 	std::wstring smallFontPath = L"../Resources/Fonts/LineSeedSansKR_KoreanCompatible_25.spritefont";
+	std::wstring bigFontPath = L"../Resources/Fonts/LineSeedSansKR_KoreanCompatible_55.spritefont";
 	flt::Vector4f fontColor = { 1.0f,1.0f,1.0f,1.0f };
 
 	// Create comboTextPool
@@ -107,7 +110,6 @@ GameManager::GameManager() :
 		_comboTextPool.push_back(comboText);
 	}
 
-
 	std::wstring missilePath = L"../Resources/Sprites/Missile.png";
 
 	for (int i = 0; i < COMBOTEXTPOOLCOUNT; ++i)
@@ -117,6 +119,14 @@ GameManager::GameManager() :
 		missileObj->SetZOrder(0.8f);
 		_missilePool.push_back(missileObj);
 	}
+
+	_roundText = flt::CreateGameObject<TextObject>(false);
+	_roundText->SetOffsetPosition({ 0.5f, 0.5f });
+	_roundText->tr.SetScale(1.5f, 1.5f, 1.5f);
+	_roundText->SetTextAlignment(eTextAlignment::CENTER);
+	_roundText->SetFont(bigFontPath);
+	_roundText->SetText(L"DEFAULT");
+	_roundText->SetTextColor(fontColor);
 
 	ReadStageFile();
 }
@@ -226,15 +236,7 @@ void GameManager::PostUpdate(float deltaSecond)
 		}
 	}
 
-	for (int i = 0; i < _players.size(); i++)
-	{
-		if (_isGameOver[i])
-		{
-			continue;
-		}
-
-		AddPlayTime(i, deltaSecond);
-	}
+	AddPlayTime(deltaSecond);
 }
 
 void GameManager::CreateUI(int index)
@@ -248,7 +250,7 @@ void GameManager::CreateUI(int index)
 	std::wstring fontPath = L"../Resources/Fonts/LineSeedSansKR_KoreanCompatible_40.spritefont";
 	std::wstring smallFontPath = L"../Resources/Fonts/LineSeedSansKR_KoreanCompatible_25.spritefont";
 
-	TextObject* garbageLineText = flt::CreateGameObject<TextObject>(true);
+	TextObject* garbageLineText = flt::CreateGameObject<TextObject>(false);
 	garbageLineText->SetOffsetPosition(GARBAGEPANEL_OFFSETPOS);
 	garbageLineText->SetText(L"0");
 	garbageLineText->SetFont(bigFontPath);
@@ -576,6 +578,48 @@ void GameManager::OnDestroyCubes(int playerIndex, int count, flt::Vector3f pos /
 
 void GameManager::SetStage(int stageNum)
 {
+	std::wstring numStr;
+	switch (stageNum)
+	{
+	case 1:
+		numStr = L"1ST";
+		break;
+	case 2:
+		numStr = L"2ND";
+		break;
+	case 3:
+		numStr = L"3RD";
+		break;
+	case 4:
+		numStr = L"4TH";
+		break;
+	case 5:
+		numStr = L"5TH";
+		break;
+	case 6:
+		numStr = L"6TH";
+		break;
+	case 7:
+		numStr = L"7TH";
+		break;
+	case 8:
+		numStr = L"8TH";
+		break;
+	case 9:
+		numStr = L"FINAL";
+		break;
+	default:
+		break;
+	}
+
+	_roundText->SetText(numStr + L"  STAGE");
+	_roundText->Enable();
+	TextObject* ptr = _roundText;
+	auto tween = flt::MakeScaleTween(&_roundText->tr);
+	tween->from({ 1.0f,1.0f,1.0f,1.0f })		
+		.to({ 0.0f,0.0f,0.0f,1.0f }).preDelay(3.5f).during(0.5f).easing(flt::ease::easeInExpo).onEnd([ptr]() {ptr->Disable(); });
+	flt::StartTween(tween);
+
 	for (int i = 0; i < _players.size(); i++)
 	{
 		_currentStage[i] = stageNum;
@@ -605,6 +649,11 @@ void GameManager::ProgressStage(int playerIndex)
 {
 	++_currentStage[playerIndex];
 	int curStage = _currentStage[playerIndex];
+
+	if (curStage > 9)
+	{
+		// TODO : 게임클리어 연출.
+	}
 
 	_isGameOver[playerIndex] = false;
 	_fallCount[playerIndex] = 0;
@@ -683,8 +732,7 @@ void GameManager::OnEndLevel(int playerIndex)
 	}
 	else if (_players.size() == 2)
 	{
-		// TODO : 웨이브가 끝나면 퍼펙트라고 해줄까? 흠.. 흠.. 흠.. 흠..
-
+		// OnCheckMinHeight 때 처리해준다. 공격받은게 없다면 Generate 고고씽.
 	}
 }
 
@@ -700,8 +748,6 @@ Player* GameManager::GetPlayer(int index)
 
 void GameManager::OnStartPlayerFall(int index)
 {
-	// TODO : UI 전부 끄고 UI 관련된거 전부 멈춰라.
-
 	_stageInfoPanel[index]->Disable();
 	_fallCountPanel[index]->Disable();
 	_garbageLineText[index]->Disable();
@@ -729,10 +775,59 @@ void GameManager::OnEndPlayerFall(int index)
 	}
 }
 
-void GameManager::OnCheckMinHeight(int index, int height)
+void GameManager::OnCheckMinHeight(int index, int height, bool doGenerate)
 {
+	if (doGenerate)
+	{
+		// TODO : 웨이브가 끝나면 퍼펙트라고 해줄까? 흠.. 흠.. 흠.. 흠..
+		std::random_device rd;
+		int width = _boards[index]->GetWidth();
+		int randomIndex;
+
+		while (true)
+		{
+			randomIndex = rd() % _battleWaveData.at(width).size();
+
+			if (height > _battleWaveData.at(width)[randomIndex].height)
+			{
+				break;
+			}
+		}
+
+		if (_boards[index] != nullptr)
+		{
+			_boards[index]->GenerateWave(_battleWaveData.at(width)[randomIndex].waveLayout);
+		}
+
+		return;
+	}
+
+	int generateHeight = 15;
+
 	if (_garbageLineCount[index] == 0)
 	{
+		if (height > generateHeight)
+		{
+			std::random_device rd;
+			int width = _boards[index]->GetWidth();
+			int randomIndex;
+
+			while (true)
+			{
+				randomIndex = rd() % _battleWaveData.at(width).size();
+
+				if (height > _battleWaveData.at(width)[randomIndex].height)
+				{
+					break;
+				}
+			}
+
+			if (_boards[index] != nullptr)
+			{
+				_boards[index]->GenerateWave(_battleWaveData.at(width)[randomIndex].waveLayout);
+			}
+		}
+
 		return;
 	}
 
@@ -766,7 +861,6 @@ void GameManager::IncreasePlayerCount()
 		_players[1]->SetAlbedoPath(blueAlbedoPath);
 
 		constexpr float offSetDelta = 0.5f;
-		// TODO : UI 배치 적절히 나눠야 함
 
 		for (int i = 0; i < _players.size(); i++)
 		{
@@ -782,6 +876,7 @@ void GameManager::IncreasePlayerCount()
 			{
 				auto originOffset = _garbageLineText[i]->GetOffsetPosition();
 				_garbageLineText[i]->SetOffsetPosition({ offSetBase + originOffset.x / MAXPLAYERCOUNT, originOffset.y });
+				_garbageLineText[i]->Enable();
 			}
 
 			if (_stageInfoPanel[i] != nullptr)
@@ -831,14 +926,32 @@ void GameManager::PrintComboText(int index, int count, int score)
 	}
 }
 
-void GameManager::AddPlayTime(int index, float time)
+void GameManager::AddPlayTime(float time)
 {
-	if (_players[index] == nullptr)
+	_playTime += time;
+	_accelTime += time;			// TODO : 배틀모드는 Column추가 하지 말까?
+
+	if (_boards[0]->GetWidth() >= 7)
 	{
 		return;
 	}
 
-	_playTime[index] += time;
+	if (_boards.size() == 1)
+	{
+		return;
+	}
+
+	constexpr float accelCycle = 45.0f;
+	constexpr float accelValue = 0.1f;
+	if (_accelTime >= accelCycle)
+	{
+		for (int i = 0; i < _players.size(); i++)
+		{
+			_boards[i]->AddBattleModeSpeed(accelValue);
+		}
+
+		_accelTime = 0.0f;
+	}
 }
 
 void GameManager::ReadStageFile()
@@ -957,7 +1070,6 @@ void GameManager::ResetGame()
 	{
 		_isGameOver[i] = false;
 		_fallCount[i] = 0;
-		_playTime[i] = 0.0f;
 		_playerScore[i] = 0;
 		_currentLevel[i] = 1;
 
@@ -984,10 +1096,61 @@ void GameManager::ResetGame()
 
 void GameManager::SetBattleMode()
 {
-	StageData data = _stageData[0];
+	/// Battle 용 Wave 데이터 추출.
+	for (auto& stage : _stageData)
+	{
+		int width = stage.stageWidth;
 
-	int width = 4;
-	int height = 30;
+		for (auto& level : stage.level)
+		{
+			int currentY = 0;
+			int waveHeight = level.height / stage.waveCount;
+
+			for (int y = 0; y < level.height; ++y)
+			{
+				if (currentY == 0)
+				{
+					_battleWaveData[width].emplace_back();
+
+					Wave& wave = _battleWaveData[width].back();
+
+					wave.width = width;
+					wave.height = waveHeight;
+
+					wave.waveLayout.resize(width);
+					for (int x = 0; x < width; ++x)
+					{
+						wave.waveLayout[x].resize(waveHeight);
+					}
+				}
+
+				for (int x = 0; x < width; ++x)
+				{
+					_battleWaveData[width].back().waveLayout[x][currentY] = level.levelLayout[x][y];
+				}
+
+				++currentY;
+
+				if (currentY >= waveHeight)
+				{
+					currentY = 0;
+				}
+			}
+		}
+	}
+
+	_roundText->SetText(L"BATTLE  MODE");
+	_roundText->Enable();
+	TextObject* ptr = _roundText;
+	auto tween = flt::MakeScaleTween(&_roundText->tr);
+	tween->from({ 1.0f,1.0f,1.0f,1.0f })
+		.to({ 0.0f,0.0f,0.0f,1.0f }).preDelay(3.5f).during(0.5f).easing(flt::ease::easeInExpo).onEnd([ptr]() {ptr->Disable(); });
+	flt::StartTween(tween);
+
+	int width = 5;
+	int height = 28;
+
+	Wave wave = _battleWaveData[width][5];
 
 	for (int i = 0; i < _players.size(); i++)
 	{
@@ -996,7 +1159,7 @@ void GameManager::SetBattleMode()
 			_boards[i]->SetBattleMode();
 			_boards[i]->Resize(width, height);
 			_boards[i]->Reset();
-			_boards[i]->GenerateLevel(data.level[0].levelLayout, 1, true);
+			_boards[i]->GenerateLevel(wave.waveLayout, 1, true);
 		}
 
 		if (_players[i] != nullptr)
@@ -1006,7 +1169,7 @@ void GameManager::SetBattleMode()
 
 		_stageCountText[i]->SetText(std::to_wstring(1));
 
-		ResizeFallCountUI(data.stageWidth - 1);
+		ResizeFallCountUI(width - 1);
 	}
 }
 
@@ -1132,7 +1295,7 @@ void GameManager::ChangeHeightCountText(int index, int height)
 
 	auto tweenScale = flt::MakeScaleTween(&textObj->tr);
 
-	tweenScale->from({ 1.8f,1.8f,1.8f,1.0f })
+	tweenScale->from({ 2.0f,2.0f,2.0f,1.0f })
 		.to({ 1.0f,1.0f,1.0f,1.0f }).during(0.3f).easing(flt::ease::easeOutBack).onEnd([&tweenScale]() {flt::ReleaseTween(tweenScale); });
 
 	flt::StartTween(tweenScale);
