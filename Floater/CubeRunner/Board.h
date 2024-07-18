@@ -82,6 +82,8 @@ public:
 	void OnEndTileFall(int x, int z);
 	void OnEndCubeDrop(CubeController* cubeCtr);
 
+	void AddBattleModeSpeed(float value);
+
 	void AddColumn();
 	void DestroyRow();
 
@@ -94,7 +96,8 @@ public:
 	void FastForward();
 	void EndFastForward();
 
-	const float& GetFFValue() { return _fastForwardValue; }
+	const float& GetGameSpeed() { return _gameSpeed; }
+	const float& GetBattleSpeed() { return _battleModeSpeed; }
 
 	void SetBattleMode() { _isBattleMode = true; }
 	int GetWidth() const { return _width; }
@@ -152,7 +155,8 @@ private:
 	bool _isAttacked;
 	bool _isBattleMode;
 	float _delayRemain;
-	float _fastForwardValue;
+	float _gameSpeed;
+	float _battleModeSpeed;
 	int _nowRollingCount;
 	int _nowGeneratingCount;
 	int _nowFallingTileCount;

@@ -44,19 +44,19 @@ void CubeController::PreUpdate(float deltaSecond)
 	switch (_status)
 	{
 	case eCUBESTATUS::ROLLING:
-		Roll(deltaSecond * _board->GetFFValue());
+		Roll(deltaSecond * _board->GetGameSpeed());
 		break;
 	case eCUBESTATUS::FALLING:
-		Fall(deltaSecond * _board->GetFFValue());
+		Fall(deltaSecond * _board->GetGameSpeed());
 		break;
 	case eCUBESTATUS::REMOVING:
-		Removing(deltaSecond * _board->GetFFValue());
+		Removing(deltaSecond * _board->GetGameSpeed());
 		break;
 	case eCUBESTATUS::GENERATING:
-		Generating(deltaSecond);
+		Generating(deltaSecond * _board->GetBattleSpeed());
 		break;
 	case eCUBESTATUS::DROPPING:
-		Dropping(deltaSecond);
+		Dropping(deltaSecond * _board->GetBattleSpeed());
 		break;
 
 	}

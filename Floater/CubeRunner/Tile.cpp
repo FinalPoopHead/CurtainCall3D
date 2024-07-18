@@ -101,7 +101,7 @@ void Tile::PreUpdate(float deltaSecond)
 
 	if (_isFalling)
 	{
-		Fall(deltaSecond * _board->GetFFValue());
+		Fall(deltaSecond * _board->GetGameSpeed());
 	}
 }
 

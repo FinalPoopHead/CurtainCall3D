@@ -29,8 +29,9 @@ constexpr float FALLTILE_DELAY = 2.0f;	// 타일 삭제 딜레이
 constexpr int CUBE_DAMAGE = 1;
 constexpr int DARKCUBE_DAMAGE = 1;
 constexpr float SLOWVALUE = 0.5f;
-constexpr float FFDEFAULT = 1.0f;
-constexpr float FFVALUE = 8.0f;
+constexpr float GAMESPEED_DEFAULT = 1.0f;
+constexpr float GAMESPEED_FASTFORWARD = 8.0f;
+constexpr float GAMESPEED_MAX = 4.0f;
 
 Board::Board(GameManager* gameManager, int playerIndex, int width, int height, float offset /*= 4.00f*/) :
 	flt::GameObject()
@@ -54,7 +55,8 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _isAttacked(false)
 	, _isBattleMode(false)
 	, _delayRemain(ROLLING_DELAY)
-	, _fastForwardValue(FFDEFAULT)
+	, _gameSpeed(GAMESPEED_DEFAULT)
+	, _battleModeSpeed(GAMESPEED_DEFAULT)
 	, _nowRollingCount(0)
 	, _nowGeneratingCount(0)
 	, _nowFallingTileCount()
@@ -162,7 +164,7 @@ void Board::PreUpdate(float deltaSecond)
 		EndFastForward();
 	}
 
-	if (_fastForwardValue == FFVALUE)
+	if (_gameSpeed == GAMESPEED_FASTFORWARD)
 	{
 		OnFastForwarding();
 	}
@@ -170,7 +172,7 @@ void Board::PreUpdate(float deltaSecond)
 	keyData = flt::GetKeyDown(flt::KeyCode::o);
 	if (keyData)
 	{
-		_fastForwardValue = SLOWVALUE;
+		_gameSpeed = SLOWVALUE;
 	}
 
 	keyData = flt::GetKeyUp(flt::KeyCode::o);
@@ -250,7 +252,7 @@ void Board::PreUpdate(float deltaSecond)
 		}
 		break;
 	case eBoardState::WAITING:
-		Wait(deltaSecond * _fastForwardValue);
+		Wait(deltaSecond * _gameSpeed);
 		break;
 	case eBoardState::CUBEROLLING:
 		if (_runningCubeControllers.empty())
@@ -503,6 +505,7 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 					ASSERT(false, "NormalCubePool is Empty");
 				}
 				cube = _normalCubePool.front();
+				dynamic_cast<NormalCube*>(cube)->SetTexture(eCubeTexture::NEUTRAL);
 				_normalCubePool.pop_front();
 				break;
 			case 2:
@@ -582,8 +585,8 @@ void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCou
 
 		player->camera->tr.SetPosition(startPos);
 		player->camera->tr.SetRotation(startRot);
-		player->camera->TweenMove(targetPos, time);
-		player->camera->TweenRotate(targetRot, time);
+		player->camera->TweenMove(targetPos, time / _battleModeSpeed);
+		player->camera->TweenRotate(targetRot, time / _battleModeSpeed);
 		_isCameraWorking = true;
 	}
 	else
@@ -625,6 +628,7 @@ void Board::GenerateWave(std::vector<std::vector<int>> waveLayout)
 					ASSERT(false, "NormalCubePool is Empty");
 				}
 				cube = _normalCubePool.front();
+				dynamic_cast<NormalCube*>(cube)->SetTexture(eCubeTexture::NEUTRAL);
 				_normalCubePool.pop_front();
 				break;
 			case 2:
@@ -683,10 +687,10 @@ void Board::DropGarbageLine(int lineCount)
 	float heightDelay = 0.15f;
 	float randomDelayValue = 0.08f;
 
-	int dropChance = 65;
+	int dropChance = 75;
 
 	int darkCube = 7;
-	int advantageCube = 15;
+	int advantageCube = 23;
 	int normalCube = 100 - darkCube - advantageCube;
 
 	std::random_device rd;
@@ -712,7 +716,6 @@ void Board::DropGarbageLine(int lineCount)
 			flt::GameObject* cube = nullptr;
 
 			int randomValue = rd() % 100;
-			ASSERT(randomValue < 100, "buggggggg");
 
 			if (randomValue < darkCube)
 			{
@@ -739,6 +742,7 @@ void Board::DropGarbageLine(int lineCount)
 					ASSERT(false, "NormalCubePool is Empty");
 				}
 				cube = _normalCubePool.front();
+				dynamic_cast<NormalCube*>(cube)->SetTexture(eCubeTexture::GARBAGE);
 				_normalCubePool.pop_front();
 			}
 
@@ -800,7 +804,14 @@ void Board::OnEndWave()
 {
 	if (_isPerfect)
 	{
-		_fastForwardValue = FFDEFAULT;
+		if (_isBattleMode)
+		{
+			_gameSpeed = _battleModeSpeed;
+		}
+		else
+		{
+			_gameSpeed = GAMESPEED_DEFAULT;
+		}
 		AddRow();
 		MoveCameraToEnd();
 	}
@@ -843,8 +854,10 @@ void Board::MoveCameraToEnd(bool onlyRight /*= false*/)
 		rot.SetEuler(offsetAngleX, offsetAngleY, 0.0f);
 	}
 
-	player->camera->TweenMove({ x,y,z }, 0.5f);
-	player->camera->TweenRotate(rot, 0.5f);
+	float time = 0.5f;
+
+	player->camera->TweenMove({ x,y,z }, time / _battleModeSpeed);
+	player->camera->TweenRotate(rot, time / _battleModeSpeed);
 	_isCameraWorking = true;
 }
 
@@ -908,9 +921,9 @@ void Board::CheckMinHeight()
 
 	std::cout << "MinHeight : " << _minHeight << std::endl;
 
-	bool isGenerate = CheckOnlyDarkRemain() || _runningCubeControllers.empty();
+	bool doGenerate = CheckOnlyDarkRemain() || _runningCubeControllers.empty();
 
-	_gameManager->OnCheckMinHeight(_playerIndex, _minHeight, isGenerate);
+	_gameManager->OnCheckMinHeight(_playerIndex, _minHeight, doGenerate);
 }
 
 void Board::ReturnCubeToPool(flt::GameObject* obj)
@@ -1180,6 +1193,18 @@ void Board::OnEndCubeDrop(CubeController* cubeCtr)
 	}
 }
 
+void Board::AddBattleModeSpeed(float value)
+{
+	if (_battleModeSpeed >= GAMESPEED_MAX)
+	{
+		_battleModeSpeed = GAMESPEED_MAX;
+		return;
+	}
+
+	_battleModeSpeed += value;
+	_gameSpeed = _battleModeSpeed;
+}
+
 void Board::AddColumn()
 {
 	_nowAddTileCount = _height;
@@ -1257,12 +1282,19 @@ void Board::AddCubeFallCount()
 
 void Board::FastForward()
 {
-	_fastForwardValue = FFVALUE;
+	_gameSpeed = GAMESPEED_FASTFORWARD;
 }
 
 void Board::EndFastForward()
 {
-	_fastForwardValue = FFDEFAULT;
+	if (_isBattleMode)
+	{
+		_gameSpeed = _battleModeSpeed;
+	}
+	else
+	{
+		_gameSpeed = GAMESPEED_DEFAULT;
+	}
 
 	if (_isOnlyDarkRemain)
 	{
@@ -1478,7 +1510,14 @@ void Board::OnEndWaiting()
 
 	if (_isCameraWorking && !_isOnlyDarkRemain)
 	{
-		_fastForwardValue = FFDEFAULT;
+		if (_isBattleMode)
+		{
+			_gameSpeed = _battleModeSpeed;
+		}
+		else
+		{
+			_gameSpeed = GAMESPEED_DEFAULT;
+		}
 
 		auto player = _gameManager->GetPlayer(_playerIndex);
 		player->camera->TracePlayer();

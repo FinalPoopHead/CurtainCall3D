@@ -66,7 +66,7 @@ public:
 
 	void OnStartPlayerFall(int index);
 	void OnEndPlayerFall(int index);
-	void OnCheckMinHeight(int index, int height, bool isGenerate);
+	void OnCheckMinHeight(int index, int height, bool doGenerate);
 	void OnHeightChange(int index, int height);
 	
 	void ReturnMissile(SpriteObject* missile);
@@ -106,11 +106,12 @@ private:
 	std::vector<TextObject*> _garbageLineText;
 	std::vector<TextObject*> _gameoverTextPanel;
 	std::vector<std::vector<TextObject*>> _gameoverText;
-	std::list<SpriteObject*> _missilePool;
+	TextObject* _roundText;
 
 	std::list<TextObject*> _liveComboTexts;
 
 	std::list<TextObject*> _comboTextPool;
+	std::list<SpriteObject*> _missilePool;
 
 	/// 게임 상태들 저장해두는 멤버 변수들
 private:
@@ -118,7 +119,7 @@ private:
 	std::vector<int> _fallCount;	
 	std::vector<int> _fallCountMax;
 	float _playTime;
-	float _columnTime;
+	float _accelTime;
 	std::vector<int> _playerScore;
 		std::vector<flt::Vector2f> _comboTextPos;		// 플레이어 별 콤보 텍스트 위치
 
@@ -130,5 +131,4 @@ private:
 
 	std::vector<int> _garbageLineCount;
 	std::vector<bool> _isBacktoBack;
-	std::vector<int> _nextWaveIndex;
 };
