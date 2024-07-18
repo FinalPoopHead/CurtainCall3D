@@ -147,7 +147,7 @@
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="PlayerModel.cpp" />
-    <ClCompile Include="Shaker.cpp" />
+    <ClCompile Include="ShakeComponent.cpp" />
     <ClCompile Include="SpriteObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="GameManager.cpp" />
@@ -175,7 +175,7 @@
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="PlayerModel.h" />
-    <ClInclude Include="Shaker.h" />
+    <ClInclude Include="ShakeComponent.h" />
     <ClInclude Include="SpriteObject.h" />
     <ClInclude Include="MainMenuScene.h" />
     <ClInclude Include="Menu.h" />

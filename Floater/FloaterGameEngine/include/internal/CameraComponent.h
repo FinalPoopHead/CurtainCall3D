@@ -21,8 +21,6 @@ namespace flt
 		Matrix4f GetViewMatrix() const;
 		Matrix4f GetProjectionMatrix() const;
 
-		void Shake(float duration, float magnitude);
-
 	protected:
 		virtual void OnCreate() override;
 		virtual void OnEnable() override;
@@ -35,11 +33,5 @@ namespace flt
 		IRenderer& _renderer;
 		uint64 _hObject;
 		bool _isDraw;
-
-		bool _isShaking;
-		float _shakeElapsedTime;
-		float _shakeDuration;
-		float _shakeMagnitude;
-		std::function<float(float)> _shakeFunc;
 	};
 }

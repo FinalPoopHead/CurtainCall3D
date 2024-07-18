@@ -11,7 +11,7 @@ class ShakeComponent : public flt::Component<ShakeComponent>
 	{
 	public:
 		Shaker(float power, float duration, flt::Vector2f dir, std::function<float(float)> shakeFunction);
-	
+
 		bool Shake(float deltaSecond, flt::Transform& transform);
 	private:
 		float _power;
@@ -24,7 +24,7 @@ class ShakeComponent : public flt::Component<ShakeComponent>
 
 public:
 	ShakeComponent();
-	void Impack(float power = 1.0f, float duration = 0.5f, flt::Vector2f dir = {1.0f, 1.0f}, std::function<float(float)> ShakeFunc = ImpactFunc);
+	void Impack(float power = 1.0f, float duration = 0.5f, flt::Vector2f dir = { 1.0f, 1.0f }, std::function<float(float)> ShakeFunc = ImpactFunc);
 	void DoIt(float amplitude, float frequency, float duration);
 
 protected:

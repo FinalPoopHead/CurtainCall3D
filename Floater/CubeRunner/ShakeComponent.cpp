@@ -1,6 +1,7 @@
-﻿#include "ShakerComponent.h"
+﻿#include "ShakeComponent.h"
 #include "../FloaterMath/include/Ease.h"
 #include <random>
+
 
 ShakeComponent::ShakeComponent()
 	: _shakers()

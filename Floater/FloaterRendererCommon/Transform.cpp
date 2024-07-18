@@ -238,6 +238,7 @@ void flt::Transform::AddWorldPosition(const Vector4f& worldPos)
 void flt::Transform::AddLocalRotation(const Vector3f& localAxis, float radian)
 {
 	Vector4f worldAxis = Vector4f{localAxis, 0.0f} * GetWorldMatrix4f();
+
 	worldAxis.Normalize();
 
 	AddWorldRotation((Vector3f)worldAxis, radian);

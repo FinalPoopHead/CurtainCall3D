@@ -16,7 +16,7 @@ GlideObject::GlideObject()
 	flt::BoxColliderComponent* boxCollider = AddComponent<flt::BoxColliderComponent>(true);
 	boxCollider->UseKinematic(true);
 
-	AddComponent<Shaker>(true);
+	AddComponent<ShakeComponent>(true);
 }
 
 GlideObject::~GlideObject()
@@ -28,6 +28,6 @@ void GlideObject::Update(float deltaTime)
 {
 	if(flt::GetKeyDown(flt::KeyCode::lCtrl))
 	{
-		GetComponent<Shaker>()->Impack(0.3f, 2.f);
+		GetComponent<ShakeComponent>()->Impack(20.f, .2f, {0.0f, 1.0f});
 	}
 }
