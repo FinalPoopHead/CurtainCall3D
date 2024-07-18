@@ -13,6 +13,7 @@ namespace flt
 {
 	struct PhysXData
 	{
+		PhysXData() : transform(), actor(nullptr), shape(nullptr) {}
 		physx::PxTransform transform;
 		physx::PxRigidDynamic* actor;
 		physx::PxShape* shape;

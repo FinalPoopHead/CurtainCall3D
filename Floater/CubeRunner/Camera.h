@@ -27,6 +27,8 @@ public:
 	void TweenRotate(flt::Quaternion targetRot, float time, std::function<float(float)> ease = [](float t) { return t; });
 	flt::Vector3f ToScreenSpace(flt::Vector3f pos);
 
+	void SetCameraIndex(uint32 index);
+
 protected:
 	virtual void PostUpdate(float deltaSecond) override;
 

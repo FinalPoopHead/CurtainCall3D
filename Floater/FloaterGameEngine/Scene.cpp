@@ -58,6 +58,7 @@ void flt::Scene::AddEnableGameObject(GameObject* gameObject, bool isEnable)
 		ASSERT(isExist, "Not exist game object");
 	}
 
+	// 게임오브젝트 활성화를 위한 추가
 	_stagingActiveGameObjects[gameObject] = isEnable;
 }
 
@@ -451,11 +452,8 @@ void flt::Scene::PostRender()
 
 void flt::Scene::StartFrame()
 {
-	while (!_gameObjectsToCreate.empty())
+	for (auto& object : _gameObjectsToCreate)
 	{
-		GameObject* object = _gameObjectsToCreate.back();
-		_gameObjectsToCreate.pop_back();
-
 		auto iter = _gameObjects.EmplaceBack(object);
 		object->_index = iter.GetIndex();
 
@@ -464,10 +462,17 @@ void flt::Scene::StartFrame()
 			component->OnCreate();
 		}
 		object->OnCreate();
+	}
+
+	while (!_gameObjectsToCreate.empty())
+	{
+		GameObject* object = _gameObjectsToCreate.back();
+		_gameObjectsToCreate.pop_back();
 
 		if (object->_isEnable)
 		{
 			object->_isEnable = false;
+			// 이 내부에서 _stagingActiveGameObjects에 추가됨(자식 Object들도 추가해야 하기 떄문에_
 			object->Enable();
 		}
 	}

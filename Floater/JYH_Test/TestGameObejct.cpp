@@ -88,17 +88,6 @@ void TestGameObejct::Update(float deltaTime)
 		}
 	}
 
-	keyData = GetKey(flt::KeyCode::lShift);
-	if (keyData)
-	{
-		std::vector<std::wstring> animList = GetComponent<flt::RendererComponent>()->GetAnimaionList();
-
-		for (auto& anim : animList)
-		{
-			std::wcout << anim << std::endl;
-		}
-	}
-
 	keyData = GetKey(flt::KeyCode::key1);
 	if (keyData)
 	{

@@ -3,7 +3,7 @@
 
 namespace flt
 {
-	struct __declspec(dllexport) Matrix3f final
+	struct FLOATER_MATH_API Matrix3f final
 	{
 		constexpr Matrix3f() noexcept : Matrix3f{ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f } {}
 		constexpr Matrix3f(const Matrix3f& other) noexcept : Matrix3f{

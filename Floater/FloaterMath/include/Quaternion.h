@@ -12,7 +12,7 @@ namespace flt
 
 namespace flt
 {
-	struct __declspec(dllexport) Quaternion : public Vector4f
+	struct FLOATER_MATH_API Quaternion : public Vector4f
 	{
 		enum class  AxisOrder
 		{

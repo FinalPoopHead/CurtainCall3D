@@ -151,6 +151,7 @@
     <ClCompile Include="HierarachyMgr.cpp" />
     <ClCompile Include="HierarchyTest.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ShakerComponent.cpp" />
     <ClCompile Include="TestGameObejct.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
@@ -166,6 +167,7 @@
     <ClInclude Include="HierarachyMgr.h" />
     <ClInclude Include="HierarchyTest.h" />
     <ClInclude Include="RotateComponent.h" />
+    <ClInclude Include="ShakerComponent.h" />
     <ClInclude Include="TestGameObejct.h" />
     <ClInclude Include="TestScene.h" />
     <ClInclude Include="UnityLoadScene.h" />
