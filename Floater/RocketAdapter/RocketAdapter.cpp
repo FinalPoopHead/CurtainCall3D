@@ -155,6 +155,7 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 
 	auto factory = Rocket::Core::CreateGraphicsObjectFactory();
 
+	ASSERT(renderable.transform, "Transform is nullptr");
 	rocketObject->transform = renderable.transform;
 
 	// 카메라 등록 로직

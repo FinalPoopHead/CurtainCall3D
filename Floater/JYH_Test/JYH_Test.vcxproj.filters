@@ -39,6 +39,9 @@
     <ClCompile Include="HierarchyTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ShakerComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TestScene.h">
@@ -67,6 +70,9 @@
     </ClInclude>
     <ClInclude Include="HierarchyTest.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShakerComponent.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

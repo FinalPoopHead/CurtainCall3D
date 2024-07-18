@@ -16,7 +16,7 @@ namespace flt
 		};
 
 	public:
-		Light() = default;
+		Light() : Light({ 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, 1.0f) {}
 		Light(const Vector3f& position, const Vector3f& color, float intensity)
 			: type(Type::none)
 			, ambientColor()

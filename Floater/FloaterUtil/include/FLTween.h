@@ -117,6 +117,7 @@ namespace flt
 	template<typename T>
 	FLTween<T>& flt::FLTween<T>::easing(std::function<float(float)> easing)
 	{
+		ASSERT(_points.size() > 1, "At least two points are required.");
 		_points[_points.size() - 2].easing = easing;
 		return *this;
 	}
@@ -124,6 +125,7 @@ namespace flt
 	template<typename T>
 	FLTween<T>& flt::FLTween<T>::during(float duration)
 	{
+		ASSERT(_points.size() > 1, "At least two points are required.");
 		_points[_points.size() - 2].duration = duration;
 		return *this;
 	}
@@ -132,6 +134,7 @@ namespace flt
 	template<typename T>
 	flt::FLTween<T>& flt::FLTween<T>::preDelay(float duration)
 	{
+		ASSERT(_points.size() > 1, "At least two points are required.");
 		_points[_points.size() - 2].preDelay = duration;
 		return *this;
 	}
@@ -139,6 +142,7 @@ namespace flt
 	template<typename T>
 	flt::FLTween<T>& flt::FLTween<T>::postDelay(float duration)
 	{
+		ASSERT(_points.size() > 1, "At least two points are required.");
 		_points[_points.size() - 2].postDelay = duration;
 		return *this;
 	}
@@ -146,6 +150,7 @@ namespace flt
 	template<typename T>
 	FLTween<T>& flt::FLTween<T>::onStart(std::function<void()> callback)
 	{
+		ASSERT(_points.size() > 1, "At least two points are required.");
 		_points[_points.size() - 2].onStart.emplace_back(callback);
 		return *this;
 	}
@@ -153,6 +158,7 @@ namespace flt
 	template<typename T>
 	FLTween<T>& flt::FLTween<T>::onStep(std::function<void(const ValueType&)> callback)
 	{
+		ASSERT(_points.size() > 1, "At least two points are required.");
 		_points[_points.size() - 2].onStep.emplace_back(callback);
 		return *this;
 	}
@@ -160,6 +166,7 @@ namespace flt
 	template<typename T>
 	FLTween<T>& flt::FLTween<T>::onEnd(std::function<void()> callback)
 	{
+		ASSERT(_points.size() > 1, "At least two points are required.");
 		_points[_points.size() - 2].onEnd.emplace_back(callback);
 		return *this;
 	}
@@ -175,7 +182,7 @@ namespace flt
 	template<typename T>
 	T flt::FLTween<T>::step(float dt)
 	{
-		ASSERT(_points.size() >= 2, "At least two points are required.");
+		ASSERT(_points.size() > 1, "At least two points are required.");
 
 		//가장 마지막을 지난다면 마지막 값을 반환
 		if (InFinishedinternal())

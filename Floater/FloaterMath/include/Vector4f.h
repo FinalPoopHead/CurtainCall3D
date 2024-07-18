@@ -2,14 +2,16 @@
 
 #include <immintrin.h>
 //#include <cmath>
+#include "FloaterMathDefine.h"
 #include "Vector3f.h"
+
 
 
 namespace flt
 {
 	struct Matrix4f;
 
-	struct __declspec(dllexport) Vector4f
+	struct FLOATER_MATH_API Vector4f
 	{
 	public:
 		[[nodiscard]] static Vector4f Lerp(const Vector4f& a, const Vector4f& b, float t) noexcept;

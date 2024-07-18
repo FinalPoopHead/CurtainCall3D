@@ -10,11 +10,6 @@ flt::CameraComponent::CameraComponent()
 	, _renderer(*GameEngine::Instance()->GetRenderer())
 	, _hObject()
 	, _isDraw(true)
-	, _isShaking(false)
-	, _shakeElapsedTime(0.0f)
-	, _shakeDuration(0.0f)
-	, _shakeMagnitude(0.0f)
-	, _shakeFunc([](float x) { return x; })
 {
 	_rendererObject->camera = new flt::Camera(nullptr);
 }
@@ -48,15 +43,9 @@ flt::Matrix4f flt::CameraComponent::GetProjectionMatrix() const
 	return _rendererObject->camera->GetProjectionMatrix();
 }
 
-void flt::CameraComponent::Shake(float duration, float magnitude)
-{
-	_shakeDuration = duration;
-	_shakeMagnitude = magnitude;
-	_shakeElapsedTime = 0.0f;
-}
-
 void flt::CameraComponent::OnCreate()
 {
+	ASSERT(&_gameObject->transform, "Transform is nullptr");
 	_rendererObject->transform = &_gameObject->transform;
 	_rendererObject->camera->SetTransform(&_gameObject->transform);
 }

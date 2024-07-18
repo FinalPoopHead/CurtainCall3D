@@ -1,5 +1,4 @@
 ﻿#pragma once
-
 #include "Common.h"
 #include <cmath>
 #include <compare>
@@ -9,7 +8,7 @@ namespace flt
 {
 	struct Matrix3f;
 
-	struct __declspec(dllexport) Vector3f
+	struct FLOATER_MATH_API Vector3f
 	{
 		constexpr Vector3f() noexcept : m{ 0.0f, 0.0f, 0.0f } {}
 		constexpr Vector3f(float x, float y, float z) noexcept : m{ x, y, z } {}

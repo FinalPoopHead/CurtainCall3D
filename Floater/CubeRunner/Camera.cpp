@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "Player.h"
 #include "Board.h"
+#include "ShakeObject.h"
 #include "../FloaterGameEngine/include/Input.h"
 
 
@@ -19,7 +20,10 @@ Camera::Camera(Player* player, Board* board) :
 	, _rotSpeed(15.0f)
 	, _state(eCameraState::TRACEPLAYER)
 {
-	_cameraComp = AddComponent<flt::CameraComponent>(true);
+	ShakeObject* shakeObject = flt::CreateGameObject<ShakeObject>(true);
+	this->AddChild(shakeObject);
+	_cameraComp = shakeObject->GetComponent<flt::CameraComponent>();
+	//_cameraComp = AddComponent<flt::CameraComponent>(true);
 
 	_currPosition = CalcTargetPosition();
 	tr.SetPosition(_currPosition);
@@ -98,6 +102,11 @@ flt::Vector3f Camera::ToScreenSpace(flt::Vector3f pos)
 	flt::Vector4f temp = { pos.x,pos.y,pos.z,1.0f };
 	flt::Vector4f result = temp * _cameraComp->GetViewMatrix() * _cameraComp->GetProjectionMatrix();
 	return { result.x, result.y, result.z };
+}
+
+void Camera::SetCameraIndex(uint32 index)
+{
+	_cameraComp->SetIndex(index);
 }
 
 void Camera::PostUpdate(float deltaSecond)
