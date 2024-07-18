@@ -45,6 +45,7 @@ flt::Matrix4f flt::CameraComponent::GetProjectionMatrix() const
 
 void flt::CameraComponent::OnCreate()
 {
+	ASSERT(&_gameObject->transform, "Transform is nullptr");
 	_rendererObject->transform = &_gameObject->transform;
 	_rendererObject->camera->SetTransform(&_gameObject->transform);
 }

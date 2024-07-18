@@ -28,6 +28,6 @@ void GlideObject::Update(float deltaTime)
 {
 	if(flt::GetKeyDown(flt::KeyCode::lCtrl))
 	{
-		GetComponent<ShakeComponent>()->Impack(20.f, .2f, {0.0f, 1.0f});
+		GetComponent<ShakeComponent>()->Impack(20.f, .2f, {1.0f, 1.0f});
 	}
 }
