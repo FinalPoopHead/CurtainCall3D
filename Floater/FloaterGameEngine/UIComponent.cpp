@@ -4,7 +4,6 @@
 #include "./include/internal/Scene.h"
 #include "./include/internal/GameEngine.h"
 #include "Image.h"
-
 #include <filesystem>
 
 flt::UIComponent::UIComponent()
