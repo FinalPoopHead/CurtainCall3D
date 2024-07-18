@@ -13,6 +13,9 @@ public:
 	MenuItem* PrevItem(MenuItem* selectedItem);
 	MenuItem* FirstItem();
 
+	virtual void OnEnable() override;
+	virtual void OnDisable() override;
+
 private:
 	std::vector<MenuItem*> items;
 };
