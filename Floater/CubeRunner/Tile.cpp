@@ -25,6 +25,7 @@ Tile::Tile(Board* board)
 	, _targetPos()
 	, _fallDelay()
 	, _fallSpeed()
+	, _addType(eAddType::ROW)
 	, _x()
 	, _z()
 {
@@ -83,13 +84,24 @@ void Tile::PreUpdate(float deltaSecond)
 		if (_elapsedTime >= _movingTime)
 		{
 			_isMoving = false;
-			_board->OnEndTileAdd(this);
+
+			switch (_addType)
+			{
+			case eAddType::ROW:
+				_board->OnEndAddRowTile(this);
+				break;
+			case eAddType::COLUMN:
+				_board->OnEndAddColumnTile(this);
+				break;
+			default:
+				break;
+			}
 		}
 	}
 
 	if (_isFalling)
 	{
-		Fall(deltaSecond * _board->GetFFValue());
+		Fall(deltaSecond * _board->GetGameSpeed());
 	}
 }
 
@@ -123,7 +135,7 @@ void Tile::DisableAdvantageMine()
 	_advantageMine->Disable();
 }
 
-void Tile::StartAddRow(float movingTime, flt::Vector3f targetPos)
+void Tile::StartAdd(float movingTime, flt::Vector3f targetPos, eAddType type /*= eAddType::ROW*/)
 {
 	_isMoving = true;
 	_elapsedTime = 0.0f;
@@ -133,6 +145,7 @@ void Tile::StartAddRow(float movingTime, flt::Vector3f targetPos)
 	_startPos.y = pos.y;
 	_startPos.z = pos.z;
 	_targetPos = targetPos;
+	_addType = type;
 }
 
 void Tile::StartFall(float delay, int row, int col)
