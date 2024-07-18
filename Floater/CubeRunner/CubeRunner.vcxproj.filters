@@ -115,7 +115,9 @@
     <ClCompile Include="ShakeComponent.cpp">
       <Filter>Component</Filter>
     </ClCompile>
-    <ClCompile Include="ShakeObject.cpp" />
+    <ClCompile Include="ShakeObject.cpp">
+      <Filter>GameObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h">
@@ -188,6 +190,8 @@
     <ClInclude Include="ShakeComponent.h">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="ShakeObject.h" />
+    <ClInclude Include="ShakeObject.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -4,7 +4,6 @@
 #include "./include/internal/Scene.h"
 #include "./include/internal/GameEngine.h"
 #include "Image.h"
-
 #include <filesystem>
 
 flt::UIComponent::UIComponent()
@@ -111,8 +110,8 @@ flt::Vector2f flt::UIComponent::GetPosition()
 void flt::UIComponent::SetOffsetPosition(flt::Vector2f offsetPos)
 {
 	_isOffsetMode = true;
-	ASSERT(offsetPos.x >= 0.0f && offsetPos.x <= 1.0f, "Offset x is out of range");
-	ASSERT(offsetPos.y >= 0.0f && offsetPos.y <= 1.0f, "Offset y is out of range");
+	//ASSERT(offsetPos.x >= 0.0f && offsetPos.x <= 1.0f, "Offset x is out of range");
+	//ASSERT(offsetPos.y >= 0.0f && offsetPos.y <= 1.0f, "Offset y is out of range");
 
 	_offsetPosition = offsetPos;
 

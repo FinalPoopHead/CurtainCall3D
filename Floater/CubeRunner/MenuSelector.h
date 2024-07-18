@@ -8,8 +8,8 @@ class MenuItem;
 class MenuSelector : public flt::GameObject
 {
 public:
-	MenuSelector(Menu* menu);
-	void SetMenu(Menu* menu);
+	MenuSelector(Menu* mainMenu, Menu* controllerMenu);
+	void SetMenu(Menu* mainMenu);
 	void next();
 	void prev();
 	void Select(flt::KeyCode keyCode);
@@ -23,8 +23,10 @@ private:
 	void MoveSelectedItem();
 
 private:
-	Menu* _menu;
+	Menu* _mainMenu;
+	Menu* _controllerSelectMenu;
 	MenuItem* _selectedItem;
 	flt::UIComponent* _ui;
+	float _lastLStickY;
 };
 

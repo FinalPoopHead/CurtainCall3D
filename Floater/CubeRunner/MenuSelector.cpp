@@ -5,10 +5,12 @@
 #include <iostream>
 
 
-MenuSelector::MenuSelector(Menu* menu)
-	: _menu(menu)
+MenuSelector::MenuSelector(Menu* mainMenu, Menu* controllerMenu)
+	: _mainMenu(mainMenu)
+	, _controllerSelectMenu(controllerMenu)
 	, _selectedItem(nullptr)
 	, _ui(nullptr)
+	, _lastLStickY(0.0f)
 {
 	//_ui = AddComponent<flt::UIComponent>(true);
 	//_ui->SetImage(L"../Resources/Sprites/abcd.jpg");
@@ -18,13 +20,13 @@ MenuSelector::MenuSelector(Menu* menu)
 
 void MenuSelector::SetMenu(Menu* menu)
 {
-	_menu = menu;
+	_mainMenu = menu;
 
 	if (_selectedItem)
 	{
 		_selectedItem->OnUnpointed();
 	}
-	_selectedItem = _menu->FirstItem();
+	_selectedItem = _mainMenu->FirstItem();
 	_selectedItem->OnPointed();
 }
 
@@ -35,7 +37,7 @@ void MenuSelector::next()
 		_selectedItem->OnUnpointed();
 	}
 
-	_selectedItem = _menu->NextItem(_selectedItem);
+	_selectedItem = _mainMenu->NextItem(_selectedItem);
 	_selectedItem->OnPointed();
 	MoveSelectedItem();
 }
@@ -47,7 +49,7 @@ void MenuSelector::prev()
 		_selectedItem->OnUnpointed();
 	}
 
-	_selectedItem = _menu->PrevItem(_selectedItem);
+	_selectedItem = _mainMenu->PrevItem(_selectedItem);
 	_selectedItem->OnPointed();
 	MoveSelectedItem();
 }
@@ -59,7 +61,7 @@ void MenuSelector::Select(flt::KeyCode keyCode)
 
 void MenuSelector::OnEnable()
 {
-	_selectedItem = _menu->FirstItem();
+	_selectedItem = _mainMenu->FirstItem();
 	_selectedItem->OnPointed();
 
 	MoveSelectedItem();
@@ -88,6 +90,20 @@ void MenuSelector::Update(float deltaSecond)
 		Select(flt::KeyCode::enter);
 	}
 
+	if (flt::GetKeyDown(flt::KeyCode::lAlt))
+	{
+		if (_mainMenu->IsEnable())
+		{
+			_mainMenu->Disable();
+			_controllerSelectMenu->Enable();
+		}
+		else
+		{
+			_mainMenu->Enable();
+			_controllerSelectMenu->Disable();
+		}
+	}
+
 	flt::GamePadState state;
 	bool isGamePadConnected = flt::GetGamePadState(0, &state);
 	if (isGamePadConnected)
@@ -104,6 +120,20 @@ void MenuSelector::Update(float deltaSecond)
 		{
 			Select(flt::KeyCode::enter);
 		}
+
+		if (fabsf(_lastLStickY) < 0.5f)
+		{
+			if (state.lStickY > 0.5f)
+			{
+				prev();
+			}
+			else if (state.lStickY < -0.5f)
+			{
+				next();
+			}
+		}
+
+		_lastLStickY = state.lStickY;
 	}
 }
 
