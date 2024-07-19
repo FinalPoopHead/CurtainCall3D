@@ -30,6 +30,11 @@ void SpriteObject::SetZOrder(float zOrder)
 	_uiRenderer->SetZOrder(zOrder);
 }
 
+void SpriteObject::SetColor(flt::Vector4f color)
+{
+	_uiRenderer->SetImageColor(color);
+}
+
 void SpriteObject::SetSize(flt::Vector2f size)
 {
 	_uiRenderer->SetSize(size);

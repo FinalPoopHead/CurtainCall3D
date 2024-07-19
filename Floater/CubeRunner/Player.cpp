@@ -127,7 +127,7 @@ void Player::Update(float deltaSecond)
 
 	if ((tileState == (int)eTileStateFlag::NONE))
 	{
-		_board->SetGameOver();
+		_board->OnStartPlayerFall();
 		_state = ePlayerState::FALLING;
 		return;
 	}
