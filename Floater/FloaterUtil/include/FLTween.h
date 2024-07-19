@@ -300,7 +300,7 @@ namespace flt
 	flt::FLTweenPoint<T>::FLTweenPoint(const T& value)
 		: value(value)
 		, duration(0.0f), preDelay(0.0f), postDelay(0.0f)
-		, easing([](float t) {return t; })
+		, easing([](float t) { return t; })
 		, onStart(), onStep(), onEnd()
 	{
 
