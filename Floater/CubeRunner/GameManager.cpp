@@ -536,27 +536,27 @@ void GameManager::OnDestroyCubes(int playerIndex, int count, flt::Vector3f pos /
 
 	switch (count)
 	{
-	case 1:
-	case 2:
-	case 3:
-		break;
-	case 4:
-	case 5:
-		damage = 1;
-		break;
-	case 6:
-	case 7:
-		damage = 2;
-		break;
-	case 8:
-		damage = 3;
-		break;
-	case 9:
-		damage = 4;
-		break;
-	default:
-		damage = 6;
-		break;
+		case 1:
+		case 2:
+		case 3:
+			break;
+		case 4:
+		case 5:
+			damage = 1;
+			break;
+		case 6:
+		case 7:
+			damage = 2;
+			break;
+		case 8:
+			damage = 3;
+			break;
+		case 9:
+			damage = 4;
+			break;
+		default:
+			damage = 6;
+			break;
 	}
 
 	float delay = 0.1f;
@@ -583,7 +583,7 @@ void GameManager::OnDestroyCubes(int playerIndex, int count, flt::Vector3f pos /
 		auto posTween = flt::MakePosTween(&missile->tr);
 		posTween->from({ startPos.x, startPos.y, 0.0f, 1.0f })
 			.to({ popupPos.x, popupPos.y, 0.0f, 1.0f }).during(0.5f).easing(flt::ease::easeOutExpo).preDelay(delay * i)
-			.to({ endPos.x,endPos.y, 0.0f, 1.0f }).during(0.5f).easing(flt::ease::easeOutExpo).onEnd([&posTween](){flt::ReleaseTween(posTween); });
+			.to({ endPos.x,endPos.y, 0.0f, 1.0f }).during(0.5f).easing(flt::ease::easeOutExpo).onEnd([&posTween]() {flt::ReleaseTween(posTween); });
 
 		flt::StartTween(scaleTween);
 		flt::StartTween(posTween);
@@ -595,42 +595,42 @@ void GameManager::SetStage(int stageNum)
 	std::wstring numStr;
 	switch (stageNum)
 	{
-	case 1:
-		numStr = L"1 S T";
-		break;
-	case 2:
-		numStr = L"2 N D";
-		break;
-	case 3:
-		numStr = L"3 R D";
-		break;
-	case 4:
-		numStr = L"4 T H";
-		break;
-	case 5:
-		numStr = L"5 T H";
-		break;
-	case 6:
-		numStr = L"6 T H";
-		break;
-	case 7:
-		numStr = L"7 T H";
-		break;
-	case 8:
-		numStr = L"8 T H";
-		break;
-	case 9:
-		numStr = L"F I N A L";
-		break;
-	default:
-		break;
+		case 1:
+			numStr = L"1 S T";
+			break;
+		case 2:
+			numStr = L"2 N D";
+			break;
+		case 3:
+			numStr = L"3 R D";
+			break;
+		case 4:
+			numStr = L"4 T H";
+			break;
+		case 5:
+			numStr = L"5 T H";
+			break;
+		case 6:
+			numStr = L"6 T H";
+			break;
+		case 7:
+			numStr = L"7 T H";
+			break;
+		case 8:
+			numStr = L"8 T H";
+			break;
+		case 9:
+			numStr = L"F I N A L";
+			break;
+		default:
+			break;
 	}
 
 	_roundText->SetText(numStr + L"   S T A G E");
 	_roundText->Enable();
 	TextObject* ptr = _roundText;
 	auto tween = flt::MakeScaleTween(&_roundText->tr);
-	tween->from(_roundText->tr.GetLocalScale())		
+	tween->from(_roundText->tr.GetLocalScale())
 		.to({ 0.0f,0.0f,0.0f,1.0f }).preDelay(3.5f).during(0.5f).easing(flt::ease::easeInExpo).onEnd([ptr]() {ptr->Disable(); });
 	flt::StartTween(tween);
 
@@ -658,7 +658,7 @@ void GameManager::SetStage(int stageNum)
 		ResizeFallCountUI(data.stageWidth - 1);
 	}
 
-	FadeOut(2.0f);
+	FadeIn(2.0f);
 }
 
 void GameManager::ProgressStage(int playerIndex)
@@ -785,7 +785,7 @@ void GameManager::OnEndPlayerFall(int index)
 	{
 		auto tweenScale = flt::MakeScaleTween(&text->tr);
 		// TODO : 싱글모드면 점수기입하고 끝내기? 멀티모드면 다른플레이어 승리 보여주고 끝내기?
-		
+
 		auto scale = text->tr.GetLocalScale();
 		flt::Vector4f startScale = { 0.0f, scale.y,scale.z,1.0f };
 
@@ -887,9 +887,10 @@ void GameManager::FadeIn(float duration)
 	auto tween = flt::MakeTween(alpha);
 	tween->from(1.0f)
 		.to(0.0f).during(duration)
-		.onStart([this]() {this->_fade->Enable(); })
+		.onStart([this]() {	this->_fade->Enable(); })
 		.onStep([this](float value) {this->_fade->SetColor({ 0.0f,0.0f,0.0f,value }); })
 		.onEnd([this]() {this->_fade->Disable(); });
+
 	StartTween(tween);
 }
 
@@ -900,7 +901,7 @@ void GameManager::FadeOut(float duration)
 	tween->from(0.0f)
 		.to(1.0f).during(duration)
 		.onStart([this]() {this->_fade->Enable(); })
-		.onStep([this](float value) {this->_fade->SetColor({ 0.0f,0.0f,0.0f,value }); })
+		.onStep([this](const float& value) {this->_fade->SetColor({ 0.0f,0.0f,0.0f,value }); })
 		.onEnd([this]() {this->_fade->Disable(); });
 	StartTween(tween);
 }

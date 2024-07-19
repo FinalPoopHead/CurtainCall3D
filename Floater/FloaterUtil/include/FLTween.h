@@ -182,6 +182,28 @@ namespace flt
 	template<typename T>
 	T flt::FLTween<T>::step(float dt)
 	{
+		if (dt == 0.0f)
+		{
+			if constexpr (std::is_pointer_v<T>)
+			{
+				*_target = _points.front().value;
+			}
+			else
+			{
+				_target = _points.front().value;
+			}
+
+			return _target;
+		}
+
+		if(_elapsed == 0.0f && _current == 0)
+		{
+			for (int i = 0; i < _points[_current].onStart.size(); ++i)
+			{
+				_points[_current].onStart[i]();
+			}
+		}
+
 		ASSERT(_points.size() > 1, "At least two points are required.");
 
 		//가장 마지막을 지난다면 마지막 값을 반환
