@@ -95,6 +95,16 @@ void flt::UIComponent::SetImage(const std::wstring& filePath)
 	}
 }
 
+void flt::UIComponent::SetImageColor(flt::Vector4f color)
+{
+	_rendererObject->imgColor = color;
+	if (_isRegisted)
+	{
+		_renderer.DeregisterObject(_hObject);
+		_hObject = _renderer.RegisterObject(*_rendererObject);
+	}
+}
+
 void flt::UIComponent::SetPosition(flt::Vector2f pixelPos)
 {
 	_isOffsetMode = false;

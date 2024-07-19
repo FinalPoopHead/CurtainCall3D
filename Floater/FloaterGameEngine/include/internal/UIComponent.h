@@ -27,6 +27,7 @@ namespace flt
 
 	public:
 		void SetImage(const std::wstring& filePath);
+		void SetImageColor(flt::Vector4f color);
 		void SetPosition(flt::Vector2f pixelPos);
 		flt::Vector2f GetPosition();
 		void SetOffsetPosition(flt::Vector2f offsetPos);

@@ -104,7 +104,7 @@ GameManager::GameManager() :
 	for (int i = 0; i < COMBOTEXTPOOLCOUNT; ++i)
 	{
 		TextObject* comboText = flt::CreateGameObject<TextObject>(false);
-		comboText->SetFont(smallFontPath);
+		comboText->SetFont(fontPath);
 		comboText->SetText(L"default text");
 		comboText->SetTextColor(fontColor);
 		_comboTextPool.push_back(comboText);
@@ -122,11 +122,17 @@ GameManager::GameManager() :
 
 	_roundText = flt::CreateGameObject<TextObject>(false);
 	_roundText->SetOffsetPosition({ 0.5f, 0.5f });
-	_roundText->tr.SetScale(1.5f, 1.5f, 1.5f);
+	_roundText->tr.SetScale(2.0f, 2.0f, 2.0f);
 	_roundText->SetTextAlignment(eTextAlignment::CENTER);
 	_roundText->SetFont(bigFontPath);
 	_roundText->SetText(L"DEFAULT");
 	_roundText->SetTextColor(fontColor);
+
+	_fade = flt::CreateGameObject<SpriteObject>(false);
+	_fade->SetSprite(L"../Resources/Sprites/Fade.png");
+	_fade->SetZOrder(0.2f);
+	_fade->SetColor({ 0.0f,0.0f,0.0f,1.0f });
+	_fade->tr.SetScale({ 4096.0f,4096.0f,1.0f,0.0f });
 
 	ReadStageFile();
 }
@@ -334,7 +340,7 @@ void GameManager::CreateUI(int index)
 	TextObject* heightCountText = flt::CreateGameObject<TextObject>(true);
 	heightCountText->SetParent(fallCountPanel);
 	heightCountText->SetPosition({ 0.0f, -25.0f });
-	heightCountText->SetFont(smallFontPath);
+	heightCountText->SetFont(fontPath);
 	heightCountText->SetText(L"0");
 	heightCountText->SetTextColor(whiteColor);
 	heightCountText->SetTextAlignment(eTextAlignment::RIGHT);
@@ -346,10 +352,10 @@ void GameManager::CreateUI(int index)
 
 	_gameoverText.emplace_back();
 
-	float gameoverOffset1 = 230.0f;
-	float gameoverOffset2 = 170.0f;
-	float gameoverOffset3 = 110.0f;
-	float gameoverOffset4 = 50.0f;
+	float gameoverOffset1 = 340.0f;
+	float gameoverOffset2 = 250.0f;
+	float gameoverOffset3 = 160.0f;
+	float gameoverOffset4 = 70.0f;
 
 	TextObject* text_G = flt::CreateGameObject<TextObject>(true);
 	text_G->SetParent(gameoverTextPanel);
@@ -358,6 +364,7 @@ void GameManager::CreateUI(int index)
 	text_G->SetFont(bigFontPath);
 	text_G->SetTextColor(whiteColor);
 	text_G->SetTextAlignment(eTextAlignment::CENTER);
+	text_G->tr.SetScale(1.5f, 1.5f, 1.5f);
 	_gameoverText[index].push_back(text_G);
 
 	TextObject* text_A = flt::CreateGameObject<TextObject>(true);
@@ -367,6 +374,7 @@ void GameManager::CreateUI(int index)
 	text_A->SetFont(bigFontPath);
 	text_A->SetTextColor(whiteColor);
 	text_A->SetTextAlignment(eTextAlignment::CENTER);
+	text_A->tr.SetScale(1.5f, 1.5f, 1.5f);
 	_gameoverText[index].push_back(text_A);
 
 	TextObject* text_M = flt::CreateGameObject<TextObject>(true);
@@ -376,6 +384,7 @@ void GameManager::CreateUI(int index)
 	text_M->SetFont(bigFontPath);
 	text_M->SetTextColor(whiteColor);
 	text_M->SetTextAlignment(eTextAlignment::CENTER);
+	text_M->tr.SetScale(1.5f, 1.5f, 1.5f);
 	_gameoverText[index].push_back(text_M);
 
 	TextObject* text_E = flt::CreateGameObject<TextObject>(true);
@@ -385,6 +394,7 @@ void GameManager::CreateUI(int index)
 	text_E->SetFont(bigFontPath);
 	text_E->SetTextColor(whiteColor);
 	text_E->SetTextAlignment(eTextAlignment::CENTER);
+	text_E->tr.SetScale(1.5f, 1.5f, 1.5f);
 	_gameoverText[index].push_back(text_E);
 
 	TextObject* text_O = flt::CreateGameObject<TextObject>(true);
@@ -394,6 +404,7 @@ void GameManager::CreateUI(int index)
 	text_O->SetFont(bigFontPath);
 	text_O->SetTextColor(whiteColor);
 	text_O->SetTextAlignment(eTextAlignment::CENTER);
+	text_O->tr.SetScale(1.5f, 1.5f, 1.5f);
 	_gameoverText[index].push_back(text_O);
 
 	TextObject* text_V = flt::CreateGameObject<TextObject>(true);
@@ -403,6 +414,7 @@ void GameManager::CreateUI(int index)
 	text_V->SetFont(bigFontPath);
 	text_V->SetTextColor(whiteColor);
 	text_V->SetTextAlignment(eTextAlignment::CENTER);
+	text_V->tr.SetScale(1.5f, 1.5f, 1.5f);
 	_gameoverText[index].push_back(text_V);
 
 	TextObject* text_E2 = flt::CreateGameObject<TextObject>(true);
@@ -412,6 +424,7 @@ void GameManager::CreateUI(int index)
 	text_E2->SetFont(bigFontPath);
 	text_E2->SetTextColor(whiteColor);
 	text_E2->SetTextAlignment(eTextAlignment::CENTER);
+	text_E2->tr.SetScale(1.5f, 1.5f, 1.5f);
 	_gameoverText[index].push_back(text_E2);
 
 	TextObject* text_R = flt::CreateGameObject<TextObject>(true);
@@ -421,6 +434,7 @@ void GameManager::CreateUI(int index)
 	text_R->SetFont(bigFontPath);
 	text_R->SetTextColor(whiteColor);
 	text_R->SetTextAlignment(eTextAlignment::CENTER);
+	text_R->tr.SetScale(1.5f, 1.5f, 1.5f);
 	_gameoverText[index].push_back(text_R);
 }
 
@@ -582,41 +596,41 @@ void GameManager::SetStage(int stageNum)
 	switch (stageNum)
 	{
 	case 1:
-		numStr = L"1ST";
+		numStr = L"1 S T";
 		break;
 	case 2:
-		numStr = L"2ND";
+		numStr = L"2 N D";
 		break;
 	case 3:
-		numStr = L"3RD";
+		numStr = L"3 R D";
 		break;
 	case 4:
-		numStr = L"4TH";
+		numStr = L"4 T H";
 		break;
 	case 5:
-		numStr = L"5TH";
+		numStr = L"5 T H";
 		break;
 	case 6:
-		numStr = L"6TH";
+		numStr = L"6 T H";
 		break;
 	case 7:
-		numStr = L"7TH";
+		numStr = L"7 T H";
 		break;
 	case 8:
-		numStr = L"8TH";
+		numStr = L"8 T H";
 		break;
 	case 9:
-		numStr = L"FINAL";
+		numStr = L"F I N A L";
 		break;
 	default:
 		break;
 	}
 
-	_roundText->SetText(numStr + L"  STAGE");
+	_roundText->SetText(numStr + L"   S T A G E");
 	_roundText->Enable();
 	TextObject* ptr = _roundText;
 	auto tween = flt::MakeScaleTween(&_roundText->tr);
-	tween->from({ 1.0f,1.0f,1.0f,1.0f })		
+	tween->from(_roundText->tr.GetLocalScale())		
 		.to({ 0.0f,0.0f,0.0f,1.0f }).preDelay(3.5f).during(0.5f).easing(flt::ease::easeInExpo).onEnd([ptr]() {ptr->Disable(); });
 	flt::StartTween(tween);
 
@@ -643,18 +657,12 @@ void GameManager::SetStage(int stageNum)
 		// _fallCountMax[i] = data.stageWidth - 1; // 아래 함수에서 처리 
 		ResizeFallCountUI(data.stageWidth - 1);
 	}
+
+	FadeOut(2.0f);
 }
 
 void GameManager::ProgressStage(int playerIndex)
 {
-	++_currentStage[playerIndex];
-	int curStage = _currentStage[playerIndex];
-
-	if (curStage > 9)
-	{
-		// TODO : 게임클리어 연출.
-	}
-
 	_isGameOver[playerIndex] = false;
 	_fallCount[playerIndex] = 0;
 	_currentLevel[playerIndex] = 1;
@@ -678,7 +686,7 @@ void GameManager::ProgressStage(int playerIndex)
 	}
 	_liveComboTexts.clear();
 
-	StageData data = _stageData[curStage - 1];
+	StageData data = _stageData[_currentStage[playerIndex] - 1];
 
 	if (_boards[playerIndex] != nullptr)
 	{
@@ -692,7 +700,7 @@ void GameManager::ProgressStage(int playerIndex)
 		_players[playerIndex]->SetPositionToRatioPosition(0.5f, 0.75f);
 	}
 
-	_stageCountText[playerIndex]->SetText(std::to_wstring(curStage));
+	_stageCountText[playerIndex]->SetText(std::to_wstring(_currentStage[playerIndex]));
 
 	ResizeFallCountUI(data.stageWidth - 1);
 }
@@ -710,9 +718,22 @@ void GameManager::OnEndLevel(int playerIndex)
 		int curStage = _currentStage[playerIndex];
 		if (_currentLevel[playerIndex] > _stageData[curStage - 1].levelCount)
 		{
-			// TODO : 스테이지 클리어
-			//_soundComponent->Stop(_soundIndex["BGM3"]);
-			ProgressStage(playerIndex);
+			++_currentStage[playerIndex];
+
+			if (_currentStage[playerIndex] > 9)
+			{
+				// TODO : 게임 클리어 연출.
+				_boards[playerIndex]->SetGameOver(true);
+
+
+			}
+			else
+			{
+				// TODO : 스테이지 클리어 연출
+				//_soundComponent->Stop(_soundIndex["BGM3"]);
+				ProgressStage(playerIndex);
+			}
+
 			return;
 		}
 
@@ -762,18 +783,15 @@ void GameManager::OnEndPlayerFall(int index)
 
 	for (auto& text : _gameoverText[index])
 	{
-		float startScale = 6.0f;
-		float endScale = 1.5f;
-
 		auto tweenScale = flt::MakeScaleTween(&text->tr);
-		// 	tweenScale->from({ startScale,startScale,startScale,1.0f})
-		// 		.to({ endScale,endScale,endScale,1.0f }).during(1.5f).easing(flt::ease::easeInOut);
-
 		// TODO : 싱글모드면 점수기입하고 끝내기? 멀티모드면 다른플레이어 승리 보여주고 끝내기?
 		
-		tweenScale->from({ 0.0f,1.0f,1.0f,1.0f })
-			.to({ 1.0f,1.0f,1.0f,1.0f }).during(2.0f).easing(flt::ease::linear).postDelay(2.0f)
-			.to({ 0.0f,1.0f,1.0f,1.0f }).during(2.0f).easing(flt::ease::linear).onEnd([&tweenScale]() {flt::ReleaseTween(tweenScale); });
+		auto scale = text->tr.GetLocalScale();
+		flt::Vector4f startScale = { 0.0f, scale.y,scale.z,1.0f };
+
+		tweenScale->from(startScale)
+			.to(scale).during(2.0f).easing(flt::ease::linear).postDelay(2.0f)
+			.to(startScale).during(2.0f).easing(flt::ease::linear).onEnd([&tweenScale]() {flt::ReleaseTween(tweenScale); });
 
 		flt::StartTween(tweenScale);
 	}
@@ -787,8 +805,17 @@ void GameManager::OnCheckMinHeight(int index, int height, bool doGenerate)
 		int width = _boards[index]->GetWidth();
 		int randomIndex;
 
+		int limit = _battleWaveData.at(width).size();
+		int count = 0;
+
 		while (true)
 		{
+			if (count > limit)
+			{
+				return;
+			}
+
+			++count;
 			randomIndex = rd() % _battleWaveData.at(width).size();
 
 			if (height > _battleWaveData.at(width)[randomIndex].height)
@@ -805,7 +832,7 @@ void GameManager::OnCheckMinHeight(int index, int height, bool doGenerate)
 		return;
 	}
 
-	int generateHeight = 15;
+	int generateHeight = 13;
 
 	if (_garbageLineCount[index] == 0)
 	{
@@ -852,6 +879,30 @@ void GameManager::ReturnMissile(SpriteObject* missile)
 {
 	_missilePool.push_back(missile);
 	missile->Disable();
+}
+
+void GameManager::FadeIn(float duration)
+{
+	float alpha = 1.0f;
+	auto tween = flt::MakeTween(alpha);
+	tween->from(1.0f)
+		.to(0.0f).during(duration)
+		.onStart([this]() {this->_fade->Enable(); })
+		.onStep([this](float value) {this->_fade->SetColor({ 0.0f,0.0f,0.0f,value }); })
+		.onEnd([this]() {this->_fade->Disable(); });
+	StartTween(tween);
+}
+
+void GameManager::FadeOut(float duration)
+{
+	float alpha = 0.0f;
+	auto tween = flt::MakeTween(alpha);
+	tween->from(0.0f)
+		.to(1.0f).during(duration)
+		.onStart([this]() {this->_fade->Enable(); })
+		.onStep([this](float value) {this->_fade->SetColor({ 0.0f,0.0f,0.0f,value }); })
+		.onEnd([this]() {this->_fade->Disable(); });
+	StartTween(tween);
 }
 
 void GameManager::IncreasePlayerCount()
@@ -1146,12 +1197,12 @@ void GameManager::SetBattleMode()
 	_roundText->Enable();
 	TextObject* ptr = _roundText;
 	auto tween = flt::MakeScaleTween(&_roundText->tr);
-	tween->from({ 1.0f,1.0f,1.0f,1.0f })
+	tween->from(_roundText->tr.GetLocalScale())
 		.to({ 0.0f,0.0f,0.0f,1.0f }).preDelay(3.5f).during(0.5f).easing(flt::ease::easeInExpo).onEnd([ptr]() {ptr->Disable(); });
 	flt::StartTween(tween);
 
 	int width = 5;
-	int height = 28;
+	int height = 30;
 
 	Wave wave = _battleWaveData[width][5];
 
@@ -1298,7 +1349,7 @@ void GameManager::ChangeHeightCountText(int index, int height)
 
 	auto tweenScale = flt::MakeScaleTween(&textObj->tr);
 
-	tweenScale->from({ 2.0f,2.0f,2.0f,1.0f })
+	tweenScale->from({ 2.0f,2.0f,2.0f,2.0f })
 		.to({ 1.0f,1.0f,1.0f,1.0f }).during(0.3f).easing(flt::ease::easeOutBack).onEnd([&tweenScale]() {flt::ReleaseTween(tweenScale); });
 
 	flt::StartTween(tweenScale);
