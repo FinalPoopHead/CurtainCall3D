@@ -23,6 +23,7 @@ namespace flt
 			, light(nullptr)
 			, animState()
 			, imgPath(L"")
+			, imgColor(1.0f, 1.0f, 1.0f, 1.0f)
 			, text()
 			, name(L"")
 			, useRootMotion(false)
@@ -42,6 +43,7 @@ namespace flt
 		Light* light;
 		AnimState animState;
 		std::wstring imgPath;
+		flt::Vector4f imgColor;
 		Text text;
 		std::wstring name;
 		bool useRootMotion;

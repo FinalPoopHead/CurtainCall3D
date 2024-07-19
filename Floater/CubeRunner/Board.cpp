@@ -169,18 +169,6 @@ void Board::PreUpdate(float deltaSecond)
 		OnFastForwarding();
 	}
 
-	keyData = flt::GetKeyDown(flt::KeyCode::o);
-	if (keyData)
-	{
-		_gameSpeed = SLOWVALUE;
-	}
-
-	keyData = flt::GetKeyUp(flt::KeyCode::o);
-	if (keyData)
-	{
-		EndFastForward();
-	}
-
 	// 치트키. 블랙큐브 빼고 전부 제거
 	keyData = flt::GetKeyDown(flt::KeyCode::p);
 	if (keyData)
@@ -1268,7 +1256,7 @@ void Board::OnEndPlayerFalling()
 	_soundComponent->Play(_soundIndex["GameOver"]);
 }
 
-void Board::SetGameOver()
+void Board::OnStartPlayerFall()
 {
 	_isGameOver = true;
 	_gameManager->OnStartPlayerFall(_playerIndex);

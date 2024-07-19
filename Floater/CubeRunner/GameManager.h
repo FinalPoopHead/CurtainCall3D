@@ -71,6 +71,9 @@ public:
 	
 	void ReturnMissile(SpriteObject* missile);
 
+	void FadeIn(float duration);
+	void FadeOut(float duration);
+
 private:
 	void IncreasePlayerCount();
 	void AddScore(int index, int score);
@@ -107,6 +110,7 @@ private:
 	std::vector<TextObject*> _gameoverTextPanel;
 	std::vector<std::vector<TextObject*>> _gameoverText;
 	TextObject* _roundText;
+	SpriteObject* _fade;
 
 	std::list<TextObject*> _liveComboTexts;
 

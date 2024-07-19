@@ -12,6 +12,7 @@ public:
 	void SetOffsetPosition(flt::Vector2f offsetPos);
 	void SetSize(flt::Vector2f size);
 	void SetZOrder(float zOrder);
+	void SetColor(flt::Vector4f color);
 
 	flt::Vector2f GetPosition();
 	flt::Vector2f GetOffsetPosition();

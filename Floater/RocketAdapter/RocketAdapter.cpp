@@ -313,6 +313,7 @@ flt::HOBJECT flt::RocketAdapter::RegisterObject(RendererObject& renderable)
 	{
 		rocketObject->spriteRenderer = factory->CreateSpriteRenderer();
 		rocketObject->spriteRenderer->SetImage(ToString(renderable.imgPath));
+		rocketObject->spriteRenderer->SetColor({ renderable.imgColor.r,renderable.imgColor.g,renderable.imgColor.b,renderable.imgColor.a });
 	}
 
 	if (renderable.text.data != L"")
