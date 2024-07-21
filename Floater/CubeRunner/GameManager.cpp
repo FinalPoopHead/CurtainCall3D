@@ -37,6 +37,8 @@ constexpr float FALLCOUNTOFFSET = 50.0f;
 
 constexpr flt::Vector4f whiteColor = { 1.0f,1.0f,1.0f,1.0f };
 
+constexpr flt::Vector4f RoundTextScale = { 2.0f,2.0f,2.0f,1.0f };
+
 std::wstring counterSlotPath = L"../Resources/Sprites/FallCounterSlot.png";
 std::wstring counterRedPath = L"../Resources/Sprites/FallCounterRed.png";
 
@@ -71,7 +73,11 @@ GameManager::GameManager() :
 	, _stageData()
 	, _currentStage(std::vector<int>(MAXPLAYERCOUNT))
 	, _currentLevel(std::vector<int>(MAXPLAYERCOUNT))
+	, _rankData()
 	, _garbageLineCount(std::vector<int>(MAXPLAYERCOUNT))
+	, _roundTextTween()
+	, _fadeInTween()
+	, _fadeOutTween()
 {
 	for (int i = 0; i < MAXPLAYERCOUNT; i++)
 	{
@@ -122,11 +128,14 @@ GameManager::GameManager() :
 
 	_roundText = flt::CreateGameObject<TextObject>(false);
 	_roundText->SetOffsetPosition({ 0.5f, 0.5f });
-	_roundText->tr.SetScale(2.0f, 2.0f, 2.0f);
 	_roundText->SetTextAlignment(eTextAlignment::CENTER);
 	_roundText->SetFont(bigFontPath);
 	_roundText->SetText(L"DEFAULT");
 	_roundText->SetTextColor(fontColor);
+
+	_roundTextTween = flt::MakeScaleTween(&_roundText->tr);
+	_roundTextTween->from(RoundTextScale)
+		.to({ 0.0f,0.0f,0.0f,1.0f }).preDelay(3.5f).during(0.5f).easing(flt::ease::easeInExpo).onEnd([this]() {this->_roundText->Disable(); });
 
 	_fade = flt::CreateGameObject<SpriteObject>(false);
 	_fade->SetSprite(L"../Resources/Sprites/Fade.png");
@@ -134,7 +143,24 @@ GameManager::GameManager() :
 	_fade->SetColor({ 0.0f,0.0f,0.0f,1.0f });
 	_fade->tr.SetScale({ 4096.0f,4096.0f,1.0f,0.0f });
 
+	float duration = 3.0f;
+
+	_fadeInTween = flt::MakeTween(0.0f);
+	_fadeInTween->from(1.0f)
+		.to(0.0f).during(duration)
+		.onStart([this]() {	this->_fade->Enable(); })
+		.onStep([this](float value) {this->_fade->SetColor({ 0.0f,0.0f,0.0f,value }); })
+		.onEnd([this]() {this->_fade->Disable(); });
+
+	_fadeOutTween = flt::MakeTween(0.0f);
+	_fadeOutTween->from(0.0f)
+		.to(1.0f).during(duration)
+		.onStart([this]() {this->_fade->Enable(); })
+		.onStep([this](const float& value) {this->_fade->SetColor({ 0.0f,0.0f,0.0f,value }); });
+		//.onEnd([this]() {this->_fade->Disable(); });
+
 	ReadStageFile();
+	ReadRankingFile();
 }
 
 GameManager::~GameManager()
@@ -628,11 +654,8 @@ void GameManager::SetStage(int stageNum)
 
 	_roundText->SetText(numStr + L"   S T A G E");
 	_roundText->Enable();
-	TextObject* ptr = _roundText;
-	auto tween = flt::MakeScaleTween(&_roundText->tr);
-	tween->from(_roundText->tr.GetLocalScale())
-		.to({ 0.0f,0.0f,0.0f,1.0f }).preDelay(3.5f).during(0.5f).easing(flt::ease::easeInExpo).onEnd([ptr]() {ptr->Disable(); });
-	flt::StartTween(tween);
+	flt::StopTween(_roundTextTween);
+	flt::StartTween(_roundTextTween);
 
 	for (int i = 0; i < _players.size(); i++)
 	{
@@ -658,7 +681,7 @@ void GameManager::SetStage(int stageNum)
 		ResizeFallCountUI(data.stageWidth - 1);
 	}
 
-	FadeIn(2.0f);
+	FadeIn();
 }
 
 void GameManager::ProgressStage(int playerIndex)
@@ -791,10 +814,12 @@ void GameManager::OnEndPlayerFall(int index)
 
 		tweenScale->from(startScale)
 			.to(scale).during(2.0f).easing(flt::ease::linear).postDelay(2.0f)
-			.to(startScale).during(2.0f).easing(flt::ease::linear).onEnd([&tweenScale]() {flt::ReleaseTween(tweenScale); });
+			.to(startScale).during(2.0f).easing(flt::ease::linear).postDelay(2.0f).onEnd([]() { });		// TODO : 점수기입 ㄱㄱ
 
 		flt::StartTween(tweenScale);
 	}
+
+	FadeOut();
 }
 
 void GameManager::OnCheckMinHeight(int index, int height, bool doGenerate)
@@ -881,29 +906,18 @@ void GameManager::ReturnMissile(SpriteObject* missile)
 	missile->Disable();
 }
 
-void GameManager::FadeIn(float duration)
+void GameManager::FadeIn()
 {
-	float alpha = 1.0f;
-	auto tween = flt::MakeTween(alpha);
-	tween->from(1.0f)
-		.to(0.0f).during(duration)
-		.onStart([this]() {	this->_fade->Enable(); })
-		.onStep([this](float value) {this->_fade->SetColor({ 0.0f,0.0f,0.0f,value }); })
-		.onEnd([this]() {this->_fade->Disable(); });
-
-	StartTween(tween);
+	StopTween(_fadeInTween);
+	StopTween(_fadeOutTween);
+	StartTween(_fadeInTween);
 }
 
-void GameManager::FadeOut(float duration)
+void GameManager::FadeOut()
 {
-	float alpha = 0.0f;
-	auto tween = flt::MakeTween(alpha);
-	tween->from(0.0f)
-		.to(1.0f).during(duration)
-		.onStart([this]() {this->_fade->Enable(); })
-		.onStep([this](const float& value) {this->_fade->SetColor({ 0.0f,0.0f,0.0f,value }); })
-		.onEnd([this]() {this->_fade->Disable(); });
-	StartTween(tween);
+	StopTween(_fadeInTween);
+	StopTween(_fadeOutTween);
+	StartTween(_fadeOutTween);
 }
 
 void GameManager::IncreasePlayerCount()
@@ -1119,6 +1133,66 @@ void GameManager::ReadStageFile()
 	}
 }
 
+void GameManager::ReadRankingFile()
+{
+	std::string str_buf;
+	std::fstream fs;
+
+	fs.open("../Resources/RankData/Ranking.csv", std::ios::in);
+
+	if (!fs.eof())
+	{
+		getline(fs, str_buf);
+
+		std::istringstream iss(str_buf);
+		std::string token;
+
+		int rank;
+		std::string name;
+		int score;
+
+		getline(iss, token, ',');
+		rank = std::stoi(token);
+
+		getline(iss, token, ',');
+		name = token;
+
+		getline(iss, token, ',');
+		score = std::stoi(token);
+
+		RankData rankData;
+		rankData.rank = rank;
+		rankData.name = name;
+		rankData.score = score;
+
+		_rankData.push_back(rankData);
+	}
+	fs.close();
+}
+
+void GameManager::WriteRankingFile()
+{
+	std::fstream fs;
+
+	fs.open("../Resources/RankData/Ranking.csv", std::ios::out);
+
+	for (auto& rankData : _rankData)
+	{
+		fs << rankData.rank << "," << rankData.name << "," << rankData.score << std::endl;
+	}
+	fs.close();
+}
+
+void GameManager::SortRanking()
+{
+	std::sort(_rankData.begin(), _rankData.end(), [](const RankData& a, const RankData& b) {return a.score > b.score; });
+
+	for (int i = 0; i < _rankData.size(); i++)
+	{
+		_rankData[i].rank = i + 1;
+	}
+}
+
 void GameManager::ResetGame()
 {
 	for (int i = 0; i < _players.size(); i++)
@@ -1196,11 +1270,8 @@ void GameManager::SetBattleMode()
 
 	_roundText->SetText(L"BATTLE  MODE");
 	_roundText->Enable();
-	TextObject* ptr = _roundText;
-	auto tween = flt::MakeScaleTween(&_roundText->tr);
-	tween->from(_roundText->tr.GetLocalScale())
-		.to({ 0.0f,0.0f,0.0f,1.0f }).preDelay(3.5f).during(0.5f).easing(flt::ease::easeInExpo).onEnd([ptr]() {ptr->Disable(); });
-	flt::StartTween(tween);
+	flt::StopTween(_roundTextTween);
+	flt::StartTween(_roundTextTween);
 
 	int width = 5;
 	int height = 30;

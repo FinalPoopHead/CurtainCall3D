@@ -2,6 +2,7 @@
 #include <vector>
 #include <list>
 #include "../FloaterGameEngine/include/EngineMinimal.h"
+#include "../FloaterGameEngine/include/MakeTween.h"
 
 class Player;
 class Board;
@@ -37,6 +38,13 @@ struct StageData
 	std::vector<Level> level;
 };
 
+struct RankData
+{
+	int rank;
+	std::string name;
+	int score;
+};
+
 class GameManager : public flt::GameObject
 {
 public:
@@ -68,11 +76,11 @@ public:
 	void OnEndPlayerFall(int index);
 	void OnCheckMinHeight(int index, int height, bool doGenerate);
 	void OnHeightChange(int index, int height);
-	
+
 	void ReturnMissile(SpriteObject* missile);
 
-	void FadeIn(float duration);
-	void FadeOut(float duration);
+	void FadeIn();
+	void FadeOut();
 
 private:
 	void IncreasePlayerCount();
@@ -80,7 +88,10 @@ private:
 	void PrintComboText(int index, int count, int score);
 	void AddPlayTime(float time);
 	void ReadStageFile();
-	void ResizeFallCountUI(int nextCount); 
+	void ReadRankingFile();
+	void WriteRankingFile();
+	void SortRanking();
+	void ResizeFallCountUI(int nextCount);
 	void AddAttackedLineCount(int index, int count);
 	void SetAttackedLineCount(int index, int count);
 	void ChangeHeightCountText(int index, int height);
@@ -94,7 +105,7 @@ private:
 private:
 	std::vector<Player*> _players;
 	std::vector<Board*> _boards;
-	
+
 	// UI들
 	// TODO : 체력 UI, 시간 UI, 점수 UI, 게임오버 UI, 콤보 UI 등등 추가 필요
 	std::vector<SpriteObject*> _stageInfoPanel;
@@ -116,23 +127,33 @@ private:
 
 	std::list<TextObject*> _comboTextPool;
 	std::list<SpriteObject*> _missilePool;
+	std::vector<flt::Vector2f> _comboTextPos;		// 플레이어 별 콤보 텍스트 위치
 
 	/// 게임 상태들 저장해두는 멤버 변수들
 private:
 	std::vector<bool> _isGameOver;
-	std::vector<int> _fallCount;	
+	std::vector<int> _fallCount;
 	std::vector<int> _fallCountMax;
 	float _playTime;
 	float _accelTime;
 	std::vector<int> _playerScore;
-		std::vector<flt::Vector2f> _comboTextPos;		// 플레이어 별 콤보 텍스트 위치
+	std::vector<int> _garbageLineCount;
+	std::vector<bool> _isBacktoBack;
 
+	/// Stage Data
 private:
 	std::vector<StageData> _stageData;
-	std::unordered_map<int,std::vector<Wave>> _battleWaveData;
+	std::unordered_map<int, std::vector<Wave>> _battleWaveData;
 	std::vector<int> _currentStage;
 	std::vector<int> _currentLevel;
 
-	std::vector<int> _garbageLineCount;
-	std::vector<bool> _isBacktoBack;
+	/// Rank Data
+private:
+	std::vector<RankData> _rankData;
+
+	/// Tween
+private:
+	flt::TweenPtr<flt::Vector4f> _roundTextTween;
+	flt::TweenPtr<float> _fadeInTween;
+	flt::TweenPtr<float> _fadeOutTween;
 };

@@ -744,7 +744,7 @@ bool flt::Scene::IsActiveTween(IFLTween* tween)
 	auto iter = _tweenMap.find(tween);
 	if (iter == _tweenMap.end())
 	{
-		ASSERT(false, "Not exist tween");
+		//ASSERT(false, "Not exist tween");
 		return false;
 	}
 	return iter->second.sparseIndex != UINT_MAX;
