@@ -95,6 +95,8 @@ private:
 	void AddAttackedLineCount(int index, int count);
 	void SetAttackedLineCount(int index, int count);
 	void ChangeHeightCountText(int index, int height);
+	void EnableScoreInput();
+	bool EnterInput(int index);
 
 	/// 사운드 관련
 private:
@@ -128,6 +130,13 @@ private:
 	std::list<TextObject*> _comboTextPool;
 	std::list<SpriteObject*> _missilePool;
 	std::vector<flt::Vector2f> _comboTextPos;		// 플레이어 별 콤보 텍스트 위치
+
+	TextObject* _inputPanel;
+	SpriteObject* _inputSelector;
+	SpriteObject* _inputFieldSprite;
+	TextObject* _inputField;
+	std::string _inputText;
+	int _selectorIndex;
 
 	/// 게임 상태들 저장해두는 멤버 변수들
 private:
