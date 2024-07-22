@@ -64,16 +64,19 @@ namespace Rocket::Core
 
 		Vector2 origin = { 0.0f,0.0f };
 
+		origin = _font->MeasureString(wstr.c_str(), false);
+		
 		switch (_textAlignment)
 		{
 		case Rocket::Core::eTextAlignment::LEFT:
+			origin.x = 0.0f;
+			origin.y /= 2.0f;
 			break;
 		case Rocket::Core::eTextAlignment::CENTER:
-			origin = _font->MeasureString(wstr.c_str(), false);
 			origin /= 2.0f;
 			break;
 		case Rocket::Core::eTextAlignment::RIGHT:
-			origin = _font->MeasureString(wstr.c_str(), false);
+			origin.y /= 2.0f;
 			break;
 		default:
 			break;

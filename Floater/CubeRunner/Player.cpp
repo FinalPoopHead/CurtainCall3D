@@ -84,7 +84,7 @@ void Player::Update(float deltaSecond)
 		break;
 	case ePlayerState::FALLING:
 	{
-		if (tr.GetWorldPosition().y < -400.0f)
+		if (tr.GetWorldPosition().y < -300.0f)
 		{
 			camera->StopCamera();
 			_state = ePlayerState::GAMEOVER;

@@ -67,6 +67,8 @@ void Camera::TraceFalling()
 		return;
 	}
 	 
+	_isCameraDropCheck = false;
+
 	_state = eCameraState::FALL;
 	_isTweenMove = false;
 	_isTweenRotate = false;
@@ -200,8 +202,9 @@ void Camera::UpdateCameraMove(float deltaSecond)
 		flt::Quaternion targetRotation{};
 		targetRotation.Look(direction);
 
-		if (pos.y - playerPos.y > 80.0f)
+		if (!_isCameraDropCheck && pos.y - playerPos.y > 80.0f)
 		{
+			_isCameraDropCheck = true;
 			tr.SetWorldPosition(pos.x, playerPos.y - 120.0f, playerPos.z - 30.0f);
 			tr.SetRotation(targetRotation);
 		}
