@@ -54,7 +54,7 @@ namespace flt
 		FLTween(T target, LerpFunction_t<Value_t> lerp = flt::defaultLerp<Value_t>);
 		FLTween(const FLTween<T>& other);
 
-		virtual bool IsFinished() const override { return InFinishedInternal(); }
+		virtual bool IsFinished() const override { return IsFinishedInternal(); }
 
 		virtual bool Update(float dt) override;
 		virtual void ResetProgress() override { _current = 0; _elapsed = 0.0f; }
@@ -80,7 +80,7 @@ namespace flt
 		FLTween<T>& onEnd(std::function<void()> callback);
 
 	private:
-		bool InFinishedInternal() const { return _current >= _points.size() - 1; }
+		bool IsFinishedInternal() const { return _current >= _points.size() - 1; }
 		void UpdateTarget(const Value_t& value);
 
 		template<typename EventsT>
@@ -98,6 +98,7 @@ namespace flt
 		std::vector<FLTweenPoint<Value_t>> _points;
 		LerpFunction_t<Value_t> _lerp;
 		T _target;
+		bool _isInDuration;
 	};
 
 	template<typename T>
@@ -137,6 +138,12 @@ namespace flt
 		return T{};
 	}
 
+	/// <summary>
+	/// easing 함수를 변경
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="easing"></param>
+	/// <returns></returns>
 	template<typename T>
 	FLTween<T>& flt::FLTween<T>::easing(std::function<float(float)> easing)
 	{
@@ -170,6 +177,12 @@ namespace flt
 		return *this;
 	}
 
+	/// <summary>
+	/// preDelay 이후 호출되는 콜백 함수를 추가
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="callback"></param>
+	/// <returns></returns>
 	template<typename T>
 	FLTween<T>& flt::FLTween<T>::onStart(std::function<void()> callback)
 	{
@@ -178,6 +191,12 @@ namespace flt
 		return *this;
 	}
 
+	/// <summary>
+	/// duration 동안 호출되는 콜백 함수를 추가
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="callback"></param>
+	/// <returns></returns>
 	template<typename T>
 	FLTween<T>& flt::FLTween<T>::onStep(std::function<void(const Value_t&)> callback)
 	{
@@ -186,6 +205,12 @@ namespace flt
 		return *this;
 	}
 
+	/// <summary>
+	/// postDelay 이후 호출되는 콜백 함수를 추가
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="callback"></param>
+	/// <returns></returns>
 	template<typename T>
 	FLTween<T>& flt::FLTween<T>::onEnd(std::function<void()> callback)
 	{
@@ -199,7 +224,7 @@ namespace flt
 	{
 		step(dt);
 
-		return InFinishedInternal();
+		return IsFinishedInternal();
 	}
 
 	template<typename T>
@@ -207,67 +232,71 @@ namespace flt
 	{
 		ASSERT(_points.size() > 1, "At least two points are required.");
 
-		if (dt == 0.0f)
+		if (dt == 0.0f || IsFinishedInternal())
 		{
-			UpdateTarget(_points.front().value);
-
-			return _target;
-		}
-
-		if (_elapsed == 0.0f && _current == 0)
-		{
-			InvokeCallbacks(_points[_current].onStart);
-		}
-
-		//가장 마지막을 지난다면 마지막 값을 반환
-		if (InFinishedInternal())
-		{
-			UpdateTarget(_points.back().value);
-
 			return _target;
 		}
 
 		_elapsed += dt;
 
-		float pointTime = _points[_current].preDelay + _points[_current].duration + _points[_current].postDelay;
-		while (_elapsed >= pointTime)
+		float currPointTime = _points[_current].preDelay + _points[_current].duration + _points[_current].postDelay;
+		while (_elapsed > currPointTime)
 		{
-			_elapsed -= pointTime;
+			_elapsed -= currPointTime;
 			InvokeCallbacks(_points[_current].onEnd);
 			_current++;
 
-			// 가장 마지막을 지난다면 마지막 값을 반환
-			if (InFinishedInternal())
+			if (IsFinishedInternal())
 			{
 				UpdateTarget(_points.back().value);
-
 				return _target;
 			}
 
-			InvokeCallbacks(_points[_current].onStart);
-			pointTime = _points[_current].preDelay + _points[_current].duration + _points[_current].postDelay;
+			if (_elapsed > _points[_current].preDelay)
+			{
+				InvokeCallbacks(_points[_current].onStart);
+				_isInDuration = true;
+			}
+			else
+			{
+				_isInDuration = false;
+			}
+
+			currPointTime = _points[_current].preDelay + _points[_current].duration + _points[_current].postDelay;
 		}
 
 		ASSERT(_current + 1 < _points.size(), "Invalid index");
 
 		float t = (_elapsed - _points[_current].preDelay) / _points[_current].duration;
-		t = std::clamp(t, 0.0f, 1.0f);
-		t = _points[_current].easing(t);
-
-		if constexpr (std::is_pointer_v<T>)
+		
+		if (t > 1.0f)
 		{
-			*_target = _lerp(_points[_current].value, _points[_current + 1].value, t);
-			for (int i = 0; i < _points[_current].onStep.size(); ++i)
-			{
-				_points[_current].onStep[i](*_target);
-			}
+			_isInDuration = false;
 		}
-		else
+		else if (t > 0.0f)
 		{
-			_target = _lerp(_points[_current].value, _points[_current + 1].value, t);
-			for (int i = 0; i < _points[_current].onStep.size(); ++i)
+			if (!_isInDuration)
 			{
-				_points[_current].onStep[i](_target);
+				InvokeCallbacks(_points[_current].onStart);
+				_isInDuration = true;
+			}
+
+			t = _points[_current].easing(t);
+			if constexpr (std::is_pointer_v<T>)
+			{
+				*_target = _lerp(_points[_current].value, _points[_current + 1].value, t);
+				for (int i = 0; i < _points[_current].onStep.size(); ++i)
+				{
+					_points[_current].onStep[i](*_target);
+				}
+			}
+			else
+			{
+				_target = _lerp(_points[_current].value, _points[_current + 1].value, t);
+				for (int i = 0; i < _points[_current].onStep.size(); ++i)
+				{
+					_points[_current].onStep[i](_target);
+				}
 			}
 		}
 
@@ -278,14 +307,14 @@ namespace flt
 	FLTween<T>& flt::FLTween<T>::from(const Value_t& value)
 	{
 		_points[0].value = value;
+		UpdateTarget(value);
 		return *this;
 	}
-
 
 	template<typename T>
 	FLTween<T>& FLTween<T>::to(const Value_t& value)
 	{
-		_points.push_back(FLTweenPoint<Value_t>(value));
+		_points.emplace_back(FLTweenPoint<Value_t>(value));
 		return *this;
 	}
 
@@ -307,7 +336,7 @@ namespace flt
 	}
 
 	template<typename T>
-	flt::FLTween<T>::FLTween(T target, LerpFunction_t<Value_t> lerp) : _elapsed(0.0f), _current(0), _points(), _lerp(lerp), _target(target)
+	flt::FLTween<T>::FLTween(T target, LerpFunction_t<Value_t> lerp) : _elapsed(0.0f), _current(0), _points(), _lerp(lerp), _target(target), _isInDuration(false)
 	{
 		if constexpr (std::is_pointer_v<T>)
 		{
