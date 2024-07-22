@@ -1104,6 +1104,21 @@ void GameManager::OnEndPlayerFall(int index)
 	if (_players.size() == 1)
 	{
 		_gameoverTextPanel[index]->Enable();
+		
+		auto scoreTween = flt::MakeScaleTween(&_finalScoreText->tr);
+		auto scale = _finalScoreText->tr.GetLocalScale();
+		flt::Vector4f startScale = { 0.0f, scale.y,scale.z,1.0f };
+
+		scoreTween->from(startScale)
+			.to(scale).preDelay(6.5f).during(1.0f).postDelay(3.0f)
+			.onStart([this]() {
+			this->_finalScoreText->Enable();
+			this->_finalScoreText->SetText(L"F I N A L   S C O R E\n" + std::to_wstring(this->_playerScore.front())); })
+			.to(startScale).during(1.0f).postDelay(2.0f)
+			.onEnd([this]() {this->EnableScoreInput();
+		this->_finalScoreText->Disable(); });
+
+		flt::StartTween(scoreTween);
 
 		for (auto& text : _gameoverText[index])
 		{
@@ -1114,7 +1129,7 @@ void GameManager::OnEndPlayerFall(int index)
 
 			tweenScale->from(startScale)
 				.to(scale).during(2.0f).easing(flt::ease::linear).postDelay(2.0f)
-				.to(startScale).during(2.0f).easing(flt::ease::linear).postDelay(2.0f).onEnd([this]() {this->EnableScoreInput(); });
+				.to(startScale).during(2.0f).easing(flt::ease::linear);
 
 			flt::StartTween(tweenScale);
 		}

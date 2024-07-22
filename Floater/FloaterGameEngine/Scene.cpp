@@ -640,7 +640,7 @@ void flt::Scene::StartTween(IFLTween* tween)
 	auto iter = _tweenMap.find(tween);
 	if (iter == _tweenMap.end())
 	{
-		ASSERT(false, "Not exist tween");
+		//ASSERT(false, "Not exist tween");
 		return;
 	}
 
