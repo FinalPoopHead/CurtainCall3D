@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "../../../FloaterUtil/include/Timer.h"
 #include "../../../FloaterMath/include/Vector2f.h"
+#include "../../../FloaterPlatform/include/EnumType.h"
 #include <unordered_map>
 #include <memory>
 
@@ -12,7 +13,6 @@ namespace flt
 	class Scene;
 	class PhysicsEngine;
 	class SoundEngine;
-
 
 	class GameEngine
 	{
@@ -40,6 +40,7 @@ namespace flt
 
 		Vector2f GetWindowSize();
 		void SetWindowTitle(const std::wstring& title);
+		void SetWindowSize(uint32 width = 0, uint32 height = 0, WindowMode mode = WindowMode::BORDERLESS);
 
 		IRenderer* GetRenderer();
 		PhysicsEngine* GetPhysicsEngine();

@@ -9,5 +9,12 @@ namespace flt
 		DX12,
 		ROCKET_DX11
 	};
+
+	enum class WindowMode
+	{
+		WINDOWED,
+		FULLSCREEN,
+		BORDERLESS
+	};
 }
 

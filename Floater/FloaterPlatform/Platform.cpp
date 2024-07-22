@@ -56,6 +56,11 @@ flt::Vector2f flt::Platform::GetWindowSize()
 	return _pOsImpl->GetWindowSize();
 }
 
+void flt::Platform::SetWindowSize(uint32 width /*= 0*/, uint32 height /*= 0*/, WindowMode mode /*= WindowMode::WINDOWED*/)
+{
+	_pOsImpl->SetWindowSize(width, height, mode);
+}
+
 void flt::Platform::SetWindowTitle(const std::wstring& title)
 {
 	_pOsImpl->SetWindowTitle(title);

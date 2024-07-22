@@ -151,6 +151,11 @@ void flt::GameEngine::SetWindowTitle(const std::wstring& title)
 	_platform->SetWindowTitle(title);
 }
 
+void flt::GameEngine::SetWindowSize(uint32 width /*= 0*/, uint32 height /*= 0*/, WindowMode mode /*= WindowMode::BORDERLESS*/)
+{
+	_platform->SetWindowSize(width, height, mode);
+}
+
 flt::GameEngine::GameEngine() :
 	_platform(nullptr),
 	_renderer(nullptr),

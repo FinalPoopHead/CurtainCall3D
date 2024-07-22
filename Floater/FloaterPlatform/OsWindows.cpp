@@ -198,13 +198,14 @@ bool flt::OsWindows::Initialize(int windowWidth, int windowHeight, const std::ws
 	RegisterClassEx(&wc);
 
 	RECT windowRect = { 0, 0, windowWidth, windowHeight };    // 윈도우 창 크기
-	AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
+	//AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
+	AdjustWindowRect(&windowRect, WS_POPUP, FALSE);
 
 	_hwnd = CreateWindow
 	(
 		wc.lpszClassName,
 		title.c_str(),
-		WS_OVERLAPPEDWINDOW | WS_SIZEBOX,
+		WS_POPUP,//WS_OVERLAPPEDWINDOW | WS_SIZEBOX,
 		100, // 윈도우 좌측 상단의 x 좌표
 		100, // 윈도우 좌측 상단의 y 좌표
 		windowRect.right - windowRect.left, // 윈도우 가로 방향 해상도
@@ -361,6 +362,56 @@ void flt::OsWindows::SetWindowTitle(const std::wstring& title)
 		ASSERT(false, "타이틀 변경 실패");
 		DWORD error = GetLastError();
 	}
+}
+
+void flt::OsWindows::SetWindowSize(uint32 width /*= 0*/, uint32 height /*= 0*/, WindowMode mode /*= WindowMode::WINDOWED*/)
+{
+	MONITORINFO monitorInfo;
+	monitorInfo.cbSize = sizeof(MONITORINFO);
+
+	HMONITOR hMonitor = MonitorFromWindow(_hwnd, MONITOR_DEFAULTTOPRIMARY);
+	GetMonitorInfo(hMonitor, &monitorInfo);
+
+	if (width == 0)
+	{
+		width = monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left;
+	}
+
+	if (height == 0)
+	{
+		height = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
+	}
+
+	if (mode == WindowMode::FULLSCREEN)
+	{
+		DEVMODE devMode;
+		devMode.dmSize = sizeof(DEVMODE);
+		devMode.dmPelsWidth = width;
+		devMode.dmPelsHeight = height;
+		devMode.dmBitsPerPel = 32;
+		devMode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+
+		LONG ret = ChangeDisplaySettings(&devMode, CDS_FULLSCREEN);
+		if (ret != DISP_CHANGE_SUCCESSFUL)
+		{
+			ASSERT(false, "전체화면으로 변경 실패");
+		}
+	}
+	else
+	{
+		ChangeDisplaySettings(NULL, 0);
+	}
+
+	if (mode == WindowMode::WINDOWED)
+	{
+		SetWindowLong(_hwnd, GWL_EXSTYLE, WS_OVERLAPPEDWINDOW | WS_SIZEBOX);
+	}
+	else
+	{
+		SetWindowLong(_hwnd, GWL_EXSTYLE, WS_POPUP);
+	}
+
+	SetWindowPos(_hwnd, HWND_TOP, 0, 0, width, height, SWP_FRAMECHANGED);
 }
 
 flt::KeyData flt::OsWindows::GetKey(KeyCode code)
