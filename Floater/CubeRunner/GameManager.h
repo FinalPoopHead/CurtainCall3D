@@ -97,6 +97,8 @@ private:
 	void ChangeHeightCountText(int index, int height);
 	void EnableScoreInput();
 	bool EnterInput(int index);
+	void SetRankText();
+	void AddBonusScore(int score);
 
 	/// 사운드 관련
 private:
@@ -119,9 +121,12 @@ private:
 	std::vector<std::vector<SpriteObject*>> _fallCountSlot;
 	std::vector<std::vector<SpriteObject*>> _fallCountRed;
 	std::vector<TextObject*> _heightCountText;
+	std::vector<TextObject*> _bonusText;
+	int _bonusScore;
 	std::vector<TextObject*> _garbageLineText;
 	std::vector<TextObject*> _gameoverTextPanel;
 	std::vector<std::vector<TextObject*>> _gameoverText;
+	TextObject* _finalScoreText;
 	TextObject* _roundText;
 	SpriteObject* _fade;
 
@@ -137,6 +142,11 @@ private:
 	TextObject* _inputField;
 	std::string _inputText;
 	int _selectorIndex;
+
+	TextObject* _rankingPanel;
+	std::vector<TextObject*> _rankText;
+	std::vector<TextObject*> _rankNameText;
+	std::vector<TextObject*> _rankScoreText;
 
 	/// 게임 상태들 저장해두는 멤버 변수들
 private:
@@ -165,4 +175,5 @@ private:
 	flt::TweenPtr<flt::Vector4f> _roundTextTween;
 	flt::TweenPtr<float> _fadeInTween;
 	flt::TweenPtr<float> _fadeOutTween;
+	std::vector<flt::TweenPtr<flt::Vector4f>> _heightCountTextTween;
 };
