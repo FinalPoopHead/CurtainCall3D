@@ -101,7 +101,9 @@ public:
 
 	void SetBattleMode() { _isBattleMode = true; }
 	int GetWidth() const { return _width; }
+	int GetHeight() const { return _height; }
 	void SetGameOver(bool isOver) { _isGameOver = isOver; }
+	void SetIsCutScene(bool isCutScene) { _isCutScene = isCutScene; }
 
 private:
 	//void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
@@ -153,6 +155,7 @@ private:
 	std::list<NormalCube*> _normalCubePool;										// 노말 큐브 풀
 
 	bool _isGameOver;		// 게임이 끝났는지? (오버 및 클리어)
+	bool _isCutScene;		// 스테이지 클리어 했는지?
 	bool _isAttacked;
 	bool _isBattleMode;
 	float _delayRemain;

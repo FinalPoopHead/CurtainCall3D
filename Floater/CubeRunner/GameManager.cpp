@@ -5,6 +5,8 @@
 #include "../FloaterGameEngine/include/Input.h"
 #include "../FloaterGameEngine/include/MakeTween.h"
 
+#include "MainMenuScene.h";
+
 #include "Player.h"
 #include "Camera.h"
 #include "Board.h"
@@ -22,7 +24,7 @@ constexpr flt::Vector2f COMBOTEXTPOSITION = { 0.05f,0.85f };
 
 // UI 관련
 constexpr flt::Vector2f HPPANEL_OFFSETPOS = { 0.9f,0.95f };
-constexpr flt::Vector2f GARBAGEPANEL_OFFSETPOS = { 0.8f,0.1f };
+constexpr flt::Vector2f GARBAGEPANEL_OFFSETPOS = { 0.9f,0.1f };
 constexpr flt::Vector2f STAGEINFOPANEL_OFFSETPOS = { 0.05f,0.1f };
 constexpr flt::Vector2f GAMEOVERPANEL_OFFSETPOS = { 0.5f,0.5f };
 
@@ -45,7 +47,7 @@ std::wstring counterRedPath = L"../Resources/Sprites/FallCounterRed.png";
 constexpr float inputOffsetX = 100.0f;
 constexpr float inputOffsetY = 100.0f;
 constexpr float selectorOffsetX = 7.0f;
-constexpr float selectorOffsetY = 21.0f;
+constexpr float selectorOffsetY = 17.0f;
 
 GameManager::GameManager() :
 	_soundComponent()
@@ -61,9 +63,12 @@ GameManager::GameManager() :
 	, _fallCountSlot()
 	, _fallCountRed()
 	, _heightCountText()
+	, _bonusText()
+	, _bonusScore()
 	, _garbageLineText()
 	, _gameoverTextPanel()
 	, _gameoverText()
+	, _finalScoreText()
 	, _roundText()
 	, _liveComboTexts()
 	, _comboTextPool()
@@ -81,6 +86,10 @@ GameManager::GameManager() :
 	, _inputField()
 	, _inputText()
 	, _selectorIndex()
+	, _rankingPanel()
+	, _rankText()
+	, _rankNameText()
+	, _rankScoreText()
 	, _stageData()
 	, _currentStage(std::vector<int>(MAXPLAYERCOUNT))
 	, _currentLevel(std::vector<int>(MAXPLAYERCOUNT))
@@ -89,6 +98,7 @@ GameManager::GameManager() :
 	, _roundTextTween()
 	, _fadeInTween()
 	, _fadeOutTween()
+	, _heightCountTextTween()
 {
 	for (int i = 0; i < MAXPLAYERCOUNT; i++)
 	{
@@ -150,22 +160,20 @@ GameManager::GameManager() :
 
 	_fade = flt::CreateGameObject<SpriteObject>(false);
 	_fade->SetSprite(L"../Resources/Sprites/Fade.png");
-	_fade->SetZOrder(0.2f);
+	_fade->SetZOrder(0.6f);
 	_fade->SetColor({ 0.0f,0.0f,0.0f,1.0f });
 	_fade->tr.SetScale({ 4096.0f,4096.0f,1.0f,0.0f });
 
-	float duration = 3.0f;
-
 	_fadeInTween = flt::MakeTween(0.0f);
 	_fadeInTween->from(1.0f)
-		.to(0.0f).during(duration)
+		.to(0.0f).during(3.0f)
 		.onStart([this]() {	this->_fade->Enable(); })
 		.onStep([this](float value) {this->_fade->SetColor({ 0.0f,0.0f,0.0f,value }); })
 		.onEnd([this]() {this->_fade->Disable(); });
 
 	_fadeOutTween = flt::MakeTween(0.0f);
 	_fadeOutTween->from(0.0f)
-		.to(1.0f).during(duration)
+		.to(1.0f).during(2.0f)
 		.onStart([this]() {this->_fade->Enable(); })
 		.onStep([this](const float& value) {this->_fade->SetColor({ 0.0f,0.0f,0.0f,value }); });
 	//.onEnd([this]() {this->_fade->Disable(); });
@@ -232,16 +240,63 @@ GameManager::GameManager() :
 	_inputSelector->SetZOrder(0.8f);
 
 	_inputFieldSprite = flt::CreateGameObject<SpriteObject>(false);
-	_inputFieldSprite->SetOffsetPosition({0.5f,0.8f});
+	_inputFieldSprite->SetOffsetPosition({ 0.5f,0.8f });
 	_inputFieldSprite->SetSprite(L"../Resources/Sprites/InputField.png");
 	_inputFieldSprite->SetZOrder(0.8f);
 
 	_inputField = flt::CreateGameObject<TextObject>(true);
 	_inputField->SetParent(_inputFieldSprite);
+	_inputField->SetPosition({ 10.0f, 70.0f });
 	_inputField->SetText(L"");
 	_inputField->SetFont(bigFontPath);
-	_inputField->SetTextColor({0.2f,0.2f,0.65f,1.0f});
+	_inputField->SetTextColor({ 0.2f,0.2f,0.65f,1.0f });
 	_inputField->SetTextAlignment(eTextAlignment::LEFT);
+
+	_rankingPanel = flt::CreateGameObject<TextObject>(false);
+	_rankingPanel->SetOffsetPosition({ 0.5f,0.1f });
+	_rankingPanel->SetText(L"B E S T    C U B E    R U N N E R S");
+	_rankingPanel->SetFont(bigFontPath);
+	_rankingPanel->SetTextColor(whiteColor);
+	_rankingPanel->SetTextAlignment(eTextAlignment::CENTER);
+
+	float rankingOffsetY = 100.0f;
+	float rankX = -550.0f;
+	float nameX = -400.0f;
+	float scoreX = 550.0f;
+
+	for (int i = 0; i < 10; ++i)
+	{
+		auto rankText = flt::CreateGameObject<TextObject>(true);
+		rankText->SetParent(_rankingPanel);
+		rankText->SetPosition({ rankX, rankingOffsetY * (i + 1) });
+		rankText->SetFont(bigFontPath);
+		rankText->SetTextColor(whiteColor);
+		rankText->SetTextAlignment(eTextAlignment::LEFT);
+		_rankText.push_back(rankText);
+
+		auto rankNameText = flt::CreateGameObject<TextObject>(true);
+		rankNameText->SetParent(_rankingPanel);
+		rankNameText->SetPosition({ nameX, rankingOffsetY * (i + 1) });
+		rankNameText->SetFont(bigFontPath);
+		rankNameText->SetTextColor(whiteColor);
+		rankNameText->SetTextAlignment(eTextAlignment::LEFT);
+		_rankNameText.push_back(rankNameText);
+
+		auto rankScoreText = flt::CreateGameObject<TextObject>(true);
+		rankScoreText->SetParent(_rankingPanel);
+		rankScoreText->SetPosition({ scoreX, rankingOffsetY * (i + 1) });
+		rankScoreText->SetFont(bigFontPath);
+		rankScoreText->SetTextColor(whiteColor);
+		rankScoreText->SetTextAlignment(eTextAlignment::RIGHT);
+		_rankScoreText.push_back(rankScoreText);
+	}
+
+	_finalScoreText = flt::CreateGameObject<TextObject>(false);
+	_finalScoreText->SetOffsetPosition({ 0.5f,0.5f });
+	_finalScoreText->SetFont(bigFontPath);
+	_finalScoreText->SetTextColor(whiteColor);
+	_finalScoreText->SetTextAlignment(eTextAlignment::CENTER);
+	_finalScoreText->tr.SetScale(1.5f, 1.5f, 1.5f);
 
 	ReadStageFile();
 	ReadRankingFile();
@@ -275,7 +330,7 @@ void GameManager::Update(float deltaSecond)
 				--_selectorIndex;
 				if (_selectorIndex < 0)
 				{
-					_selectorIndex = 10; 
+					_selectorIndex = 10;
 				}
 				else
 				{
@@ -292,7 +347,7 @@ void GameManager::Update(float deltaSecond)
 			if (flt::GetKeyDown(flt::KeyCode::up))
 			{
 				_selectorIndex -= 11;
-				if(_selectorIndex < 0)
+				if (_selectorIndex < 0)
 				{
 					_selectorIndex += 33;
 				}
@@ -304,8 +359,37 @@ void GameManager::Update(float deltaSecond)
 				bool inputEnd = EnterInput(_selectorIndex);
 				if (inputEnd)
 				{
-					// TODO : 랭킹 보여주고 메인메뉴로 돌아가기
+					SetRankText();
 
+					auto panelTween = flt::MakeScaleTween(&_inputPanel->tr);
+					panelTween->from({ 1.0f,1.0f,1.0f,1.0f })
+						.to({ 0.0f, 1.0f,1.0f,1.0f }).during(1.0f)
+						.onEnd([this]() {
+						this->_inputPanel->Disable();
+						this->_inputPanel->tr.SetScale(1.0, 1.0, 1.0);
+							});
+
+					auto fieldTween = flt::MakeScaleTween(&_inputFieldSprite->tr);
+					fieldTween->from({ 1.0f,1.0f,1.0f,1.0f })
+						.to({ 0.0f, 1.0f,1.0f,1.0f }).during(1.0f)
+						.onEnd([this]() {
+						this->_inputFieldSprite->Disable();
+						this->_inputFieldSprite->tr.SetScale(1.0, 1.0, 1.0);
+							});
+
+					auto rankingTween = flt::MakeScaleTween(&_rankingPanel->tr);
+					rankingTween->from({ 0.0f,1.0f,1.0f,1.0f })
+						.to({ 1.0f,1.0f,1.0f,1.0f }).preDelay(1.5f).during(1.0f)
+						.onStart([this] {this->_rankingPanel->Enable(); })
+						.postDelay(10.0f)
+						.to({ 0.0f,1.0f,1.0f,1.0f }).during(1.0f)
+						.postDelay(0.5f)
+						.onEnd([this] {this->_rankingPanel->Disable();
+					flt::SetScene(flt::CreateScene<MainMenuScene>()); });
+
+					StartTween(panelTween);
+					StartTween(fieldTween);
+					StartTween(rankingTween);
 				}
 			}
 
@@ -394,7 +478,7 @@ void GameManager::PostUpdate(float deltaSecond)
 		auto& comboText = _liveComboTexts.front();
 		auto offsetPos = comboText->GetOffsetPosition();
 
-		if (offsetPos.y <= 0.15f)
+		if (offsetPos.y <= 0.25f)
 		{
 			comboText->Disable();		// 특정 높이가 되면 Disable 및 Pool로 반환
 			_comboTextPool.push_back(comboText);
@@ -439,7 +523,7 @@ void GameManager::CreateUI(int index)
 	stageCounterText->SetFont(fontPath);
 	stageCounterText->SetTextColor(whiteColor);
 	stageCounterText->SetText(L"0");
-	stageCounterText->SetPosition({ -24.0f,-20.0f });
+	stageCounterText->SetPosition({ -24.0f, 15.0f });
 	_stageCountText.push_back(stageCounterText);
 
 	TextObject* playerScoreText = flt::CreateGameObject<TextObject>(true);
@@ -447,7 +531,7 @@ void GameManager::CreateUI(int index)
 	playerScoreText->SetFont(smallFontPath);
 	playerScoreText->SetTextColor(whiteColor);
 	playerScoreText->SetText(L"0");
-	playerScoreText->SetPosition({ 36.0f, 6.0f });
+	playerScoreText->SetPosition({ 36.0f, 26.0f });
 	_playerScoreText.push_back(playerScoreText);
 
 	_levelCountSlot.emplace_back();
@@ -499,12 +583,27 @@ void GameManager::CreateUI(int index)
 
 	TextObject* heightCountText = flt::CreateGameObject<TextObject>(true);
 	heightCountText->SetParent(fallCountPanel);
-	heightCountText->SetPosition({ 0.0f, -25.0f });
+	heightCountText->SetPosition({ 0.0f, -50.0f });
 	heightCountText->SetFont(fontPath);
 	heightCountText->SetText(L"0");
 	heightCountText->SetTextColor(whiteColor);
 	heightCountText->SetTextAlignment(eTextAlignment::RIGHT);
 	_heightCountText.push_back(heightCountText);
+
+	_bonusText.emplace_back();
+	//_bonusText = flt::CreateGameObject<TextObject>(false);
+	_bonusText.back() = flt::CreateGameObject<TextObject>(false);
+	_bonusText.back()->SetParent(fallCountPanel);
+	_bonusText.back()->SetPosition({ 0.0f, -150.0f });
+	_bonusText.back()->SetFont(fontPath);
+	_bonusText.back()->SetText(L"+ 0 points");
+	_bonusText.back()->SetTextColor(whiteColor);
+	_bonusText.back()->SetTextAlignment(eTextAlignment::RIGHT);
+
+	_heightCountTextTween.emplace_back();
+	_heightCountTextTween.back() = flt::MakeScaleTween(&heightCountText->tr);
+	_heightCountTextTween.back()->from({ 2.0f,2.0f,2.0f,2.0f })
+		.to({ 1.0f,1.0f,1.0f,1.0f }).during(0.3f).easing(flt::ease::easeOutBack);
 
 	TextObject* gameoverTextPanel = flt::CreateGameObject<TextObject>(false);
 	gameoverTextPanel->SetOffsetPosition(GAMEOVERPANEL_OFFSETPOS);
@@ -696,27 +795,27 @@ void GameManager::OnDestroyCubes(int playerIndex, int count, flt::Vector3f pos /
 
 	switch (count)
 	{
-		case 1:
-		case 2:
-		case 3:
-			break;
-		case 4:
-		case 5:
-			damage = 1;
-			break;
-		case 6:
-		case 7:
-			damage = 2;
-			break;
-		case 8:
-			damage = 3;
-			break;
-		case 9:
-			damage = 4;
-			break;
-		default:
-			damage = 6;
-			break;
+	case 1:
+	case 2:
+	case 3:
+		break;
+	case 4:
+	case 5:
+		damage = 1;
+		break;
+	case 6:
+	case 7:
+		damage = 2;
+		break;
+	case 8:
+		damage = 3;
+		break;
+	case 9:
+		damage = 4;
+		break;
+	default:
+		damage = 6;
+		break;
 	}
 
 	float delay = 0.1f;
@@ -752,38 +851,40 @@ void GameManager::OnDestroyCubes(int playerIndex, int count, flt::Vector3f pos /
 
 void GameManager::SetStage(int stageNum)
 {
+	_stageInfoPanel.front()->Enable();
+
 	std::wstring numStr;
 	switch (stageNum)
 	{
-		case 1:
-			numStr = L"1 S T";
-			break;
-		case 2:
-			numStr = L"2 N D";
-			break;
-		case 3:
-			numStr = L"3 R D";
-			break;
-		case 4:
-			numStr = L"4 T H";
-			break;
-		case 5:
-			numStr = L"5 T H";
-			break;
-		case 6:
-			numStr = L"6 T H";
-			break;
-		case 7:
-			numStr = L"7 T H";
-			break;
-		case 8:
-			numStr = L"8 T H";
-			break;
-		case 9:
-			numStr = L"F I N A L";
-			break;
-		default:
-			break;
+	case 1:
+		numStr = L"1 S T";
+		break;
+	case 2:
+		numStr = L"2 N D";
+		break;
+	case 3:
+		numStr = L"3 R D";
+		break;
+	case 4:
+		numStr = L"4 T H";
+		break;
+	case 5:
+		numStr = L"5 T H";
+		break;
+	case 6:
+		numStr = L"6 T H";
+		break;
+	case 7:
+		numStr = L"7 T H";
+		break;
+	case 8:
+		numStr = L"8 T H";
+		break;
+	case 9:
+		numStr = L"F I N A L";
+		break;
+	default:
+		break;
 	}
 
 	_roundText->SetText(numStr + L"   S T A G E");
@@ -820,46 +921,102 @@ void GameManager::SetStage(int stageNum)
 
 void GameManager::ProgressStage(int playerIndex)
 {
-	_isGameOver[playerIndex] = false;
-	_fallCount[playerIndex] = 0;
-	_currentLevel[playerIndex] = 1;
+	_stageInfoPanel[playerIndex]->Enable();
 
-	for (int j = 0; j < _fallCountMax[playerIndex]; ++j)
+	++_currentStage[playerIndex];
+
+	if (_currentStage[playerIndex] > 9)
 	{
-		_fallCountRed[playerIndex][j]->Disable();
+		// TODO : Game Clear Cut Scene
+		_boards[playerIndex]->SetGameOver(true);
+
+
+	}
+	else
+	{
+		std::wstring numStr;
+		switch (_currentStage[playerIndex])
+		{
+		case 1:
+			numStr = L"1 S T";
+			break;
+		case 2:
+			numStr = L"2 N D";
+			break;
+		case 3:
+			numStr = L"3 R D";
+			break;
+		case 4:
+			numStr = L"4 T H";
+			break;
+		case 5:
+			numStr = L"5 T H";
+			break;
+		case 6:
+			numStr = L"6 T H";
+			break;
+		case 7:
+			numStr = L"7 T H";
+			break;
+		case 8:
+			numStr = L"8 T H";
+			break;
+		case 9:
+			numStr = L"F I N A L";
+			break;
+		default:
+			break;
+		}
+
+		_roundText->SetText(numStr + L"   S T A G E");
+		_roundText->Enable();
+		flt::StopTween(_roundTextTween);
+		flt::StartTween(_roundTextTween);
+
+		_isGameOver[playerIndex] = false;
+		_fallCount[playerIndex] = 0;
+		_currentLevel[playerIndex] = 1;
+
+		for (int j = 0; j < _fallCountMax[playerIndex]; ++j)
+		{
+			_fallCountRed[playerIndex][j]->Disable();
+		}
+
+		for (int j = 0; j < 4; j++)
+		{
+			_levelCountBlue[playerIndex][j]->Disable();
+		}
+
+		_levelCountBlue[playerIndex][0]->Enable();
+
+		for (auto& comboText : _liveComboTexts)
+		{
+			comboText->Disable();
+			_comboTextPool.push_back(comboText);
+		}
+		_liveComboTexts.clear();
+
+		StageData data = _stageData[_currentStage[playerIndex] - 1];
+
+		if (_boards[playerIndex] != nullptr)
+		{
+			_boards[playerIndex]->Resize(data.stageWidth, data.stageHeight);
+			_boards[playerIndex]->Reset();
+			_boards[playerIndex]->GenerateLevel(data.level[0].levelLayout, data.waveCount, true);
+		}
+
+		if (_players[playerIndex] != nullptr)
+		{
+			_players[playerIndex]->SetPositionToRatioPosition(0.5f, 0.75f);
+		}
+
+		_stageCountText[playerIndex]->SetText(std::to_wstring(_currentStage[playerIndex]));
+
+		ResizeFallCountUI(data.stageWidth - 1);
+
+		FadeIn();
 	}
 
-	for (int j = 0; j < 4; j++)
-	{
-		_levelCountBlue[playerIndex][j]->Disable();
-	}
-
-	_levelCountBlue[playerIndex][0]->Enable();
-
-	for (auto& comboText : _liveComboTexts)
-	{
-		comboText->Disable();
-		_comboTextPool.push_back(comboText);
-	}
-	_liveComboTexts.clear();
-
-	StageData data = _stageData[_currentStage[playerIndex] - 1];
-
-	if (_boards[playerIndex] != nullptr)
-	{
-		_boards[playerIndex]->Resize(data.stageWidth, data.stageHeight);
-		_boards[playerIndex]->Reset();
-		_boards[playerIndex]->GenerateLevel(data.level[0].levelLayout, data.waveCount, true);
-	}
-
-	if (_players[playerIndex] != nullptr)
-	{
-		_players[playerIndex]->SetPositionToRatioPosition(0.5f, 0.75f);
-	}
-
-	_stageCountText[playerIndex]->SetText(std::to_wstring(_currentStage[playerIndex]));
-
-	ResizeFallCountUI(data.stageWidth - 1);
 }
 
 void GameManager::OnStageStart()
@@ -875,21 +1032,30 @@ void GameManager::OnEndLevel(int playerIndex)
 		int curStage = _currentStage[playerIndex];
 		if (_currentLevel[playerIndex] > _stageData[curStage - 1].levelCount)
 		{
-			++_currentStage[playerIndex];
+			// Stage Clear CutScene
+			_boards[playerIndex]->SetIsCutScene(true);
 
-			if (_currentStage[playerIndex] > 9)
-			{
-				// TODO : 게임 클리어 연출.
-				_boards[playerIndex]->SetGameOver(true);
+			_stageInfoPanel[playerIndex]->Disable();
+			FadeOut();
 
+			auto calcTween = flt::MakeTween(0);
+			int heightCount = _boards.front()->GetHeight();
 
-			}
-			else
-			{
-				// TODO : 스테이지 클리어 연출
-				//_soundComponent->Stop(_soundIndex["BGM3"]);
-				ProgressStage(playerIndex);
-			}
+			calcTween->from(heightCount)
+				.to(0).preDelay(2.5f).during(2.0f)
+				.onStart([this,heightCount] {
+				this->_bonusText.front()->Enable(); 
+				this->AddBonusScore(heightCount * 1000);})
+				.onStep([this](const int& value) {this->_heightCountText.front()->SetText(std::to_wstring(value) + L" lines");})
+				.postDelay(2.0f)
+				.onEnd([this] {	
+				this->_heightCountText.front()->SetText(std::to_wstring(0) + L" lines");
+				this->_bonusText.front()->Disable();
+				this->_boards.front()->SetIsCutScene(false);
+				this->ProgressStage(0); 
+					});
+
+			StartTween(calcTween);
 
 			return;
 		}
@@ -935,24 +1101,30 @@ void GameManager::OnStartPlayerFall(int index)
 
 void GameManager::OnEndPlayerFall(int index)
 {
-	_gameoverTextPanel[index]->Enable();
-
-	for (auto& text : _gameoverText[index])
+	if (_players.size() == 1)
 	{
-		auto tweenScale = flt::MakeScaleTween(&text->tr);
-		// TODO : 싱글모드면 점수기입하고 끝내기? 멀티모드면 다른플레이어 승리 보여주고 끝내기?
+		_gameoverTextPanel[index]->Enable();
 
-		auto scale = text->tr.GetLocalScale();
-		flt::Vector4f startScale = { 0.0f, scale.y,scale.z,1.0f };
+		for (auto& text : _gameoverText[index])
+		{
+			auto tweenScale = flt::MakeScaleTween(&text->tr);
 
-		tweenScale->from(startScale)
-			.to(scale).during(2.0f).easing(flt::ease::linear).postDelay(2.0f)
-			.to(startScale).during(2.0f).easing(flt::ease::linear).postDelay(2.0f).onEnd([this]() {this->EnableScoreInput(); });		// TODO : 점수기입 ㄱㄱ
+			auto scale = text->tr.GetLocalScale();
+			flt::Vector4f startScale = { 0.0f, scale.y,scale.z,1.0f };
 
-		flt::StartTween(tweenScale);
+			tweenScale->from(startScale)
+				.to(scale).during(2.0f).easing(flt::ease::linear).postDelay(2.0f)
+				.to(startScale).during(2.0f).easing(flt::ease::linear).postDelay(2.0f).onEnd([this]() {this->EnableScoreInput(); });
+
+			flt::StartTween(tweenScale);
+		}
+
+		FadeOut();
 	}
-
-	FadeOut();
+	else if (_players.size() == 2)
+	{
+		// TODO : 승리 패배 연출 만들어야함
+	}
 }
 
 void GameManager::OnCheckMinHeight(int index, int height, bool doGenerate)
@@ -1122,7 +1294,7 @@ void GameManager::PrintComboText(int index, int count, int score)
 		auto& scoreText = _comboTextPool.front();
 		// scoreText->Enable();		// Enable은 높이에 따라 PostUpdate에서 처리
 		scoreText->SetText(std::to_wstring(score));
-		scoreText->SetOffsetPosition(_comboTextPos[index] + flt::Vector2f(0.0f, 0.05f));
+		scoreText->SetOffsetPosition(_comboTextPos[index] + flt::Vector2f(0.0f, 0.1f));
 		_liveComboTexts.push_back(scoreText);
 		_comboTextPool.pop_front();
 	}
@@ -1273,9 +1445,14 @@ void GameManager::ReadRankingFile()
 
 	fs.open("../Resources/RankData/Ranking.csv", std::ios::in);
 
-	if (!fs.eof())
+	while (!fs.eof())
 	{
 		getline(fs, str_buf);
+
+		if (fs.eof())
+		{
+			break;
+		}
 
 		std::istringstream iss(str_buf);
 		std::string token;
@@ -1552,12 +1729,8 @@ void GameManager::ChangeHeightCountText(int index, int height)
 
 	textObj->SetText(std::to_wstring(height) + L" lines");
 
-	auto tweenScale = flt::MakeScaleTween(&textObj->tr);
-
-	tweenScale->from({ 2.0f,2.0f,2.0f,2.0f })
-		.to({ 1.0f,1.0f,1.0f,1.0f }).during(0.3f).easing(flt::ease::easeOutBack).onEnd([&tweenScale]() {flt::ReleaseTween(tweenScale); });
-
-	flt::StartTween(tweenScale);
+	flt::StopTween(_heightCountTextTween[index]);
+	flt::StartTween(_heightCountTextTween[index]);
 }
 
 void GameManager::EnableScoreInput()
@@ -1569,6 +1742,11 @@ void GameManager::EnableScoreInput()
 
 bool GameManager::EnterInput(int index)
 {
+	if (_inputText.size() >= 10)
+	{
+		return false;
+	}
+
 	if (0 <= index && index <= 25)
 	{
 		_inputText.append(1, 65 + index);
@@ -1577,54 +1755,80 @@ bool GameManager::EnterInput(int index)
 	{
 		switch (index)
 		{
-			case 26:
-				// !
-				_inputText.append("!");
-				break;
-			case 27:
-				// ?
-				_inputText.append("?");
-				break;
-			case 28:
-				// /
-				_inputText.append("/");
-				break;
-			case 29:
-				// .
-				_inputText.append(".");
-				break;
-			case 30:
-				// " "
-				_inputText.append(" ");
-				break;
-			case 31:
-				// DEL
-				if (_inputText.size() > 0)
-				{
-					_inputText.pop_back();
-				}
-				break;
-			case 32:
-				// END
-				if (_inputText.size() > 0)
-				{
-					_rankData.push_back({ 0, _inputText, _playerScore.front() });
-					SortRanking();
-					WriteRankingFile();
-					_inputPanel->Disable();
-					_inputFieldSprite->Disable();
-					_inputField->SetText(L"");
-					_inputText.clear();
-					ResetGame();
-					return true;
-				}
-				break;
-			default:
-				break;
+		case 26:
+			// !
+			_inputText.append("!");
+			break;
+		case 27:
+			// ?
+			_inputText.append("?");
+			break;
+		case 28:
+			// /
+			_inputText.append("/");
+			break;
+		case 29:
+			// .
+			_inputText.append(".");
+			break;
+		case 30:
+			// " "
+			_inputText.append(" ");
+			break;
+		case 31:
+			// DEL
+			if (_inputText.size() > 0)
+			{
+				_inputText.pop_back();
+			}
+			break;
+		case 32:
+			// END
+			if (_inputText.size() > 0)
+			{
+				_rankData.push_back({ 0, _inputText, _playerScore.front() });
+				SortRanking();
+				WriteRankingFile();
+				_inputField->SetText(L"");
+				_inputText.clear();
+				return true;
+			}
+			break;
+		default:
+			break;
 		}
 	}
 
 	_inputField->SetText(std::wstring().assign(_inputText.begin(), _inputText.end()));		// TODO : 만약 깨지면 여기 문제
 
 	return false;
+}
+
+void GameManager::SetRankText()
+{
+	int index = 0;
+
+	for (auto& rankData : _rankData)
+	{
+		std::wstring name = std::wstring().assign(rankData.name.begin(), rankData.name.end());		// TODO : 만약 깨지면 여기 문제
+		_rankText[index]->SetText(std::to_wstring(rankData.rank));
+		_rankNameText[index]->SetText(name);
+		_rankScoreText[index]->SetText(std::to_wstring(rankData.score));
+		++index;
+	}
+}
+
+void GameManager::AddBonusScore(int score)
+{
+	auto bonusTween = flt::MakeTween(0);
+	bonusTween->from(0)
+		.to(score).during(2.0f)
+		.onStep([this](const int& value) {
+		this->_bonusText.front()->SetText(L"+ " + std::to_wstring(value) + L" Points");
+			})
+		.onEnd([this,score]() {
+		this->_bonusText.front()->SetText(L"+ " + std::to_wstring(score) + L" Points");
+		this->AddScore(0, score); });
+
+	flt::StartTween(bonusTween);
 }

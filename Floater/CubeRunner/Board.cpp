@@ -224,7 +224,7 @@ void Board::PreUpdate(float deltaSecond)
 					cubeCtr->SetIsRunning(true);
 				}
 			}
-			else if (_waveCubeControllers.empty())
+			else if (!_isCutScene && _waveCubeControllers.empty())
 			{
 				_gameManager->OnEndLevel(_playerIndex);
 			}
@@ -458,6 +458,7 @@ void Board::ConvertToTilePosition(int x, int z, float& outX, float& outZ)
 void Board::GenerateLevel(std::vector<std::vector<int>> levelLayout, int waveCount, bool isFirst /*= false*/)
 {
 	_isGameOver = false;
+	_isCutScene = false;
 
 	int width = levelLayout.size();
 	int height = levelLayout[0].size();

@@ -52,6 +52,7 @@ private:
 	float _lookDegree;
 	float _movSpeed;
 	float _rotSpeed;
+	bool _isCameraDropCheck = false;
 
 	eCameraState _state;
 
