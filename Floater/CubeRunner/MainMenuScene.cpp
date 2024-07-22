@@ -7,6 +7,9 @@
 extern int g_PlayerNum;
 extern int g_StageNum;
 
+extern int g_player1Input;
+extern int g_player2Input;
+
 void MainMenuScene::Initialize()
 {
 	MenuItem* title = flt::CreateGameObject<MenuItem>(true);
@@ -67,21 +70,21 @@ void MainMenuScene::Initialize()
 		controllerMenu->AddItem(item1);
 
 		item1->SetDefaultSpritePath(L"../Resources/Sprites/abcd.jpg");
-		item1->SetPointedSpritePath(L"../Resources/Sprites/abcd.jpg");
+		item1->SetPointedSpritePath(L"../Resources/Sprites/test.jpg");
 		item1->SetOffsetPosition({ 0.25f, 0.5f });
 		item1->SetSize({ 500.0f, 500.0f });
 
-		item1->SetSelectFunc([]() { g_PlayerNum = 1; g_StageNum = 1; flt::SetScene(L"class GameScene"); });
+		item1->SetSelectFunc([]() { });
 
 		MenuItem * item2 = flt::CreateGameObject<MenuItem>(false);
 		controllerMenu->AddItem(item2);
 
 		item2->SetDefaultSpritePath(L"../Resources/Sprites/abcd.jpg");
-		item2->SetPointedSpritePath(L"../Resources/Sprites/abcd.jpg");
+		item2->SetPointedSpritePath(L"../Resources/Sprites/test.jpg");
 		item2->SetOffsetPosition({ 0.75f, 0.5f });
 		item2->SetSize({ 500.0f, 500.0f });
 
-		item2->SetSelectFunc([]() { g_PlayerNum = 2; g_StageNum = 1; flt::SetScene(L"class GameScene"); });
+		item2->SetSelectFunc([]() { });
 	}
 
 	MenuSelector* selector = flt::CreateGameObject<MenuSelector>(true, menu, controllerMenu);
