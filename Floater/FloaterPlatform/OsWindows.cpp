@@ -374,7 +374,7 @@ void flt::OsWindows::SetWindowTitle(const std::wstring& title)
 	}
 }
 
-void flt::OsWindows::SetWindowSize(uint32 width /*= 0*/, uint32 height /*= 0*/, WindowMode mode /*= WindowMode::WINDOWED*/)
+void flt::OsWindows::SetWindowSize(uint32 width /*= 0*/, uint32 height /*= 0*/, WindowMode mode /*= WindowMode::WINDOWED*/, int monitorIndex /*= -1*/)
 {
 	MONITORINFOEX monitorInfo;
 	monitorInfo.cbSize = sizeof(MONITORINFOEX);
@@ -410,33 +410,39 @@ void flt::OsWindows::SetWindowSize(uint32 width /*= 0*/, uint32 height /*= 0*/, 
 	{
 		DISPLAY_DEVICE displayDevice;
 		displayDevice.cb = sizeof(DISPLAY_DEVICE);
-		DWORD displayNum = 0;
 
-		// 일단 PRIMARY_DEVICE라고 가정하고 하자.
-		while (EnumDisplayDevices(NULL, displayNum, &displayDevice, 0))
+		if (monitorIndex < 0 || EnumDisplayDevices(NULL, (DWORD)monitorIndex, &displayDevice, 0))
 		{
-			auto str = displayDevice.DeviceString;
-			auto name = displayDevice.DeviceName;
-			if (wcscmp(monitorInfo.szDevice, displayDevice.DeviceName) == 0)
+			DWORD displayNum = 0;
+			while (EnumDisplayDevices(NULL, displayNum, &displayDevice, 0))
 			{
-				break;
-			}
-			++displayNum;
+				if (!(displayDevice.StateFlags & DISPLAY_DEVICE_ACTIVE))
+				{
+					++displayNum;
+					continue;
+				}
 
-			/// 현재 디스플레이에서 가능한 모드 출력
-			//DEVMODE devMode;
-			//devMode.dmSize = sizeof(DEVMODE);
-			//DWORD modeIndex = 0;
-			//while(EnumDisplaySettings(displayDevice.DeviceName, modeIndex, &devMode) != 0)
-			//{
-			//	std::cout << "Mode " << modeIndex << ": "
-			//		<< devMode.dmPelsWidth << "x"
-			//		<< devMode.dmPelsHeight << " @ "
-			//		<< devMode.dmDisplayFrequency << "Hz, "
-			//		<< devMode.dmBitsPerPel << " bits"
-			//		<< std::endl;
-			//	++modeIndex;
-			//}
+				if (wcscmp(monitorInfo.szDevice, displayDevice.DeviceName) == 0)
+				{
+					break;
+				}
+
+				/// 현재 디스플레이에서 가능한 모드 출력
+				/*DEVMODE devMode;
+				devMode.dmSize = sizeof(DEVMODE);
+				DWORD modeIndex = 0;
+				while(EnumDisplaySettings(displayDevice.DeviceName, modeIndex, &devMode) != 0)
+				{
+					std::cout << "Mode " << modeIndex << ": "
+						<< devMode.dmPelsWidth << "x"
+						<< devMode.dmPelsHeight << " @ "
+						<< devMode.dmDisplayFrequency << "Hz, "
+						<< devMode.dmBitsPerPel << " bits"
+						<< std::endl;
+					++modeIndex;
+				}*/
+				++displayNum;
+			}
 		}
 
 		DEVMODE devMode;
@@ -450,10 +456,21 @@ void flt::OsWindows::SetWindowSize(uint32 width /*= 0*/, uint32 height /*= 0*/, 
 
 		LONG ret = ChangeDisplaySettingsEx(displayDevice.DeviceName, &devMode, NULL, CDS_FULLSCREEN, NULL);
 		ASSERT(ret == DISP_CHANGE_SUCCESSFUL, "전체화면으로 변경 실패");
+
+		///  TODO 전체화면을 하려면 렌더러에서도 해줘야한다.
+		//for (auto& [renderer, type] : _rendererMap)
+		//{
+		//	renderer->SetFullScreen(true);
+		//}
 	}
 	else
 	{
 		ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
+
+		//for (auto& [renderer, type] : _rendererMap)
+		//{
+		//	renderer->SetFullScreen(false);
+		//}
 	}
 
 	// 해상도를 바꿧다면 위치, 크기가 바뀔 수 있기때문에 모니터 크기를 다시 계산.
