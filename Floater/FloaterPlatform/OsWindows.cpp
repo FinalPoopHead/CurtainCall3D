@@ -198,22 +198,29 @@ bool flt::OsWindows::Initialize(int windowWidth, int windowHeight, const std::ws
 	RegisterClassEx(&wc);
 
 	RECT windowRect = { 0, 0, windowWidth, windowHeight };    // 윈도우 창 크기
-	//AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
-	AdjustWindowRect(&windowRect, WS_POPUP, FALSE);
+	BOOL ret = AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW | WS_SIZEBOX, FALSE);
+	if (ret == 0)
+	{
+		ASSERT(false, "사각형 크기 계산 실패");
+		return false;
+	}
 
-	_hwnd = CreateWindow
+	//AdjustWindowRect(&windowRect, WS_POPUP, FALSE);
+
+	_hwnd = CreateWindowEx
 	(
+		0,
 		wc.lpszClassName,
 		title.c_str(),
-		WS_POPUP,//WS_OVERLAPPEDWINDOW | WS_SIZEBOX,
+		WS_OVERLAPPEDWINDOW | WS_SIZEBOX,
 		100, // 윈도우 좌측 상단의 x 좌표
 		100, // 윈도우 좌측 상단의 y 좌표
 		windowRect.right - windowRect.left, // 윈도우 가로 방향 해상도
 		windowRect.bottom - windowRect.top, // 윈도우 세로 방향 해상도
 		NULL,
-		NULL,
+		NULL,	// hMenu
 		wc.hInstance,
-		this
+		this	// lpParaam
 	);
 
 	if (_hwnd == NULL)
@@ -240,8 +247,11 @@ bool flt::OsWindows::Initialize(int windowWidth, int windowHeight, const std::ws
 	SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)TopExceptionFilter);
 
 	wchar_t buffer[512];
-	DWORD result = GetModuleFileName(nullptr, buffer, 512);
-	ASSERT(result != 0, "가져오기 실패");
+	{
+		DWORD result = GetModuleFileName(nullptr, buffer, 512);
+		ASSERT(result != 0, "가져오기 실패");
+	}
+
 	_exePath = buffer;
 	_exePath = _exePath.substr(0, _exePath.find_last_of(L"\\") + 1);
 
@@ -366,52 +376,97 @@ void flt::OsWindows::SetWindowTitle(const std::wstring& title)
 
 void flt::OsWindows::SetWindowSize(uint32 width /*= 0*/, uint32 height /*= 0*/, WindowMode mode /*= WindowMode::WINDOWED*/)
 {
-	MONITORINFO monitorInfo;
-	monitorInfo.cbSize = sizeof(MONITORINFO);
+	MONITORINFOEX monitorInfo;
+	monitorInfo.cbSize = sizeof(MONITORINFOEX);
 
 	HMONITOR hMonitor = MonitorFromWindow(_hwnd, MONITOR_DEFAULTTOPRIMARY);
 	GetMonitorInfo(hMonitor, &monitorInfo);
 
-	if (width == 0)
+	bool useMonitorSize = false;
+	if (width == 0 && height == 0)
 	{
 		width = monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left;
+		height = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
+		useMonitorSize = true;
 	}
 
-	if (height == 0)
+	LONG_PTR style = WS_POPUP; 
+	if (mode == WindowMode::WINDOWED)
 	{
-		height = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
+		style = WS_OVERLAPPEDWINDOW | WS_SIZEBOX;
+
+		RECT windowRect = { 0, 0, (LONG)width, (LONG)height };    // 윈도우 창 크기
+		BOOL ret = AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW | WS_SIZEBOX, FALSE);
+		ASSERT(ret != 0, "사각형 크기 계산 실패");
+
+		width = windowRect.right - windowRect.left;
+		height = windowRect.bottom - windowRect.top;
 	}
+	style = SetWindowLongPtr(_hwnd, GWL_STYLE, style);
+	ASSERT(style != 0, "스타일 변경 실패");
+	SetWindowPos(_hwnd, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
 	if (mode == WindowMode::FULLSCREEN)
 	{
+		DISPLAY_DEVICE displayDevice;
+		displayDevice.cb = sizeof(DISPLAY_DEVICE);
+		DWORD displayNum = 0;
+
+		// 일단 PRIMARY_DEVICE라고 가정하고 하자.
+		while (EnumDisplayDevices(NULL, displayNum, &displayDevice, 0))
+		{
+			auto str = displayDevice.DeviceString;
+			auto name = displayDevice.DeviceName;
+			if (wcscmp(monitorInfo.szDevice, displayDevice.DeviceName) == 0)
+			{
+				break;
+			}
+			++displayNum;
+
+			/// 현재 디스플레이에서 가능한 모드 출력
+			//DEVMODE devMode;
+			//devMode.dmSize = sizeof(DEVMODE);
+			//DWORD modeIndex = 0;
+			//while(EnumDisplaySettings(displayDevice.DeviceName, modeIndex, &devMode) != 0)
+			//{
+			//	std::cout << "Mode " << modeIndex << ": "
+			//		<< devMode.dmPelsWidth << "x"
+			//		<< devMode.dmPelsHeight << " @ "
+			//		<< devMode.dmDisplayFrequency << "Hz, "
+			//		<< devMode.dmBitsPerPel << " bits"
+			//		<< std::endl;
+			//	++modeIndex;
+			//}
+		}
+
 		DEVMODE devMode;
+		memset(&devMode, 0, sizeof(DEVMODE));
 		devMode.dmSize = sizeof(DEVMODE);
 		devMode.dmPelsWidth = width;
 		devMode.dmPelsHeight = height;
 		devMode.dmBitsPerPel = 32;
 		devMode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+		
 
-		LONG ret = ChangeDisplaySettings(&devMode, CDS_FULLSCREEN);
-		if (ret != DISP_CHANGE_SUCCESSFUL)
-		{
-			ASSERT(false, "전체화면으로 변경 실패");
-		}
+		LONG ret = ChangeDisplaySettingsEx(displayDevice.DeviceName, &devMode, NULL, CDS_FULLSCREEN, NULL);
+		ASSERT(ret == DISP_CHANGE_SUCCESSFUL, "전체화면으로 변경 실패");
 	}
 	else
 	{
-		ChangeDisplaySettings(NULL, 0);
+		ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
 	}
 
-	if (mode == WindowMode::WINDOWED)
+	// 해상도를 바꿧다면 위치, 크기가 바뀔 수 있기때문에 모니터 크기를 다시 계산.
+	hMonitor = MonitorFromWindow(_hwnd, MONITOR_DEFAULTTOPRIMARY);
+	GetMonitorInfo(hMonitor, &monitorInfo);
+	if (useMonitorSize)
 	{
-		SetWindowLong(_hwnd, GWL_EXSTYLE, WS_OVERLAPPEDWINDOW | WS_SIZEBOX);
-	}
-	else
-	{
-		SetWindowLong(_hwnd, GWL_EXSTYLE, WS_POPUP);
+		width = monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left;
+		height = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
 	}
 
-	SetWindowPos(_hwnd, HWND_TOP, 0, 0, width, height, SWP_FRAMECHANGED);
+	//SetWindowPos(_hwnd, HWND_TOP, 0, 0, width, height, SWP_SHOWWINDOW | SWP_FRAMECHANGED);
+	SetWindowPos(_hwnd, HWND_TOP, monitorInfo.rcMonitor.left, monitorInfo.rcMonitor.top, width, height, SWP_SHOWWINDOW);
 }
 
 flt::KeyData flt::OsWindows::GetKey(KeyCode code)
@@ -1538,6 +1593,18 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 		break;
 
 		case WM_DESTROY:
+		{
+			::PostQuitMessage(0);
+			return 0;
+		}
+
+		case WM_CLOSE:
+		{
+			::PostQuitMessage(0);
+			return 0;
+		}
+
+		case SC_CLOSE:
 		{
 			::PostQuitMessage(0);
 			return 0;

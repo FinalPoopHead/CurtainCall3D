@@ -8,7 +8,9 @@ int main(int argc, char* argv[])
 {
 	flt::GameEngine* pGameEngine = flt::GameEngine::Instance();
 	pGameEngine->SetWindowTitle(L"Cube Runner");
-	pGameEngine->SetWindowSize(1280, 720, flt::WindowMode::FULLSCREEN);
+
+	pGameEngine->SetWindowSize(1280, 720, flt::WindowMode::WINDOWED);
+	//pGameEngine->SetWindowSize(1280, 720, flt::WindowMode::BORDERLESS);
 
 	flt::CreateScene<MainMenuScene>();
 	flt::CreateScene<GameScene>();
