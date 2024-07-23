@@ -354,6 +354,12 @@ bool flt::RocketAdapter::DeregisterObject(HOBJECT renderable)
 	return true;
 }
 
+bool flt::RocketAdapter::SetFullScreen(bool isFullScreen)
+{
+	//_impl->SetFullScreen(isFullScreen);
+	return true;
+}
+
 bool flt::RocketAdapter::Resize(uint32 width, uint32 height)
 {
 	_impl->OnResize(width, height);

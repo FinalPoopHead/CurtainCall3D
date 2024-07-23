@@ -22,10 +22,17 @@
 #include "../FloaterUtil/include/FLTween.h"
 #include "../FloaterMath/include/Ease.h"
 #include "../FloaterMath/include/Bezier.h"
+#include <windows.h>
 
 #include <array>
 
 //void Func(flt::info info);
+
+template<typename T>
+T& unmove(T&& t)
+{
+	return t;
+}
 
 int main(int argc, char* argv[])
 {
@@ -57,10 +64,18 @@ int main(int argc, char* argv[])
 		//int i = 0;
 	}*/
 
+
+
 	/// 로그 테스트
-	/*{
-		flt::Info(L"Hello {}!", L"World");
-	}*/
+	{
+		std::wstring str = L"Hello {}!";
+		flt::Info(str, L"World");
+
+		flt::Info(L"Debug Test {}, {}, {}", 1, 2.1f, L"finished");
+		auto arr = std::make_wformat_args(unmove(1));
+		auto arr = std::make_wformat_args(unmove(2.1f));
+		auto arr = std::make_wformat_args(unmove(L"finished"));
+	}
 
 	/// 베지어 테스트
 	/*{
@@ -76,7 +91,7 @@ int main(int argc, char* argv[])
 	}*/
 
 	/// 트윈 테스트
-	/*{
+	{
 		int value = 100;
 		int valueRef = 100;
 
@@ -92,25 +107,40 @@ int main(int argc, char* argv[])
 				{
 					std::cout << " ";
 				}
-				std::cout << "*\n";
+				std::cout << "*";
 			};
 
-		flt::FLTween tween = flt::tween::from(0)
-			.to(100).during(100.0f).easing(flt::Bezier::EaseInOut()).onStart([]() { std::cout << "Start\n"; }).onStep(onStepFunc).onEnd([]() { std::cout << "End\n"; })
-			.to(0).during(100.0f).easing(flt::ease::easeInOut).onStep(onStepFunc)
-			.to(100).during(100.0f).easing(flt::ease::easeInOutExpo).onStep(onStepFunc);
 
-		for (int i = 0; i < 300; ++i)
+
+		flt::Timer timer;
+		timer.Start();
+
+		auto onStartFunc = [&timer]() { std::cout << timer.GetTotalSeconds() << " s "; };
+		auto onEndFunc = [&timer]() { std::cout << timer.GetTotalSeconds() << " e "; };
+		flt::FLTween tween = flt::tween::from(0)
+			.to(10).preDelay(2.0f).during(10.0f).postDelay(2.0f).easing(flt::Bezier::EaseInOut()).onStart(onStartFunc).onStep(onStepFunc).onEnd(onEndFunc)
+			.to(0).preDelay(3.0f).during(10.0f).postDelay(3.0f).easing(flt::ease::easeInOut).onStart(onStartFunc).onStep(onStepFunc).onEnd(onEndFunc)
+			.to(10).preDelay(4.0f).during(10.0f).postDelay(4.0f).easing(flt::ease::easeInOutExpo).onStart(onStartFunc).onStep(onStepFunc).onEnd(onEndFunc);
+
+
+		flt::Timer timer2;
+		timer2.Start();
+		for (int i = 0; i < 50; ++i)
 		{
-			int value = tween.step(1.0f);
+			timer2.Update();
+			float dt = timer2.GetDeltaSeconds();
+			std::cout << timer2.GetTotalSeconds() << " : ";
+			int value = tween.step(dt);
+			std::cout << "\n";
+			Sleep(1000);
 		}
 
 		std::cout << "------------------\n";
 
 		flt::FLTween tweenPtr = flt::tween::from(&value)
 			.from(0)
-			.to(100).preDelay(10.0f).during(10.0f).postDelay(3.0f).easing(flt::Bezier::EaseInOut()).onStep(onStepFunc)
-			.to(0).preDelay(2.0f).during(100.0f).easing(flt::Bezier::EaseIn()).onStep(onStepFunc);
+			.to(10).preDelay(2.0f).during(10.0f).postDelay(3.0f).easing(flt::Bezier::EaseInOut()).onStep(onStepFunc)
+			.to(0).preDelay(2.0f).during(10.0f).postDelay(3.0f).easing(flt::Bezier::EaseIn()).onStep(onStepFunc);
 
 		for (int i = 0; i < 110; ++i)
 		{
@@ -133,7 +163,7 @@ int main(int argc, char* argv[])
 			}
 			std::cout << "*\n";
 		}
-	}*/
+	}
 
 	std::filesystem::path path = std::filesystem::current_path();
 

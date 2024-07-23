@@ -34,6 +34,7 @@ namespace flt
 
 		Vector2f GetWindowSize();
 		void SetWindowTitle(const std::wstring& title);
+		void SetWindowSize(uint32 width = 0, uint32 height = 0, WindowMode mode = WindowMode::WINDOWED, int monitorIndex = -1);
 
 		KeyData GetKey(KeyCode code);
 		KeyData GetKeyDown(KeyCode code);
