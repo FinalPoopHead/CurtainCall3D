@@ -17,6 +17,7 @@ Player::Player(Board* board) :
 	, _state(ePlayerState::PLAYING)
 	, _padIndex(-1)
 	, _speed(10.0f)
+	, _isPlayWalkSound(false)
 {
 	std::wstring path = L"../Resources/Sound/";
 	_soundComponent = AddComponent<flt::SoundComponent>(true);
@@ -278,6 +279,16 @@ void Player::Update(float deltaSecond)
 	if (nextPosOffset.NormPow() > 0)
 	{
 		_model->PlayWalk();
+
+		if (!_soundComponent->isPlay(_soundIndex["PlayerWalk"]))
+		{
+			_soundComponent->Play(_soundIndex["PlayerWalk"]);
+			std::cout << "Play Walk Sound\n";
+		}
+		else
+		{
+			std::cout << "Not Walk Sound1\n";
+		}
 		// TODO : 현재 Play 중인지 아닌지 체크해서 재생시켜야함.
 // 		_soundComponent->Play(_soundIndex["PlayerWalk"]);
 // 		_soundComponent->Play(_soundIndex["PlayerWalk1"]);
@@ -285,6 +296,10 @@ void Player::Update(float deltaSecond)
 	else
 	{
 		_model->PlayIdle();
+		if (_soundComponent->isPlay(_soundIndex["PlayerWalk"]))
+		{
+			_soundComponent->Stop(_soundIndex["PlayerWalk"]);
+		}
 	}
 	nextPos = nextPosOffset + pos;
 	tr.SetWorldPosition(nextPos);

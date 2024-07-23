@@ -90,7 +90,7 @@ void flt::SoundEngine::Play(flt::Sound* sound, bool isLoop/*= false*/)
 		}
 	}
 
-	FMOD_RESULT result = _system->playSound(sound->_fSound, _channelGroups[sound->_category], false, &channel);
+	FMOD_RESULT result = _system->playSound(sound->_fSound, _channelGroups[sound->_category], false, &sound->_channel);
 	ASSERT(result == FMOD_OK, "재생 실패");
 }
 
@@ -106,6 +106,7 @@ bool flt::SoundEngine::isPlay(Sound* sound)
 		if (isPlaying)
 		{
 			channel->getPaused(&isPlaying);
+			isPlaying = !isPlaying;
 		}
 	}
 
