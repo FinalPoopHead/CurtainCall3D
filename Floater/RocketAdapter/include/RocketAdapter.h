@@ -28,6 +28,7 @@ namespace flt
 		virtual HOBJECT RegisterObject(RendererObject& renderable);
 		virtual bool DeregisterObject(HOBJECT renderable);
 
+		virtual bool SetFullScreen(bool isFullScreen);
 		virtual bool Resize(uint32 width, uint32 height);
 
 

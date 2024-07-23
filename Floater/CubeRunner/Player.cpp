@@ -17,20 +17,15 @@ Player::Player(Board* board) :
 	, _state(ePlayerState::PLAYING)
 	, _padIndex(-1)
 	, _speed(10.0f)
+	, _isPlayWalkSound(false)
 {
 	std::wstring path = L"../Resources/Sound/";
 	_soundComponent = AddComponent<flt::SoundComponent>(true);
 	_soundComponent->AddSound(path + L"PlayerWalk.mp3");
-	_soundComponent->AddSound(path + L"PlayerWalk1.mp3");
-	_soundComponent->AddSound(path + L"PlayerWalk2.mp3");
-	_soundComponent->AddSound(path + L"PlayerWalk3.mp3");
 
 	int index = 0;
 	_soundIndex = std::unordered_map<std::string, int>();
 	_soundIndex["PlayerWalk"] = index++;
-	_soundIndex["PlayerWalk1"] = index++;
-	_soundIndex["PlayerWalk2"] = index++;
-	_soundIndex["PlayerWalk3"] = index++;
 
 	_model = flt::CreateGameObject<PlayerModel>(true);
 	tr.AddChild(&_model->tr);
@@ -275,9 +270,16 @@ void Player::Update(float deltaSecond)
 		nextPosOffset.z = 0.0f;
 	}
 
+	std::string soundName = "PlayerWalk";
 	if (nextPosOffset.NormPow() > 0)
 	{
 		_model->PlayWalk();
+
+		if (!_soundComponent->isPlay(_soundIndex[soundName]))
+		{
+			_soundComponent->Play(_soundIndex[soundName]);
+			std::cout << "Play Walk Sound\n";
+		}
 		// TODO : 현재 Play 중인지 아닌지 체크해서 재생시켜야함.
 // 		_soundComponent->Play(_soundIndex["PlayerWalk"]);
 // 		_soundComponent->Play(_soundIndex["PlayerWalk1"]);

@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Component.h"
+#include "../FloaterUtil/include/OwningPtr.h"
 #include <vector>
 #include <string>
 
@@ -13,6 +14,7 @@ namespace flt
 	{
 	public:
 		SoundComponent();
+		virtual ~SoundComponent();
 
 		virtual void OnDestroy() override;
 
@@ -25,7 +27,8 @@ namespace flt
 
 	private:
 		SoundEngine* _soundEngine;
-		std::vector<Sound*> _sounds;
+		//std::vector<Sound*> _sounds;
+		std::vector<OwningPtr<Sound>> _sounds;
 	};
 
 }

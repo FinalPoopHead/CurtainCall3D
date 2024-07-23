@@ -38,6 +38,14 @@ namespace flt
 		void DestroyRenderer(IRenderer* renderer);
 
 		[[nodiscard]] Vector2f GetWindowSize();
+		/// <summary>
+		/// 윈도우 크기, 전체화면, 모니터 지정등을 설정한다.
+		/// </summary>
+		/// <param name="width">0일 경우 지정된 모니터의 너비</param>
+		/// <param name="height">0일 경우 지정된 모니터의 높이</param>
+		/// <param name="mode"></param>
+		/// <param name="monitorIndex">음수거나 유효하지 않은 숫자일 때 윈도우가 있는 모니터 index</param>
+		void SetWindowSize(uint32 width = 0, uint32 height = 0, WindowMode mode = WindowMode::WINDOWED, int monitorIndex = -1);
 		void SetWindowTitle(const std::wstring& title);
 
 		[[nodiscard]] KeyData GetKey(KeyCode code);

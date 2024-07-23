@@ -63,6 +63,7 @@ namespace flt
 
 		virtual bool Test() override;
 	public:
+		virtual bool SetFullScreen(bool isFullScreen);
 		virtual bool Resize(unsigned __int32 windowWidth, unsigned __int32 windowHeight);
 
 	private:
@@ -91,6 +92,7 @@ namespace flt
 		// 엔진 상태등에 관련된 변수들
 		bool _isRunRenderEngine;
 		bool _useVsync;
+		bool _isFullScreen;
 		UINT _monitorIndex = 0;
 		UINT _refreshRatesIndex = 1;
 		RenderMode _renderMode;

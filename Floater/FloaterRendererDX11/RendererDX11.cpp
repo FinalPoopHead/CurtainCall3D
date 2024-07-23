@@ -25,6 +25,7 @@ flt::RendererDX11::RendererDX11() :
 	_hwnd(NULL),
 	_isRunRenderEngine(false),
 	_useVsync(false),
+	_isFullScreen(false),
 	_monitorIndex(0),
 	_refreshRatesIndex(1),
 	_renderMode(RenderMode::DEFERRED),
@@ -150,7 +151,7 @@ bool flt::RendererDX11::Initialize(HWND hwnd, HWND debugHWnd /*= NULL*/)
 	fullScreenDesc.RefreshRate = { 0, 0 };
 	fullScreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UPPER_FIELD_FIRST;
 	fullScreenDesc.Scaling = DXGI_MODE_SCALING_STRETCHED;
-	fullScreenDesc.Windowed = true;
+	fullScreenDesc.Windowed = !_isFullScreen;
 
 	result = _dxgiFactory->CreateSwapChainForHwnd(_device.Get(), _hwnd, &desc, &fullScreenDesc, NULL, &_swapChain);
 	if (result != S_OK)
@@ -473,9 +474,21 @@ bool flt::RendererDX11::Test()
 	return tester.Test();
 }
 
+bool flt::RendererDX11::SetFullScreen(bool isFullScreen)
+{
+	if (_isFullScreen == isFullScreen)
+	{
+		return true;
+	}
+	_isFullScreen = isFullScreen;
+
+	return OnResize();
+}
+
 bool flt::RendererDX11::Resize(unsigned __int32 windowWidth, unsigned __int32 windowHeight)
 {
-	if (!_swapChain)
+	/// 이전 구현
+	/*if (!_swapChain)
 	{
 		return false;
 	}
@@ -508,7 +521,16 @@ bool flt::RendererDX11::Resize(unsigned __int32 windowWidth, unsigned __int32 wi
 
 	_displayWidth = windowHeight;
 	_displayHeight = windowHeight;
-	return true;
+	return true;*/
+
+	bool ret = OnResize();
+
+	_windowWidth = windowHeight;
+	_windowHeight = windowHeight;
+
+	_displayWidth = windowHeight;
+	_displayHeight = windowHeight;
+	return ret;
 }
 
 bool flt::RendererDX11::ForwardRender(float deltaTime)
@@ -1173,7 +1195,8 @@ bool flt::RendererDX11::InitGPUInfo()
 
 bool flt::RendererDX11::OnResize()
 {
-	if (!_immediateContext)
+	/// 이전 버전
+	/*if (!_immediateContext)
 	{
 		return false;
 	}
@@ -1248,6 +1271,146 @@ bool flt::RendererDX11::OnResize()
 	// 테스트를 위한 배경 색상 변경
 	float bgColor[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
 	_immediateContext->ClearRenderTargetView(_renderTargetView.Get(), bgColor);
+
+	//g-buffer또한 다시 만들기
+	D3D11_TEXTURE2D_DESC gBufferTextureDesc{};
+	gBufferTextureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	gBufferTextureDesc.Width = backBufferDesc.Width;
+	gBufferTextureDesc.Height = backBufferDesc.Height;
+	gBufferTextureDesc.MipLevels = 1;
+	gBufferTextureDesc.ArraySize = 1;
+	gBufferTextureDesc.SampleDesc.Count = 1;
+	gBufferTextureDesc.SampleDesc.Quality = 0;
+	gBufferTextureDesc.Usage = D3D11_USAGE_DEFAULT;
+	gBufferTextureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+
+	D3D11_RENDER_TARGET_VIEW_DESC gBufferRenderTargetViewDesc{};
+	gBufferRenderTargetViewDesc.Format = gBufferTextureDesc.Format;
+	gBufferRenderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC gBufferShaderResourceViewDesc{};
+	gBufferShaderResourceViewDesc.Format = gBufferTextureDesc.Format;
+	gBufferShaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	gBufferShaderResourceViewDesc.Texture2D.MipLevels = 1;
+
+	for (int i = 0; i < GBUFFER_COUNT; ++i)
+	{
+		result = _device->CreateTexture2D(&gBufferTextureDesc, nullptr, &_gBuffer[i].texture);
+		if (result != S_OK)
+		{
+			ASSERT(false, "G-Buffer 텍스쳐 생성 실패");
+			return false;
+		}
+
+		result = _device->CreateRenderTargetView(_gBuffer[i].texture.Get(), &gBufferRenderTargetViewDesc, &_gBuffer[i].rtv);
+		if (result != S_OK)
+		{
+			ASSERT(false, "G-Buffer 렌더 타겟 뷰 생성 실패");
+			return false;
+		}
+
+		result = _device->CreateShaderResourceView(_gBuffer[i].texture.Get(), &gBufferShaderResourceViewDesc, &_gBuffer[i].srv);
+		if (result != S_OK)
+		{
+			ASSERT(false, "G-Buffer 쉐이더 리소스 뷰 생성 실패");
+			return false;
+		}
+	}
+
+	return true;*/
+
+	_swapChain = nullptr;
+	_renderTargetView = nullptr;
+	_depthStencilView = nullptr;
+	_depthStencil = nullptr;
+	_backBuffer = nullptr;
+	_immediateContext->ClearState();
+	//_immediateContext->Flush();
+
+	DXGI_SWAP_CHAIN_DESC1 desc = { 0, };
+
+	desc.Width = 0; // CreateSwapChainForHwnd 로 호출 시 0으로 세팅하면 해당 hwnd에서 런타임에 출력창에서 너비를 가져옵니다.
+	desc.Height = 0; // CreateSwapChainForHwnd 로 호출 시 0으로 세팅하면 해당 hwnd에서 런타임에 출력창에서 높이를 가져옵니다.
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.Stereo = FALSE;
+	desc.SampleDesc = { 1, 0 };
+	desc.BufferUsage = DXGI_USAGE_BACK_BUFFER | DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	desc.BufferCount = 2;
+	desc.Scaling = DXGI_SCALING_STRETCH;
+	desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+	desc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+	desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+
+	DXGI_SWAP_CHAIN_FULLSCREEN_DESC fullScreenDesc = { };
+	fullScreenDesc.RefreshRate = { 0, 0 };
+	fullScreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UPPER_FIELD_FIRST;
+	fullScreenDesc.Scaling = DXGI_MODE_SCALING_STRETCHED;
+	fullScreenDesc.Windowed = !_isFullScreen;
+
+	HRESULT result = _dxgiFactory->CreateSwapChainForHwnd(_device.Get(), _hwnd, &desc, &fullScreenDesc, NULL, &_swapChain);
+	if (result != S_OK)
+	{
+		ASSERT(false, "스왑체인 생성 실패");
+		return false;
+	}
+
+	result = _swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)(&_backBuffer));
+
+	if (result != S_OK)
+	{
+		ASSERT(false, "버퍼 가져오기 실패");
+		return false;
+	}
+
+	result = _device->CreateRenderTargetView(_backBuffer.Get(), nullptr, &_renderTargetView);
+
+	if (result != S_OK)
+	{
+		ASSERT(false, "렌더 타겟 뷰 생성 실패");
+		return false;
+	}
+
+	D3D11_TEXTURE2D_DESC backBufferDesc = { 0 };
+	_backBuffer->GetDesc(&backBufferDesc);
+
+	// 뎁스 스텐실 뷰 만들기
+	CD3D11_TEXTURE2D_DESC depthStencilDesc;
+	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthStencilDesc.Width = backBufferDesc.Width;
+	depthStencilDesc.Height = backBufferDesc.Height;
+	depthStencilDesc.ArraySize = 1;
+	depthStencilDesc.MipLevels = 1;
+	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthStencilDesc.SampleDesc.Count = 1;
+	depthStencilDesc.SampleDesc.Quality = 0;
+	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthStencilDesc.CPUAccessFlags = 0;
+	depthStencilDesc.MiscFlags = 0;
+
+	result = _device->CreateTexture2D(&depthStencilDesc, nullptr, &_depthStencil);
+
+	result = _device->CreateDepthStencilView(_depthStencil.Get(), nullptr, &_depthStencilView);
+
+	_immediateContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
+
+	// 뷰포트 생성
+	D3D11_VIEWPORT viewPort[1]{};
+	viewPort[0].TopLeftX = 0.0f;
+	viewPort[0].TopLeftY = 0.0f;
+	viewPort[0].Width = (FLOAT)backBufferDesc.Width;
+	viewPort[0].Height = (FLOAT)backBufferDesc.Height;
+	viewPort[0].MinDepth = 0.0f;
+	viewPort[0].MaxDepth = 1.0f;
+
+	_immediateContext->RSSetViewports(1, viewPort);
+
+	_displayWidth = backBufferDesc.Width;
+	_displayHeight = backBufferDesc.Height;
+
+	// 테스트를 위한 배경 색상 변경
+	float bgColor[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
+	_immediateContext->ClearRenderTargetView(_renderTargetView.Get(), bgColor);
+
 
 	//g-buffer또한 다시 만들기
 	D3D11_TEXTURE2D_DESC gBufferTextureDesc{};

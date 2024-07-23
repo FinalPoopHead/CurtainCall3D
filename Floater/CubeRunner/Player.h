@@ -41,4 +41,5 @@ private:
 	int _padIndex;
 	float _speed;
 	float _fallSpeed;
+	bool _isPlayWalkSound;
 };
