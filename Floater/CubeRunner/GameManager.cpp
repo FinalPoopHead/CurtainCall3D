@@ -912,6 +912,11 @@ void GameManager::SetStage(int stageNum)
 
 		_stageCountText[i]->SetText(std::to_wstring(stageNum));
 
+		if (stageNum == 9)
+		{
+			_stageCountText[i]->SetText(L"F");
+		}
+
 		// _fallCountMax[i] = data.stageWidth - 1; // 아래 함수에서 처리 
 		ResizeFallCountUI(data.stageWidth - 1);
 	}
@@ -1527,6 +1532,8 @@ void GameManager::ResetGame()
 		_playerScore[i] = 0;
 		_currentLevel[i] = 1;
 
+		_playerScoreText[i]->SetText(L"0");
+
 		for (int j = 0; j < _fallCountMax[i]; ++j)
 		{
 			_fallCountRed[i][j]->Disable();
@@ -1618,10 +1625,12 @@ void GameManager::SetBattleMode()
 			_players[i]->SetPositionToRatioPosition(0.5f, 0.75f);
 		}
 
-		_stageCountText[i]->SetText(std::to_wstring(1));
+		_stageCountText[i]->SetText(L"B");
 
 		ResizeFallCountUI(width - 1);
 	}
+
+	FadeIn();
 }
 
 void GameManager::ResizeFallCountUI(int nextCount)
