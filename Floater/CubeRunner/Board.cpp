@@ -10,6 +10,7 @@
 #include "GameManager.h"
 #include "Player.h"
 #include "Camera.h"
+#include "ShakeComponent.h"
 
 constexpr int TILE_COUNT = 512;
 constexpr int CUBE_COUNT = 512;
@@ -677,6 +678,11 @@ void Board::GenerateWave(std::vector<std::vector<int>> waveLayout)
 
 void Board::DropGarbageLine(int lineCount)
 {
+	if (lineCount <= 0)
+	{
+		return;
+	}
+
 	int width = _width;
 	int height = lineCount;
 
@@ -686,7 +692,7 @@ void Board::DropGarbageLine(int lineCount)
 	int dropChance = 75;
 
 	int darkCube = 7;
-	int advantageCube = 23;
+	int advantageCube = 25;
 	int normalCube = 100 - darkCube - advantageCube;
 
 	std::random_device rd;
@@ -1123,6 +1129,7 @@ void Board::OnEndAddRowTile(Tile* tile)
 		Resize(_width, _height + 1);
 		SetDelay(ADDTILE_DELAY);
 		_soundComponent->Play(_soundIndex["TileAdd"]);
+		_gameManager->GetPlayer(_playerIndex)->camera->GetShakeComponent()->Impack();
 	}
 	else if (_nowAddTileCount < 0)
 	{
@@ -1186,6 +1193,8 @@ void Board::OnEndCubeDrop(CubeController* cubeCtr)
 
 		UpdateBoard();
 		_soundComponent->Play(_soundIndex["CubeDrop"]);
+
+		_gameManager->GetPlayer(_playerIndex)->camera->GetShakeComponent()->Impack();
 	}
 }
 
