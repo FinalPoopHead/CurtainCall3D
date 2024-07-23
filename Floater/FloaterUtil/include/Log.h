@@ -19,6 +19,12 @@ namespace flt
 		MAX
 	};
 
+	template<typename T>
+	T& UnMove(T&& t)
+	{
+		return t;
+	}
+
 	//class Logger
 	//{
 	//public:
@@ -42,7 +48,7 @@ namespace flt
 			<< " line : " << location.line()
 			<< " func : " << location.function_name() 
 			<< "\n";
-		std::wcout << std::vformat(fmt, std::make_wformat_args(std::forward<Args>(args)...)) << "\n";
+		std::wcout << std::vformat(fmt, std::make_wformat_args(UnMove(args)...)) << "\n";
 	}
 
 	// Helper class for logging
