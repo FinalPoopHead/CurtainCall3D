@@ -102,7 +102,6 @@ void CubeController::StartFall(bool withDamage /*= true*/)
 
 	_status = eCUBESTATUS::FALLING;
 	_fallSpeed = STARTFALLSPEED;
-	_board->RemoveFromControllerList(this);
 	_isRunning = false;
 
 	if (withDamage)
@@ -112,6 +111,8 @@ void CubeController::StartFall(bool withDamage /*= true*/)
 			_board->AddCubeFallCount();
 		}
 	}
+
+	_board->RemoveFromControllerList(this);
 }
 
 void CubeController::StartRemove(float removeTime)
