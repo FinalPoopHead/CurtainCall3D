@@ -30,7 +30,7 @@ namespace flt
 	//};
 
 	template<typename... Args>
-	void Log(LogLevel msgLevel, std::source_location location, std::wstring_view fmt, Args... args)
+	void Log(LogLevel msgLevel, std::source_location location, std::wstring_view fmt, Args&&... args)
 	{
 		// TODO : 로그를 남길 level이 맞는지 체크
 		// TODO : 로그를 남길 방법에 대한 구현 (콘솔, 파일)
@@ -59,12 +59,12 @@ namespace flt
 	template <typename... Args>
 	Info(std::wstring_view, Args&&...) -> Info<Args...>;
 
-	template<typename... Args>
+	/*template<typename... Args>
 	struct Debug
 	{
 		Debug(std::wstring_view fmt, Args&&... args, std::source_location location = std::source_location::current())
 		{
-			Log(LogLevel::debug, location, fmt, std::forward<Args>(args)...);
+			Log(LogLevel::debug, location, fmt, std::forward<Args&&>(args)...);
 		}
 	};
 
@@ -105,5 +105,5 @@ namespace flt
 	};
 
 	template <typename... Args>
-	Critical(std::wstring_view, Args&&...) -> Critical<Args...>;
+	Critical(std::wstring_view, Args&&...) -> Critical<Args...>;*/
 }

@@ -28,6 +28,12 @@
 
 //void Func(flt::info info);
 
+template<typename T>
+T& unmove(T&& t)
+{
+	return t;
+}
+
 int main(int argc, char* argv[])
 {
 	setlocale(LC_ALL, ".UTF8");
@@ -58,10 +64,18 @@ int main(int argc, char* argv[])
 		//int i = 0;
 	}*/
 
+
+
 	/// 로그 테스트
-	/*{
-		flt::Info(L"Hello {}!", L"World");
-	}*/
+	{
+		std::wstring str = L"Hello {}!";
+		flt::Info(str, L"World");
+
+		flt::Info(L"Debug Test {}, {}, {}", 1, 2.1f, L"finished");
+		auto arr = std::make_wformat_args(unmove(1));
+		auto arr = std::make_wformat_args(unmove(2.1f));
+		auto arr = std::make_wformat_args(unmove(L"finished"));
+	}
 
 	/// 베지어 테스트
 	/*{
