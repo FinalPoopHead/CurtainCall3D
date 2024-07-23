@@ -1768,7 +1768,10 @@ bool GameManager::EnterInput(int index)
 {
 	if (_inputText.size() >= 10)
 	{
-		return false;
+		if (!(index == 31 || index == 32))
+		{
+			return false;
+		}
 	}
 
 	if (0 <= index && index <= 25)

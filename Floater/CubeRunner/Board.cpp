@@ -629,12 +629,19 @@ void Board::GenerateWave(std::vector<std::vector<int>> waveLayout)
 				_advantageCubePool.pop_front();
 				break;
 			case 3:
-				if (_darkCubePool.empty())
+// 				if (_darkCubePool.empty())
+// 				{
+// 					ASSERT(false, "DarkCubePool is Empty");
+// 				}
+// 				cube = _darkCubePool.front();
+// 				_darkCubePool.pop_front();
+				// TODO : 임시로.. 뭔가 기분좋으라고..
+				if (_advantageCubePool.empty())
 				{
-					ASSERT(false, "DarkCubePool is Empty");
+					ASSERT(false, "AdvantageCubePool is Empty");
 				}
-				cube = _darkCubePool.front();
-				_darkCubePool.pop_front();
+				cube = _advantageCubePool.front();
+				_advantageCubePool.pop_front();
 				break;
 			default:
 				ASSERT(false, "Invalid CubeType");
