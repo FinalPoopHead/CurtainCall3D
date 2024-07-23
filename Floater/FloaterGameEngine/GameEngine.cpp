@@ -57,6 +57,8 @@ bool flt::GameEngine::Update()
 	if (_nextScene)
 	{
 		ChangeScene();
+		// 씬을 바꿀 때 걸린시간은 deltaTime에서 제외한다.
+		_timer.Start();
 	}
 	else
 	{
@@ -202,6 +204,10 @@ void flt::GameEngine::ChangeScene()
 	_currentScene->Initialize();
 	_currentScene->StartScene();
 
+	//// 씬 바꾼 이후 첫 프레임은 그냥 0.0초로 돌린다.
+	_currentScene->StartFrame();
+	_currentScene->Update(0.0f);
+	_currentScene->EndFrame();
 	//UpdateImpl(_loadingScene);
 
 	_nextScene = nullptr;
@@ -213,6 +219,7 @@ bool flt::GameEngine::UpdateImpl(Scene* scene)
 
 	_timer.Update();
 	float deltaSecond = (float)_timer.GetDeltaSeconds();
+	std::cout << "dt : " << deltaSecond << "\n";
 	bool isOnWindows = _platform->Update(deltaSecond);
 	_soundEngine->Update();
 
