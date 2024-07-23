@@ -14,15 +14,17 @@ void MainMenuScene::Initialize()
 {
 	MenuItem* title = flt::CreateGameObject<MenuItem>(true);
 	title->SetDefaultSpritePath(L"../Resources/Sprites/GameTitle.png");
-	title->SetOffsetPosition({ 0.5f, 0.3f });
+	title->SetOffsetPosition({ 0.5f, 0.25f });
 	flt::Vector2f titleSize{ 256.0f, 122.8f };
-	titleSize *= 2.5f;
+	//titleSize *= 2.5f;
+	titleSize *= 4.f;
 	title->SetSize(titleSize);
 
 	Menu* menu = flt::CreateGameObject<Menu>(true);
 
 	flt::Vector2f menuItemSize = { 164.0f, 66.4f };
-	menuItemSize *= 2.0f;
+	//menuItemSize *= 2.0f;
+	menuItemSize *= 4.0f;
 	float menuItemOffsetX = 0.85f;
 	float menuItemOffsetY = 0.65f;
 

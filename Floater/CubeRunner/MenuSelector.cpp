@@ -91,34 +91,34 @@ void MenuSelector::Update(float deltaSecond)
 		Select(flt::KeyCode::enter);
 	}
 
-	if (flt::GetKeyDown(flt::KeyCode::lAlt))
-	{
-		if (_mainMenu->IsEnable())
-		{
-			_mainMenu->Disable();
-			_controllerSelectMenu->Enable();
-		}
-		else
-		{
-			_mainMenu->Enable();
-			_controllerSelectMenu->Disable();
-		}
-	}
+	//if (flt::GetKeyDown(flt::KeyCode::lAlt))
+	//{
+	//	if (_mainMenu->IsEnable())
+	//	{
+	//		_mainMenu->Disable();
+	//		_controllerSelectMenu->Enable();
+	//	}
+	//	else
+	//	{
+	//		_mainMenu->Enable();
+	//		_controllerSelectMenu->Disable();
+	//	}
+	//}
 
-	if(flt::GetKeyDown(flt::KeyCode::lCtrl))
-	{
-		flt::GameEngine::Instance()->SetWindowSize(1280, 720, flt::WindowMode::FULLSCREEN);
-	}
+	//if(flt::GetKeyDown(flt::KeyCode::lCtrl))
+	//{
+	//	flt::GameEngine::Instance()->SetWindowSize(1280, 720, flt::WindowMode::FULLSCREEN);
+	//}
 
-	if(flt::GetKeyDown(flt::KeyCode::lShift))
-	{
-		flt::GameEngine::Instance()->SetWindowSize(1280, 720, flt::WindowMode::WINDOWED);
-	}
+	//if(flt::GetKeyDown(flt::KeyCode::lShift))
+	//{
+	//	flt::GameEngine::Instance()->SetWindowSize(1280, 720, flt::WindowMode::WINDOWED);
+	//}
 
-	if (flt::GetKeyDown(flt::KeyCode::capslock))
-	{
-		flt::GameEngine::Instance()->SetWindowSize(0, 0, flt::WindowMode::BORDERLESS);
-	}
+	//if (flt::GetKeyDown(flt::KeyCode::capslock))
+	//{
+	//	flt::GameEngine::Instance()->SetWindowSize(0, 0, flt::WindowMode::BORDERLESS);
+	//}
 
 	flt::GamePadState state;
 	bool isGamePadConnected = flt::GetGamePadState(0, &state);
