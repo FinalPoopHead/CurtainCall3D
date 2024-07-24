@@ -330,19 +330,6 @@ void GameManager::Update(float deltaSecond)
 		comboText->SetOffsetPosition({ originOffset.x, originOffset.y - COMBOTEXTSPEED * deltaSecond });
 	}
 
-	flt::KeyData keyData = flt::GetKeyDown(flt::KeyCode::key0);
-	if (keyData)
-	{
-		_boards[0]->SetIsWinner(true);
-		_boards[1]->SetIsWinner(false);
-
-		for (auto& board : _boards)
-		{
-			board->SetGameOver(true);
-			board->ShowBattleResult();
-		}
-	}
-
 	if (_players.size() == 1)
 	{
 		if (_isGameOver.front())
