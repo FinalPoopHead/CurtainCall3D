@@ -87,6 +87,8 @@ void Player::Update(float deltaSecond)
 			return;
 		}
 
+		_model->PlayAnimation(5, false);
+
 		camera->TraceFalling();
 		_fallSpeed += 9.8f * deltaSecond;
 		if (_fallSpeed >= 60.0f)

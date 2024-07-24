@@ -168,6 +168,7 @@ private:
 	float _gameSpeed;
 	float _battleModeSpeed;
 	int _nowRollingCount;
+	int _currentShakePower;
 	int _nowGeneratingCount;
 	int _nowFallingTileCount;
 	int _damageCount;
