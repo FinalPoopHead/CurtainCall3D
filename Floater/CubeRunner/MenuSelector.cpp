@@ -119,7 +119,7 @@ void MenuSelector::Update(float deltaSecond)
 			for (int i = 0; i < 2; ++i)
 			{
 				flt::GamePadState state;
-				bool isGamePadConnected = flt::GetGamePadState(0, &state);
+				bool isGamePadConnected = flt::GetGamePadState(i, &state);
 				if (isGamePadConnected)
 				{
 					if (state.buttonsDown & flt::GamePadState::ButtonFlag::UP)
