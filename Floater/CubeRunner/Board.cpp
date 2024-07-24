@@ -804,8 +804,6 @@ void Board::AddRow()
 
 		tile->StartAdd(ADDTILE_TIME, { x,0.0f,z });
 	}
-
-	_gameManager->GetPlayer(_playerIndex)->SetPadVibration(false, 1.0f, 1.0f);
 }
 
 void Board::OnEndWave()
@@ -1136,6 +1134,8 @@ void Board::OnEndAddRowTile(Tile* tile)
 		SetDelay(ADDTILE_DELAY);
 		_soundComponent->Play(_soundIndex["TileAdd"]);
 		_gameManager->GetPlayer(_playerIndex)->camera->GetShakeComponent()->Impack();
+		_gameManager->GetPlayer(_playerIndex)->SetPadVibration(false, 1.0f, 0.5f);
+		_gameManager->GetPlayer(_playerIndex)->SetPadVibration(true, 1.0f, 0.5f);
 	}
 	else if (_nowAddTileCount < 0)
 	{
