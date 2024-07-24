@@ -3,6 +3,7 @@
 
 
 flt::IFLTween::IFLTween()
+	: _name()
 {
 }
 
