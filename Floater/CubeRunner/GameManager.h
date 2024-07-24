@@ -76,6 +76,10 @@ public:
 	void OnEndPlayerFall(int index);
 	void OnCheckMinHeight(int index, int height, bool doGenerate);
 	void OnHeightChange(int index, int height);
+	void SetResultText(int playerIndex, int textIndex, std::wstring key, std::wstring value);
+	void SetResultTextColor(int playerIndex, int textIndex, flt::Vector4f color);
+	void StartWinLoseTween(int playerIndex, bool isWin);
+	void StartResultTween(int playerIndex,int textCount);
 
 	void ReturnMissile(SpriteObject* missile);
 
@@ -126,6 +130,10 @@ private:
 	std::vector<TextObject*> _garbageLineText;
 	std::vector<TextObject*> _gameoverTextPanel;
 	std::vector<std::vector<TextObject*>> _gameoverText;
+	std::vector<TextObject*> _winLoseText;
+	std::vector<TextObject*> _resultPanel;
+	std::vector<std::vector<TextObject*>> _resultText;
+	std::vector<std::vector<TextObject*>> _resultValueText;
 	TextObject* _finalScorePanel;
 	TextObject* _finalScoreText;
 	TextObject* _roundText;
