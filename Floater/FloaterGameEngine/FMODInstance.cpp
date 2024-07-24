@@ -21,6 +21,10 @@ void flt::FMODInstance::Initialize(int fmodDriverIndex)
 	result = FMOD::System_Create(&_system);
 	ASSERT(result == FMOD_OK, "");
 
+	// 딜레이를 줄이기 위해 세팅. init하기 전에 세팅을 해줘야 함.
+	result = _system->setDSPBufferSize(512, 2);
+	ASSERT(result == FMOD_OK, "");
+
 	result = _system->init(512, FMOD_INIT_NORMAL, 0);
 	ASSERT(result == FMOD_OK, "");
 
@@ -37,8 +41,7 @@ void flt::FMODInstance::Initialize(int fmodDriverIndex)
 		ASSERT(result == FMOD_OK, "");
 	}
 
-	//result = _system->setDSPBufferSize(512, 2);
-	//ASSERT(result == FMOD_OK, "");
+
 	result = _system->setDriver(fmodDriverIndex);
 	ASSERT(result == FMOD_OK, "");
 }

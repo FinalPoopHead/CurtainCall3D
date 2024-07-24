@@ -1431,6 +1431,10 @@ void GameManager::OnStartPlayerFall(int index)
 		_boards[(index + 1) % 2]->SetIsWinner(true);
 		_boards[index]->SetIsWinner(false);
 	}
+
+	_soundComponent->Stop(0);
+	_soundComponent->Stop(1);
+	_soundComponent->Stop(2);
 }
 
 void GameManager::OnEndPlayerFall(int index)
