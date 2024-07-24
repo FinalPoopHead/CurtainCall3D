@@ -29,6 +29,7 @@ public:
 	void SetAlbedoPath(std::wstring path);
 	void SetPositionToRatioPosition(float ratioX, float ratioY);
 	void SetPadVibration(bool isRightMotor, float motorPower, float duration);
+	void SetGameOver() {_state = ePlayerState::GAMEOVER; }
 
 public:
 	Camera* camera;

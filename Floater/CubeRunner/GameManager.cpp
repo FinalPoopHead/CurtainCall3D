@@ -68,6 +68,10 @@ GameManager::GameManager() :
 	, _garbageLineText()
 	, _gameoverTextPanel()
 	, _gameoverText()
+	, _winLoseText()
+	, _resultPanel()
+	, _resultText()
+	, _resultValueText()
 	, _finalScorePanel()
 	, _finalScoreText()
 	, _roundText()
@@ -324,6 +328,19 @@ void GameManager::Update(float deltaSecond)
 	{
 		auto originOffset = comboText->GetOffsetPosition();
 		comboText->SetOffsetPosition({ originOffset.x, originOffset.y - COMBOTEXTSPEED * deltaSecond });
+	}
+
+	flt::KeyData keyData = flt::GetKeyDown(flt::KeyCode::key0);
+	if (keyData)
+	{
+		_boards[0]->SetIsWinner(true);
+		_boards[1]->SetIsWinner(false);
+
+		for (auto& board : _boards)
+		{
+			board->SetGameOver(true);
+			board->ShowBattleResult();
+		}
 	}
 
 	if (_players.size() == 1)
@@ -706,6 +723,46 @@ void GameManager::CreateUI(int index)
 	text_R->SetTextAlignment(eTextAlignment::CENTER);
 	text_R->tr.SetScale(1.5f, 1.5f, 1.5f);
 	_gameoverText[index].push_back(text_R);
+
+	TextObject* winLoseText = flt::CreateGameObject<TextObject>(false);
+	winLoseText->SetOffsetPosition({ 0.5f,0.2f });
+	winLoseText->SetFont(bigFontPath);
+	winLoseText->SetTextColor(whiteColor);
+	winLoseText->SetText(L"WIN!");
+	winLoseText->SetTextAlignment(eTextAlignment::CENTER);
+	winLoseText->tr.SetScale(2.0f, 2.0f, 2.0f);
+	_winLoseText.push_back(winLoseText);
+
+	TextObject* resultPanel = flt::CreateGameObject<TextObject>(false);
+	resultPanel->SetOffsetPosition({ 0.5f,0.3f });
+	resultPanel->SetFont(bigFontPath);
+	_resultPanel.push_back(resultPanel);
+
+	_resultText.emplace_back();
+	_resultValueText.emplace_back();
+	int resultSize = 5;
+	float resultX = 600.0f;
+	float resultY = 150.0f;
+	for (int i = 0; i < resultSize; ++i)
+	{
+		TextObject* resultText = flt::CreateGameObject<TextObject>(false);
+		resultText->SetParent(resultPanel);
+		resultText->SetPosition({ -resultX, resultY * i });
+		resultText->SetFont(bigFontPath);
+		resultText->SetText(L"NORMAL CUBE");
+		resultText->SetTextColor(whiteColor);
+		resultText->SetTextAlignment(eTextAlignment::LEFT);
+		_resultText[index].push_back(resultText);
+
+		TextObject* resultValue = flt::CreateGameObject<TextObject>(false);
+		resultValue->SetParent(resultPanel);
+		resultValue->SetPosition({ resultX / 2.0f, resultY * i });
+		resultValue->SetFont(bigFontPath);
+		resultValue->SetText(L":  10");
+		resultValue->SetTextColor(whiteColor);
+		resultValue->SetTextAlignment(eTextAlignment::RIGHT);
+		_resultValueText[index].push_back(resultValue);
+	}
 }
 
 void GameManager::SetBoardAndPlayer(int index, Board* board, Player* player)
@@ -806,27 +863,27 @@ void GameManager::OnDestroyCubes(int playerIndex, int count, flt::Vector3f pos /
 
 	switch (count)
 	{
-		case 1:
-		case 2:
-		case 3:
-			break;
-		case 4:
-		case 5:
-			damage = 1;
-			break;
-		case 6:
-		case 7:
-			damage = 2;
-			break;
-		case 8:
-			damage = 3;
-			break;
-		case 9:
-			damage = 4;
-			break;
-		default:
-			damage = 6;
-			break;
+	case 1:
+	case 2:
+	case 3:
+		break;
+	case 4:
+	case 5:
+		damage = 1;
+		break;
+	case 6:
+	case 7:
+		damage = 2;
+		break;
+	case 8:
+		damage = 3;
+		break;
+	case 9:
+		damage = 4;
+		break;
+	default:
+		damage = 6;
+		break;
 	}
 
 	float delay = 0.1f;
@@ -867,35 +924,35 @@ void GameManager::SetStage(int stageNum)
 	std::wstring numStr;
 	switch (stageNum)
 	{
-		case 1:
-			numStr = L"1 S T";
-			break;
-		case 2:
-			numStr = L"2 N D";
-			break;
-		case 3:
-			numStr = L"3 R D";
-			break;
-		case 4:
-			numStr = L"4 T H";
-			break;
-		case 5:
-			numStr = L"5 T H";
-			break;
-		case 6:
-			numStr = L"6 T H";
-			break;
-		case 7:
-			numStr = L"7 T H";
-			break;
-		case 8:
-			numStr = L"8 T H";
-			break;
-		case 9:
-			numStr = L"F I N A L";
-			break;
-		default:
-			break;
+	case 1:
+		numStr = L"1 S T";
+		break;
+	case 2:
+		numStr = L"2 N D";
+		break;
+	case 3:
+		numStr = L"3 R D";
+		break;
+	case 4:
+		numStr = L"4 T H";
+		break;
+	case 5:
+		numStr = L"5 T H";
+		break;
+	case 6:
+		numStr = L"6 T H";
+		break;
+	case 7:
+		numStr = L"7 T H";
+		break;
+	case 8:
+		numStr = L"8 T H";
+		break;
+	case 9:
+		numStr = L"F I N A L";
+		break;
+	default:
+		break;
 	}
 
 	_roundText->SetText(numStr + L"   S T A G E");
@@ -971,35 +1028,35 @@ void GameManager::ProgressStage(int playerIndex)
 		std::wstring numStr;
 		switch (_currentStage[playerIndex])
 		{
-			case 1:
-				numStr = L"1 S T";
-				break;
-			case 2:
-				numStr = L"2 N D";
-				break;
-			case 3:
-				numStr = L"3 R D";
-				break;
-			case 4:
-				numStr = L"4 T H";
-				break;
-			case 5:
-				numStr = L"5 T H";
-				break;
-			case 6:
-				numStr = L"6 T H";
-				break;
-			case 7:
-				numStr = L"7 T H";
-				break;
-			case 8:
-				numStr = L"8 T H";
-				break;
-			case 9:
-				numStr = L"F I N A L";
-				break;
-			default:
-				break;
+		case 1:
+			numStr = L"1 S T";
+			break;
+		case 2:
+			numStr = L"2 N D";
+			break;
+		case 3:
+			numStr = L"3 R D";
+			break;
+		case 4:
+			numStr = L"4 T H";
+			break;
+		case 5:
+			numStr = L"5 T H";
+			break;
+		case 6:
+			numStr = L"6 T H";
+			break;
+		case 7:
+			numStr = L"7 T H";
+			break;
+		case 8:
+			numStr = L"8 T H";
+			break;
+		case 9:
+			numStr = L"F I N A L";
+			break;
+		default:
+			break;
 		}
 
 		_roundText->SetText(numStr + L"   S T A G E");
@@ -1166,11 +1223,94 @@ Player* GameManager::GetPlayer(int index)
 
 void GameManager::OnStartPlayerFall(int index)
 {
-	_stageInfoPanel[index]->Disable();
-	_fallCountPanel[index]->Disable();
-	_garbageLineText[index]->Disable();
+	auto originPosStageInfo = _stageInfoPanel[index]->GetOffsetPosition();
+	auto originPosFallCount = _fallCountPanel[index]->GetOffsetPosition();
+	auto originPosGarbageLine = _garbageLineText[index]->GetOffsetPosition();
 
-	// TODO : index는 패배고 index가 아닌 사람은 승리?
+	auto stageInfoTween = flt::MakeTween(0.0f);
+	stageInfoTween->from(originPosStageInfo.x)
+		.to(-0.3f).during(1.0f).easing(flt::ease::easeInBack)
+		.onStep([this, index, originPosStageInfo](const float& value)
+			{this->_stageInfoPanel[index]->SetOffsetPosition({ value,originPosStageInfo.y }); })
+		.onEnd([this, index, originPosStageInfo]() {
+		_stageInfoPanel[index]->Disable();
+		_stageInfoPanel[index]->SetOffsetPosition(originPosStageInfo);
+			});
+
+	auto fallCountTween = flt::MakeTween(0.0f);
+	fallCountTween->from(originPosFallCount.x)
+		.to(1.3f).during(1.0f).easing(flt::ease::easeInBack)
+		.onStep([this, index, originPosFallCount](const float& value)
+			{this->_fallCountPanel[index]->SetOffsetPosition({ value,originPosFallCount.y }); })
+		.onEnd([this, index, originPosFallCount]() {
+		_fallCountPanel[index]->Disable();
+		_fallCountPanel[index]->SetOffsetPosition(originPosFallCount);
+			});
+
+	auto garbageLineTween = flt::MakeTween(0.0f);
+	garbageLineTween->from(originPosGarbageLine.x)
+		.to(1.3f).during(1.0f).easing(flt::ease::easeInBack)
+		.onStep([this, index, originPosGarbageLine](const float& value)
+			{this->_garbageLineText[index]->SetOffsetPosition({ value,originPosGarbageLine.y }); })
+		.onEnd([this, index, originPosGarbageLine]() {
+		_garbageLineText[index]->Disable();
+		_garbageLineText[index]->SetOffsetPosition(originPosGarbageLine);
+			});
+
+	flt::StartTween(stageInfoTween);
+	flt::StartTween(fallCountTween);
+	flt::StartTween(garbageLineTween);
+
+	if (_players.size() == 2)
+	{
+		int opIndex = (index + 1) % 2;
+
+		auto originPosStageInfo = _stageInfoPanel[opIndex]->GetOffsetPosition();
+		auto originPosFallCount = _fallCountPanel[opIndex]->GetOffsetPosition();
+		auto originPosGarbageLine = _garbageLineText[opIndex]->GetOffsetPosition();
+
+		auto stageInfoTween = flt::MakeTween(0.0f);
+		stageInfoTween->from(originPosStageInfo.x)
+			.to(-0.3f).during(1.0f).easing(flt::ease::easeInBack)
+			.onStep([this, opIndex, originPosStageInfo](const float& value)
+				{this->_stageInfoPanel[opIndex]->SetOffsetPosition({ value,originPosStageInfo.y }); })
+			.onEnd([this, opIndex, originPosStageInfo]() {
+			_stageInfoPanel[opIndex]->Disable();
+			_stageInfoPanel[opIndex]->SetOffsetPosition(originPosStageInfo);
+				});
+
+		auto fallCountTween = flt::MakeTween(0.0f);
+		fallCountTween->from(originPosFallCount.x)
+			.to(1.3f).during(1.0f).easing(flt::ease::easeInBack)
+			.onStep([this, opIndex, originPosFallCount](const float& value)
+				{this->_fallCountPanel[opIndex]->SetOffsetPosition({ value,originPosFallCount.y }); })
+			.onEnd([this, opIndex, originPosFallCount]() {
+			_fallCountPanel[opIndex]->Disable();
+			_fallCountPanel[opIndex]->SetOffsetPosition(originPosFallCount);
+				});
+
+		auto garbageLineTween = flt::MakeTween(0.0f);
+		garbageLineTween->from(originPosGarbageLine.x)
+			.to(1.3f).during(1.0f).easing(flt::ease::easeInBack)
+			.onStep([this, opIndex, originPosGarbageLine](const float& value)
+				{this->_garbageLineText[opIndex]->SetOffsetPosition({ value,originPosGarbageLine.y }); })
+			.onEnd([this, opIndex, originPosGarbageLine]() {
+			_garbageLineText[opIndex]->Disable();
+			_garbageLineText[opIndex]->SetOffsetPosition(originPosGarbageLine);
+				});
+
+		flt::StartTween(stageInfoTween);
+		flt::StartTween(fallCountTween);
+		flt::StartTween(garbageLineTween);
+
+		for (auto& board : _boards)
+		{
+			board->SetGameOver(true);
+		}
+
+		_boards[(index + 1) % 2]->SetIsWinner(true);
+		_boards[index]->SetIsWinner(false);
+	}
 }
 
 void GameManager::OnEndPlayerFall(int index)
@@ -1212,7 +1352,18 @@ void GameManager::OnEndPlayerFall(int index)
 	}
 	else if (_players.size() == 2)
 	{
-		// TODO : 승리 패배 연출 만들어야함
+		for (auto& player : _players)
+		{
+			player->SetGameOver();
+		}
+
+		int index = 0;
+		for (auto& board : _boards)
+		{
+			board->ShowBattleResult();
+
+			++index;
+		}
 	}
 }
 
@@ -1306,6 +1457,94 @@ void GameManager::OnHeightChange(int index, int height)
 	ChangeHeightCountText(index, height);
 }
 
+void GameManager::SetResultText(int playerIndex, int textIndex, std::wstring key, std::wstring value)
+{
+	_resultText[playerIndex][textIndex]->SetText(key);
+	_resultValueText[playerIndex][textIndex]->SetText(value);
+}
+
+void GameManager::SetResultTextColor(int playerIndex, int textIndex, flt::Vector4f color)
+{
+	_resultText[playerIndex][textIndex]->SetTextColor(color);
+	_resultValueText[playerIndex][textIndex]->SetTextColor(color);
+}
+
+void GameManager::StartWinLoseTween(int playerIndex, bool isWin)
+{
+	for (auto& winlose : _winLoseText)
+	{
+		winlose->Enable();
+	}
+
+	if (isWin)
+	{
+		_winLoseText[playerIndex]->SetText(L"WIN!");
+		_winLoseText[playerIndex]->SetTextColor({ 1.0f,0.83f,0.0f,1.0f });
+
+		auto scaleTween = flt::MakeScaleTween(&_winLoseText[playerIndex]->tr);
+		scaleTween->from({ 0.0f,0.0f,0.0f,1.0f })
+			.to({ 2.0f,2.0f,2.0f,1.0f }).preDelay(0.5f).during(1.5f).easing(flt::ease::easeOutElastic);
+
+		flt::Quaternion startRot;
+		flt::Quaternion firstRot;
+		firstRot.SetEuler(0.0f, 0.0f, -30.0f);
+		flt::Quaternion secondRot;
+		secondRot.SetEuler(0.0f, 0.0f, 30.0f);
+
+		auto rotTween = flt::MakeRotTween(&_winLoseText[playerIndex]->tr);
+		rotTween->from(startRot)
+			.to(firstRot).preDelay(0.5f).during(0.25f)
+			.to(secondRot).during(0.5f)
+			.to(startRot).during(0.25f);
+
+		flt::StartTween(scaleTween);
+		flt::StartTween(rotTween);
+	}
+	else
+	{
+		// 0.5f, 0.2f
+		_winLoseText[playerIndex]->SetText(L"LOSE..");
+		_winLoseText[playerIndex]->SetTextColor({ 0.1f,0.1f,0.6f,1.0f });
+		float xPos = _winLoseText[playerIndex]->GetOffsetPosition().x;
+		_winLoseText[playerIndex]->SetOffsetPosition({ xPos, -0.1f });
+
+		auto posYTween = flt::MakeTween(0.0f);
+		posYTween->from(-0.1f)
+			.to(0.2f).preDelay(0.5f).during(1.5f).easing(flt::ease::easeOutBounce)
+			.onStep([this, playerIndex, xPos](const float& value) {this->_winLoseText[playerIndex]->SetOffsetPosition({ xPos,value }); });
+
+		flt::StartTween(posYTween);
+	}
+}
+
+void GameManager::StartResultTween(int playerIndex, int textCount)
+{
+	if (textCount > _resultText[playerIndex].size())
+	{
+		ASSERT(false, "GameManager StartResultTween INDEX OVER");
+	}
+
+	_resultPanel[playerIndex]->Enable();
+
+	float delay = 0.2f;
+
+	for (int i = 0; i < textCount; ++i)
+	{
+		auto text = _resultText[playerIndex][i];
+		auto value = _resultValueText[playerIndex][i];
+
+		text->Disable();
+		value->Disable();
+
+		auto revealTween = flt::MakeTween(0);
+		revealTween->from(0)
+			.to(0).during(delay * i)
+			.onEnd([this, text, value]() {text->Enable(); value->Enable(); });
+
+		flt::StartTween(revealTween);
+	}
+}
+
 void GameManager::ReturnMissile(SpriteObject* missile)
 {
 	_missilePool.push_back(missile);
@@ -1364,6 +1603,18 @@ void GameManager::IncreasePlayerCount()
 			{
 				auto originOffset = _gameoverTextPanel[i]->GetOffsetPosition();
 				_gameoverTextPanel[i]->SetOffsetPosition({ offSetBase + originOffset.x / MAXPLAYERCOUNT, originOffset.y });
+			}
+
+			if (_winLoseText[i] != nullptr)
+			{
+				auto originOffset = _winLoseText[i]->GetOffsetPosition();
+				_winLoseText[i]->SetOffsetPosition({ offSetBase + originOffset.x / MAXPLAYERCOUNT, originOffset.y });
+			}
+
+			if (_resultPanel[i] != nullptr)
+			{
+				auto originOffset = _resultPanel[i]->GetOffsetPosition();
+				_resultPanel[i]->SetOffsetPosition({ offSetBase + originOffset.x / MAXPLAYERCOUNT, originOffset.y });
 			}
 
 			_comboTextPos[i] = { offSetBase + COMBOTEXTPOSITION.x / MAXPLAYERCOUNT, COMBOTEXTPOSITION.y };
@@ -1863,47 +2114,47 @@ bool GameManager::EnterInput(int index)
 	{
 		switch (index)
 		{
-			case 26:
-				// !
-				_inputText.append("!");
-				break;
-			case 27:
-				// ?
-				_inputText.append("?");
-				break;
-			case 28:
-				// /
-				_inputText.append("/");
-				break;
-			case 29:
-				// .
-				_inputText.append(".");
-				break;
-			case 30:
-				// " "
-				_inputText.append(" ");
-				break;
-			case 31:
-				// DEL
-				if (_inputText.size() > 0)
-				{
-					_inputText.pop_back();
-				}
-				break;
-			case 32:
-				// END
-				if (_inputText.size() > 0)
-				{
-					_rankData.push_back({ 0, _inputText, _playerScore.front() });
-					SortRanking();
-					WriteRankingFile();
-					_inputField->SetText(L"");
-					_inputText.clear();
-					return true;
-				}
-				break;
-			default:
-				break;
+		case 26:
+			// !
+			_inputText.append("!");
+			break;
+		case 27:
+			// ?
+			_inputText.append("?");
+			break;
+		case 28:
+			// /
+			_inputText.append("/");
+			break;
+		case 29:
+			// .
+			_inputText.append(".");
+			break;
+		case 30:
+			// " "
+			_inputText.append(" ");
+			break;
+		case 31:
+			// DEL
+			if (_inputText.size() > 0)
+			{
+				_inputText.pop_back();
+			}
+			break;
+		case 32:
+			// END
+			if (_inputText.size() > 0)
+			{
+				_rankData.push_back({ 0, _inputText, _playerScore.front() });
+				SortRanking();
+				WriteRankingFile();
+				_inputField->SetText(L"");
+				_inputText.clear();
+				return true;
+			}
+			break;
+		default:
+			break;
 		}
 	}
 

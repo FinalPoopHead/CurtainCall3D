@@ -14,6 +14,7 @@ enum class eCameraState
 class Player;
 class Board;
 class ShakeComponent;
+class PlayerModel;
 
 class Camera : public flt::GameObject
 {
