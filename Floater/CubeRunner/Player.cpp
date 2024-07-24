@@ -291,33 +291,16 @@ void Player::Update(float deltaSecond)
 	nextPos = nextPosOffset + pos;
 	tr.SetWorldPosition(nextPos);
 
-	// 디버그용 코드
-	keyData = flt::GetKey(flt::KeyCode::mouseLButton);
-	if (keyData)
-	{
-		flt::Vector4f pos = tr.GetWorldPosition();
-		int tileX = 0;
-		int tileZ = 0;
-		_board->ConvertToTileIndex(pos.x, pos.z, tileX, tileZ);
-
-		float x = 0.0f;
-		float z = 0.0f;
-
-		_board->ConvertToTilePosition(tileX, tileZ, x, z);
-
-		printf("%.3f, %.3f | %d, %d | %.3f, %.3f\n", pos.x, pos.z, tileX, tileZ, x, z);
-	}
-
 	if (isGamePadConnected)
 	{
 		if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
 		{
-			flt::SetGamePadVibration(_padIndex, true, 1.0f, 1.0f);
+
 			printf("A\n");
 		}
 		if (state.buttonsDown & flt::GamePadState::ButtonFlag::B)
 		{
-			flt::SetGamePadVibration(_padIndex, false, 1.0f, 1.0f);
+
 			printf("B\n");
 		}
 		if (state.buttonsDown & flt::GamePadState::ButtonFlag::X)
@@ -360,5 +343,11 @@ void Player::SetPositionToRatioPosition(float ratioX, float ratioY)
 
 	_board->GetRatioPosition(ratioX, ratioY, x, z);
 	tr.SetPosition(x, 2.0f, z);
+}
+
+void Player::SetPadVibration(bool isRightMotor, float motorPower, float duration)
+{
+
+	flt::SetGamePadVibration(_padIndex, isRightMotor, motorPower, duration);
 }
 

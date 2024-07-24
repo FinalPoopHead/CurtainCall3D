@@ -28,6 +28,7 @@ public:
 	void SetPadIndex(int padIndex) { _padIndex = padIndex; }
 	void SetAlbedoPath(std::wstring path);
 	void SetPositionToRatioPosition(float ratioX, float ratioY);
+	void SetPadVibration(bool isRightMotor, float motorPower, float duration);
 
 public:
 	Camera* camera;
