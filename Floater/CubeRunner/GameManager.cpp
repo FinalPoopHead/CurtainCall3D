@@ -68,6 +68,7 @@ GameManager::GameManager() :
 	, _garbageLineText()
 	, _gameoverTextPanel()
 	, _gameoverText()
+	, _finalScorePanel()
 	, _finalScoreText()
 	, _roundText()
 	, _liveComboTexts()
@@ -156,7 +157,8 @@ GameManager::GameManager() :
 
 	_roundTextTween = flt::MakeScaleTween(&_roundText->tr);
 	_roundTextTween->from(RoundTextScale)
-		.to({ 0.0f,0.0f,0.0f,1.0f }).preDelay(3.5f).during(0.5f).easing(flt::ease::easeInExpo).onEnd([this]() {this->_roundText->Disable(); });
+		.to({ 0.0f,0.0f,0.0f,1.0f }).preDelay(3.5f).during(0.5f).easing(flt::ease::easeInExpo)
+		.onEnd([this]() {this->_roundText->Disable(); this->_roundText->tr.SetScale(RoundTextScale); });
 
 	_fade = flt::CreateGameObject<SpriteObject>(false);
 	_fade->SetSprite(L"../Resources/Sprites/Fade.png");
@@ -291,12 +293,20 @@ GameManager::GameManager() :
 		_rankScoreText.push_back(rankScoreText);
 	}
 
-	_finalScoreText = flt::CreateGameObject<TextObject>(false);
-	_finalScoreText->SetOffsetPosition({ 0.5f,0.5f });
+	_finalScorePanel = flt::CreateGameObject<TextObject>(false);
+	_finalScorePanel->SetOffsetPosition({ 0.5f,0.5f });
+	_finalScorePanel->SetText(L"F I N A L   S C O R E");
+	_finalScorePanel->SetFont(bigFontPath);
+	_finalScorePanel->SetTextColor(whiteColor);
+	_finalScorePanel->SetTextAlignment(eTextAlignment::CENTER);
+	_finalScorePanel->tr.SetScale(1.5f, 1.5f, 1.5f);
+
+	_finalScoreText = flt::CreateGameObject<TextObject>(true);
+	_finalScoreText->SetParent(_finalScorePanel);
+	_finalScoreText->SetPosition({ 0.0f, 120.0f });
 	_finalScoreText->SetFont(bigFontPath);
 	_finalScoreText->SetTextColor(whiteColor);
 	_finalScoreText->SetTextAlignment(eTextAlignment::CENTER);
-	_finalScoreText->tr.SetScale(1.5f, 1.5f, 1.5f);
 
 	ReadStageFile();
 	ReadRankingFile();
@@ -1110,18 +1120,18 @@ void GameManager::OnEndPlayerFall(int index)
 	{
 		_gameoverTextPanel[index]->Enable();
 
-		auto scoreTween = flt::MakeScaleTween(&_finalScoreText->tr);
-		auto scale = _finalScoreText->tr.GetLocalScale();
+		auto scoreTween = flt::MakeScaleTween(&_finalScorePanel->tr);
+		auto scale = _finalScorePanel->tr.GetLocalScale();
 		flt::Vector4f startScale = { 0.0f, scale.y,scale.z,1.0f };
 
 		scoreTween->from(startScale)
 			.to(scale).preDelay(6.5f).during(1.0f).postDelay(3.0f)
 			.onStart([this]() {
-			this->_finalScoreText->Enable();
-			this->_finalScoreText->SetText(L"F I N A L   S C O R E\n" + std::to_wstring(this->_playerScore.front())); })
+			this->_finalScorePanel->Enable();
+			this->_finalScoreText->SetText(std::to_wstring(this->_playerScore.front())); })
 			.to(startScale).during(1.0f).postDelay(2.0f)
 			.onEnd([this]() {this->EnableScoreInput();
-		this->_finalScoreText->Disable(); });
+		this->_finalScorePanel->Disable(); });
 
 		flt::StartTween(scoreTween);
 
