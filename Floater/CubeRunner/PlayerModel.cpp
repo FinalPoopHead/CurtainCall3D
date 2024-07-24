@@ -13,6 +13,11 @@ PlayerModel::PlayerModel()
 	_renderer->SetMaterial(0, L"..\\Resources\\Textures\\Rob02White_Roughness.png", flt::RawMaterial::TextureType::ROUGHNESS);
 }
 
+void PlayerModel::PlayAnimation(int index, bool isLoop)
+{
+	_renderer->PlayAnimation(index, isLoop);
+}
+
 void PlayerModel::PlayWalk()
 {
 	_renderer->PlayAnimation(21, true);

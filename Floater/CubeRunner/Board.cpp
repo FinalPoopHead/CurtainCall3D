@@ -59,6 +59,7 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _gameSpeed(GAMESPEED_DEFAULT)
 	, _battleModeSpeed(GAMESPEED_DEFAULT)
 	, _nowRollingCount(0)
+	, _currentShakePower()
 	, _nowGeneratingCount(0)
 	, _nowFallingTileCount()
 	, _damageCount()
@@ -175,31 +176,35 @@ void Board::PreUpdate(float deltaSecond)
 	}
 
 	// 치트키. 블랙큐브 빼고 전부 제거
-	keyData = flt::GetKeyDown(flt::KeyCode::p);
+	keyData = flt::GetKey(flt::KeyCode::lCtrl);
 	if (keyData)
 	{
-		std::list<CubeController*> removeList;
-		for (auto& cubeCtr : _runningCubeControllers)
+		keyData = flt::GetKeyDown(flt::KeyCode::p);
+		if (keyData)
 		{
-			if (cubeCtr->GetCubeType() == eCUBETYPE::DARK)
+			std::list<CubeController*> removeList;
+			for (auto& cubeCtr : _runningCubeControllers)
 			{
-				continue;
+				if (cubeCtr->GetCubeType() == eCUBETYPE::DARK)
+				{
+					continue;
+				}
+
+				auto pos = cubeCtr->GetPosition();
+				int x = 0;
+				int z = 0;
+
+				ConvertToTileIndex(pos.x, pos.z, x, z);
+
+				_tiles[x][z]->_cube = nullptr;
+				_tileStates[x][z] = (int)_tileStates[x][z] & ~CUBE;
+				removeList.push_back(cubeCtr);
 			}
 
-			auto pos = cubeCtr->GetPosition();
-			int x = 0;
-			int z = 0;
-
-			ConvertToTileIndex(pos.x, pos.z, x, z);
-
-			_tiles[x][z]->_cube = nullptr;
-			_tileStates[x][z] = (int)_tileStates[x][z] & ~CUBE;
-			removeList.push_back(cubeCtr);
-		}
-
-		for (auto& cubeCtr : removeList)
-		{
-			cubeCtr->StartRemove(REMOVE_TIME);
+			for (auto& cubeCtr : removeList)
+			{
+				cubeCtr->StartRemove(REMOVE_TIME);
+			}
 		}
 	}
 
@@ -775,6 +780,8 @@ void Board::TickCubesRolling(float rollingTime)
 		}
 	}
 
+	_currentShakePower = _nowRollingCount;
+
 	if (_nowRollingCount > 0)
 	{
 		_boardState = eBoardState::CUBEROLLING;
@@ -1098,6 +1105,12 @@ void Board::OnEndCubeRoll()
 
 		SetDelay(delay);
 		_soundComponent->Play(_soundIndex["CubeRoll"]);
+		
+		float power = _currentShakePower / 100.0f;
+
+		_gameManager->GetPlayer(_playerIndex)->camera->GetShakeComponent()->Impack(power/2.0f);
+		//_gameManager->GetPlayer(_playerIndex)->SetPadVibration(false, power, 0.5f);
+		_gameManager->GetPlayer(_playerIndex)->SetPadVibration(true, power, 0.5f);
 	}
 }
 

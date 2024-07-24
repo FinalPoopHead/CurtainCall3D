@@ -330,19 +330,6 @@ void GameManager::Update(float deltaSecond)
 		comboText->SetOffsetPosition({ originOffset.x, originOffset.y - COMBOTEXTSPEED * deltaSecond });
 	}
 
-	flt::KeyData keyData = flt::GetKeyDown(flt::KeyCode::key0);
-	if (keyData)
-	{
-		_boards[0]->SetIsWinner(true);
-		_boards[1]->SetIsWinner(false);
-
-		for (auto& board : _boards)
-		{
-			board->SetGameOver(true);
-			board->ShowBattleResult();
-		}
-	}
-
 	// 플레이어 1인일 경우에만 작동
 	// 게임오버시에 랭킹 관련 작업
 	// 스테이지 빠르게 넘어가는 핫키
@@ -430,67 +417,72 @@ void GameManager::Update(float deltaSecond)
 			return;
 		}
 
-		flt::KeyData keyData = flt::GetKeyDown(flt::KeyCode::key1);
-		if (keyData)
-		{
-			ResetGame();
-			SetStage(1);
-		}
 
-		keyData = flt::GetKeyDown(flt::KeyCode::key2);
+		flt::KeyData keyData = flt::GetKey(flt::KeyCode::lCtrl);
 		if (keyData)
 		{
-			ResetGame();
-			SetStage(2);
-		}
+			keyData = flt::GetKeyDown(flt::KeyCode::key1);
+			if (keyData)
+			{
+				ResetGame();
+				SetStage(1);
+			}
 
-		keyData = flt::GetKeyDown(flt::KeyCode::key3);
-		if (keyData)
-		{
-			ResetGame();
-			SetStage(3);
-		}
+			keyData = flt::GetKeyDown(flt::KeyCode::key2);
+			if (keyData)
+			{
+				ResetGame();
+				SetStage(2);
+			}
 
-		keyData = flt::GetKeyDown(flt::KeyCode::key4);
-		if (keyData)
-		{
-			ResetGame();
-			SetStage(4);
-		}
+			keyData = flt::GetKeyDown(flt::KeyCode::key3);
+			if (keyData)
+			{
+				ResetGame();
+				SetStage(3);
+			}
 
-		keyData = flt::GetKeyDown(flt::KeyCode::key5);
-		if (keyData)
-		{
-			ResetGame();
-			SetStage(5);
-		}
+			keyData = flt::GetKeyDown(flt::KeyCode::key4);
+			if (keyData)
+			{
+				ResetGame();
+				SetStage(4);
+			}
 
-		keyData = flt::GetKeyDown(flt::KeyCode::key6);
-		if (keyData)
-		{
-			ResetGame();
-			SetStage(6);
-		}
+			keyData = flt::GetKeyDown(flt::KeyCode::key5);
+			if (keyData)
+			{
+				ResetGame();
+				SetStage(5);
+			}
 
-		keyData = flt::GetKeyDown(flt::KeyCode::key7);
-		if (keyData)
-		{
-			ResetGame();
-			SetStage(7);
-		}
+			keyData = flt::GetKeyDown(flt::KeyCode::key6);
+			if (keyData)
+			{
+				ResetGame();
+				SetStage(6);
+			}
 
-		keyData = flt::GetKeyDown(flt::KeyCode::key8);
-		if (keyData)
-		{
-			ResetGame();
-			SetStage(8);
-		}
+			keyData = flt::GetKeyDown(flt::KeyCode::key7);
+			if (keyData)
+			{
+				ResetGame();
+				SetStage(7);
+			}
 
-		keyData = flt::GetKeyDown(flt::KeyCode::key9);
-		if (keyData)
-		{
-			ResetGame();
-			SetStage(9);
+			keyData = flt::GetKeyDown(flt::KeyCode::key8);
+			if (keyData)
+			{
+				ResetGame();
+				SetStage(8);
+			}
+
+			keyData = flt::GetKeyDown(flt::KeyCode::key9);
+			if (keyData)
+			{
+				ResetGame();
+				SetStage(9);
+			}
 		}
 	}
 }
