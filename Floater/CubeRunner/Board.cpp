@@ -176,31 +176,35 @@ void Board::PreUpdate(float deltaSecond)
 	}
 
 	// 치트키. 블랙큐브 빼고 전부 제거
-	keyData = flt::GetKeyDown(flt::KeyCode::p);
+	keyData = flt::GetKey(flt::KeyCode::lCtrl);
 	if (keyData)
 	{
-		std::list<CubeController*> removeList;
-		for (auto& cubeCtr : _runningCubeControllers)
+		keyData = flt::GetKeyDown(flt::KeyCode::p);
+		if (keyData)
 		{
-			if (cubeCtr->GetCubeType() == eCUBETYPE::DARK)
+			std::list<CubeController*> removeList;
+			for (auto& cubeCtr : _runningCubeControllers)
 			{
-				continue;
+				if (cubeCtr->GetCubeType() == eCUBETYPE::DARK)
+				{
+					continue;
+				}
+
+				auto pos = cubeCtr->GetPosition();
+				int x = 0;
+				int z = 0;
+
+				ConvertToTileIndex(pos.x, pos.z, x, z);
+
+				_tiles[x][z]->_cube = nullptr;
+				_tileStates[x][z] = (int)_tileStates[x][z] & ~CUBE;
+				removeList.push_back(cubeCtr);
 			}
 
-			auto pos = cubeCtr->GetPosition();
-			int x = 0;
-			int z = 0;
-
-			ConvertToTileIndex(pos.x, pos.z, x, z);
-
-			_tiles[x][z]->_cube = nullptr;
-			_tileStates[x][z] = (int)_tileStates[x][z] & ~CUBE;
-			removeList.push_back(cubeCtr);
-		}
-
-		for (auto& cubeCtr : removeList)
-		{
-			cubeCtr->StartRemove(REMOVE_TIME);
+			for (auto& cubeCtr : removeList)
+			{
+				cubeCtr->StartRemove(REMOVE_TIME);
+			}
 		}
 	}
 
