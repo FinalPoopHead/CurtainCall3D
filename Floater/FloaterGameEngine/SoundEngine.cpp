@@ -1,6 +1,5 @@
 ﻿#include "SoundEngine.h"
 #include "../FloaterUtil/include/FloaterMacro.h"
-
 #include "../FloaterUtil/include/ConvString.h"
 #include "FMODInstance.h"
 #include "../External/include/fmod/fmod.hpp"
@@ -26,11 +25,11 @@ void flt::SoundEngine::Initialize()
 	ASSERT(result == FMOD_OK, "");
 	
 	///기본적으로 디폴트 장치를 0번에 세팅해주는 코드.
-	//int defaultDriverIndex = -1;
-	//system->getDriver(&defaultDriverIndex);
-	//ASSERT(defaultDriverIndex != -1, "Failed to get default driver index");
-	//_instances.emplace_back();
-	//_instances.back().Initialize(defaultDriverIndex);
+	int defaultDriverIndex = -1;
+	system->getDriver(&defaultDriverIndex);
+	ASSERT(defaultDriverIndex != -1, "Failed to get default driver index");
+	_instances.emplace_back();
+	_instances.back().Initialize(defaultDriverIndex);
 
 	//여러 장치 사용하는 테스트.
 	int numDrivers = 0;
@@ -38,10 +37,10 @@ void flt::SoundEngine::Initialize()
 
 	for (int i = 0; i < numDrivers; ++i)
 	{
-		//if (i == defaultDriverIndex)
-		//{
-		//	continue;
-		//}
+		if (i == defaultDriverIndex)
+		{
+			continue;
+		}
 
 		FMOD_GUID guid{};
 		constexpr uint32 nameLen = 256;
@@ -52,6 +51,7 @@ void flt::SoundEngine::Initialize()
 
 		system->getDriverInfo(i, name, nameLen, &guid, &systemRate, &speakerMode, &speakerModeChannels);
 
+		// 어떤것을 추가해야할지 몰라서 현재 적당해보이는걸로 추가
 		constexpr std::string_view highDefinition = "High Definition Audio Device";
 		constexpr std::string_view usbAudio = "USB Audio Device";
 		std::string_view driverName = name;
