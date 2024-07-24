@@ -13,7 +13,8 @@ class UIStateContext
 	{
 		friend UIStateContext;
 	public:
-		UIElement(const std::string& name, MenuItem* item) : _name(name), _item(item) {}
+		UIElement() : UIElement("NULL Element", nullptr, nullptr) {}
+		UIElement(const std::string& name, MenuItem* item, UIStateContext* owner) : _name(name), _item(item), _owner(owner) {}
 		virtual ~UIElement() {}
 
 		UIElement& onEnable(std::function<void()> func) { _onEnables.emplace_back(func); return *this; }
@@ -22,6 +23,7 @@ class UIStateContext
 		UIElement& onActive(std::function<void()> func) { _onActives.emplace_back(func); return *this; }
 		UIElement& onSelect(std::function<void(flt::KeyCode)> func) { _onSelects.emplace_back(func); return *this; }
 
+	private:
 		void Enable() { for (auto& onEnableFunc : _onEnables) { onEnableFunc(); } }
 		void Disable() { for (auto& onDisableFunc : _onDisables) { onDisableFunc(); } }
 		void Update(float deltaSecond) { for (auto& onUpdateFunc : _onUpdates) { onUpdateFunc(deltaSecond); } }
@@ -33,6 +35,7 @@ class UIStateContext
 	private:
 		std::string _name;
 		MenuItem* _item;
+		UIStateContext* _owner;
 		std::vector<std::function<void()>> _onEnables;
 		std::vector<std::function<void()>> _onDisables;
 		std::vector<std::function<void(float)>> _onUpdates;
@@ -40,10 +43,9 @@ class UIStateContext
 		std::vector<std::function<void(flt::KeyCode)>> _onSelects;
 	};
 
-
 public:
 	UIStateContext();
-	virtual ~UIStateContext();
+	virtual ~UIStateContext() {}
 
 protected:
 	virtual void Update(float deltaSecond);
@@ -56,7 +58,10 @@ public:
 	UIElement& AddElement(const std::string& name, MenuItem* item);
 	UIElement& GetElement(const std::string& name);
 
+	UIStateContext& AddKey(flt::KeyCode keyCode);
+
 private:
 	std::unordered_map<std::string, UIElement> _elements;
 	std::unordered_set<flt::KeyCode> _downKeyCodes;
+	bool _isControllable;
 };

@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="FSM.h" />
     <ClInclude Include="include\Expected.h" />
     <ClInclude Include="include\FLTween.h" />
     <ClInclude Include="include\Hash.h" />

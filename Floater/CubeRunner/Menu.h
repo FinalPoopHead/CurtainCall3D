@@ -13,6 +13,8 @@ public:
 	MenuItem* PrevItem(MenuItem* selectedItem);
 	MenuItem* FirstItem();
 
+
+protected:
 	virtual void OnEnable() override;
 	virtual void OnDisable() override;
 

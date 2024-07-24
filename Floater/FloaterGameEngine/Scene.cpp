@@ -646,7 +646,8 @@ void flt::Scene::StartTween(IFLTween* tween)
 
 	if (iter->second.sparseIndex != UINT_MAX)
 	{
-		ASSERT(false, "Already Activated");
+		//ASSERT(false, "Already Activated");
+		iter->first->ResetProgress();
 		return;
 	}
 

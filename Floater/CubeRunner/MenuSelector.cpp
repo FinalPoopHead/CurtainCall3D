@@ -1,17 +1,21 @@
 ﻿#include "MenuSelector.h"
 #include "Menu.h"
 #include "MenuItem.h"
+#include "RankViewer.h"
 #include "../FloaterGameEngine/include/Input.h"
 #include <iostream>
 
 #include "../FloaterGameEngine/include/internal/GameEngine.h"
 
 MenuSelector::MenuSelector(Menu* mainMenu, Menu* controllerMenu)
-	: _mainMenu(mainMenu)
+	: _title(nullptr)
+	, _mainMenu(mainMenu)
 	, _controllerSelectMenu(controllerMenu)
+	, _rankViewer(nullptr)
 	, _selectedItem(nullptr)
 	, _ui(nullptr)
 	, _lastLStickY(0.0f)
+	, _mode(Mode::MainMenu)
 {
 	//_ui = AddComponent<flt::UIComponent>(true);
 	//_ui->SetImage(L"../Resources/Sprites/abcd.jpg");
@@ -33,6 +37,11 @@ void MenuSelector::SetMenu(Menu* menu)
 
 void MenuSelector::next()
 {
+	if (!_selectedItem->IsEnable())
+	{
+		return;
+	}
+
 	if (_selectedItem)
 	{
 		_selectedItem->OnUnpointed();
@@ -45,6 +54,11 @@ void MenuSelector::next()
 
 void MenuSelector::prev()
 {
+	if (!_selectedItem->IsEnable())
+	{
+		return;
+	}
+
 	if (_selectedItem)
 	{
 		_selectedItem->OnUnpointed();
@@ -57,11 +71,18 @@ void MenuSelector::prev()
 
 void MenuSelector::Select(flt::KeyCode keyCode)
 {
+	if (!_selectedItem->IsEnable())
+	{
+		return;
+	}
+
 	_selectedItem->Select(keyCode);
 }
 
 void MenuSelector::OnEnable()
 {
+	SetMainMenuMode();
+
 	_selectedItem = _mainMenu->FirstItem();
 	_selectedItem->OnPointed();
 
@@ -78,18 +99,83 @@ void MenuSelector::OnDisable()
 
 void MenuSelector::Update(float deltaSecond)
 {
-	if (flt::GetKeyDown(flt::KeyCode::right) || flt::GetKeyDown(flt::KeyCode::down))
+	switch (_mode)
 	{
-		next();
+		case MenuSelector::Mode::MainMenu:
+		{
+			if (flt::GetKeyDown(flt::KeyCode::right) || flt::GetKeyDown(flt::KeyCode::down))
+			{
+				next();
+			}
+			if (flt::GetKeyDown(flt::KeyCode::left) || flt::GetKeyDown(flt::KeyCode::up))
+			{
+				prev();
+			}
+			if (flt::GetKeyDown(flt::KeyCode::enter))
+			{
+				Select(flt::KeyCode::enter);
+			}
+
+			flt::GamePadState state;
+			bool isGamePadConnected = flt::GetGamePadState(0, &state);
+			if (isGamePadConnected)
+			{
+				if (state.buttonsDown & flt::GamePadState::ButtonFlag::UP)
+				{
+					prev();
+				}
+				if (state.buttonsDown & flt::GamePadState::ButtonFlag::DOWN)
+				{
+					next();
+				}
+				if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
+				{
+					Select(flt::KeyCode::enter);
+				}
+
+				if (fabsf(_lastLStickY) < 0.5f)
+				{
+					if (state.lStickY > 0.5f)
+					{
+						prev();
+					}
+					else if (state.lStickY < -0.5f)
+					{
+						next();
+					}
+				}
+
+				_lastLStickY = state.lStickY;
+			}
+		}
+		break;
+		case MenuSelector::Mode::RankView:
+		{
+			if (flt::GetKeyDown(flt::KeyCode::enter))
+			{
+				SetMainMenuMode();
+			}
+
+			flt::GamePadState state;
+			bool isGamePadConnected = flt::GetGamePadState(0, &state);
+			if (isGamePadConnected)
+			{
+				if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
+				{
+					SetMainMenuMode();
+				}
+			}
+		}
+		break;
+		case MenuSelector::Mode::ControllerSelect:
+		{
+
+		}
+		break;
+		default:
+			break;
 	}
-	if (flt::GetKeyDown(flt::KeyCode::left) || flt::GetKeyDown(flt::KeyCode::up))
-	{
-		prev();
-	}
-	if (flt::GetKeyDown(flt::KeyCode::enter))
-	{
-		Select(flt::KeyCode::enter);
-	}
+
 
 	//if (flt::GetKeyDown(flt::KeyCode::lAlt))
 	//{
@@ -120,37 +206,7 @@ void MenuSelector::Update(float deltaSecond)
 	//	flt::GameEngine::Instance()->SetWindowSize(0, 0, flt::WindowMode::BORDERLESS);
 	//}
 
-	flt::GamePadState state;
-	bool isGamePadConnected = flt::GetGamePadState(0, &state);
-	if (isGamePadConnected)
-	{
-		if (state.buttonsDown & flt::GamePadState::ButtonFlag::UP)
-		{
-			prev();
-		}
-		if (state.buttonsDown & flt::GamePadState::ButtonFlag::DOWN)
-		{
-			next();
-		}
-		if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
-		{
-			Select(flt::KeyCode::enter);
-		}
 
-		if (fabsf(_lastLStickY) < 0.5f)
-		{
-			if (state.lStickY > 0.5f)
-			{
-				prev();
-			}
-			else if (state.lStickY < -0.5f)
-			{
-				next();
-			}
-		}
-
-		_lastLStickY = state.lStickY;
-	}
 }
 
 void MenuSelector::MoveSelectedItem()
@@ -165,3 +221,33 @@ void MenuSelector::MoveSelectedItem()
 
 	//_ui->SetPosition(pos);
 }
+
+void MenuSelector::SetMainMenuMode()
+{
+	_title->Enable();
+	_mainMenu->Enable();
+	_rankViewer->Disable();
+	_controllerSelectMenu->Disable();
+	_mode = Mode::MainMenu;
+}
+
+void MenuSelector::SetViewRankMode()
+{
+	_title->Disable();
+	_mainMenu->Disable();
+	_controllerSelectMenu->Disable();
+	_rankViewer->Enable();
+	_mode = Mode::RankView;
+
+}
+
+void MenuSelector::SetControllerSelectMode()
+{
+	_title->Disable();
+	_mainMenu->Disable();
+	_rankViewer->Disable();
+	_controllerSelectMenu->Enable();
+	_mode = Mode::ControllerSelect;
+}
+
+
