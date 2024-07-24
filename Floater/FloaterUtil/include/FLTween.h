@@ -350,7 +350,7 @@ namespace flt
 
 
 	template<typename T>
-	flt::FLTween<T>::FLTween(const FLTween& other) : _elapsed(other._elapsed), _current(other._current), _points(other._points), _lerp(other._lerp), _target(other._target)
+	flt::FLTween<T>::FLTween(const FLTween& other) : _elapsed(other._elapsed), _current(other._current), _points(other._points), _lerp(other._lerp), _target(other._target), _isInDuration(other._isInDuration)
 	{
 
 	}
