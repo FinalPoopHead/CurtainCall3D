@@ -14,7 +14,7 @@ MenuSelector::MenuSelector(Menu* mainMenu, Menu* controllerMenu)
 	, _rankViewer(nullptr)
 	, _selectedItem(nullptr)
 	, _ui(nullptr)
-	, _lastLStickY(0.0f)
+	, _lastLStickY{0.0f, 0.0f}
 	, _mode(Mode::MainMenu)
 {
 	//_ui = AddComponent<flt::UIComponent>(true);
@@ -116,37 +116,41 @@ void MenuSelector::Update(float deltaSecond)
 				Select(flt::KeyCode::enter);
 			}
 
-			flt::GamePadState state;
-			bool isGamePadConnected = flt::GetGamePadState(0, &state);
-			if (isGamePadConnected)
+			for (int i = 0; i < 2; ++i)
 			{
-				if (state.buttonsDown & flt::GamePadState::ButtonFlag::UP)
+				flt::GamePadState state;
+				bool isGamePadConnected = flt::GetGamePadState(0, &state);
+				if (isGamePadConnected)
 				{
-					prev();
-				}
-				if (state.buttonsDown & flt::GamePadState::ButtonFlag::DOWN)
-				{
-					next();
-				}
-				if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
-				{
-					Select(flt::KeyCode::enter);
-				}
-
-				if (fabsf(_lastLStickY) < 0.5f)
-				{
-					if (state.lStickY > 0.5f)
+					if (state.buttonsDown & flt::GamePadState::ButtonFlag::UP)
 					{
 						prev();
 					}
-					else if (state.lStickY < -0.5f)
+					if (state.buttonsDown & flt::GamePadState::ButtonFlag::DOWN)
 					{
 						next();
 					}
-				}
+					if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
+					{
+						Select(flt::KeyCode::enter);
+					}
 
-				_lastLStickY = state.lStickY;
+					if (fabsf(_lastLStickY[i]) < 0.5f)
+					{
+						if (state.lStickY > 0.5f)
+						{
+							prev();
+						}
+						else if (state.lStickY < -0.5f)
+						{
+							next();
+						}
+					}
+
+					_lastLStickY[i] = state.lStickY;
+				}
 			}
+			
 		}
 		break;
 		case MenuSelector::Mode::RankView:
@@ -156,15 +160,19 @@ void MenuSelector::Update(float deltaSecond)
 				SetMainMenuMode();
 			}
 
-			flt::GamePadState state;
-			bool isGamePadConnected = flt::GetGamePadState(0, &state);
-			if (isGamePadConnected)
+			for (int i = 0; i < 2; ++i)
 			{
-				if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
+				flt::GamePadState state;
+				bool isGamePadConnected = flt::GetGamePadState(i, &state);
+				if (isGamePadConnected)
 				{
-					SetMainMenuMode();
+					if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
+					{
+						SetMainMenuMode();
+					}
 				}
 			}
+
 		}
 		break;
 		case MenuSelector::Mode::ControllerSelect:
