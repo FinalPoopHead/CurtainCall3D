@@ -59,6 +59,7 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _gameSpeed(GAMESPEED_DEFAULT)
 	, _battleModeSpeed(GAMESPEED_DEFAULT)
 	, _nowRollingCount(0)
+	, _currentShakePower()
 	, _nowGeneratingCount(0)
 	, _nowFallingTileCount()
 	, _damageCount()
@@ -775,6 +776,8 @@ void Board::TickCubesRolling(float rollingTime)
 		}
 	}
 
+	_currentShakePower = _nowRollingCount;
+
 	if (_nowRollingCount > 0)
 	{
 		_boardState = eBoardState::CUBEROLLING;
@@ -1098,6 +1101,12 @@ void Board::OnEndCubeRoll()
 
 		SetDelay(delay);
 		_soundComponent->Play(_soundIndex["CubeRoll"]);
+		
+		float power = _currentShakePower / 100.0f;
+
+		_gameManager->GetPlayer(_playerIndex)->camera->GetShakeComponent()->Impack(power/2.0f);
+		//_gameManager->GetPlayer(_playerIndex)->SetPadVibration(false, power, 0.5f);
+		_gameManager->GetPlayer(_playerIndex)->SetPadVibration(true, power, 0.5f);
 	}
 }
 
