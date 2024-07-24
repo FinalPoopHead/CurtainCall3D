@@ -121,6 +121,12 @@
     <ClCompile Include="UIStateContext.cpp">
       <Filter>GameObject\UI</Filter>
     </ClCompile>
+    <ClCompile Include="UIStateContextController.cpp">
+      <Filter>GameObject\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="RankViewer.cpp">
+      <Filter>GameObject\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h">
@@ -197,6 +203,12 @@
       <Filter>GameObject</Filter>
     </ClInclude>
     <ClInclude Include="UIStateContext.h">
+      <Filter>GameObject\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UIStateContextController.h">
+      <Filter>GameObject\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="RankViewer.h">
       <Filter>GameObject\UI</Filter>
     </ClInclude>
   </ItemGroup>

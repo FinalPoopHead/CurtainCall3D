@@ -32,7 +32,11 @@ namespace flt
 		{
 			if (this != &other)
 			{
-				_destructor(_ptr);
+				if (_ptr)
+				{
+					_destructor(_ptr);
+				}
+
 				_ptr = other._ptr;
 				other._ptr = nullptr;
 			}
@@ -40,7 +44,11 @@ namespace flt
 		}
 		constexpr OwningPtr& operator=(T* ptr) noexcept
 		{
-			_destructor(_ptr);
+			if (_ptr)
+			{
+				_destructor(_ptr);
+			}
+
 			_ptr = ptr;
 			return *this;
 		}

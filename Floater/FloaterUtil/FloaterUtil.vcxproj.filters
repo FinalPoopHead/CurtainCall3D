@@ -25,6 +25,9 @@
     <Filter Include="Tweening">
       <UniqueIdentifier>{5a8a552c-2355-493d-b736-fd75bef117cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FSM">
+      <UniqueIdentifier>{deb8a6ee-2251-416c-89e4-6befbbaef8f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Allocator.h">
@@ -111,6 +114,9 @@
     </ClInclude>
     <ClInclude Include="include\StaticArray.h">
       <Filter>DataStructure</Filter>
+    </ClInclude>
+    <ClInclude Include="FSM.h">
+      <Filter>FSM</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

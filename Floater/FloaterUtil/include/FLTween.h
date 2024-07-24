@@ -80,20 +80,22 @@ namespace flt
 		FLTween<T>& postDelay(float duration);
 		FLTween<T>& easing(std::function<float(float)> easing);
 
+		FLTween<T>& onInitialize(std::function<void()> callback);
 		FLTween<T>& onStart(std::function<void()> callback);
 		FLTween<T>& onStep(std::function<void(const Value_t&)> callback);
 		FLTween<T>& onEnd(std::function<void()> callback);
+		FLTween<T>& onFinalize(std::function<void()> callback);
 
 	private:
 		bool IsFinishedInternal() const { return _current >= _points.size() - 1; }
 		void UpdateTarget(const Value_t& value);
 
-		template<typename EventsT>
-		void InvokeCallbacks(const EventsT& events)
+		template<typename EventsT, typename... Args>
+		void InvokeCallbacks(const EventsT& events, Args&&... args)
 		{
 			for (int i = 0; i < events.size(); ++i)
 			{
-				events[i]();
+				events[i](std::forward<Args>(args)...);
 			}
 		}
 
@@ -104,6 +106,9 @@ namespace flt
 		LerpFunction_t<Value_t> _lerp;
 		T _target;
 		bool _isInDuration;
+		bool _isActivated;
+		std::vector<std::function<void()>> _onInitialize;
+		std::vector<std::function<void()>> _onFinalize;
 	};
 
 	template<typename T>
@@ -183,6 +188,19 @@ namespace flt
 	}
 
 	/// <summary>
+	/// tween이 맨 처음 시작할 때 호출되는 콜백 함수를 추가
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="callback"></param>
+	/// <returns></returns>
+	template<typename T>
+	flt::FLTween<T>& flt::FLTween<T>::onInitialize(std::function<void()> callback)
+	{
+		_onInitialize.emplace_back(callback);
+		return *this;
+	}
+
+	/// <summary>
 	/// preDelay 이후 호출되는 콜백 함수를 추가
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
@@ -224,6 +242,20 @@ namespace flt
 		return *this;
 	}
 
+	/// <summary>
+	/// tween이 모두 마무리되고 마지막에 호출되는 콜백 함수를 추가
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="callback"></param>
+	/// <returns></returns>
+	template<typename T>
+	flt::FLTween<T>& flt::FLTween<T>::onFinalize(std::function<void()> callback)
+	{
+		_onFinalize.emplace_back(callback);
+		return *this;
+	}
+
+
 	template<typename T>
 	bool flt::FLTween<T>::Update(float dt)
 	{
@@ -236,6 +268,12 @@ namespace flt
 	T flt::FLTween<T>::step(float dt)
 	{
 		ASSERT(_points.size() > 1, "At least two points are required.");
+
+		if(!_isActivated)
+		{
+			_isActivated = true;
+			InvokeCallbacks(_onInitialize);
+		}
 
 		if (dt == 0.0f || IsFinishedInternal())
 		{
@@ -253,6 +291,8 @@ namespace flt
 
 			if (IsFinishedInternal())
 			{
+				_isActivated = false;
+				InvokeCallbacks(_onFinalize);
 				UpdateTarget(_points.back().value);
 				return _target;
 			}
@@ -290,18 +330,20 @@ namespace flt
 			if constexpr (std::is_pointer_v<T>)
 			{
 				*_target = _lerp(_points[_current].value, _points[_current + 1].value, t);
-				for (int i = 0; i < _points[_current].onStep.size(); ++i)
-				{
-					_points[_current].onStep[i](*_target);
-				}
+				InvokeCallbacks(_points[_current].onStep, *_target);
+				//for (int i = 0; i < _points[_current].onStep.size(); ++i)
+				//{
+				//	_points[_current].onStep[i](*_target);
+				//}
 			}
 			else
 			{
 				_target = _lerp(_points[_current].value, _points[_current + 1].value, t);
-				for (int i = 0; i < _points[_current].onStep.size(); ++i)
-				{
-					_points[_current].onStep[i](_target);
-				}
+				InvokeCallbacks(_points[_current].onStep, _target);
+				//for (int i = 0; i < _points[_current].onStep.size(); ++i)
+				//{
+				//	_points[_current].onStep[i](_target);
+				//}
 			}
 		}
 
@@ -347,6 +389,8 @@ namespace flt
 		, _lerp(lerp)
 		, _target(target)
 		, _isInDuration(false)
+		, _isActivated(false)
+		, _onInitialize(), _onFinalize()
 
 	{
 		if constexpr (std::is_pointer_v<T>)
@@ -361,7 +405,14 @@ namespace flt
 
 
 	template<typename T>
-	flt::FLTween<T>::FLTween(const FLTween& other) : _elapsed(other._elapsed), _current(other._current), _points(other._points), _lerp(other._lerp), _target(other._target), _isInDuration(other._isInDuration)
+	flt::FLTween<T>::FLTween(const FLTween& other) 
+		: _elapsed(other._elapsed), _current(other._current)
+		, _points(other._points)
+		, _lerp(other._lerp)
+		, _target(other._target)
+		, _isInDuration(other._isInDuration)
+		, _isActivated(other._isActivated)
+		, _onInitialize(other._onInitialize), _onFinalize(other._onFinalize)
 	{
 
 	}
