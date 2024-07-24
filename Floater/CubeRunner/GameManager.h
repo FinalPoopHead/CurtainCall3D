@@ -126,6 +126,7 @@ private:
 	std::vector<TextObject*> _garbageLineText;
 	std::vector<TextObject*> _gameoverTextPanel;
 	std::vector<std::vector<TextObject*>> _gameoverText;
+	TextObject* _finalScorePanel;
 	TextObject* _finalScoreText;
 	TextObject* _roundText;
 	SpriteObject* _fade;

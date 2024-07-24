@@ -68,6 +68,7 @@ GameManager::GameManager() :
 	, _garbageLineText()
 	, _gameoverTextPanel()
 	, _gameoverText()
+	, _finalScorePanel()
 	, _finalScoreText()
 	, _roundText()
 	, _liveComboTexts()
@@ -156,7 +157,8 @@ GameManager::GameManager() :
 
 	_roundTextTween = flt::MakeScaleTween(&_roundText->tr);
 	_roundTextTween->from(RoundTextScale)
-		.to({ 0.0f,0.0f,0.0f,1.0f }).preDelay(3.5f).during(0.5f).easing(flt::ease::easeInExpo).onEnd([this]() {this->_roundText->Disable(); });
+		.to({ 0.0f,0.0f,0.0f,1.0f }).preDelay(3.5f).during(0.5f).easing(flt::ease::easeInExpo)
+		.onEnd([this]() {this->_roundText->Disable(); this->_roundText->tr.SetScale(RoundTextScale); });
 
 	_fade = flt::CreateGameObject<SpriteObject>(false);
 	_fade->SetSprite(L"../Resources/Sprites/Fade.png");
@@ -291,12 +293,20 @@ GameManager::GameManager() :
 		_rankScoreText.push_back(rankScoreText);
 	}
 
-	_finalScoreText = flt::CreateGameObject<TextObject>(false);
-	_finalScoreText->SetOffsetPosition({ 0.5f,0.5f });
+	_finalScorePanel = flt::CreateGameObject<TextObject>(false);
+	_finalScorePanel->SetOffsetPosition({ 0.5f,0.5f });
+	_finalScorePanel->SetText(L"F I N A L   S C O R E");
+	_finalScorePanel->SetFont(bigFontPath);
+	_finalScorePanel->SetTextColor(whiteColor);
+	_finalScorePanel->SetTextAlignment(eTextAlignment::CENTER);
+	_finalScorePanel->tr.SetScale(1.5f, 1.5f, 1.5f);
+
+	_finalScoreText = flt::CreateGameObject<TextObject>(true);
+	_finalScoreText->SetParent(_finalScorePanel);
+	_finalScoreText->SetPosition({ 0.0f, 120.0f });
 	_finalScoreText->SetFont(bigFontPath);
 	_finalScoreText->SetTextColor(whiteColor);
 	_finalScoreText->SetTextAlignment(eTextAlignment::CENTER);
-	_finalScoreText->tr.SetScale(1.5f, 1.5f, 1.5f);
 
 	ReadStageFile();
 	ReadRankingFile();
@@ -795,27 +805,27 @@ void GameManager::OnDestroyCubes(int playerIndex, int count, flt::Vector3f pos /
 
 	switch (count)
 	{
-	case 1:
-	case 2:
-	case 3:
-		break;
-	case 4:
-	case 5:
-		damage = 1;
-		break;
-	case 6:
-	case 7:
-		damage = 2;
-		break;
-	case 8:
-		damage = 3;
-		break;
-	case 9:
-		damage = 4;
-		break;
-	default:
-		damage = 6;
-		break;
+		case 1:
+		case 2:
+		case 3:
+			break;
+		case 4:
+		case 5:
+			damage = 1;
+			break;
+		case 6:
+		case 7:
+			damage = 2;
+			break;
+		case 8:
+			damage = 3;
+			break;
+		case 9:
+			damage = 4;
+			break;
+		default:
+			damage = 6;
+			break;
 	}
 
 	float delay = 0.1f;
@@ -856,35 +866,35 @@ void GameManager::SetStage(int stageNum)
 	std::wstring numStr;
 	switch (stageNum)
 	{
-	case 1:
-		numStr = L"1 S T";
-		break;
-	case 2:
-		numStr = L"2 N D";
-		break;
-	case 3:
-		numStr = L"3 R D";
-		break;
-	case 4:
-		numStr = L"4 T H";
-		break;
-	case 5:
-		numStr = L"5 T H";
-		break;
-	case 6:
-		numStr = L"6 T H";
-		break;
-	case 7:
-		numStr = L"7 T H";
-		break;
-	case 8:
-		numStr = L"8 T H";
-		break;
-	case 9:
-		numStr = L"F I N A L";
-		break;
-	default:
-		break;
+		case 1:
+			numStr = L"1 S T";
+			break;
+		case 2:
+			numStr = L"2 N D";
+			break;
+		case 3:
+			numStr = L"3 R D";
+			break;
+		case 4:
+			numStr = L"4 T H";
+			break;
+		case 5:
+			numStr = L"5 T H";
+			break;
+		case 6:
+			numStr = L"6 T H";
+			break;
+		case 7:
+			numStr = L"7 T H";
+			break;
+		case 8:
+			numStr = L"8 T H";
+			break;
+		case 9:
+			numStr = L"F I N A L";
+			break;
+		default:
+			break;
 	}
 
 	_roundText->SetText(numStr + L"   S T A G E");
@@ -960,35 +970,35 @@ void GameManager::ProgressStage(int playerIndex)
 		std::wstring numStr;
 		switch (_currentStage[playerIndex])
 		{
-		case 1:
-			numStr = L"1 S T";
-			break;
-		case 2:
-			numStr = L"2 N D";
-			break;
-		case 3:
-			numStr = L"3 R D";
-			break;
-		case 4:
-			numStr = L"4 T H";
-			break;
-		case 5:
-			numStr = L"5 T H";
-			break;
-		case 6:
-			numStr = L"6 T H";
-			break;
-		case 7:
-			numStr = L"7 T H";
-			break;
-		case 8:
-			numStr = L"8 T H";
-			break;
-		case 9:
-			numStr = L"F I N A L";
-			break;
-		default:
-			break;
+			case 1:
+				numStr = L"1 S T";
+				break;
+			case 2:
+				numStr = L"2 N D";
+				break;
+			case 3:
+				numStr = L"3 R D";
+				break;
+			case 4:
+				numStr = L"4 T H";
+				break;
+			case 5:
+				numStr = L"5 T H";
+				break;
+			case 6:
+				numStr = L"6 T H";
+				break;
+			case 7:
+				numStr = L"7 T H";
+				break;
+			case 8:
+				numStr = L"8 T H";
+				break;
+			case 9:
+				numStr = L"F I N A L";
+				break;
+			default:
+				break;
 		}
 
 		_roundText->SetText(numStr + L"   S T A G E");
@@ -1088,16 +1098,16 @@ void GameManager::OnEndLevel(int playerIndex)
 
 			calcTween->from(heightCount)
 				.to(0).preDelay(2.5f).during(2.0f)
-				.onStart([this,heightCount] {
-				this->_bonusText.front()->Enable(); 
-				this->AddBonusScore(heightCount * 1000);})
-				.onStep([this](const int& value) {this->_heightCountText.front()->SetText(std::to_wstring(value) + L" lines");})
+				.onStart([this, heightCount] {
+				this->_bonusText.front()->Enable();
+				this->AddBonusScore(heightCount * 1000); })
+				.onStep([this](const int& value) {this->_heightCountText.front()->SetText(std::to_wstring(value) + L" lines"); })
 				.postDelay(2.0f)
-				.onEnd([this] {	
+				.onEnd([this] {
 				this->_heightCountText.front()->SetText(std::to_wstring(0) + L" lines");
 				this->_bonusText.front()->Disable();
 				this->_boards.front()->SetIsCutScene(false);
-				this->ProgressStage(0); 
+				this->ProgressStage(0);
 					});
 
 			StartTween(calcTween);
@@ -1167,19 +1177,19 @@ void GameManager::OnEndPlayerFall(int index)
 	if (_players.size() == 1)
 	{
 		_gameoverTextPanel[index]->Enable();
-		
-		auto scoreTween = flt::MakeScaleTween(&_finalScoreText->tr);
-		auto scale = _finalScoreText->tr.GetLocalScale();
+
+		auto scoreTween = flt::MakeScaleTween(&_finalScorePanel->tr);
+		auto scale = _finalScorePanel->tr.GetLocalScale();
 		flt::Vector4f startScale = { 0.0f, scale.y,scale.z,1.0f };
 
 		scoreTween->from(startScale)
 			.to(scale).preDelay(6.5f).during(1.0f).postDelay(3.0f)
 			.onStart([this]() {
-			this->_finalScoreText->Enable();
-			this->_finalScoreText->SetText(L"F I N A L   S C O R E\n" + std::to_wstring(this->_playerScore.front())); })
+			this->_finalScorePanel->Enable();
+			this->_finalScoreText->SetText(std::to_wstring(this->_playerScore.front())); })
 			.to(startScale).during(1.0f).postDelay(2.0f)
 			.onEnd([this]() {this->EnableScoreInput();
-		this->_finalScoreText->Disable(); });
+		this->_finalScorePanel->Disable(); });
 
 		flt::StartTween(scoreTween);
 
@@ -1207,6 +1217,26 @@ void GameManager::OnEndPlayerFall(int index)
 
 void GameManager::OnCheckMinHeight(int index, int height, bool doGenerate)
 {
+	int garbageCount = _garbageLineCount[index];
+
+	if (garbageCount > 0)
+	{
+		if (height > 1)
+		{
+			if (garbageCount > height)
+			{
+				_boards[index]->DropGarbageLine(height);
+				SetAttackedLineCount(index, garbageCount - height);
+			}
+			else
+			{
+				_boards[index]->DropGarbageLine(garbageCount);
+				SetAttackedLineCount(index, 0);
+			}
+			return;
+		}
+	}
+
 	if (doGenerate)
 	{
 		std::random_device rd;
@@ -1267,14 +1297,6 @@ void GameManager::OnCheckMinHeight(int index, int height, bool doGenerate)
 		}
 
 		return;
-	}
-
-	int garbageCount = _garbageLineCount[index];
-
-	if (height > garbageCount)
-	{
-		_boards[index]->DropGarbageLine(garbageCount);
-		SetAttackedLineCount(index, 0);
 	}
 }
 
@@ -1393,7 +1415,7 @@ void GameManager::AddPlayTime(float time)
 		return;
 	}
 
-	constexpr float accelCycle = 45.0f;
+	constexpr float accelCycle = 25.0f;
 	constexpr float accelValue = 0.1f;
 	if (_accelTime >= accelCycle)
 	{
@@ -1826,7 +1848,10 @@ bool GameManager::EnterInput(int index)
 {
 	if (_inputText.size() >= 10)
 	{
-		return false;
+		if (!(index == 31 || index == 32))
+		{
+			return false;
+		}
 	}
 
 	if (0 <= index && index <= 25)
@@ -1837,47 +1862,47 @@ bool GameManager::EnterInput(int index)
 	{
 		switch (index)
 		{
-		case 26:
-			// !
-			_inputText.append("!");
-			break;
-		case 27:
-			// ?
-			_inputText.append("?");
-			break;
-		case 28:
-			// /
-			_inputText.append("/");
-			break;
-		case 29:
-			// .
-			_inputText.append(".");
-			break;
-		case 30:
-			// " "
-			_inputText.append(" ");
-			break;
-		case 31:
-			// DEL
-			if (_inputText.size() > 0)
-			{
-				_inputText.pop_back();
-			}
-			break;
-		case 32:
-			// END
-			if (_inputText.size() > 0)
-			{
-				_rankData.push_back({ 0, _inputText, _playerScore.front() });
-				SortRanking();
-				WriteRankingFile();
-				_inputField->SetText(L"");
-				_inputText.clear();
-				return true;
-			}
-			break;
-		default:
-			break;
+			case 26:
+				// !
+				_inputText.append("!");
+				break;
+			case 27:
+				// ?
+				_inputText.append("?");
+				break;
+			case 28:
+				// /
+				_inputText.append("/");
+				break;
+			case 29:
+				// .
+				_inputText.append(".");
+				break;
+			case 30:
+				// " "
+				_inputText.append(" ");
+				break;
+			case 31:
+				// DEL
+				if (_inputText.size() > 0)
+				{
+					_inputText.pop_back();
+				}
+				break;
+			case 32:
+				// END
+				if (_inputText.size() > 0)
+				{
+					_rankData.push_back({ 0, _inputText, _playerScore.front() });
+					SortRanking();
+					WriteRankingFile();
+					_inputField->SetText(L"");
+					_inputText.clear();
+					return true;
+				}
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -1908,7 +1933,7 @@ void GameManager::AddBonusScore(int score)
 		.onStep([this](const int& value) {
 		this->_bonusText.front()->SetText(L"+ " + std::to_wstring(value) + L" Points");
 			})
-		.onEnd([this,score]() {
+		.onEnd([this, score]() {
 		this->_bonusText.front()->SetText(L"+ " + std::to_wstring(score) + L" Points");
 		this->AddScore(0, score); });
 

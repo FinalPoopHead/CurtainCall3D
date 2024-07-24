@@ -13,6 +13,7 @@ enum class eCameraState
 
 class Player;
 class Board;
+class ShakeComponent;
 
 class Camera : public flt::GameObject
 {
@@ -29,6 +30,8 @@ public:
 
 	void SetCameraIndex(uint32 index);
 
+	ShakeComponent* GetShakeComponent() { return _shakeComp; }
+
 protected:
 	virtual void PostUpdate(float deltaSecond) override;
 
@@ -42,6 +45,7 @@ private:
 
 private:
 	flt::CameraComponent* _cameraComp;
+	ShakeComponent* _shakeComp;
 	Player* _player;
 	Board* _board;
 	float _height;
