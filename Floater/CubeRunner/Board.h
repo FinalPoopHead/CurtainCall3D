@@ -99,7 +99,7 @@ public:
 	const float& GetGameSpeed() { return _gameSpeed; }
 	const float& GetBattleSpeed() { return _battleModeSpeed; }
 
-	void SetBattleMode() { _isBattleMode = true; }
+	void SetBattleMode();
 	int GetWidth() const { return _width; }
 	int GetHeight() const { return _height; }
 	void SetGameOver(bool isOver) { _isGameOver = isOver; }
