@@ -1309,6 +1309,15 @@ void Board::EndFastForward()
 	}
 }
 
+void Board::SetBattleMode()
+{
+	_isBattleMode = true;
+
+	// For Resource Load
+	auto cube = _normalCubePool.back();
+	dynamic_cast<NormalCube*>(cube)->SetTexture(eCubeTexture::GARBAGE);
+}
+
 void Board::Resize(int newWidth, int newHeight)
 {
 	// 타일 높이가 변화시 먼저 처리
