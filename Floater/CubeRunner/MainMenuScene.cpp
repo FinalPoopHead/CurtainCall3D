@@ -17,7 +17,6 @@ void MainMenuScene::Initialize()
 	Menu* controllerMenu = flt::CreateGameObject<Menu>(false);
 	MenuSelector* selector = flt::CreateGameObject<MenuSelector>(true, menu, controllerMenu);
 
-
 	MenuItem* title = flt::CreateGameObject<MenuItem>(true);
 	title->SetDefaultSpritePath(L"../Resources/Sprites/GameTitle.png");
 	title->SetOffsetPosition({ 0.5f, 0.25f });
@@ -28,7 +27,6 @@ void MainMenuScene::Initialize()
 	auto titleTween = flt::MakeTween(flt::Vector2f{ titlePos.x, 0.0f });
 	titleTween->to({ titlePos.x, titlePos.y }).during(1.0f).easing(flt::ease::easeOutElastic).onStep([title](const flt::Vector2f& pos) {title->SetOffsetPosition(pos); });
 	title->SetTween(std::move(titleTween));
-
 
 	selector->SetTitle(title);
 
@@ -116,7 +114,6 @@ void MainMenuScene::Initialize()
 		item4->SetSelectFunc([]() { flt::ExitGame(); });*/
 	}
 
-
 	{
 		MenuItem* item1 = flt::CreateGameObject<MenuItem>(false);
 		controllerMenu->AddItem(item1);
@@ -141,12 +138,16 @@ void MainMenuScene::Initialize()
 
 	RankViewer* rankViewer = flt::CreateGameObject<RankViewer>(false);
 
-
 	selector->SetRankViewer(rankViewer);
 
 
 	flt::GameObject* camera = flt::CreateGameObject<flt::GameObject>(true);
 	camera->AddComponent<flt::CameraComponent>(true);
+
+	flt::GameObject* bgmObject = flt::CreateGameObject<flt::GameObject>(true);
+	bgmObject->AddComponent<flt::SoundComponent>(true);
+	bgmObject->GetComponent<flt::SoundComponent>()->AddSound(L"../Resources/Sound/menu/universe-space-sounds-3595.mp3");
+	bgmObject->GetComponent<flt::SoundComponent>()->Play(0, true);
 }
 
 void MainMenuScene::Finalize()

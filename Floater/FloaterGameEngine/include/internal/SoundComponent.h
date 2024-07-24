@@ -28,7 +28,7 @@ namespace flt
 	private:
 		SoundEngine* _soundEngine;
 		//std::vector<Sound*> _sounds;
-		std::vector<OwningPtr<Sound>> _sounds;
+		std::vector<std::vector<OwningPtr<Sound>>> _soundsPerSpeaker;
 	};
 
 }

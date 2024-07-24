@@ -10,70 +10,64 @@
 flt::SoundComponent::SoundComponent() : 
 	_soundEngine(GameEngine::Instance()->GetSoundEngine())
 {
-
+	_soundsPerSpeaker.resize(_soundEngine->GetCurrOutputDriverNum());
 }
 
 flt::SoundComponent::~SoundComponent()
 {
-	//for(auto& sound : _sounds)
-	//{
-	//	delete sound;
-	//}
 }
 
 void flt::SoundComponent::OnDestroy()
 {
-	for (auto& sound : _sounds)
+	for (int i = 0; i < _soundsPerSpeaker.size(); ++i)
 	{
-		_soundEngine->Stop(sound.get());
+		for (auto& sound : _soundsPerSpeaker[i])
+		{
+			_soundEngine->Stop(sound.get(), i);
+		}
 	}
+
 }
 
 int flt::SoundComponent::AddSound(std::wstring path)
 {
-	Sound* sound = new Sound();
+	for(int i = 0; i < _soundsPerSpeaker.size(); ++i)
+	{
+		Sound* sound = new Sound();
 
-	//void* buff;
-	//std::fstream file(path);
-	//file.seekg(0, file.end);
-	//int length = static_cast<int>(file.tellg());
-	//file.seekg(0, file.beg);
-	//buff = malloc(length);
-	//file.read((char*)buff, length);
-	//file.close();
+		bool isSuccess = _soundEngine->CreateSound(ToString(path).c_str(), &sound->_fSound, i);
+		ASSERT(isSuccess, "Failed to create sound");
 
-	//sound->_buffer = buff;
-
-	//FMOD_CREATESOUNDEXINFO exinfo{};
-	//exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
-	//exinfo.length = length;
-
-	//bool isSuccess = _soundEngine->CreateSound(buff, &exinfo, &sound->_fSound);
-
-	bool isSuccess = _soundEngine->CreateSound(ToString(path).c_str(), &sound->_fSound);
-	ASSERT(isSuccess, "Failed to create sound");
-
-	_sounds.emplace_back(sound);
-
-	return (int)_sounds.size() - 1;
+		_soundsPerSpeaker[i].emplace_back(sound);
+	}
+	return (int)_soundsPerSpeaker[0].size() - 1;
 }
 
 void flt::SoundComponent::Play(int index, bool isLoop/*= false*/)
 {
-	_soundEngine->Play(_sounds[index].get(), isLoop);
+	for(int i = 0; i < _soundsPerSpeaker.size(); ++i)
+	{
+		_soundEngine->Play(_soundsPerSpeaker[i][index].get(), isLoop, i);
+	}
 }
 
 bool flt::SoundComponent::isPlay(int index)
 {
-	return _soundEngine->isPlay(_sounds[index].get());
+	return _soundEngine->isPlay(_soundsPerSpeaker[0][index].get(), 0);
 }
 
 void flt::SoundComponent::Pause(int index)
 {
-	_soundEngine->Pause(_sounds[index].get());
+	for (int i = 0; i < _soundsPerSpeaker.size(); ++i)
+	{
+		_soundEngine->Pause(_soundsPerSpeaker[i][index].get(), i);
+	}
 }
 
 void flt::SoundComponent::Stop(int index)
 {
-	_soundEngine->Stop(_sounds[index].get());
+	for (int i = 0; i < _soundsPerSpeaker.size(); ++i)
+	{
+		_soundEngine->Stop(_soundsPerSpeaker[i][index].get(), i);
+	}
 }

@@ -44,6 +44,6 @@ private:
 	RankViewer* _rankViewer;
 	MenuItem* _selectedItem;
 	flt::UIComponent* _ui;
-	float _lastLStickY;
+	float _lastLStickY[2];
 	Mode _mode;
 };
