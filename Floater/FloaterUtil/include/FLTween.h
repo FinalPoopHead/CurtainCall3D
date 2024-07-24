@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <vector>
+#include <string>
 #include <functional>
 #include <type_traits>
 #include <algorithm>
@@ -43,6 +44,9 @@ namespace flt
 		virtual bool Update(float dt) = 0;
 		virtual void ResetProgress() = 0;
 		virtual bool IsFinished() const = 0;
+
+	protected:
+		std::string _name;
 	};
 
 	template<typename T>
@@ -57,7 +61,7 @@ namespace flt
 		virtual bool IsFinished() const override { return IsFinishedInternal(); }
 
 		virtual bool Update(float dt) override;
-		virtual void ResetProgress() override { _current = 0; _elapsed = 0.0f; }
+		virtual void ResetProgress() override { _current = 0; _elapsed = 0.0f; _isInDuration = false; }
 
 		T step(float dt);
 		T seek(float dt);
@@ -67,6 +71,7 @@ namespace flt
 		//FLTween& onStep(std::function<bool(FLTween&, T)> callback);
 		//FLTween& onStep(std::function<bool(T)> callback);
 		//FLTween& onStep(std::function<bool()> callback);
+		FLTween<T>& name(const std::string& name) { _name = name; return *this; }
 
 		FLTween<T>& from(const Value_t& value);
 		FLTween<T>& to(const Value_t& value);
@@ -336,7 +341,13 @@ namespace flt
 	}
 
 	template<typename T>
-	flt::FLTween<T>::FLTween(T target, LerpFunction_t<Value_t> lerp) : _elapsed(0.0f), _current(0), _points(), _lerp(lerp), _target(target), _isInDuration(false)
+	flt::FLTween<T>::FLTween(T target, LerpFunction_t<Value_t> lerp) 
+		: _elapsed(0.0f), _current(0)
+		, _points()
+		, _lerp(lerp)
+		, _target(target)
+		, _isInDuration(false)
+
 	{
 		if constexpr (std::is_pointer_v<T>)
 		{

@@ -118,6 +118,9 @@
     <ClCompile Include="ShakeObject.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
+    <ClCompile Include="UIStateContext.cpp">
+      <Filter>GameObject\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h">
@@ -192,6 +195,9 @@
     </ClInclude>
     <ClInclude Include="ShakeObject.h">
       <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="UIStateContext.h">
+      <Filter>GameObject\UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
