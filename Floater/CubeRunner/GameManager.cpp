@@ -158,7 +158,8 @@ GameManager::GameManager() :
 	_roundTextTween = flt::MakeScaleTween(&_roundText->tr);
 	_roundTextTween->from(RoundTextScale)
 		.to({ 0.0f,0.0f,0.0f,1.0f }).preDelay(3.5f).during(0.5f).easing(flt::ease::easeInExpo)
-		.onEnd([this]() {this->_roundText->Disable(); this->_roundText->tr.SetScale(RoundTextScale); });
+		.onInitialize([this]() { this->_roundText->tr.SetScale(RoundTextScale); })
+		.onFinalize([this]() { this->_roundText->Disable(); });
 
 	_fade = flt::CreateGameObject<SpriteObject>(false);
 	_fade->SetSprite(L"../Resources/Sprites/Fade.png");
@@ -1062,7 +1063,7 @@ void GameManager::OnStageStart()
 		}
 
 	}
-	else if(_currentStage[0] < 6)
+	else if (_currentStage[0] < 6)
 	{
 		if (!_soundComponent->isPlay(1))
 		{
