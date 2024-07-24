@@ -13,11 +13,13 @@ namespace flt
 {
 	class SoundEngine;
 	class SoundComponent;
+	class FMODInstance;
 
 	class Sound
 	{
 		friend class SoundEngine;
 		friend class SoundComponent;
+		friend class FMODInstance;
 
 	public:
 		enum Category
@@ -54,5 +56,4 @@ namespace flt
 		Category _category;
 		bool _isLoop;
 	};
-
 }

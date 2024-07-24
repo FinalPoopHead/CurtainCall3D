@@ -804,6 +804,8 @@ void Board::AddRow()
 
 		tile->StartAdd(ADDTILE_TIME, { x,0.0f,z });
 	}
+
+	_gameManager->GetPlayer(_playerIndex)->SetPadVibration(false, 1.0f, 1.0f);
 }
 
 void Board::OnEndWave()
@@ -1197,6 +1199,8 @@ void Board::OnEndCubeDrop(CubeController* cubeCtr)
 		_soundComponent->Play(_soundIndex["CubeDrop"]);
 
 		_gameManager->GetPlayer(_playerIndex)->camera->GetShakeComponent()->Impack();
+		_gameManager->GetPlayer(_playerIndex)->SetPadVibration(false, 1.0f, 0.5f);
+		_gameManager->GetPlayer(_playerIndex)->SetPadVibration(true, 1.0f, 0.5f);
 	}
 }
 
@@ -1341,6 +1345,7 @@ void Board::DestroyRow()
 	--_nextDestroyRow;
 
 	_soundComponent->Play(_soundIndex["TileDestroy"]);
+	_gameManager->GetPlayer(_playerIndex)->SetPadVibration(false, 1.0f, 1.0f);
 }
 
 bool Board::IsMineSet()
@@ -1737,6 +1742,7 @@ bool Board::UpdateDetonate()
 				{
 					result = true;
 					_soundComponent->Play(_soundIndex["CubeDestroy"]);
+					_gameManager->GetPlayer(_playerIndex)->SetPadVibration(true, 1.0f, 1.0f);
 				}
 
 				_tileStates[i][j] = (int)_tileStates[i][j] & ~((int)eTileStateFlag::DETONATE);

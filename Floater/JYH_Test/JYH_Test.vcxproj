@@ -150,7 +150,9 @@
     <ClCompile Include="GlideObject.cpp" />
     <ClCompile Include="HierarachyMgr.cpp" />
     <ClCompile Include="HierarchyTest.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="main.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="ShakerComponent.cpp" />
     <ClCompile Include="TestGameObejct.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>

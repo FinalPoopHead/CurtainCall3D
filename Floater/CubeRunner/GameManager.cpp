@@ -162,7 +162,8 @@ GameManager::GameManager() :
 	_roundTextTween = flt::MakeScaleTween(&_roundText->tr);
 	_roundTextTween->from(RoundTextScale)
 		.to({ 0.0f,0.0f,0.0f,1.0f }).preDelay(3.5f).during(0.5f).easing(flt::ease::easeInExpo)
-		.onEnd([this]() {this->_roundText->Disable(); this->_roundText->tr.SetScale(RoundTextScale); });
+		.onInitialize([this]() { this->_roundText->tr.SetScale(RoundTextScale); })
+		.onFinalize([this]() { this->_roundText->Disable(); });
 
 	_fade = flt::CreateGameObject<SpriteObject>(false);
 	_fade->SetSprite(L"../Resources/Sprites/Fade.png");
@@ -989,6 +990,24 @@ void GameManager::SetStage(int stageNum)
 	}
 
 	FadeIn();
+
+	// 사운드 필요 없으면 종료
+	if (_currentStage[0] < 3)
+	{
+		_soundComponent->Stop(1);
+		_soundComponent->Stop(2);
+
+	}
+	else if (_currentStage[0] < 6)
+	{
+		_soundComponent->Stop(0);
+		_soundComponent->Stop(2);
+	}
+	else
+	{
+		_soundComponent->Stop(0);
+		_soundComponent->Stop(1);
+	}
 }
 
 void GameManager::ProgressStage(int playerIndex)
@@ -1093,6 +1112,28 @@ void GameManager::ProgressStage(int playerIndex)
 
 void GameManager::OnStageStart()
 {
+	if (_currentStage[0] < 3)
+	{
+		if (!_soundComponent->isPlay(0))
+		{
+			_soundComponent->Play(0, true);
+		}
+
+	}
+	else if (_currentStage[0] < 6)
+	{
+		if (!_soundComponent->isPlay(1))
+		{
+			_soundComponent->Play(1, true);
+		}
+	}
+	else
+	{
+		if (!_soundComponent->isPlay(2))
+		{
+			_soundComponent->Play(2, true);
+		}
+	}
 	//_soundComponent->Play(_soundIndex["BGM3"]);
 }
 
@@ -1128,6 +1169,24 @@ void GameManager::OnEndLevel(int playerIndex)
 					});
 
 			StartTween(calcTween);
+
+			// 사운드 필요 없으면 종료
+			if (_currentStage[0] < 3)
+			{
+				_soundComponent->Stop(1);
+				_soundComponent->Stop(2);
+
+			}
+			else if (_currentStage[0] < 6)
+			{
+				_soundComponent->Stop(0);
+				_soundComponent->Stop(2);
+			}
+			else
+			{
+				_soundComponent->Stop(0);
+				_soundComponent->Stop(1);
+			}
 
 			return;
 		}
