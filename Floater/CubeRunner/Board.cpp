@@ -808,6 +808,11 @@ void Board::AddRow()
 
 void Board::OnEndWave()
 {
+	if (_isGameOver)
+	{
+		return;
+	}
+
 	if (_isPerfect)
 	{
 		if (_isBattleMode)
@@ -1206,7 +1211,6 @@ void Board::OnEndCubeDrop(CubeController* cubeCtr)
 
 void Board::ShowBattleResult()
 {
-	// TODO : 여기서 연출 만들면 된다.
 	// 먼저 모든 큐브 제거
 	std::list<CubeController*> removeList;
 	for (auto& cubeCtr : _runningCubeControllers)

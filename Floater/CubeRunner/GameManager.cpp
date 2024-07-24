@@ -1149,22 +1149,68 @@ void GameManager::OnEndLevel(int playerIndex)
 			_boards[playerIndex]->SetIsCutScene(true);
 
 			_stageInfoPanel[playerIndex]->Disable();
-			FadeOut();
+			//FadeOut();
+
+			///
+			auto player = _players.front();
+			auto camera = player->camera;
+
+			camera->StopCamera();
+
+			auto winlose = _winLoseText.front();
+
+			winlose->Enable();
+
+			winlose->SetText(L"STAGE CLEAR!");
+			winlose->SetTextColor({ 1.0f,0.83f,0.0f,1.0f });
+
+			auto scaleTween = flt::MakeScaleTween(&winlose->tr);
+			scaleTween->from({ 0.0f,0.0f,0.0f,1.0f })
+				.to({ 2.0f,2.0f,2.0f,1.0f }).preDelay(1.0f).during(1.5f).easing(flt::ease::easeOutElastic);
+
+			flt::StartTween(scaleTween);
+
+			float forwardRatio = 10.0f;
+			float upRatio = 1.5f;
+
+			// 카메라 워크
+			auto playerPos = player->tr.GetWorldPosition();
+			auto targetPos = playerPos;
+			targetPos += (player->tr.Forward() * forwardRatio);
+			targetPos += (player->tr.Up() * upRatio);
+
+			auto posTween = flt::MakePosTween(&camera->tr);
+			posTween->from(camera->tr.GetWorldPosition())
+				.to(targetPos).during(0.5f);
+
+			auto targetRot = player->tr.GetWorldRotation();
+			auto euler = targetRot.GetEuler();
+			targetRot.SetEuler(euler.x, euler.y + 180, euler.z);
+
+			auto rotTween = flt::MakeRotTween(&camera->tr);
+			rotTween->from(camera->tr.GetWorldRotation())
+				.to(targetRot).during(0.5f);
+
+			flt::StartTween(posTween);
+			flt::StartTween(rotTween);
+			///
 
 			auto calcTween = flt::MakeTween(0);
 			int heightCount = _boards.front()->GetHeight();
 
 			calcTween->from(heightCount)
+				.to(0).during(2.5f).onStart([this]() {this->FadeOut(); })
 				.to(0).preDelay(2.5f).during(2.0f)
 				.onStart([this, heightCount] {
 				this->_bonusText.front()->Enable();
 				this->AddBonusScore(heightCount * 1000); })
 				.onStep([this](const int& value) {this->_heightCountText.front()->SetText(std::to_wstring(value) + L" lines"); })
 				.postDelay(2.0f)
-				.onEnd([this] {
+				.onEnd([this, winlose] {
 				this->_heightCountText.front()->SetText(std::to_wstring(0) + L" lines");
 				this->_bonusText.front()->Disable();
 				this->_boards.front()->SetIsCutScene(false);
+				winlose->Disable();
 				this->ProgressStage(0);
 					});
 
@@ -1483,7 +1529,7 @@ void GameManager::StartWinLoseTween(int playerIndex, bool isWin)
 
 		auto scaleTween = flt::MakeScaleTween(&_winLoseText[playerIndex]->tr);
 		scaleTween->from({ 0.0f,0.0f,0.0f,1.0f })
-			.to({ 2.0f,2.0f,2.0f,1.0f }).preDelay(0.5f).during(1.5f).easing(flt::ease::easeOutElastic);
+			.to({ 2.0f,2.0f,2.0f,1.0f }).preDelay(1.0f).during(1.5f).easing(flt::ease::easeOutElastic);
 
 		flt::Quaternion startRot;
 		flt::Quaternion firstRot;
