@@ -108,6 +108,9 @@ public:
 	void SetIsCutScene(bool isCutScene) { _isCutScene = isCutScene; }
 	void SetIsWinner(bool isWinner) { _isWinner = isWinner; }
 	bool GetIsWinner() const { return _isWinner; }
+	int GetNormalCount() const { return _normalCubeDestroyCount; }
+	int GetAdvantageCount() const { return _advantageCubeDestroyCount; }
+	int GetDarkCount() const { return _darkCubeDestroyCount; }
 
 private:
 	//void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
