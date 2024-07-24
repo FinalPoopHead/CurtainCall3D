@@ -1279,7 +1279,7 @@ void GameManager::OnEndLevel(int playerIndex)
 			int heightCount = _boards.front()->GetHeight();
 
 			calcTween->from(heightCount)
-				.to(0).during(2.5f).onEnd([this]() {this->FadeOut(); })
+				.to(heightCount).during(2.5f).onEnd([this]() {this->FadeOut(); })
 				.to(0).preDelay(2.5f).during(2.0f)
 				.onStart([this, heightCount] {
 				this->_bonusText.front()->Enable();
