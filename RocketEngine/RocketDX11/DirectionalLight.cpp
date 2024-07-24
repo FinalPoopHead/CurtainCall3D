@@ -13,7 +13,7 @@ namespace Rocket::Core
 		, _specularColor(1.0f, 1.0f, 1.0f, 1.0f)
 		, _specularPower(4.0f)
 		, _lengthZ(0.0f)
-		, _shadowRadius(50.0f)
+		, _shadowRadius(100.0f)
 		, _lightPosForShadow(Vector3::Zero)
 		, _boundingFrustum()
 		, _viewMatrix()

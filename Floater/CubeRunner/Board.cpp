@@ -11,6 +11,7 @@
 #include "Player.h"
 #include "Camera.h"
 #include "ShakeComponent.h"
+#include "MainMenuScene.h"
 
 constexpr int TILE_COUNT = 512;
 constexpr int CUBE_COUNT = 512;
@@ -53,7 +54,6 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _darkCubePool()
 	, _normalCubePool()
 	, _isGameOver(true)
-	, _isAttacked(false)
 	, _isBattleMode(false)
 	, _delayRemain(ROLLING_DELAY)
 	, _gameSpeed(GAMESPEED_DEFAULT)
@@ -66,9 +66,13 @@ Board::Board(GameManager* gameManager, int playerIndex, int width, int height, f
 	, _isOnlyDarkRemain(false)
 	, _isCameraWorking(false)
 	, _isFirst(false)
+	, _isWinner(false)
 	, _nowAddTileCount()
 	, _nextDestroyRow()
 	, _minHeight()
+	, _normalCubeDestroyCount()
+	, _advantageCubeDestroyCount()
+	, _darkCubeDestroyCount()
 	, _minePos({ -1,-1 })
 	, _fallingTileCount()
 	, _addTiles()
@@ -251,7 +255,7 @@ void Board::PreUpdate(float deltaSecond)
 		return;
 		break;
 	case eBoardState::STAGECHANGING:
-		// TODO : 스테이지 변경 연출
+		// TODO : 스테이지 변경 연출 -> 된걸로알고있음
 		return;
 		break;
 	case eBoardState::TILEDESTROYING:
@@ -636,7 +640,7 @@ void Board::GenerateWave(std::vector<std::vector<int>> waveLayout)
 // 				}
 // 				cube = _darkCubePool.front();
 // 				_darkCubePool.pop_front();
-				// TODO : 임시로.. 뭔가 기분좋으라고..
+				// 먼저 클리어한 사람에게 어드밴티지 보상
 				if (_advantageCubePool.empty())
 				{
 					ASSERT(false, "AdvantageCubePool is Empty");
@@ -800,12 +804,15 @@ void Board::AddRow()
 
 		tile->StartAdd(ADDTILE_TIME, { x,0.0f,z });
 	}
-
-	_gameManager->GetPlayer(_playerIndex)->SetPadVibration(false, 1.0f, 1.0f);
 }
 
 void Board::OnEndWave()
 {
+	if (_isGameOver)
+	{
+		return;
+	}
+
 	if (_isPerfect)
 	{
 		if (_isBattleMode)
@@ -1132,6 +1139,8 @@ void Board::OnEndAddRowTile(Tile* tile)
 		SetDelay(ADDTILE_DELAY);
 		_soundComponent->Play(_soundIndex["TileAdd"]);
 		_gameManager->GetPlayer(_playerIndex)->camera->GetShakeComponent()->Impack();
+		_gameManager->GetPlayer(_playerIndex)->SetPadVibration(false, 1.0f, 0.5f);
+		_gameManager->GetPlayer(_playerIndex)->SetPadVibration(true, 1.0f, 0.5f);
 	}
 	else if (_nowAddTileCount < 0)
 	{
@@ -1161,7 +1170,6 @@ void Board::OnEndAddColumnTile(Tile* tile)
 void Board::OnStartTileFall(int x, int z)
 {
 	_tileStates[x][z] = (int)eTileStateFlag::NONE;
-	// TODO : Player가 위에 있었으면 게임오버 해야함
 }
 
 void Board::OnEndTileFall(int x, int z)
@@ -1169,7 +1177,6 @@ void Board::OnEndTileFall(int x, int z)
 	_fallingTileCount[z]--;
 	_nowFallingTileCount--;
 
-	// TODO : 이거 0일대만 처리하고 0보다 작으면 아무것도 하지말고 0으로 쳐버리면 될듯?
 	if (_fallingTileCount[z] == 0)
 	{
 		_fallingTileCount[z] = 0;
@@ -1199,6 +1206,86 @@ void Board::OnEndCubeDrop(CubeController* cubeCtr)
 		_gameManager->GetPlayer(_playerIndex)->camera->GetShakeComponent()->Impack();
 		_gameManager->GetPlayer(_playerIndex)->SetPadVibration(false, 1.0f, 0.5f);
 		_gameManager->GetPlayer(_playerIndex)->SetPadVibration(true, 1.0f, 0.5f);
+	}
+}
+
+void Board::ShowBattleResult()
+{
+	// 먼저 모든 큐브 제거
+	std::list<CubeController*> removeList;
+	for (auto& cubeCtr : _runningCubeControllers)
+	{
+		auto pos = cubeCtr->GetPosition();
+		int x = 0;
+		int z = 0;
+
+		ConvertToTileIndex(pos.x, pos.z, x, z);
+
+		_tiles[x][z]->_cube = nullptr;
+		_tileStates[x][z] = (int)_tileStates[x][z] & ~CUBE;
+		removeList.push_back(cubeCtr);
+	}
+
+	for (auto& cubeCtr : removeList)
+	{
+		cubeCtr->StartRemove(REMOVE_TIME);
+	}
+
+	auto player = _gameManager->GetPlayer(_playerIndex);
+	auto camera = player->camera;
+	
+	camera->StopCamera();
+
+	_gameManager->SetResultText(_playerIndex, 0, L"NORMAL CUBE", L": " + std::to_wstring(_normalCubeDestroyCount));
+	_gameManager->SetResultTextColor(_playerIndex, 0, { 1.0f,1.0f,1.0f,1.0f });
+
+	_gameManager->SetResultText(_playerIndex, 1, L"ADVANTAGE CUBE", L": " + std::to_wstring(_advantageCubeDestroyCount));
+	_gameManager->SetResultTextColor(_playerIndex, 1, { 0.3f,0.9f,0.3f,1.0f });
+
+	_gameManager->SetResultText(_playerIndex, 2, L"DARK CUBE", L": " + std::to_wstring(_darkCubeDestroyCount));
+	_gameManager->SetResultTextColor(_playerIndex, 2, { 0.5f,0.5f,0.5f,1.0f });
+
+	_gameManager->StartWinLoseTween(_playerIndex, _isWinner);
+
+	float forwardRatio = 10.0f;
+	float upRatio = 1.5f;
+	float rightRatio = 2.0f;
+
+	// Winner를 바라보는 카메라 워크
+	if (_isWinner)
+	{
+		auto playerPos = player->tr.GetWorldPosition();
+		auto targetPos = playerPos;
+		targetPos += (player->tr.Forward() * forwardRatio);
+		targetPos += (player->tr.Up() * upRatio);
+
+		auto secondPos = targetPos + (player->tr.Right() * rightRatio);
+
+		auto posTween = flt::MakePosTween(&camera->tr);
+		posTween->from(camera->tr.GetWorldPosition())
+			.to(targetPos).during(0.5f).postDelay(3.0f)
+			.to(secondPos).during(0.4f).easing(flt::ease::easeOutQuint)
+			.onEnd([this]() {
+			_gameManager->StartResultTween(_playerIndex, 3); 
+			_gameManager->StartResultTween((_playerIndex + 1) % 2, 3);
+				});
+
+		auto targetRot = player->tr.GetWorldRotation();
+		auto euler = targetRot.GetEuler();
+		targetRot.SetEuler(euler.x, euler.y + 180, euler.z);
+
+		auto rotTween = flt::MakeRotTween(&camera->tr);
+		rotTween->from(camera->tr.GetWorldRotation())
+			.to(targetRot).during(0.5f).postDelay(15.0f)
+			.onEnd([]() {flt::SetScene(flt::CreateScene<MainMenuScene>()); });
+
+		flt::StartTween(posTween);
+		flt::StartTween(rotTween);
+	}
+	else
+	{
+		// Loser는 그냥 결과창만..
+
 	}
 }
 
@@ -1273,7 +1360,6 @@ bool Board::IsMineSet()
 
 void Board::OnEndPlayerFalling()
 {
-	// TODO : GameOver 연출
 	_gameManager->OnEndPlayerFall(_playerIndex);
 	_soundComponent->Play(_soundIndex["GameOver"]);
 }
@@ -1411,9 +1497,8 @@ void Board::Resize(int newWidth, int newHeight)
 
 void Board::Reset()
 {
-	// TODO : 진행중이던 게임 전부 리셋해야함.
+	// 진행중이던 게임 전부 리셋
 	// 큐브풀로 다 갖고오고 타일풀로 다 갖고오고 진행중이던거 전부 제거하고..
-	// 조금 까다롭군
 
 	for (int i = 0; i < _width; ++i)
 	{
@@ -1500,12 +1585,7 @@ void Board::Wait(float deltaSecond)
 
 void Board::OnWaiting()
 {
-	// TODO : 상대방이 공격하면 여기서 처리하는건데.. 음..
-	if (_isAttacked)
-	{
-		_isAttacked = false;
-		DestroyRow();
-	}
+
 }
 
 void Board::OnEndWaiting()
@@ -1624,7 +1704,8 @@ bool Board::UpdateDetonate()
 					// NormalCube 수납
 					if (cubeCtr->IsRunning())
 					{
-						destroyCount++;
+						++destroyCount;
+						++_normalCubeDestroyCount;
 						cubeCtr->StartRemove(REMOVE_TIME);
 
 						float x = 0.0f, y = 0.0f, z = 0.0f;
@@ -1636,6 +1717,7 @@ bool Board::UpdateDetonate()
 					// DarkCube 수납 및 스테이지 한 줄 삭제
 					if (cubeCtr->IsRunning())
 					{
+						++_darkCubeDestroyCount;
 						_isPerfect = false;
 						DestroyRow();
 						cubeCtr->StartRemove(REMOVE_TIME);
@@ -1647,7 +1729,8 @@ bool Board::UpdateDetonate()
 					{
 						_tileStates[i][j] = _tileStates[i][j] | (int)eTileStateFlag::ADVANTAGEMINE;
 						_tiles[i][j]->EnableAdvantageMine();
-						destroyCount++;
+						++destroyCount;
+						++_advantageCubeDestroyCount;
 						cubeCtr->StartRemove(REMOVE_TIME);
 
 						float x = 0.0f, y = 0.0f, z = 0.0f;

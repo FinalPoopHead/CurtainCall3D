@@ -77,9 +77,6 @@
     <ClInclude Include="include\internal\Collider.h">
       <Filter>Component\impl</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionPair.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="include\EngineMinimal.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -104,9 +101,6 @@
     <ClInclude Include="Image.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="include\internal\DirectionalLight.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="include\MakeTween.h">
       <Filter>fltween</Filter>
     </ClInclude>
@@ -115,6 +109,12 @@
     </ClInclude>
     <ClInclude Include="FMODInstance.h">
       <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionPair.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\internal\DirectionalLight.h">
+      <Filter>Component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -166,16 +166,10 @@
     <ClCompile Include="RendererNode.cpp">
       <Filter>Manager\Resource\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Sound.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="UIComponent.cpp">
       <Filter>Component\impl</Filter>
     </ClCompile>
     <ClCompile Include="Image.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="DirectionalLight.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="MakeTween.cpp">
@@ -186,6 +180,12 @@
     </ClCompile>
     <ClCompile Include="FMODInstance.cpp">
       <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Component</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

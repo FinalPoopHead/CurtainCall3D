@@ -12,6 +12,7 @@ class DarkCube;
 class NormalCube;
 class GameManager;
 class Player;
+class PlayerModel;
 
 enum class eTileStateFlag
 {
@@ -81,6 +82,7 @@ public:
 	void OnStartTileFall(int x, int z);		// x,z index의 타일이 떨어지기 시작함.
 	void OnEndTileFall(int x, int z);
 	void OnEndCubeDrop(CubeController* cubeCtr);
+	void ShowBattleResult();
 
 	void AddBattleModeSpeed(float value);
 
@@ -104,6 +106,11 @@ public:
 	int GetHeight() const { return _height; }
 	void SetGameOver(bool isOver) { _isGameOver = isOver; }
 	void SetIsCutScene(bool isCutScene) { _isCutScene = isCutScene; }
+	void SetIsWinner(bool isWinner) { _isWinner = isWinner; }
+	bool GetIsWinner() const { return _isWinner; }
+	int GetNormalCount() const { return _normalCubeDestroyCount; }
+	int GetAdvantageCount() const { return _advantageCubeDestroyCount; }
+	int GetDarkCount() const { return _darkCubeDestroyCount; }
 
 private:
 	//void ConvertToTileIndex(float x, float z, int& outX, int& outZ);
@@ -156,7 +163,6 @@ private:
 
 	bool _isGameOver;		// 게임이 끝났는지? (오버 및 클리어)
 	bool _isCutScene;		// 스테이지 클리어 했는지?
-	bool _isAttacked;
 	bool _isBattleMode;
 	float _delayRemain;
 	float _gameSpeed;
@@ -170,9 +176,14 @@ private:
 	bool _isOnlyDarkRemain;
 	bool _isCameraWorking;
 	bool _isFirst;
+	bool _isWinner;
 	int _nowAddTileCount;
 	int _nextDestroyRow;
 	int _minHeight;
+
+	int _normalCubeDestroyCount;
+	int _advantageCubeDestroyCount;
+	int _darkCubeDestroyCount;
 
 	std::pair<int, int> _minePos;
 	std::unordered_map<int,int> _fallingTileCount;	// key는 heightIndex

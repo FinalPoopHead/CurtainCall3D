@@ -68,6 +68,10 @@ GameManager::GameManager() :
 	, _garbageLineText()
 	, _gameoverTextPanel()
 	, _gameoverText()
+	, _winLoseText()
+	, _resultPanel()
+	, _resultText()
+	, _resultValueText()
 	, _finalScorePanel()
 	, _finalScoreText()
 	, _roundText()
@@ -324,6 +328,19 @@ void GameManager::Update(float deltaSecond)
 	{
 		auto originOffset = comboText->GetOffsetPosition();
 		comboText->SetOffsetPosition({ originOffset.x, originOffset.y - COMBOTEXTSPEED * deltaSecond });
+	}
+
+	flt::KeyData keyData = flt::GetKeyDown(flt::KeyCode::key0);
+	if (keyData)
+	{
+		_boards[0]->SetIsWinner(true);
+		_boards[1]->SetIsWinner(false);
+
+		for (auto& board : _boards)
+		{
+			board->SetGameOver(true);
+			board->ShowBattleResult();
+		}
 	}
 
 	if (_players.size() == 1)
@@ -706,6 +723,46 @@ void GameManager::CreateUI(int index)
 	text_R->SetTextAlignment(eTextAlignment::CENTER);
 	text_R->tr.SetScale(1.5f, 1.5f, 1.5f);
 	_gameoverText[index].push_back(text_R);
+
+	TextObject* winLoseText = flt::CreateGameObject<TextObject>(false);
+	winLoseText->SetOffsetPosition({ 0.5f,0.2f });
+	winLoseText->SetFont(bigFontPath);
+	winLoseText->SetTextColor(whiteColor);
+	winLoseText->SetText(L"WIN!");
+	winLoseText->SetTextAlignment(eTextAlignment::CENTER);
+	winLoseText->tr.SetScale(2.0f, 2.0f, 2.0f);
+	_winLoseText.push_back(winLoseText);
+
+	TextObject* resultPanel = flt::CreateGameObject<TextObject>(false);
+	resultPanel->SetOffsetPosition({ 0.5f,0.3f });
+	resultPanel->SetFont(bigFontPath);
+	_resultPanel.push_back(resultPanel);
+
+	_resultText.emplace_back();
+	_resultValueText.emplace_back();
+	int resultSize = 5;
+	float resultX = 600.0f;
+	float resultY = 150.0f;
+	for (int i = 0; i < resultSize; ++i)
+	{
+		TextObject* resultText = flt::CreateGameObject<TextObject>(false);
+		resultText->SetParent(resultPanel);
+		resultText->SetPosition({ -resultX, resultY * i });
+		resultText->SetFont(bigFontPath);
+		resultText->SetText(L"NORMAL CUBE");
+		resultText->SetTextColor(whiteColor);
+		resultText->SetTextAlignment(eTextAlignment::LEFT);
+		_resultText[index].push_back(resultText);
+
+		TextObject* resultValue = flt::CreateGameObject<TextObject>(false);
+		resultValue->SetParent(resultPanel);
+		resultValue->SetPosition({ resultX / 2.0f, resultY * i });
+		resultValue->SetFont(bigFontPath);
+		resultValue->SetText(L":  10");
+		resultValue->SetTextColor(whiteColor);
+		resultValue->SetTextAlignment(eTextAlignment::RIGHT);
+		_resultValueText[index].push_back(resultValue);
+	}
 }
 
 void GameManager::SetBoardAndPlayer(int index, Board* board, Player* player)
@@ -806,27 +863,27 @@ void GameManager::OnDestroyCubes(int playerIndex, int count, flt::Vector3f pos /
 
 	switch (count)
 	{
-		case 1:
-		case 2:
-		case 3:
-			break;
-		case 4:
-		case 5:
-			damage = 1;
-			break;
-		case 6:
-		case 7:
-			damage = 2;
-			break;
-		case 8:
-			damage = 3;
-			break;
-		case 9:
-			damage = 4;
-			break;
-		default:
-			damage = 6;
-			break;
+	case 1:
+	case 2:
+	case 3:
+		break;
+	case 4:
+	case 5:
+		damage = 1;
+		break;
+	case 6:
+	case 7:
+		damage = 2;
+		break;
+	case 8:
+		damage = 3;
+		break;
+	case 9:
+		damage = 4;
+		break;
+	default:
+		damage = 6;
+		break;
 	}
 
 	float delay = 0.1f;
@@ -867,35 +924,35 @@ void GameManager::SetStage(int stageNum)
 	std::wstring numStr;
 	switch (stageNum)
 	{
-		case 1:
-			numStr = L"1 S T";
-			break;
-		case 2:
-			numStr = L"2 N D";
-			break;
-		case 3:
-			numStr = L"3 R D";
-			break;
-		case 4:
-			numStr = L"4 T H";
-			break;
-		case 5:
-			numStr = L"5 T H";
-			break;
-		case 6:
-			numStr = L"6 T H";
-			break;
-		case 7:
-			numStr = L"7 T H";
-			break;
-		case 8:
-			numStr = L"8 T H";
-			break;
-		case 9:
-			numStr = L"F I N A L";
-			break;
-		default:
-			break;
+	case 1:
+		numStr = L"1 S T";
+		break;
+	case 2:
+		numStr = L"2 N D";
+		break;
+	case 3:
+		numStr = L"3 R D";
+		break;
+	case 4:
+		numStr = L"4 T H";
+		break;
+	case 5:
+		numStr = L"5 T H";
+		break;
+	case 6:
+		numStr = L"6 T H";
+		break;
+	case 7:
+		numStr = L"7 T H";
+		break;
+	case 8:
+		numStr = L"8 T H";
+		break;
+	case 9:
+		numStr = L"F I N A L";
+		break;
+	default:
+		break;
 	}
 
 	_roundText->SetText(numStr + L"   S T A G E");
@@ -963,43 +1020,118 @@ void GameManager::ProgressStage(int playerIndex)
 	{
 		// TODO : Game Clear Cut Scene
 		_boards[playerIndex]->SetGameOver(true);
+		
+		/// start
+		FadeIn();
+		auto player = _players.front();
+		auto camera = player->camera;
 
+		camera->StopCamera();
 
+		auto winlose = _winLoseText.front();
+
+		winlose->Enable();
+
+		winlose->SetText(L"ALL CLEAR!");
+		winlose->SetTextColor({ 1.0f,0.83f,0.0f,1.0f });
+
+		auto scaleTween = flt::MakeScaleTween(&winlose->tr);
+		scaleTween->from({ 0.0f,0.0f,0.0f,1.0f })
+			.to({ 2.0f,2.0f,2.0f,1.0f }).preDelay(3.0f).during(1.5f).easing(flt::ease::easeOutElastic);
+
+		flt::StartTween(scaleTween);
+
+		SetResultText(0, 0, L"NORMAL CUBE", L": " + std::to_wstring(_boards.front()->GetNormalCount()));
+		SetResultTextColor(0, 0, { 1.0f,1.0f,1.0f,1.0f });
+
+		SetResultText(0, 1, L"ADVANTAGE CUBE", L": " + std::to_wstring(_boards.front()->GetAdvantageCount()));
+		SetResultTextColor(0, 1, { 0.3f,0.9f,0.3f,1.0f });
+
+		SetResultText(0, 2, L"DARK CUBE", L": " + std::to_wstring(_boards.front()->GetDarkCount()));
+		SetResultTextColor(0, 2, { 0.5f,0.5f,0.5f,1.0f });
+
+		float forwardRatio = 10.0f;
+		float upRatio = 1.5f;
+		float rightRatio = 2.0f;
+
+		// 카메라 워크
+		auto playerPos = player->tr.GetWorldPosition();
+		auto targetPos = playerPos;
+		targetPos += (player->tr.Forward() * forwardRatio);
+		targetPos += (player->tr.Up() * upRatio);
+
+		auto secondPos = targetPos + (player->tr.Right() * rightRatio);
+
+		auto posTween = flt::MakePosTween(&camera->tr);
+		posTween->from(camera->tr.GetWorldPosition())
+			.to(targetPos).during(0.5f).postDelay(5.0f)
+			.to(secondPos).during(0.4f).easing(flt::ease::easeOutQuint)
+			.onEnd([this]() { StartResultTween(0, 3); });
+
+		auto targetRot = player->tr.GetWorldRotation();
+		auto euler = targetRot.GetEuler();
+		targetRot.SetEuler(euler.x, euler.y + 180, euler.z);
+
+		auto rotTween = flt::MakeRotTween(&camera->tr);
+		rotTween->from(camera->tr.GetWorldRotation())
+			.to(targetRot).during(0.5f).postDelay(10.0f).onEnd([this]() {FadeOut(); });
+
+		flt::StartTween(posTween);
+		flt::StartTween(rotTween);
+
+		auto scoreTween = flt::MakeScaleTween(&_finalScorePanel->tr);
+		auto scale = _finalScorePanel->tr.GetLocalScale();
+		flt::Vector4f startScale = { 0.0f, scale.y,scale.z,1.0f };
+
+		scoreTween->from(startScale)
+			.to(scale).preDelay(15.0f).during(1.0f).postDelay(3.0f)
+			.onStart([this]() {
+			this->_resultPanel.front()->Disable();
+			this->_winLoseText.front()->Disable();
+			this->_finalScorePanel->Enable();
+			this->_finalScoreText->SetText(std::to_wstring(this->_playerScore.front())); })
+			.to(startScale).during(1.0f).postDelay(2.0f)
+			.onEnd([this]() {this->EnableScoreInput();
+		this->_finalScorePanel->Disable(); });
+
+		flt::StartTween(scoreTween);
+
+		/// end
 	}
 	else
 	{
 		std::wstring numStr;
 		switch (_currentStage[playerIndex])
 		{
-			case 1:
-				numStr = L"1 S T";
-				break;
-			case 2:
-				numStr = L"2 N D";
-				break;
-			case 3:
-				numStr = L"3 R D";
-				break;
-			case 4:
-				numStr = L"4 T H";
-				break;
-			case 5:
-				numStr = L"5 T H";
-				break;
-			case 6:
-				numStr = L"6 T H";
-				break;
-			case 7:
-				numStr = L"7 T H";
-				break;
-			case 8:
-				numStr = L"8 T H";
-				break;
-			case 9:
-				numStr = L"F I N A L";
-				break;
-			default:
-				break;
+		case 1:
+			numStr = L"1 S T";
+			break;
+		case 2:
+			numStr = L"2 N D";
+			break;
+		case 3:
+			numStr = L"3 R D";
+			break;
+		case 4:
+			numStr = L"4 T H";
+			break;
+		case 5:
+			numStr = L"5 T H";
+			break;
+		case 6:
+			numStr = L"6 T H";
+			break;
+		case 7:
+			numStr = L"7 T H";
+			break;
+		case 8:
+			numStr = L"8 T H";
+			break;
+		case 9:
+			numStr = L"F I N A L";
+			break;
+		default:
+			break;
 		}
 
 		_roundText->SetText(numStr + L"   S T A G E");
@@ -1092,22 +1224,67 @@ void GameManager::OnEndLevel(int playerIndex)
 			_boards[playerIndex]->SetIsCutScene(true);
 
 			_stageInfoPanel[playerIndex]->Disable();
-			FadeOut();
+
+			/// start
+			auto player = _players.front();
+			auto camera = player->camera;
+
+			camera->StopCamera();
+
+			auto winlose = _winLoseText.front();
+
+			winlose->Enable();
+
+			winlose->SetText(L"STAGE CLEAR!");
+			winlose->SetTextColor({ 1.0f,0.83f,0.0f,1.0f });
+
+			auto scaleTween = flt::MakeScaleTween(&winlose->tr);
+			scaleTween->from({ 0.0f,0.0f,0.0f,1.0f })
+				.to({ 2.0f,2.0f,2.0f,1.0f }).preDelay(1.0f).during(1.5f).easing(flt::ease::easeOutElastic);
+
+			flt::StartTween(scaleTween);
+
+			float forwardRatio = 10.0f;
+			float upRatio = 1.5f;
+
+			// 카메라 워크
+			auto playerPos = player->tr.GetWorldPosition();
+			auto targetPos = playerPos;
+			targetPos += (player->tr.Forward() * forwardRatio);
+			targetPos += (player->tr.Up() * upRatio);
+
+			auto posTween = flt::MakePosTween(&camera->tr);
+			posTween->from(camera->tr.GetWorldPosition())
+				.to(targetPos).during(0.5f);
+
+			auto targetRot = player->tr.GetWorldRotation();
+			auto euler = targetRot.GetEuler();
+			targetRot.SetEuler(euler.x, euler.y + 180, euler.z);
+
+			auto rotTween = flt::MakeRotTween(&camera->tr);
+			rotTween->from(camera->tr.GetWorldRotation())
+				.to(targetRot).during(0.5f);
+
+			flt::StartTween(posTween);
+			flt::StartTween(rotTween);
+			/// end
 
 			auto calcTween = flt::MakeTween(0);
 			int heightCount = _boards.front()->GetHeight();
 
 			calcTween->from(heightCount)
+				.to(0).during(2.5f).onEnd([this]() {this->FadeOut(); })
 				.to(0).preDelay(2.5f).during(2.0f)
 				.onStart([this, heightCount] {
 				this->_bonusText.front()->Enable();
 				this->AddBonusScore(heightCount * 1000); })
 				.onStep([this](const int& value) {this->_heightCountText.front()->SetText(std::to_wstring(value) + L" lines"); })
 				.postDelay(2.0f)
-				.onEnd([this] {
+				.onEnd([this, winlose] {
 				this->_heightCountText.front()->SetText(std::to_wstring(0) + L" lines");
 				this->_bonusText.front()->Disable();
 				this->_boards.front()->SetIsCutScene(false);
+				winlose->Disable();
 				this->ProgressStage(0);
 					});
 
@@ -1166,33 +1343,107 @@ Player* GameManager::GetPlayer(int index)
 
 void GameManager::OnStartPlayerFall(int index)
 {
-	_stageInfoPanel[index]->Disable();
-	_fallCountPanel[index]->Disable();
-	_garbageLineText[index]->Disable();
+	auto originPosStageInfo = _stageInfoPanel[index]->GetOffsetPosition();
+	auto originPosFallCount = _fallCountPanel[index]->GetOffsetPosition();
+	auto originPosGarbageLine = _garbageLineText[index]->GetOffsetPosition();
 
-	// TODO : index는 패배고 index가 아닌 사람은 승리?
+	auto stageInfoTween = flt::MakeTween(0.0f);
+	stageInfoTween->from(originPosStageInfo.x)
+		.to(-0.3f).during(1.0f).easing(flt::ease::easeInBack)
+		.onStep([this, index, originPosStageInfo](const float& value)
+			{this->_stageInfoPanel[index]->SetOffsetPosition({ value,originPosStageInfo.y }); })
+		.onEnd([this, index, originPosStageInfo]() {
+		_stageInfoPanel[index]->Disable();
+		_stageInfoPanel[index]->SetOffsetPosition(originPosStageInfo);
+			});
+
+	auto fallCountTween = flt::MakeTween(0.0f);
+	fallCountTween->from(originPosFallCount.x)
+		.to(1.3f).during(1.0f).easing(flt::ease::easeInBack)
+		.onStep([this, index, originPosFallCount](const float& value)
+			{this->_fallCountPanel[index]->SetOffsetPosition({ value,originPosFallCount.y }); })
+		.onEnd([this, index, originPosFallCount]() {
+		_fallCountPanel[index]->Disable();
+		_fallCountPanel[index]->SetOffsetPosition(originPosFallCount);
+			});
+
+	auto garbageLineTween = flt::MakeTween(0.0f);
+	garbageLineTween->from(originPosGarbageLine.x)
+		.to(1.3f).during(1.0f).easing(flt::ease::easeInBack)
+		.onStep([this, index, originPosGarbageLine](const float& value)
+			{this->_garbageLineText[index]->SetOffsetPosition({ value,originPosGarbageLine.y }); })
+		.onEnd([this, index, originPosGarbageLine]() {
+		_garbageLineText[index]->Disable();
+		_garbageLineText[index]->SetOffsetPosition(originPosGarbageLine);
+			});
+
+	flt::StartTween(stageInfoTween);
+	flt::StartTween(fallCountTween);
+	flt::StartTween(garbageLineTween);
+
+	if (_players.size() == 2)
+	{
+		int opIndex = (index + 1) % 2;
+
+		auto originPosStageInfo = _stageInfoPanel[opIndex]->GetOffsetPosition();
+		auto originPosFallCount = _fallCountPanel[opIndex]->GetOffsetPosition();
+		auto originPosGarbageLine = _garbageLineText[opIndex]->GetOffsetPosition();
+
+		auto stageInfoTween = flt::MakeTween(0.0f);
+		stageInfoTween->from(originPosStageInfo.x)
+			.to(-0.3f).during(1.0f).easing(flt::ease::easeInBack)
+			.onStep([this, opIndex, originPosStageInfo](const float& value)
+				{this->_stageInfoPanel[opIndex]->SetOffsetPosition({ value,originPosStageInfo.y }); })
+			.onEnd([this, opIndex, originPosStageInfo]() {
+			_stageInfoPanel[opIndex]->Disable();
+			_stageInfoPanel[opIndex]->SetOffsetPosition(originPosStageInfo);
+				});
+
+		auto fallCountTween = flt::MakeTween(0.0f);
+		fallCountTween->from(originPosFallCount.x)
+			.to(1.3f).during(1.0f).easing(flt::ease::easeInBack)
+			.onStep([this, opIndex, originPosFallCount](const float& value)
+				{this->_fallCountPanel[opIndex]->SetOffsetPosition({ value,originPosFallCount.y }); })
+			.onEnd([this, opIndex, originPosFallCount]() {
+			_fallCountPanel[opIndex]->Disable();
+			_fallCountPanel[opIndex]->SetOffsetPosition(originPosFallCount);
+				});
+
+		auto garbageLineTween = flt::MakeTween(0.0f);
+		garbageLineTween->from(originPosGarbageLine.x)
+			.to(1.3f).during(1.0f).easing(flt::ease::easeInBack)
+			.onStep([this, opIndex, originPosGarbageLine](const float& value)
+				{this->_garbageLineText[opIndex]->SetOffsetPosition({ value,originPosGarbageLine.y }); })
+			.onEnd([this, opIndex, originPosGarbageLine]() {
+			_garbageLineText[opIndex]->Disable();
+			_garbageLineText[opIndex]->SetOffsetPosition(originPosGarbageLine);
+				});
+
+		flt::StartTween(stageInfoTween);
+		flt::StartTween(fallCountTween);
+		flt::StartTween(garbageLineTween);
+
+		for (auto& board : _boards)
+		{
+			board->SetGameOver(true);
+		}
+
+		_boards[(index + 1) % 2]->SetIsWinner(true);
+		_boards[index]->SetIsWinner(false);
+	}
+
+	_soundComponent->Stop(0);
+	_soundComponent->Stop(1);
+	_soundComponent->Stop(2);
 }
 
 void GameManager::OnEndPlayerFall(int index)
 {
 	if (_players.size() == 1)
 	{
+		FadeOut();
+
 		_gameoverTextPanel[index]->Enable();
-
-		auto scoreTween = flt::MakeScaleTween(&_finalScorePanel->tr);
-		auto scale = _finalScorePanel->tr.GetLocalScale();
-		flt::Vector4f startScale = { 0.0f, scale.y,scale.z,1.0f };
-
-		scoreTween->from(startScale)
-			.to(scale).preDelay(6.5f).during(1.0f).postDelay(3.0f)
-			.onStart([this]() {
-			this->_finalScorePanel->Enable();
-			this->_finalScoreText->SetText(std::to_wstring(this->_playerScore.front())); })
-			.to(startScale).during(1.0f).postDelay(2.0f)
-			.onEnd([this]() {this->EnableScoreInput();
-		this->_finalScorePanel->Disable(); });
-
-		flt::StartTween(scoreTween);
 
 		for (auto& text : _gameoverText[index])
 		{
@@ -1208,11 +1459,35 @@ void GameManager::OnEndPlayerFall(int index)
 			flt::StartTween(tweenScale);
 		}
 
-		FadeOut();
+		auto scoreTween = flt::MakeScaleTween(&_finalScorePanel->tr);
+		auto scale = _finalScorePanel->tr.GetLocalScale();
+		flt::Vector4f startScale = { 0.0f, scale.y,scale.z,1.0f };
+
+		scoreTween->from(startScale)
+			.to(scale).preDelay(6.5f).during(1.0f).postDelay(3.0f)
+			.onStart([this]() {
+			this->_finalScorePanel->Enable();
+			this->_finalScoreText->SetText(std::to_wstring(this->_playerScore.front())); })
+			.to(startScale).during(1.0f).postDelay(2.0f)
+			.onEnd([this]() {this->EnableScoreInput();
+		this->_finalScorePanel->Disable(); });
+
+		flt::StartTween(scoreTween);
 	}
 	else if (_players.size() == 2)
 	{
-		// TODO : 승리 패배 연출 만들어야함
+		for (auto& player : _players)
+		{
+			player->SetGameOver();
+		}
+
+		int index = 0;
+		for (auto& board : _boards)
+		{
+			board->ShowBattleResult();
+
+			++index;
+		}
 	}
 }
 
@@ -1306,6 +1581,94 @@ void GameManager::OnHeightChange(int index, int height)
 	ChangeHeightCountText(index, height);
 }
 
+void GameManager::SetResultText(int playerIndex, int textIndex, std::wstring key, std::wstring value)
+{
+	_resultText[playerIndex][textIndex]->SetText(key);
+	_resultValueText[playerIndex][textIndex]->SetText(value);
+}
+
+void GameManager::SetResultTextColor(int playerIndex, int textIndex, flt::Vector4f color)
+{
+	_resultText[playerIndex][textIndex]->SetTextColor(color);
+	_resultValueText[playerIndex][textIndex]->SetTextColor(color);
+}
+
+void GameManager::StartWinLoseTween(int playerIndex, bool isWin)
+{
+	for (auto& winlose : _winLoseText)
+	{
+		winlose->Enable();
+	}
+
+	if (isWin)
+	{
+		_winLoseText[playerIndex]->SetText(L"WIN!");
+		_winLoseText[playerIndex]->SetTextColor({ 1.0f,0.83f,0.0f,1.0f });
+
+		auto scaleTween = flt::MakeScaleTween(&_winLoseText[playerIndex]->tr);
+		scaleTween->from({ 0.0f,0.0f,0.0f,1.0f })
+			.to({ 2.0f,2.0f,2.0f,1.0f }).preDelay(1.0f).during(1.5f).easing(flt::ease::easeOutElastic);
+
+		flt::Quaternion startRot;
+		flt::Quaternion firstRot;
+		firstRot.SetEuler(0.0f, 0.0f, -30.0f);
+		flt::Quaternion secondRot;
+		secondRot.SetEuler(0.0f, 0.0f, 30.0f);
+
+		auto rotTween = flt::MakeRotTween(&_winLoseText[playerIndex]->tr);
+		rotTween->from(startRot)
+			.to(firstRot).preDelay(0.5f).during(0.25f)
+			.to(secondRot).during(0.5f)
+			.to(startRot).during(0.25f);
+
+		flt::StartTween(scaleTween);
+		flt::StartTween(rotTween);
+	}
+	else
+	{
+		// 0.5f, 0.2f
+		_winLoseText[playerIndex]->SetText(L"LOSE..");
+		_winLoseText[playerIndex]->SetTextColor({ 0.1f,0.1f,0.6f,1.0f });
+		float xPos = _winLoseText[playerIndex]->GetOffsetPosition().x;
+		_winLoseText[playerIndex]->SetOffsetPosition({ xPos, -0.1f });
+
+		auto posYTween = flt::MakeTween(0.0f);
+		posYTween->from(-0.1f)
+			.to(0.2f).preDelay(0.5f).during(1.5f).easing(flt::ease::easeOutBounce)
+			.onStep([this, playerIndex, xPos](const float& value) {this->_winLoseText[playerIndex]->SetOffsetPosition({ xPos,value }); });
+
+		flt::StartTween(posYTween);
+	}
+}
+
+void GameManager::StartResultTween(int playerIndex, int textCount)
+{
+	if (textCount > _resultText[playerIndex].size())
+	{
+		ASSERT(false, "GameManager StartResultTween INDEX OVER");
+	}
+
+	_resultPanel[playerIndex]->Enable();
+
+	float delay = 0.2f;
+
+	for (int i = 0; i < textCount; ++i)
+	{
+		auto text = _resultText[playerIndex][i];
+		auto value = _resultValueText[playerIndex][i];
+
+		text->Disable();
+		value->Disable();
+
+		auto revealTween = flt::MakeTween(0);
+		revealTween->from(0)
+			.to(0).during(delay * i)
+			.onEnd([this, text, value]() {text->Enable(); value->Enable(); });
+
+		flt::StartTween(revealTween);
+	}
+}
+
 void GameManager::ReturnMissile(SpriteObject* missile)
 {
 	_missilePool.push_back(missile);
@@ -1364,6 +1727,18 @@ void GameManager::IncreasePlayerCount()
 			{
 				auto originOffset = _gameoverTextPanel[i]->GetOffsetPosition();
 				_gameoverTextPanel[i]->SetOffsetPosition({ offSetBase + originOffset.x / MAXPLAYERCOUNT, originOffset.y });
+			}
+
+			if (_winLoseText[i] != nullptr)
+			{
+				auto originOffset = _winLoseText[i]->GetOffsetPosition();
+				_winLoseText[i]->SetOffsetPosition({ offSetBase + originOffset.x / MAXPLAYERCOUNT, originOffset.y });
+			}
+
+			if (_resultPanel[i] != nullptr)
+			{
+				auto originOffset = _resultPanel[i]->GetOffsetPosition();
+				_resultPanel[i]->SetOffsetPosition({ offSetBase + originOffset.x / MAXPLAYERCOUNT, originOffset.y });
 			}
 
 			_comboTextPos[i] = { offSetBase + COMBOTEXTPOSITION.x / MAXPLAYERCOUNT, COMBOTEXTPOSITION.y };
@@ -1863,47 +2238,47 @@ bool GameManager::EnterInput(int index)
 	{
 		switch (index)
 		{
-			case 26:
-				// !
-				_inputText.append("!");
-				break;
-			case 27:
-				// ?
-				_inputText.append("?");
-				break;
-			case 28:
-				// /
-				_inputText.append("/");
-				break;
-			case 29:
-				// .
-				_inputText.append(".");
-				break;
-			case 30:
-				// " "
-				_inputText.append(" ");
-				break;
-			case 31:
-				// DEL
-				if (_inputText.size() > 0)
-				{
-					_inputText.pop_back();
-				}
-				break;
-			case 32:
-				// END
-				if (_inputText.size() > 0)
-				{
-					_rankData.push_back({ 0, _inputText, _playerScore.front() });
-					SortRanking();
-					WriteRankingFile();
-					_inputField->SetText(L"");
-					_inputText.clear();
-					return true;
-				}
-				break;
-			default:
-				break;
+		case 26:
+			// !
+			_inputText.append("!");
+			break;
+		case 27:
+			// ?
+			_inputText.append("?");
+			break;
+		case 28:
+			// /
+			_inputText.append("/");
+			break;
+		case 29:
+			// .
+			_inputText.append(".");
+			break;
+		case 30:
+			// " "
+			_inputText.append(" ");
+			break;
+		case 31:
+			// DEL
+			if (_inputText.size() > 0)
+			{
+				_inputText.pop_back();
+			}
+			break;
+		case 32:
+			// END
+			if (_inputText.size() > 0)
+			{
+				_rankData.push_back({ 0, _inputText, _playerScore.front() });
+				SortRanking();
+				WriteRankingFile();
+				_inputField->SetText(L"");
+				_inputText.clear();
+				return true;
+			}
+			break;
+		default:
+			break;
 		}
 	}
 
