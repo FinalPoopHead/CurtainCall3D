@@ -147,6 +147,7 @@
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="PlayerModel.cpp" />
+    <ClCompile Include="RankViewer.cpp" />
     <ClCompile Include="ShakeComponent.cpp" />
     <ClCompile Include="ShakeObject.cpp" />
     <ClCompile Include="SpriteObject.cpp" />
@@ -163,6 +164,7 @@
     <ClCompile Include="TextObject.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="UIStateContext.cpp" />
+    <ClCompile Include="UIStateContextController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdvantageCube.h" />
@@ -177,6 +179,7 @@
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="PlayerModel.h" />
+    <ClInclude Include="RankViewer.h" />
     <ClInclude Include="ShakeComponent.h" />
     <ClInclude Include="ShakeObject.h" />
     <ClInclude Include="SpriteObject.h" />
@@ -191,6 +194,7 @@
     <ClInclude Include="TextObject.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="UIStateContext.h" />
+    <ClInclude Include="UIStateContextController.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

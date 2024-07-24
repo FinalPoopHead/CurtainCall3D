@@ -4,6 +4,7 @@
 
 class Menu;
 class MenuItem;
+class RankViewer;
 
 class MenuSelector : public flt::GameObject
 {
@@ -14,6 +15,10 @@ public:
 	void prev();
 	void Select(flt::KeyCode keyCode);
 
+	void SetTitle(MenuItem* title) { _title = title; }
+	void SetRankViewer(RankViewer* rankViewer) { _rankViewer = rankViewer; }
+	void ViewRank();
+
 protected:
 	void OnEnable() override;
 	void OnDisable() override;
@@ -22,9 +27,12 @@ protected:
 private:
 	void MoveSelectedItem();
 
+
 private:
+	MenuItem* _title;
 	Menu* _mainMenu;
 	Menu* _controllerSelectMenu;
+	RankViewer* _rankViewer;
 	MenuItem* _selectedItem;
 	flt::UIComponent* _ui;
 	float _lastLStickY;

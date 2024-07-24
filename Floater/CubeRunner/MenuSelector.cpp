@@ -1,14 +1,17 @@
 ﻿#include "MenuSelector.h"
 #include "Menu.h"
 #include "MenuItem.h"
+#include "RankViewer.h"
 #include "../FloaterGameEngine/include/Input.h"
 #include <iostream>
 
 #include "../FloaterGameEngine/include/internal/GameEngine.h"
 
 MenuSelector::MenuSelector(Menu* mainMenu, Menu* controllerMenu)
-	: _mainMenu(mainMenu)
+	: _title(nullptr)
+	, _mainMenu(mainMenu)
 	, _controllerSelectMenu(controllerMenu)
+	, _rankViewer(nullptr)
 	, _selectedItem(nullptr)
 	, _ui(nullptr)
 	, _lastLStickY(0.0f)
@@ -91,6 +94,11 @@ void MenuSelector::Update(float deltaSecond)
 		Select(flt::KeyCode::enter);
 	}
 
+	if (flt::GetKeyDown(flt::KeyCode::lAlt))
+	{
+		ViewRank();
+	}
+
 	//if (flt::GetKeyDown(flt::KeyCode::lAlt))
 	//{
 	//	if (_mainMenu->IsEnable())
@@ -164,4 +172,20 @@ void MenuSelector::MoveSelectedItem()
 	//pos.x -= offset;
 
 	//_ui->SetPosition(pos);
+}
+
+void MenuSelector::ViewRank()
+{
+	if (_rankViewer->IsEnable())
+	{
+		_title->Enable();
+		_mainMenu->Enable();
+		_rankViewer->Disable();
+	}
+	else
+	{
+		_title->Disable();
+		_mainMenu->Disable();
+		_rankViewer->Enable();
+	}
 }

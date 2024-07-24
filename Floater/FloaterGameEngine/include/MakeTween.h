@@ -31,7 +31,7 @@ namespace flt
 			{
 				if (IsActiveTween(tween))
 				{
-					tween->onEnd([tween]() { ReleaseTween(tween); });
+					tween->onFinalize([tween]() { ReleaseTween(tween); });
 				}
 				else
 				{

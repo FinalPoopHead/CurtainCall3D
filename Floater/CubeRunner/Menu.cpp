@@ -49,11 +49,6 @@ void Menu::OnEnable()
 	for (auto& item : items)
 	{
 		item->Enable();
-		flt::Vector2f pos = item->GetOffsetPosition();
-		auto tween = flt::MakeTween(flt::Vector2f{ 1.0f, pos.y });
-		tween->to({ pos.x, pos.y }).during(1.0f).easing(flt::ease::easeOutElastic).onStep([item](const flt::Vector2f& pos) {item->SetOffsetPosition(pos); });
-		flt::StartTween(tween);
-		item->Enable();
 	}
 }
 

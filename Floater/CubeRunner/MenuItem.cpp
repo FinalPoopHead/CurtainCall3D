@@ -3,6 +3,11 @@
 
 
 MenuItem::MenuItem()
+	: _defaultSpriteName()
+	, _pointedSpriteName()
+	, _ui(nullptr)
+	, _selectFunc([]() {})
+	, _tween(nullptr)
 {
 	_ui = AddComponent<flt::UIComponent>(true);
 	_ui->SetZOrder(0.4f);
@@ -110,5 +115,13 @@ void MenuItem::Select(flt::KeyCode keyCode)
 	if (keyCode == flt::KeyCode::enter)
 	{
 		_selectFunc();
+	}
+}
+
+void MenuItem::OnEnable()
+{
+	if (_tween.get())
+	{
+		flt::StartTween(_tween);
 	}
 }

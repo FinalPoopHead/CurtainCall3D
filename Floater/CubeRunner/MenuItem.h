@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include "../FloaterGameEngine/include/EngineMinimal.h"
+#include "../FloaterGameEngine/include/MakeTween.h"
+
 #include <functional>
 
 
@@ -32,11 +34,16 @@ public:
 	void Select(flt::KeyCode keyCode);
 
 	void SetSelectFunc(const std::function<void()>& func) { _selectFunc = func; }
+	void SetTween(flt::TweenPtr<flt::Vector2f>&& tween) { _tween = std::move(tween); }
 
+	protected:
+		void OnEnable() override;
 private:
 	//flt::RendererComponent* _spriteRenderer;
 	std::wstring _defaultSpriteName;
 	std::wstring _pointedSpriteName;
 	flt::UIComponent* _ui;
 	std::function<void()> _selectFunc;
+	flt::TweenPtr<flt::Vector2f> _tween;
+
 };
