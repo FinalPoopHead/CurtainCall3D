@@ -8,6 +8,12 @@ class RankViewer;
 
 class MenuSelector : public flt::GameObject
 {
+	enum class Mode
+	{
+		MainMenu,
+		RankView,
+		ControllerSelect
+	};
 public:
 	MenuSelector(Menu* mainMenu, Menu* controllerMenu);
 	void SetMenu(Menu* mainMenu);
@@ -17,7 +23,10 @@ public:
 
 	void SetTitle(MenuItem* title) { _title = title; }
 	void SetRankViewer(RankViewer* rankViewer) { _rankViewer = rankViewer; }
-	void ViewRank();
+
+	void SetMainMenuMode();
+	void SetViewRankMode();
+	void SetControllerSelectMode();
 
 protected:
 	void OnEnable() override;
@@ -36,5 +45,5 @@ private:
 	MenuItem* _selectedItem;
 	flt::UIComponent* _ui;
 	float _lastLStickY;
+	Mode _mode;
 };
-

@@ -54,7 +54,7 @@ void MainMenuScene::Initialize()
 		std::function<void()> selectFunc[numMenuItems] = {
 			[]() { g_PlayerNum = 1; g_StageNum = 1; flt::SetScene(L"class GameScene"); },
 			[]() { g_PlayerNum = 2; g_StageNum = 1; flt::SetScene(L"class GameScene"); },
-			[selector]() { selector->ViewRank(); },
+			[selector]() { selector->SetViewRankMode(); },
 			[]() { flt::ExitGame(); }
 		};
 

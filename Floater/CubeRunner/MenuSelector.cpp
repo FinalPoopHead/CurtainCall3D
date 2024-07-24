@@ -15,6 +15,7 @@ MenuSelector::MenuSelector(Menu* mainMenu, Menu* controllerMenu)
 	, _selectedItem(nullptr)
 	, _ui(nullptr)
 	, _lastLStickY(0.0f)
+	, _mode(Mode::MainMenu)
 {
 	//_ui = AddComponent<flt::UIComponent>(true);
 	//_ui->SetImage(L"../Resources/Sprites/abcd.jpg");
@@ -36,6 +37,11 @@ void MenuSelector::SetMenu(Menu* menu)
 
 void MenuSelector::next()
 {
+	if (!_selectedItem->IsEnable())
+	{
+		return;
+	}
+
 	if (_selectedItem)
 	{
 		_selectedItem->OnUnpointed();
@@ -48,6 +54,11 @@ void MenuSelector::next()
 
 void MenuSelector::prev()
 {
+	if (!_selectedItem->IsEnable())
+	{
+		return;
+	}
+
 	if (_selectedItem)
 	{
 		_selectedItem->OnUnpointed();
@@ -60,11 +71,18 @@ void MenuSelector::prev()
 
 void MenuSelector::Select(flt::KeyCode keyCode)
 {
+	if (!_selectedItem->IsEnable())
+	{
+		return;
+	}
+
 	_selectedItem->Select(keyCode);
 }
 
 void MenuSelector::OnEnable()
 {
+	SetMainMenuMode();
+
 	_selectedItem = _mainMenu->FirstItem();
 	_selectedItem->OnPointed();
 
@@ -81,23 +99,83 @@ void MenuSelector::OnDisable()
 
 void MenuSelector::Update(float deltaSecond)
 {
-	if (flt::GetKeyDown(flt::KeyCode::right) || flt::GetKeyDown(flt::KeyCode::down))
+	switch (_mode)
 	{
-		next();
-	}
-	if (flt::GetKeyDown(flt::KeyCode::left) || flt::GetKeyDown(flt::KeyCode::up))
-	{
-		prev();
-	}
-	if (flt::GetKeyDown(flt::KeyCode::enter))
-	{
-		Select(flt::KeyCode::enter);
+		case MenuSelector::Mode::MainMenu:
+		{
+			if (flt::GetKeyDown(flt::KeyCode::right) || flt::GetKeyDown(flt::KeyCode::down))
+			{
+				next();
+			}
+			if (flt::GetKeyDown(flt::KeyCode::left) || flt::GetKeyDown(flt::KeyCode::up))
+			{
+				prev();
+			}
+			if (flt::GetKeyDown(flt::KeyCode::enter))
+			{
+				Select(flt::KeyCode::enter);
+			}
+
+			flt::GamePadState state;
+			bool isGamePadConnected = flt::GetGamePadState(0, &state);
+			if (isGamePadConnected)
+			{
+				if (state.buttonsDown & flt::GamePadState::ButtonFlag::UP)
+				{
+					prev();
+				}
+				if (state.buttonsDown & flt::GamePadState::ButtonFlag::DOWN)
+				{
+					next();
+				}
+				if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
+				{
+					Select(flt::KeyCode::enter);
+				}
+
+				if (fabsf(_lastLStickY) < 0.5f)
+				{
+					if (state.lStickY > 0.5f)
+					{
+						prev();
+					}
+					else if (state.lStickY < -0.5f)
+					{
+						next();
+					}
+				}
+
+				_lastLStickY = state.lStickY;
+			}
+		}
+		break;
+		case MenuSelector::Mode::RankView:
+		{
+			if (flt::GetKeyDown(flt::KeyCode::enter))
+			{
+				SetMainMenuMode();
+			}
+
+			flt::GamePadState state;
+			bool isGamePadConnected = flt::GetGamePadState(0, &state);
+			if (isGamePadConnected)
+			{
+				if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
+				{
+					SetMainMenuMode();
+				}
+			}
+		}
+		break;
+		case MenuSelector::Mode::ControllerSelect:
+		{
+
+		}
+		break;
+		default:
+			break;
 	}
 
-	if (flt::GetKeyDown(flt::KeyCode::lAlt))
-	{
-		ViewRank();
-	}
 
 	//if (flt::GetKeyDown(flt::KeyCode::lAlt))
 	//{
@@ -128,37 +206,7 @@ void MenuSelector::Update(float deltaSecond)
 	//	flt::GameEngine::Instance()->SetWindowSize(0, 0, flt::WindowMode::BORDERLESS);
 	//}
 
-	flt::GamePadState state;
-	bool isGamePadConnected = flt::GetGamePadState(0, &state);
-	if (isGamePadConnected)
-	{
-		if (state.buttonsDown & flt::GamePadState::ButtonFlag::UP)
-		{
-			prev();
-		}
-		if (state.buttonsDown & flt::GamePadState::ButtonFlag::DOWN)
-		{
-			next();
-		}
-		if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
-		{
-			Select(flt::KeyCode::enter);
-		}
 
-		if (fabsf(_lastLStickY) < 0.5f)
-		{
-			if (state.lStickY > 0.5f)
-			{
-				prev();
-			}
-			else if (state.lStickY < -0.5f)
-			{
-				next();
-			}
-		}
-
-		_lastLStickY = state.lStickY;
-	}
 }
 
 void MenuSelector::MoveSelectedItem()
@@ -174,18 +222,32 @@ void MenuSelector::MoveSelectedItem()
 	//_ui->SetPosition(pos);
 }
 
-void MenuSelector::ViewRank()
+void MenuSelector::SetMainMenuMode()
 {
-	if (_rankViewer->IsEnable())
-	{
-		_title->Enable();
-		_mainMenu->Enable();
-		_rankViewer->Disable();
-	}
-	else
-	{
-		_title->Disable();
-		_mainMenu->Disable();
-		_rankViewer->Enable();
-	}
+	_title->Enable();
+	_mainMenu->Enable();
+	_rankViewer->Disable();
+	_controllerSelectMenu->Disable();
+	_mode = Mode::MainMenu;
 }
+
+void MenuSelector::SetViewRankMode()
+{
+	_title->Disable();
+	_mainMenu->Disable();
+	_controllerSelectMenu->Disable();
+	_rankViewer->Enable();
+	_mode = Mode::RankView;
+
+}
+
+void MenuSelector::SetControllerSelectMode()
+{
+	_title->Disable();
+	_mainMenu->Disable();
+	_rankViewer->Disable();
+	_controllerSelectMenu->Enable();
+	_mode = Mode::ControllerSelect;
+}
+
+
