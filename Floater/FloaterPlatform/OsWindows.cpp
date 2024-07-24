@@ -1231,6 +1231,16 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 		}
 		break;
 
+		// 창 메뉴에서 명령 선택이나 단추 클릭시 이 메시지 호출
+		//case WM_SYSCOMMAND:
+		//{
+		//	if ((wParam & 0xFFF0) == SC_CLOSE)
+		//	{
+		//		::PostQuitMessage(0);
+		//	}
+		//}
+		//break;
+
 		case WM_SETCURSOR:
 		{
 			if (LOWORD(lParam) == HTCLIENT)
@@ -1421,7 +1431,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 
 		case WM_CREATE:
 		{
-			// OsWindows객체의 thisPtr을 저장.
+			// 앞으로 this를 사용할 수 있도록 OsWindows객체의 포인터를 thisPtr에 저장.
 			thisPtr = (OsWindows*)(((LPCREATESTRUCT)lParam)->lpCreateParams);
 
 			Xbox::Initialize(thisPtr->_pGamePads, sizeof(thisPtr->_pGamePads) / sizeof(thisPtr->_pGamePads[0]));
@@ -1508,15 +1518,17 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 				{
 					case RIM_TYPEMOUSE:
 					{
-						std::wcout << L"	Mouse" << std::endl;
-						std::wcout << L"	ID: " << rdi.mouse.dwId << std::endl;
-						std::wcout << L"	Number of Buttons: " << rdi.mouse.dwNumberOfButtons << std::endl;
-						std::wcout << L"	Sample Rate: " << rdi.mouse.dwSampleRate << std::endl;
+						/// 디버깅용
+						//std::wcout << L"	Mouse" << std::endl;
+						//std::wcout << L"	ID: " << rdi.mouse.dwId << std::endl;
+						//std::wcout << L"	Number of Buttons: " << rdi.mouse.dwNumberOfButtons << std::endl;
+						//std::wcout << L"	Sample Rate: " << rdi.mouse.dwSampleRate << std::endl;
 
 						RAWINPUTDEVICE rawInputDevice;
 
 						rawInputDevice.dwFlags = 0;
 						// RIDEV_NOLEGACY;	// 레거시 메시지 생성 금지, 마우스의 경우 윈도우 창에서 작업중 표시로 바뀌며 닫기 버튼등이 동작하지 않음.
+						// RIDEV_CAPTUREMOUSE; // 마우스가 포커스가 없는 창 위에 있어도 메시지를 받음, RIDEV_NOLEGACY와 같이 사용해야함
 						// RIDEV_INPUTSINK; // 백 그라운드에서도 인풋 받기
 						rawInputDevice.usUsagePage = 1;
 						rawInputDevice.usUsage = 2;
@@ -1536,20 +1548,24 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 					break;
 					case RIM_TYPEKEYBOARD:
 					{
-						std::wcout << L"	Keyboard" << std::endl;
-						std::wcout << L"	Type: " << rdi.keyboard.dwType << std::endl;
-						std::wcout << L"	Sub Type: " << rdi.keyboard.dwSubType << std::endl;
-						std::wcout << L"	Keyboard Mode: " << rdi.keyboard.dwKeyboardMode << std::endl;
-						std::wcout << L"	Number of Function Keys: " << rdi.keyboard.dwNumberOfFunctionKeys << std::endl;
-						std::wcout << L"	Number of Indicators: " << rdi.keyboard.dwNumberOfIndicators << std::endl;
-						std::wcout << L"	Number of Keys Total: " << rdi.keyboard.dwNumberOfKeysTotal << std::endl;
+						/// 디버깅용
+						//std::wcout << L"	Keyboard" << std::endl;
+						//std::wcout << L"	Type: " << rdi.keyboard.dwType << std::endl;
+						//std::wcout << L"	Sub Type: " << rdi.keyboard.dwSubType << std::endl;
+						//std::wcout << L"	Keyboard Mode: " << rdi.keyboard.dwKeyboardMode << std::endl;
+						//std::wcout << L"	Number of Function Keys: " << rdi.keyboard.dwNumberOfFunctionKeys << std::endl;
+						//std::wcout << L"	Number of Indicators: " << rdi.keyboard.dwNumberOfIndicators << std::endl;
+						//std::wcout << L"	Number of Keys Total: " << rdi.keyboard.dwNumberOfKeysTotal << std::endl;
 
 						RAWINPUTDEVICE rawInputDevice;
 
 						rawInputDevice.dwFlags =
-							RIDEV_NOLEGACY;// |
-						//RIDEV_NOHOTKEYS; // 윈도우 등 핫키 무시하기
-						// RIDEV_INPUTSINK; // 백 그라운드에서도 인풋 받기
+						RIDEV_NOLEGACY; // 마우스/키보드의 레거시 메시지를 생성하지 않음 -> alt f4등이 동작하지 않음. WM_KEYDOWN메시지가 생성되지 않음. 성능상 이득이 있음
+						// RIDEV_NOHOTKEYS; // 윈도우 등 핫키 무시하기
+						// RIDEV_INPUTSINK; // 백 그라운드에서도 인풋 받기, hwndTarget지정 필요
+						// RIDEV_EXINPUTSINK; // 포 그라운드에서 처리하지 않는 경우에만 입력 수신(포 그라운드에서 RAWINPUT에 등록이 안된 경우)
+						// RIDEV_DEVNOTIFY; // 장비 제거 등 메시지를 WM_INPUT_DEVICE_CHANGE 로 받음
+
 						rawInputDevice.usUsagePage = 1;
 						rawInputDevice.usUsage = 6;
 						rawInputDevice.hwndTarget = hwnd;
@@ -1567,6 +1583,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 					break;
 					case RIM_TYPEHID:
 					{
+						/// 디버깅용
 						//std::wcout << L"	HID" << std::endl;
 						//std::wcout << L"	Vendor ID: " << rdi.hid.dwVendorId << std::endl;
 						//std::wcout << L"	Product ID: " << rdi.hid.dwProductId << std::endl;
@@ -1602,7 +1619,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 					}
 					break;
 					default:
-						std::wcout << L"	Unknown" << std::endl;
+						// std::wcout << L"	Unknown" << std::endl;
 						break;
 				}
 			}
@@ -1612,19 +1629,21 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 		case WM_DESTROY:
 		{
 			::PostQuitMessage(0);
-			return 0;
+			//return 0;
 		}
+		break;
 
 		case WM_CLOSE:
 		{
 			::PostQuitMessage(0);
-			return 0;
+			//return 0;
 		}
+		break;
 
 		case SC_CLOSE:
 		{
 			::PostQuitMessage(0);
-			return 0;
+			//return 0;
 		}
 		break;
 	}
