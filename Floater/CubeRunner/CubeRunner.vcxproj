@@ -162,6 +162,7 @@
     <ClCompile Include="TestCamera.cpp" />
     <ClCompile Include="TextObject.cpp" />
     <ClCompile Include="Tile.cpp" />
+    <ClCompile Include="UIStateContext.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdvantageCube.h" />
@@ -189,6 +190,7 @@
     <ClInclude Include="TestCamera.h" />
     <ClInclude Include="TextObject.h" />
     <ClInclude Include="Tile.h" />
+    <ClInclude Include="UIStateContext.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
