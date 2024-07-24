@@ -3,11 +3,13 @@
 #include "Player.h"
 #include "Board.h"
 #include "ShakeObject.h"
+#include "ShakeComponent.h"
 #include "../FloaterGameEngine/include/Input.h"
 
 
 Camera::Camera(Player* player, Board* board) :
 	_cameraComp()
+	, _shakeComp()
 	, _player(player)
 	, _board(board)
 	, _height(10.0f)
@@ -23,6 +25,7 @@ Camera::Camera(Player* player, Board* board) :
 	ShakeObject* shakeObject = flt::CreateGameObject<ShakeObject>(true);
 	this->AddChild(shakeObject);
 	_cameraComp = shakeObject->GetComponent<flt::CameraComponent>();
+	_shakeComp = shakeObject->GetComponent<ShakeComponent>();
 	//_cameraComp = AddComponent<flt::CameraComponent>(true);
 
 	_currPosition = CalcTargetPosition();
