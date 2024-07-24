@@ -1776,7 +1776,7 @@ unsigned char flt::OsWindows::_keyCodeMap[256] =
 	NULL,	// VK_LWIN           0x5B
 	NULL,	// VK_RWIN           0x5C
 	NULL,	// VK_APPS           0x5D
-	NULL, // 0x5E : reserved
+	NULL,	//	0x5E : reserved
 	NULL,	// VK_SLEEP          0x5F
 	(unsigned char)KeyCode::num0,	// VK_NUMPAD0        0x60
 	(unsigned char)KeyCode::num1,	// VK_NUMPAD1        0x61
@@ -1806,10 +1806,10 @@ unsigned char flt::OsWindows::_keyCodeMap[256] =
 	(unsigned char)KeyCode::f10,	// VK_F10            0x79
 	(unsigned char)KeyCode::f11,	// VK_F11            0x7A
 	(unsigned char)KeyCode::f12,	// VK_F12            0x7B
-	NULL,	// VK_F13            0x7C
-	NULL,	// VK_F14            0x7D
-	NULL,	// VK_F15            0x7E
-	NULL,	// VK_F16            0x7F
+	(unsigned char)KeyCode::f13,	// VK_F13            0x7C
+	(unsigned char)KeyCode::f14,	// VK_F14            0x7D
+	(unsigned char)KeyCode::f15,	// VK_F15            0x7E
+	(unsigned char)KeyCode::f16,	// VK_F16            0x7F
 	NULL,	// VK_F17            0x80
 	NULL,	// VK_F18            0x81
 	NULL,	// VK_F19            0x82
@@ -1861,12 +1861,12 @@ unsigned char flt::OsWindows::_keyCodeMap[256] =
 	NULL,	// VK_BROWSER_SEARCH      0xAA
 	NULL,	// VK_BROWSER_FAVORITES   0xAB
 	NULL,	// VK_BROWSER_HOME        0xAC
-	NULL,	// VK_VOLUME_MUTE         0xAD
-	NULL,	// VK_VOLUME_DOWN         0xAE
-	NULL,	// VK_VOLUME_UP           0xAF
-	NULL,	// VK_MEDIA_NEXT_TRACK    0xB0
-	NULL,	// VK_MEDIA_PREV_TRACK    0xB1
-	NULL,	// VK_MEDIA_STOP          0xB2
+	(unsigned char)KeyCode::volumMute,	// VK_VOLUME_MUTE         0xAD
+	(unsigned char)KeyCode::volumDown,	// VK_VOLUME_DOWN         0xAE
+	(unsigned char)KeyCode::volumUp,	// VK_VOLUME_UP           0xAF
+	(unsigned char)KeyCode::mediaNext,	// VK_MEDIA_NEXT_TRACK    0xB0
+	(unsigned char)KeyCode::mediaPrev,	// VK_MEDIA_PREV_TRACK    0xB1
+	(unsigned char)KeyCode::mediaStop,	// VK_MEDIA_STOP          0xB2
 	NULL,	// VK_MEDIA_PLAY_PAUSE    0xB3
 	NULL,	// VK_LAUNCH_MAIL         0xB4
 	NULL,	// VK_LAUNCH_MEDIA_SELECT 0xB5
