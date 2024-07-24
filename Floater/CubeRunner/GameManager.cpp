@@ -343,17 +343,23 @@ void GameManager::Update(float deltaSecond)
 		}
 	}
 
+	// 플레이어 1인일 경우에만 작동
+	// 게임오버시에 랭킹 관련 작업
+	// 스테이지 빠르게 넘어가는 핫키
 	if (_players.size() == 1)
 	{
 		if (_isGameOver.front())
 		{
-			if (flt::GetKeyDown(flt::KeyCode::right))
+			flt::GamePadState gamePadState;
+			bool isPadConnected = flt::GetGamePadState(0, &gamePadState);
+
+			if (flt::GetKeyDown(flt::KeyCode::right) || (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::RIGHT)))
 			{
 				++_selectorIndex;
 				_selectorIndex = 11 * ((_selectorIndex - 1) / 11) + (_selectorIndex % 11);
 				_inputSelector->SetPosition({ (_selectorIndex % 11 - 5) * inputOffsetX + selectorOffsetX, (_selectorIndex / 11 - 1) * inputOffsetY - selectorOffsetY });
 			}
-			if (flt::GetKeyDown(flt::KeyCode::left))
+			if (flt::GetKeyDown(flt::KeyCode::left) || (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::LEFT)))
 			{
 				--_selectorIndex;
 				if (_selectorIndex < 0)
@@ -366,13 +372,13 @@ void GameManager::Update(float deltaSecond)
 				}
 				_inputSelector->SetPosition({ (_selectorIndex % 11 - 5) * inputOffsetX + selectorOffsetX, (_selectorIndex / 11 - 1) * inputOffsetY - selectorOffsetY });
 			}
-			if (flt::GetKeyDown(flt::KeyCode::down))
+			if (flt::GetKeyDown(flt::KeyCode::down) || (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::DOWN)))
 			{
 				_selectorIndex += 11;
 				_selectorIndex = _selectorIndex % 33;
 				_inputSelector->SetPosition({ (_selectorIndex % 11 - 5) * inputOffsetX + selectorOffsetX, (_selectorIndex / 11 - 1) * inputOffsetY - selectorOffsetY });
 			}
-			if (flt::GetKeyDown(flt::KeyCode::up))
+			if (flt::GetKeyDown(flt::KeyCode::up) || (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::UP)))
 			{
 				_selectorIndex -= 11;
 				if (_selectorIndex < 0)
@@ -382,7 +388,7 @@ void GameManager::Update(float deltaSecond)
 				_selectorIndex = _selectorIndex % 33;
 				_inputSelector->SetPosition({ (_selectorIndex % 11 - 5) * inputOffsetX + selectorOffsetX, (_selectorIndex / 11 - 1) * inputOffsetY - selectorOffsetY });
 			}
-			if (flt::GetKeyDown(flt::KeyCode::enter))
+			if (flt::GetKeyDown(flt::KeyCode::enter) || (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::A)))
 			{
 				bool inputEnd = EnterInput(_selectorIndex);
 				if (inputEnd)
