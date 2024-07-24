@@ -10,8 +10,5 @@ ShakeObject::ShakeObject()
 
 void ShakeObject::PostUpdate(float deltaSecond)
 {
-	if (flt::GetKeyDown(flt::KeyCode::lCtrl))
-	{
-		_shaker->Impack(20.f, .2f, { 1.0f, 1.0f });
-	}
+
 }

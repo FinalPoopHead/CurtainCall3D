@@ -32,6 +32,7 @@ namespace flt
 
 	enum class KeyCode
 	{
+		/// 마우스
 		none,
 		mouseLButton,
 		mouseRButton,
@@ -41,7 +42,7 @@ namespace flt
 		mouseButton3,
 		mouseButton4,
 
-
+		/// 키보드
 		backspace,
 		tab,
 		enter,
@@ -125,7 +126,20 @@ namespace flt
 		f10,
 		f11,
 		f12,
+		f13,
+		f14,
+		f15,
+		f16,
 
+		/// 키보드 특수키
+		volumUp,
+		volumDown,
+		volumMute,
+		mediaNext,
+		mediaPrev,
+		mediaStop,
+
+		/// 게임패드
 		gpadA,
 		gpadB,
 		gpadX,
