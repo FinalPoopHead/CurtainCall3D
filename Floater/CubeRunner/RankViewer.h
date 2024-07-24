@@ -7,6 +7,10 @@ class RankViewer : public flt::GameObject
 {
 	struct RankData
 	{
+		RankData() : rank(0), name(""), score(0) {}
+		RankData(int rank, std::string name, int score)
+			: rank(rank), name(name), score(score) {}
+
 		int rank;
 		std::string name;
 		int score;

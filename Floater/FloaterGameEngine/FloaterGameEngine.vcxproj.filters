@@ -113,6 +113,9 @@
     <ClInclude Include="include\internal\FLTEvent.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="FMODInstance.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -180,6 +183,9 @@
     </ClCompile>
     <ClCompile Include="FLTEvent.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="FMODInstance.cpp">
+      <Filter>Sound</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
