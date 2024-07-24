@@ -125,7 +125,6 @@ void flt::Scene::TweenUpdate(float deltaSecond)
 
 		// 업데이트 이후 이 트윈이 이미 _scaleTweens에서 없을 수 있음.
 		Vector4f scale = tween->step(deltaSecond);
-
 		target->SetScale(scale);
 
 		if (tween->IsFinished())

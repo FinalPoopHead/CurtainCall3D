@@ -273,6 +273,7 @@ namespace flt
 		{
 			_isActivated = true;
 			InvokeCallbacks(_onInitialize);
+			UpdateTarget(_points.front().value);
 		}
 
 		if (dt == 0.0f || IsFinishedInternal())
@@ -292,8 +293,8 @@ namespace flt
 			if (IsFinishedInternal())
 			{
 				_isActivated = false;
-				InvokeCallbacks(_onFinalize);
 				UpdateTarget(_points.back().value);
+				InvokeCallbacks(_onFinalize);
 				return _target;
 			}
 
@@ -327,23 +328,15 @@ namespace flt
 			}
 
 			t = _points[_current].easing(t);
+
+			UpdateTarget(_lerp(_points[_current].value, _points[_current + 1].value, t));
 			if constexpr (std::is_pointer_v<T>)
 			{
-				*_target = _lerp(_points[_current].value, _points[_current + 1].value, t);
 				InvokeCallbacks(_points[_current].onStep, *_target);
-				//for (int i = 0; i < _points[_current].onStep.size(); ++i)
-				//{
-				//	_points[_current].onStep[i](*_target);
-				//}
 			}
 			else
 			{
-				_target = _lerp(_points[_current].value, _points[_current + 1].value, t);
 				InvokeCallbacks(_points[_current].onStep, _target);
-				//for (int i = 0; i < _points[_current].onStep.size(); ++i)
-				//{
-				//	_points[_current].onStep[i](_target);
-				//}
 			}
 		}
 
