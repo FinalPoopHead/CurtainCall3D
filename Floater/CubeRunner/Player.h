@@ -31,6 +31,9 @@ public:
 	void SetPadVibration(bool isRightMotor, float motorPower, float duration);
 	void SetGameOver() {_state = ePlayerState::GAMEOVER; }
 
+private:
+	void PauseResumeGame();
+
 public:
 	Camera* camera;
 
