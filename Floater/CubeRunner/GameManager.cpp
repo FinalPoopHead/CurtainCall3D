@@ -2301,10 +2301,14 @@ void GameManager::SetRankText()
 {
 	int index = 0;
 
-	//for (auto& rankData : _rankData)
-	for (int i = 0; i < 10; ++i)
+	for (auto& rankData : _rankData)
 	{
-		auto& rankData = _rankData[i];
+		// TODO : 이건 하드코딩이다.
+		if (index >= 10)
+		{
+			break;
+		}
+
 		std::wstring name = std::wstring().assign(rankData.name.begin(), rankData.name.end());		// TODO : 만약 깨지면 여기 문제
 		_rankText[index]->SetText(std::to_wstring(rankData.rank));
 		_rankNameText[index]->SetText(name);
