@@ -206,6 +206,8 @@ void flt::GameEngine::ChangeScene()
 	_currentScene->Initialize();
 	_currentScene->StartScene();
 
+	// 윈도우 update를 하지 않으면 버튼 상태가 변하지 않아 이전 상태가 유지된다.
+	bool isOnWindows = _platform->Update(deltaSecond);
 	//// 씬 바꾼 이후 첫 프레임은 그냥 0.0초로 돌린다.
 	_currentScene->StartFrame();
 	_currentScene->Update(0.0f);
