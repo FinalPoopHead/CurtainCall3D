@@ -79,7 +79,7 @@ public:
 	void SetResultText(int playerIndex, int textIndex, std::wstring key, std::wstring value);
 	void SetResultTextColor(int playerIndex, int textIndex, flt::Vector4f color);
 	void StartWinLoseTween(int playerIndex, bool isWin);
-	void StartResultTween(int playerIndex,int textCount);
+	void StartResultTween(int playerIndex, int textCount);
 
 	void ReturnMissile(SpriteObject* missile);
 
@@ -185,4 +185,9 @@ private:
 	flt::TweenPtr<float> _fadeInTween;
 	flt::TweenPtr<float> _fadeOutTween;
 	std::vector<flt::TweenPtr<flt::Vector4f>> _heightCountTextTween;
+
+	/// 게임 패드 관련 데이터
+private:
+	float _lastLstickX;
+	float _lastLstickY;
 };

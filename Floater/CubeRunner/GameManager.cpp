@@ -340,13 +340,17 @@ void GameManager::Update(float deltaSecond)
 			flt::GamePadState gamePadState;
 			bool isPadConnected = flt::GetGamePadState(0, &gamePadState);
 
-			if (flt::GetKeyDown(flt::KeyCode::right) || (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::RIGHT)))
+			if (flt::GetKeyDown(flt::KeyCode::right) 
+				|| (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::RIGHT)) 
+				|| ((fabsf(_lastLstickX) < 0.5f) && (gamePadState.lStickX >= 0.5f)))
 			{
 				++_selectorIndex;
 				_selectorIndex = 11 * ((_selectorIndex - 1) / 11) + (_selectorIndex % 11);
 				_inputSelector->SetPosition({ (_selectorIndex % 11 - 5) * inputOffsetX + selectorOffsetX, (_selectorIndex / 11 - 1) * inputOffsetY - selectorOffsetY });
 			}
-			if (flt::GetKeyDown(flt::KeyCode::left) || (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::LEFT)))
+			if (flt::GetKeyDown(flt::KeyCode::left) 
+				|| (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::LEFT)) 
+				|| ((fabsf(_lastLstickX) < 0.5f) && (gamePadState.lStickX <= -0.5f)))
 			{
 				--_selectorIndex;
 				if (_selectorIndex < 0)
@@ -359,13 +363,17 @@ void GameManager::Update(float deltaSecond)
 				}
 				_inputSelector->SetPosition({ (_selectorIndex % 11 - 5) * inputOffsetX + selectorOffsetX, (_selectorIndex / 11 - 1) * inputOffsetY - selectorOffsetY });
 			}
-			if (flt::GetKeyDown(flt::KeyCode::down) || (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::DOWN)))
+			if (flt::GetKeyDown(flt::KeyCode::down) 
+				|| (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::DOWN))
+				|| ((fabsf(_lastLstickY) < 0.5f) && (gamePadState.lStickY <= -0.5f)))
 			{
 				_selectorIndex += 11;
 				_selectorIndex = _selectorIndex % 33;
 				_inputSelector->SetPosition({ (_selectorIndex % 11 - 5) * inputOffsetX + selectorOffsetX, (_selectorIndex / 11 - 1) * inputOffsetY - selectorOffsetY });
 			}
-			if (flt::GetKeyDown(flt::KeyCode::up) || (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::UP)))
+			if (flt::GetKeyDown(flt::KeyCode::up) 
+				|| (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::UP))
+				|| ((fabsf(_lastLstickY) < 0.5f) && (gamePadState.lStickY >= 0.5f)))
 			{
 				_selectorIndex -= 11;
 				if (_selectorIndex < 0)
@@ -375,7 +383,8 @@ void GameManager::Update(float deltaSecond)
 				_selectorIndex = _selectorIndex % 33;
 				_inputSelector->SetPosition({ (_selectorIndex % 11 - 5) * inputOffsetX + selectorOffsetX, (_selectorIndex / 11 - 1) * inputOffsetY - selectorOffsetY });
 			}
-			if (flt::GetKeyDown(flt::KeyCode::enter) || (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::A)))
+			if (flt::GetKeyDown(flt::KeyCode::enter) 
+				|| (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::A)))
 			{
 				bool inputEnd = EnterInput(_selectorIndex);
 				if (inputEnd)
@@ -413,6 +422,9 @@ void GameManager::Update(float deltaSecond)
 					StartTween(rankingTween);
 				}
 			}
+
+			_lastLstickX = gamePadState.lStickX;
+			_lastLstickY = gamePadState.lStickY;
 
 			return;
 		}
