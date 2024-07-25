@@ -136,7 +136,8 @@ void RankViewer::UpdateRankText()
 	}
 	fs.close();
 
-	for (int i = 0; i < _rankData.size(); ++i)
+	//for (int i = 0; i < _rankData.size(); ++i)
+	for (int i = 0; i < 10; ++i)
 	{
 		std::wstring name = flt::ToWstring(_rankData[i].name);
 		_rankText[i]->SetText(std::to_wstring(_rankData[i].rank));
