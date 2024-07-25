@@ -166,7 +166,8 @@ void MenuSelector::Update(float deltaSecond)
 				bool isGamePadConnected = flt::GetGamePadState(i, &state);
 				if (isGamePadConnected)
 				{
-					if (state.buttonsDown & flt::GamePadState::ButtonFlag::A)
+					if (state.buttonsDown & flt::GamePadState::ButtonFlag::A
+						|| state.buttonsDown & flt::GamePadState::ButtonFlag::B)
 					{
 						SetMainMenuMode();
 					}
