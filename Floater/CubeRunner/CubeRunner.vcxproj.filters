@@ -127,6 +127,9 @@
     <ClCompile Include="RankViewer.cpp">
       <Filter>GameObject\UI</Filter>
     </ClCompile>
+    <ClCompile Include="MineCone.cpp">
+      <Filter>GameObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Board.h">
@@ -210,6 +213,9 @@
     </ClInclude>
     <ClInclude Include="RankViewer.h">
       <Filter>GameObject\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="MineCone.h">
+      <Filter>GameObject\Mine</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

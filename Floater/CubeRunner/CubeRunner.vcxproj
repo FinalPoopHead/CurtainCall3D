@@ -146,6 +146,7 @@
     <ClCompile Include="DetonatedMine.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="MineCone.cpp" />
     <ClCompile Include="PlayerModel.cpp" />
     <ClCompile Include="RankViewer.cpp" />
     <ClCompile Include="ShakeComponent.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="GameManager.h" />
+    <ClInclude Include="MineCone.h" />
     <ClInclude Include="PlayerModel.h" />
     <ClInclude Include="RankViewer.h" />
     <ClInclude Include="ShakeComponent.h" />
