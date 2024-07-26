@@ -53,4 +53,7 @@ namespace flt
 	Vector2f GetWindowSize();
 
 	void ExitGame();
+
+	float GetTimeScale();
+	float SetTimeScale(float timeScale);
 }

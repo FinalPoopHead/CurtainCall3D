@@ -31,6 +31,18 @@ void flt::GameEngine::ExitGame()
 	_platform->Exit();
 }
 
+float flt::GameEngine::GetTimeScale() const
+{
+	return _timeScale;
+}
+
+float flt::GameEngine::SetTimeScale(float timeScale)
+{
+	float old = _timeScale;
+	_timeScale = timeScale;
+	return old;
+}
+
 void flt::GameEngine::Initialize()
 {
 	bool isDebug = false;
@@ -168,9 +180,10 @@ flt::GameEngine::GameEngine() :
 	_loadingScene(nullptr),
 	_nextScene(nullptr),
 	_currentScene(nullptr),
+	_timeScale(1.0f),
 	_timer(),
-	_fixedUpdateTimer(),
 	_fixedUpdateElapsedSecond(0.0f)
+	//_fixedUpdateTimer()
 {
 
 }
@@ -222,7 +235,7 @@ bool flt::GameEngine::UpdateImpl(Scene* scene)
 	ASSERT(scene, "Scene is not set");
 
 	_timer.Update();
-	float deltaSecond = (float)_timer.GetDeltaSeconds();
+	float deltaSecond = (float)_timer.GetDeltaSeconds() * _timeScale;
 	bool isOnWindows = _platform->Update(deltaSecond);
 	_soundEngine->Update();
 

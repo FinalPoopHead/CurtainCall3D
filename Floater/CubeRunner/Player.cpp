@@ -52,12 +52,20 @@ void Player::Update(float deltaSecond)
 			static MainMenuScene* scene = flt::CreateScene<MainMenuScene>();
 			flt::SetScene(scene);
 		}
+		if(state.buttonsDown & flt::GamePadState::ButtonFlag::START)
+		{
+			PauseResumeGame();
+		}
 	}
 
 	if (flt::GetKeyDown(flt::KeyCode::backspace))
 	{
 		static MainMenuScene* scene = flt::CreateScene<MainMenuScene>();
 		flt::SetScene(scene);
+	}
+	if (flt::GetKeyDown(flt::KeyCode::spacebar))
+	{
+		PauseResumeGame();
 	}
 
 	switch (_state)
@@ -351,5 +359,18 @@ void Player::SetPadVibration(bool isRightMotor, float motorPower, float duration
 {
 
 	flt::SetGamePadVibration(_padIndex, isRightMotor, motorPower, duration);
+}
+
+void Player::PauseResumeGame()
+{
+	float timeScale = flt::GetTimeScale();
+	if (timeScale > 0)
+	{
+		flt::SetTimeScale(0.0f);
+	}
+	else
+	{
+		flt::SetTimeScale(1.0f);
+	}
 }
 

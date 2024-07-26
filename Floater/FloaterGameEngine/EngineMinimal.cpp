@@ -43,8 +43,20 @@ flt::Scene* flt::SetScene(const std::wstring& sceneName)
 
 
 
+
+
 void flt::ExitGame()
 {
 	//GameEngine* engine = GameEngine::Instance();
 	g_engine->ExitGame();
+}
+
+float flt::GetTimeScale()
+{
+	return g_engine->GetTimeScale();
+}
+
+float flt::SetTimeScale(float timeScale)
+{
+	return g_engine->SetTimeScale(timeScale);
 }
