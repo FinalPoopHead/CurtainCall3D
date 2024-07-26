@@ -3,13 +3,15 @@
 #include "Camera.h"
 #include "Board.h"
 #include "PlayerModel.h"
+#include "GameManager.h"
 
 
 //TEST Include
 #include "MainMenuScene.h"
 
-Player::Player(Board* board) :
+Player::Player(GameManager* gameManager,Board* board) :
 	camera(nullptr)
+	, _gameManager(gameManager)
 	, _soundComponent()
 	, _soundIndex()
 	, _model(nullptr)
@@ -74,6 +76,15 @@ void Player::Update(float deltaSecond)
 		break;
 	case ePlayerState::CRUSHED:
 		// TODO : 깔렸을때 자동으로 빨리감기해서 굴려버려야함.
+		if (state.buttonsDown & flt::GamePadState::ButtonFlag::Y)
+		{
+			// 빨리감기
+			_board->FastForward();
+		}
+		if (state.buttonsUp & flt::GamePadState::ButtonFlag::Y)
+		{
+			_board->EndFastForward();
+		}
 		break;
 	case ePlayerState::PUSHEDOUT:
 	{
@@ -366,10 +377,12 @@ void Player::PauseResumeGame()
 	float timeScale = flt::GetTimeScale();
 	if (timeScale > 0)
 	{
+		_gameManager->PauseImage(true);
 		flt::SetTimeScale(0.0f);
 	}
 	else
 	{
+		_gameManager->PauseImage(false);
 		flt::SetTimeScale(1.0f);
 	}
 }

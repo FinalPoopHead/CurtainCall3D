@@ -36,7 +36,7 @@ void GameScene::Initialize()
 		Board* board = flt::CreateGameObject<Board>(true, gameManager, playerIndex, WIDTH, HEIGHT);
 		board->tr.SetPosition(boardOffset * playerIndex, 0.0f, 0.0f);
 
-		Player* player = flt::CreateGameObject<Player>(true, board);
+		Player* player = flt::CreateGameObject<Player>(true, gameManager, board);
 		player->camera->SetCameraIndex(playerIndex);
 
 		gameManager->SetBoardAndPlayer(playerIndex, board, player);	// UI를 먼저 만들고 Player와 Board를 등록해야함.

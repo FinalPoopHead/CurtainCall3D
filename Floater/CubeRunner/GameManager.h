@@ -85,6 +85,7 @@ public:
 
 	void FadeIn();
 	void FadeOut();
+	void PauseImage(bool isPause);
 
 private:
 	void IncreasePlayerCount();
@@ -137,6 +138,7 @@ private:
 	TextObject* _finalScorePanel;
 	TextObject* _finalScoreText;
 	TextObject* _roundText;
+	TextObject* _pauseText;
 	SpriteObject* _fade;
 
 	std::list<TextObject*> _liveComboTexts;
