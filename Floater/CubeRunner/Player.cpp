@@ -60,11 +60,15 @@ void Player::Update(float deltaSecond)
 		}
 	}
 
-	if (flt::GetKeyDown(flt::KeyCode::backspace))
+	if (flt::GetKey(flt::KeyCode::lCtrl))
 	{
-		static MainMenuScene* scene = flt::CreateScene<MainMenuScene>();
-		flt::SetScene(scene);
+		if (flt::GetKeyDown(flt::KeyCode::backspace))
+		{
+			static MainMenuScene* scene = flt::CreateScene<MainMenuScene>();
+			flt::SetScene(scene);
+		}
 	}
+
 	if (flt::GetKeyDown(flt::KeyCode::spacebar))
 	{
 		PauseResumeGame();

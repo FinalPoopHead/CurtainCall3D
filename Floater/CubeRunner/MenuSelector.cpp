@@ -103,15 +103,17 @@ void MenuSelector::Update(float deltaSecond)
 	{
 		case MenuSelector::Mode::MainMenu:
 		{
-			if (flt::GetKeyDown(flt::KeyCode::right) || flt::GetKeyDown(flt::KeyCode::down))
+			if (flt::GetKeyDown(flt::KeyCode::right) || flt::GetKeyDown(flt::KeyCode::down)
+				|| flt::GetKeyDown(flt::KeyCode::d) || flt::GetKeyDown(flt::KeyCode::s))
 			{
 				next();
 			}
-			if (flt::GetKeyDown(flt::KeyCode::left) || flt::GetKeyDown(flt::KeyCode::up))
+			if (flt::GetKeyDown(flt::KeyCode::left) || flt::GetKeyDown(flt::KeyCode::up)
+				|| flt::GetKeyDown(flt::KeyCode::a) || flt::GetKeyDown(flt::KeyCode::w))
 			{
 				prev();
 			}
-			if (flt::GetKeyDown(flt::KeyCode::enter))
+			if (flt::GetKeyDown(flt::KeyCode::enter) || flt::GetKeyDown(flt::KeyCode::j))
 			{
 				Select(flt::KeyCode::enter);
 			}
@@ -155,7 +157,7 @@ void MenuSelector::Update(float deltaSecond)
 		break;
 		case MenuSelector::Mode::RankView:
 		{
-			if (flt::GetKeyDown(flt::KeyCode::enter))
+			if (flt::GetKeyDown(flt::KeyCode::enter) || flt::GetKeyDown(flt::KeyCode::j))
 			{
 				SetMainMenuMode();
 			}

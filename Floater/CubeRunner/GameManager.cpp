@@ -350,6 +350,7 @@ void GameManager::Update(float deltaSecond)
 			bool isPadConnected = flt::GetGamePadState(0, &gamePadState);
 
 			if (flt::GetKeyDown(flt::KeyCode::right)
+				|| flt::GetKeyDown(flt::KeyCode::d)
 				|| (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::RIGHT))
 				|| ((fabsf(_lastLstickX) < 0.5f) && (gamePadState.lStickX >= 0.5f)))
 			{
@@ -358,6 +359,7 @@ void GameManager::Update(float deltaSecond)
 				_inputSelector->SetPosition({ (_selectorIndex % 11 - 5) * inputOffsetX + selectorOffsetX, (_selectorIndex / 11 - 1) * inputOffsetY - selectorOffsetY });
 			}
 			if (flt::GetKeyDown(flt::KeyCode::left)
+				|| flt::GetKeyDown(flt::KeyCode::a)
 				|| (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::LEFT))
 				|| ((fabsf(_lastLstickX) < 0.5f) && (gamePadState.lStickX <= -0.5f)))
 			{
@@ -373,6 +375,7 @@ void GameManager::Update(float deltaSecond)
 				_inputSelector->SetPosition({ (_selectorIndex % 11 - 5) * inputOffsetX + selectorOffsetX, (_selectorIndex / 11 - 1) * inputOffsetY - selectorOffsetY });
 			}
 			if (flt::GetKeyDown(flt::KeyCode::down)
+				|| flt::GetKeyDown(flt::KeyCode::s)
 				|| (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::DOWN))
 				|| ((fabsf(_lastLstickY) < 0.5f) && (gamePadState.lStickY <= -0.5f)))
 			{
@@ -381,6 +384,7 @@ void GameManager::Update(float deltaSecond)
 				_inputSelector->SetPosition({ (_selectorIndex % 11 - 5) * inputOffsetX + selectorOffsetX, (_selectorIndex / 11 - 1) * inputOffsetY - selectorOffsetY });
 			}
 			if (flt::GetKeyDown(flt::KeyCode::up)
+				|| flt::GetKeyDown(flt::KeyCode::w)
 				|| (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::UP))
 				|| ((fabsf(_lastLstickY) < 0.5f) && (gamePadState.lStickY >= 0.5f)))
 			{
@@ -393,6 +397,7 @@ void GameManager::Update(float deltaSecond)
 				_inputSelector->SetPosition({ (_selectorIndex % 11 - 5) * inputOffsetX + selectorOffsetX, (_selectorIndex / 11 - 1) * inputOffsetY - selectorOffsetY });
 			}
 			if (flt::GetKeyDown(flt::KeyCode::enter)
+				|| flt::GetKeyDown(flt::KeyCode::j)
 				|| (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::A)))
 			{
 				bool inputEnd = EnterInput(_selectorIndex);
@@ -429,6 +434,14 @@ void GameManager::Update(float deltaSecond)
 					StartTween(panelTween);
 					StartTween(fieldTween);
 					StartTween(rankingTween);
+				}
+			}
+			if (flt::GetKeyDown(flt::KeyCode::k)
+				|| (isPadConnected && (gamePadState.buttonsDown & flt::GamePadState::ButtonFlag::B)))
+			{
+				if (_inputText.size() > 0)
+				{
+					_inputText.pop_back();
 				}
 			}
 
