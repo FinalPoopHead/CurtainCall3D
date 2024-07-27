@@ -4,6 +4,7 @@
 class Board;
 class Camera;
 class PlayerModel;
+class GameManager;
 
 enum class ePlayerState
 {
@@ -17,7 +18,7 @@ enum class ePlayerState
 class Player : public flt::GameObject
 {
 public:
-	Player(Board* board);
+	Player(GameManager* gameManager, Board* board);
 	~Player() {}
 
 protected:
@@ -31,10 +32,14 @@ public:
 	void SetPadVibration(bool isRightMotor, float motorPower, float duration);
 	void SetGameOver() {_state = ePlayerState::GAMEOVER; }
 
+private:
+	void PauseResumeGame();
+
 public:
 	Camera* camera;
 
 private:
+	GameManager* _gameManager;
 	flt::SoundComponent* _soundComponent;
 	std::unordered_map<std::string, int> _soundIndex;
 	PlayerModel* _model;

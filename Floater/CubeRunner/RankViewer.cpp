@@ -136,8 +136,14 @@ void RankViewer::UpdateRankText()
 	}
 	fs.close();
 
-	for (int i = 0; i < _rankData.size(); ++i)
+	for (int i = 0; i < _rankData.size(); ++i)	
 	{
+		// TODO : 이건 하드코딩이다
+		if (i >= 10)
+		{
+			break;
+		}
+
 		std::wstring name = flt::ToWstring(_rankData[i].name);
 		_rankText[i]->SetText(std::to_wstring(_rankData[i].rank));
 		_rankNameText[i]->SetText(name);

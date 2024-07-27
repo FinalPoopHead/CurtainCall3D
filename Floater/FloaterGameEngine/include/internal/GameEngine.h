@@ -49,6 +49,9 @@ namespace flt
 
 		void ExitGame();
 
+		float GetTimeScale() const;
+		float SetTimeScale(float timeScale);
+
 	private:
 		void ChangeScene();
 		bool UpdateImpl(Scene* scene);
@@ -67,9 +70,10 @@ namespace flt
 		Scene* _nextScene;
 		Scene* _currentScene;
 		std::unordered_map<std::wstring, Scene*> _scenes;
-		Timer _timer;
 
-		Timer _fixedUpdateTimer;
+		float _timeScale;
+		Timer _timer;
 		float _fixedUpdateElapsedSecond;
+		//Timer _fixedUpdateTimer;
 	};
 }
