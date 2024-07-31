@@ -205,9 +205,7 @@ bool flt::OsWindows::Initialize(int windowWidth, int windowHeight, const std::ws
 		return false;
 	}
 
-	//AdjustWindowRect(&windowRect, WS_POPUP, FALSE);
-
-	_hwnd = CreateWindowEx
+	HWND hwnd = CreateWindowEx
 	(
 		0,
 		wc.lpszClassName,
@@ -223,22 +221,22 @@ bool flt::OsWindows::Initialize(int windowWidth, int windowHeight, const std::ws
 		this	// lpParaam
 	);
 
-	if (_hwnd == NULL)
+	if (!Initialize((uint64)hwnd))
 	{
 		return false;
 	}
 
-	// XBOX 컨트롤러 관련 등록
-	DEV_BROADCAST_DEVICEINTERFACE_W db =
-	{
-		.dbcc_size = sizeof(db),
-		.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE,
-		.dbcc_classguid = Xbox::guid,
-	};
-	RegisterDeviceNotificationW(_hwnd, &db, DEVICE_NOTIFY_WINDOW_HANDLE);
+	return true;
+}
 
-	ShowWindow(_hwnd, SW_SHOWDEFAULT);
-	UpdateWindow(_hwnd);
+bool flt::OsWindows::Initialize(uint64 hwnd)
+{
+	_hwnd = (HWND)hwnd;
+
+	if (_hwnd == NULL)
+	{
+		return false;
+	}
 
 	// 덤프 파일을 남기기 위한 세팅.
 	// https://docs.microsoft.com/en-us/windows/win32/api/minidumpapiset/nf-minidumpapiset-minidumpwritedump
@@ -246,14 +244,16 @@ bool flt::OsWindows::Initialize(int windowWidth, int windowHeight, const std::ws
 
 	SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)TopExceptionFilter);
 
-	wchar_t buffer[512];
+	bool ret = InitializeXBOXController(_hwnd);
+	if(ret == false)
 	{
-		DWORD result = GetModuleFileName(nullptr, buffer, 512);
-		ASSERT(result != 0, "가져오기 실패");
+		return false;
 	}
 
-	_exePath = buffer;
-	_exePath = _exePath.substr(0, _exePath.find_last_of(L"\\") + 1);
+	InitializeExePath();
+
+	ShowWindow(_hwnd, SW_SHOWDEFAULT);
+	UpdateWindow(_hwnd);
 
 	return true;
 }
@@ -266,6 +266,11 @@ bool flt::OsWindows::Finalize()
 
 bool flt::OsWindows::Update(float deltaSeconds)
 {
+	if(_hwnd == NULL)
+	{
+		return false;
+	}
+
 	UpdateKeyState();
 
 	// 윈도우 메세지 처리
@@ -357,6 +362,11 @@ void flt::OsWindows::DestroyRenderer(IRenderer* renderer)
 #endif
 }
 
+uint32 flt::OsWindows::GetWindowHandle()
+{
+	return (uint32)_hwnd;
+}
+
 flt::Vector2f flt::OsWindows::GetWindowSize()
 {
 	RECT rect;
@@ -390,7 +400,7 @@ void flt::OsWindows::SetWindowSize(uint32 width /*= 0*/, uint32 height /*= 0*/, 
 		useMonitorSize = true;
 	}
 
-	LONG_PTR style = WS_POPUP; 
+	LONG_PTR style = WS_POPUP;
 	if (mode == WindowMode::WINDOWED)
 	{
 		style = WS_OVERLAPPEDWINDOW | WS_SIZEBOX;
@@ -452,7 +462,7 @@ void flt::OsWindows::SetWindowSize(uint32 width /*= 0*/, uint32 height /*= 0*/, 
 		devMode.dmPelsHeight = height;
 		devMode.dmBitsPerPel = 32;
 		devMode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-		
+
 
 		LONG ret = ChangeDisplaySettingsEx(displayDevice.DeviceName, &devMode, NULL, CDS_FULLSCREEN, NULL);
 		ASSERT(ret == DISP_CHANGE_SUCCESSFUL, "전체화면으로 변경 실패");
@@ -473,7 +483,7 @@ void flt::OsWindows::SetWindowSize(uint32 width /*= 0*/, uint32 height /*= 0*/, 
 		//}
 	}
 
-	// 해상도를 바꿧다면 위치, 크기가 바뀔 수 있기때문에 모니터 크기를 다시 계산.
+	// 모니터 해상도를 바꿧다면 위치, 크기가 바뀔 수 있기때문에 모니터 크기를 다시 계산.
 	hMonitor = MonitorFromWindow(_hwnd, MONITOR_DEFAULTTOPRIMARY);
 	GetMonitorInfo(hMonitor, &monitorInfo);
 	if (useMonitorSize)
@@ -670,6 +680,36 @@ std::wstring flt::OsWindows::GetAbsPath(std::wstring relativePath)
 void flt::OsWindows::Exit()
 {
 	::PostQuitMessage(0);
+}
+
+bool flt::OsWindows::InitializeXBOXController(HWND hwnd)
+{
+	DEV_BROADCAST_DEVICEINTERFACE_W db =
+	{
+		.dbcc_size = sizeof(db),
+		.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE,
+		.dbcc_classguid = Xbox::guid,
+	};
+	HDEVNOTIFY ret = RegisterDeviceNotificationW(hwnd, &db, DEVICE_NOTIFY_WINDOW_HANDLE);
+
+	if (ret == NULL)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void flt::OsWindows::InitializeExePath()
+{
+	wchar_t buffer[512];
+	{
+		DWORD result = GetModuleFileName(nullptr, buffer, 512);
+		ASSERT(result != 0, "가져오기 실패");
+	}
+
+	_exePath = buffer;
+	_exePath = _exePath.substr(0, _exePath.find_last_of(L"\\") + 1);
 }
 
 void flt::OsWindows::UpdateKeyState()
@@ -1560,7 +1600,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 						RAWINPUTDEVICE rawInputDevice;
 
 						rawInputDevice.dwFlags =
-						RIDEV_NOLEGACY; // 마우스/키보드의 레거시 메시지를 생성하지 않음 -> alt f4등이 동작하지 않음. WM_KEYDOWN메시지가 생성되지 않음. 성능상 이득이 있음
+							RIDEV_NOLEGACY; // 마우스/키보드의 레거시 메시지를 생성하지 않음 -> alt f4등이 동작하지 않음. WM_KEYDOWN메시지가 생성되지 않음. 성능상 이득이 있음
 						// RIDEV_NOHOTKEYS; // 윈도우 등 핫키 무시하기
 						// RIDEV_INPUTSINK; // 백 그라운드에서도 인풋 받기, hwndTarget지정 필요
 						// RIDEV_EXINPUTSINK; // 포 그라운드에서 처리하지 않는 경우에만 입력 수신(포 그라운드에서 RAWINPUT에 등록이 안된 경우)

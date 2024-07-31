@@ -35,6 +35,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FloaterGameEngine", "Floate
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CubeRunner", "CubeRunner\CubeRunner.vcxproj", "{70728D34-BAAA-4D13-8AB2-85BF7D7D7AC2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QtEditor", "QtEditor\QtEditor.vcxproj", "{BC43C118-0E12-471A-A1FA-C2EA754BBC57}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -131,6 +133,14 @@ Global
 		{70728D34-BAAA-4D13-8AB2-85BF7D7D7AC2}.Release|x64.Build.0 = Release|x64
 		{70728D34-BAAA-4D13-8AB2-85BF7D7D7AC2}.Release|x86.ActiveCfg = Release|Win32
 		{70728D34-BAAA-4D13-8AB2-85BF7D7D7AC2}.Release|x86.Build.0 = Release|Win32
+		{BC43C118-0E12-471A-A1FA-C2EA754BBC57}.Debug|x64.ActiveCfg = Debug|x64
+		{BC43C118-0E12-471A-A1FA-C2EA754BBC57}.Debug|x64.Build.0 = Debug|x64
+		{BC43C118-0E12-471A-A1FA-C2EA754BBC57}.Debug|x86.ActiveCfg = Debug|x64
+		{BC43C118-0E12-471A-A1FA-C2EA754BBC57}.Debug|x86.Build.0 = Debug|x64
+		{BC43C118-0E12-471A-A1FA-C2EA754BBC57}.Release|x64.ActiveCfg = Release|x64
+		{BC43C118-0E12-471A-A1FA-C2EA754BBC57}.Release|x64.Build.0 = Release|x64
+		{BC43C118-0E12-471A-A1FA-C2EA754BBC57}.Release|x86.ActiveCfg = Release|x64
+		{BC43C118-0E12-471A-A1FA-C2EA754BBC57}.Release|x86.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

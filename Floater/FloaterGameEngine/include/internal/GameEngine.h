@@ -26,9 +26,11 @@ namespace flt
 	
 	public:
 		static GameEngine* Instance();
+		static GameEngine* Instance(uint32 handle);
 
 	public:
 		void Initialize();
+		void Initialize(uint32 handle);
 		bool Update();
 		void Finalize();
 
@@ -38,6 +40,7 @@ namespace flt
 		bool AddScene(const std::wstring& sceneName, Scene* scene);
 		Scene* GetCurrentScene();
 
+		uint32 GetWindowHandle();
 		Vector2f GetWindowSize();
 		void SetWindowTitle(const std::wstring& title);
 		void SetWindowSize(uint32 width = 0, uint32 height = 0, WindowMode mode = WindowMode::BORDERLESS);

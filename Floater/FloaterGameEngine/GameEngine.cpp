@@ -65,6 +65,28 @@ void flt::GameEngine::Initialize()
 	_timer.Start();
 }
 
+void flt::GameEngine::Initialize(uint32 handle)
+{
+	bool isDebug = false;
+#ifdef _DEBUG
+	isDebug = true;
+#endif
+	_platform = std::make_unique<Platform>(isDebug);
+	bool ret = _platform->Initialize(handle);
+	ASSERT(ret, "Platform Initialize failed");
+	_platform->ShowCursor(false);
+
+	_renderer = _platform->CreateRenderer(RendererType::ROCKET_DX11);
+	//_renderer = _platform->CreateRenderer(RendererType::DX11);
+	_physicsEngine = std::make_unique<PhysicsEngine>();
+	_physicsEngine->Initialize();
+
+	_soundEngine = std::make_unique<SoundEngine>();
+	_soundEngine->Initialize();
+
+	_timer.Start();
+}
+
 bool flt::GameEngine::Update()
 {
 	bool isRun = true;
@@ -157,6 +179,11 @@ flt::Scene* flt::GameEngine::GetCurrentScene()
 	return _currentScene;
 }
 
+uint32 flt::GameEngine::GetWindowHandle()
+{
+	return _platform->GetWindowHandle();
+}
+
 flt::Vector2f flt::GameEngine::GetWindowSize()
 {
 	return _platform->GetWindowSize();
@@ -203,6 +230,16 @@ flt::GameEngine* flt::GameEngine::Instance()
 	return s_instance;
 }
 
+flt::GameEngine* flt::GameEngine::Instance(uint32 handle)
+{
+	if (s_instance == nullptr)
+	{
+		s_instance = new GameEngine();
+		s_instance->Initialize(handle);
+	}
+	return s_instance;
+}
+
 void flt::GameEngine::ChangeScene()
 {
 	ASSERT(_nextScene, "ChangeScene is nullptr");
@@ -236,7 +273,7 @@ bool flt::GameEngine::UpdateImpl(Scene* scene)
 
 	_timer.Update();
 	float deltaSecond = (float)_timer.GetDeltaSeconds() * _timeScale;
-	bool isOnWindows = _platform->Update(deltaSecond);
+
 	_soundEngine->Update();
 
 	scene->StartFrame();
@@ -266,6 +303,8 @@ bool flt::GameEngine::UpdateImpl(Scene* scene)
 
 	scene->EndFrame();
 
+	// 외부에서 윈도우 루프를 더 돌리게 된 경우 키입력이 씹히지 않도록 하기 위해 맨 마지막에 호출한다.
+	bool isOnWindows = _platform->Update(deltaSecond);
 	return isOnWindows;
 }
 

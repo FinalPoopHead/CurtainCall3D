@@ -31,6 +31,11 @@ bool flt::Platform::Initialize(int pixelWidth, int pixelHeight, std::wstring tit
 	return _pOsImpl->Initialize(pixelWidth, pixelHeight, title, imgPath);
 }
 
+bool flt::Platform::Initialize(uint32 handle)
+{
+	return _pOsImpl->Initialize(handle);
+}
+
 bool flt::Platform::Finalize()
 {
 	return _pOsImpl->Finalize();
@@ -49,6 +54,11 @@ flt::IRenderer* flt::Platform::CreateRenderer(RendererType type)
 void flt::Platform::DestroyRenderer(IRenderer* renderer)
 {
 	_pOsImpl->DestroyRenderer(renderer);
+}
+
+uint32 flt::Platform::GetWindowHandle()
+{
+	return _pOsImpl->GetWindowHandle();
 }
 
 flt::Vector2f flt::Platform::GetWindowSize()

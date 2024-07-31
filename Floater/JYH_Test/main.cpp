@@ -36,6 +36,9 @@ T& unmove(T&& t)
 
 int main(int argc, char* argv[])
 {
+	int ghag = 0;
+	int* pghag = &ghag;
+
 	setlocale(LC_ALL, ".UTF8");
 	std::cout << std::boolalpha;
 
@@ -92,7 +95,7 @@ int main(int argc, char* argv[])
 	}*/
 
 	/// 트윈 테스트
-	{
+	/*{
 		int value = 100;
 		int valueRef = 100;
 
@@ -164,7 +167,7 @@ int main(int argc, char* argv[])
 			}
 			std::cout << "*\n";
 		}
-	}
+	}*/
 
 	std::filesystem::path path = std::filesystem::current_path();
 
@@ -172,6 +175,7 @@ int main(int argc, char* argv[])
 	////std::cout << std::hardware_destructive_interference_size << std::endl;
 
 	flt::GameEngine* pGameEngine = flt::GameEngine::Instance();
+	//pGameEngine->SetWindowSize(0, 0, flt::WindowMode::WINDOWED);
 
 	//UnityLoadScene unityLoadScene(L"..\\x64\\data\\SoaringMap.json");
 	//pGameEngine->SetScene(&unityLoadScene);

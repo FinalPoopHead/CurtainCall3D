@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{BC43C118-0E12-471A-A1FA-C2EA754BBC57}</ProjectGuid>
+    <Keyword>QtVS_v304</Keyword>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0</WindowsTargetPlatformVersion>
+    <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
+    <Import Project="$(QtMsBuild)\qt_defaults.props" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
+    <QtInstall>6.7.2_msvc2019_64</QtInstall>
+    <QtModules>core;gui;widgets</QtModules>
+    <QtBuildConfig>debug</QtBuildConfig>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
+    <QtInstall>6.7.2_msvc2019_64</QtInstall>
+    <QtModules>core</QtModules>
+    <QtBuildConfig>release</QtBuildConfig>
+  </PropertyGroup>
+  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  </Target>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(QtMsBuild)\Qt.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(QtMsBuild)\Qt.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
+    <ClCompile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
+    <ClCompile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="test\AdvantageCube.cpp" />
+    <ClCompile Include="test\AdvantageMine.cpp" />
+    <ClCompile Include="test\Board.cpp" />
+    <ClCompile Include="test\Camera.cpp" />
+    <ClCompile Include="test\ControllerManager.cpp" />
+    <ClCompile Include="test\CubeController.cpp" />
+    <ClCompile Include="test\DarkCube.cpp" />
+    <ClCompile Include="test\DetonatedMine.cpp" />
+    <ClCompile Include="test\DirectionalLight.cpp" />
+    <ClCompile Include="test\GameManager.cpp" />
+    <ClCompile Include="test\GameScene.cpp" />
+    <ClCompile Include="test\MainMenuScene.cpp" />
+    <ClCompile Include="test\Menu.cpp" />
+    <ClCompile Include="test\MenuItem.cpp" />
+    <ClCompile Include="test\MenuSelector.cpp" />
+    <ClCompile Include="test\Mine.cpp" />
+    <ClCompile Include="test\MineCone.cpp" />
+    <ClCompile Include="test\NormalCube.cpp" />
+    <ClCompile Include="test\Player.cpp" />
+    <ClCompile Include="test\PlayerModel.cpp" />
+    <ClCompile Include="test\RankViewer.cpp" />
+    <ClCompile Include="test\ShakeComponent.cpp" />
+    <ClCompile Include="test\ShakeObject.cpp" />
+    <ClCompile Include="test\SpriteObject.cpp" />
+    <ClCompile Include="test\TestCamera.cpp" />
+    <ClCompile Include="test\TextObject.cpp" />
+    <ClCompile Include="test\Tile.cpp" />
+    <ClCompile Include="test\UIStateContext.cpp" />
+    <ClCompile Include="test\UIStateContextController.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="MainWindow.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="MainWindow.ui" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FloaterGameEngine\FloaterGameEngine.vcxproj">
+      <Project>{ecbd9ca3-cc41-4494-a682-aa7b0c481fa8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\FloaterPlatform\FloaterPlatform.vcxproj">
+      <Project>{71b12dec-4df4-401f-a453-6216ef08c579}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\FloaterRendererCommon\FloaterRendererCommon.vcxproj">
+      <Project>{4c5ca68f-1387-44e2-84e2-6d07d893d21c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\FloaterUtil\FloaterUtil.vcxproj">
+      <Project>{cb145f87-3fe0-445e-bb70-582b466cbe74}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="test\AdvantageCube.h" />
+    <ClInclude Include="test\AdvantageMine.h" />
+    <ClInclude Include="test\Board.h" />
+    <ClInclude Include="test\Camera.h" />
+    <ClInclude Include="test\ControllerManager.h" />
+    <ClInclude Include="test\CubeController.h" />
+    <ClInclude Include="test\DarkCube.h" />
+    <ClInclude Include="test\DetonatedMine.h" />
+    <ClInclude Include="test\DirectionalLight.h" />
+    <ClInclude Include="test\GameManager.h" />
+    <ClInclude Include="test\GameScene.h" />
+    <ClInclude Include="test\MainMenuScene.h" />
+    <ClInclude Include="test\Menu.h" />
+    <ClInclude Include="test\MenuItem.h" />
+    <ClInclude Include="test\MenuSelector.h" />
+    <ClInclude Include="test\Mine.h" />
+    <ClInclude Include="test\MineCone.h" />
+    <ClInclude Include="test\NormalCube.h" />
+    <ClInclude Include="test\Player.h" />
+    <ClInclude Include="test\PlayerModel.h" />
+    <ClInclude Include="test\RankViewer.h" />
+    <ClInclude Include="test\ShakeComponent.h" />
+    <ClInclude Include="test\ShakeObject.h" />
+    <ClInclude Include="test\SpriteObject.h" />
+    <ClInclude Include="test\TestCamera.h" />
+    <ClInclude Include="test\TextObject.h" />
+    <ClInclude Include="test\Tile.h" />
+    <ClInclude Include="test\UIStateContext.h" />
+    <ClInclude Include="test\UIStateContextController.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="QtEditor.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
+    <Import Project="$(QtMsBuild)\qt.targets" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

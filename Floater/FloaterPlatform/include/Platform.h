@@ -31,11 +31,14 @@ namespace flt
 
 	public:
 		[[nodiscard]] bool Initialize(int pixelWidth, int pixelHeight, std::wstring title, std::wstring imgPath);
+		[[nodiscard]] bool Initialize(uint32 handle);
 		[[nodiscard]] bool Finalize();
 		[[nodiscard]] bool Update(float deltaSeconds);
 
 		[[nodiscard]] IRenderer* CreateRenderer(RendererType type);
 		void DestroyRenderer(IRenderer* renderer);
+
+		[[nodiscard]] uint32 GetWindowHandle();
 
 		[[nodiscard]] Vector2f GetWindowSize();
 		/// <summary>

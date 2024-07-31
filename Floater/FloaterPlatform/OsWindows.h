@@ -26,11 +26,14 @@ namespace flt
 		OsWindows(bool useConsole);
 		virtual ~OsWindows();
 		bool Initialize(int windowWidth, int windowHeight, const std::wstring& title, const std::wstring& imgPath);
+		bool Initialize(uint64 hwnd);
 		bool Finalize();
 		bool Update(float deltaSeconds);
 
 		IRenderer* CreateRenderer(RendererType type);
 		void DestroyRenderer(IRenderer* renderer);
+
+		uint32 GetWindowHandle();
 
 		Vector2f GetWindowSize();
 		void SetWindowTitle(const std::wstring& title);
@@ -55,6 +58,9 @@ namespace flt
 		void Exit();
 
 	private:
+		bool InitializeXBOXController(HWND hwnd);
+		void InitializeExePath();
+
 		void UpdateKeyState();
 		void UpdateGamePadVibration(float deltaSeconds);
 
