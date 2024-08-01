@@ -42,16 +42,17 @@
 
 const std::wstring flt::OsWindows::s_name = L"Windows";
 
-flt::OsWindows::OsWindows(bool useConsole) :
-	_hwnd(NULL),
-	_isActivated(false),
-	_keyTimer(),
-	_pKeyStates{ new(std::nothrow) KeyState[(int)KeyCode::MAX] },
-	_pKeyDatas{ new(std::nothrow) KeyData[(int)KeyCode::MAX] },
-	_keyUp(),
-	_consoleHwnd(NULL),
-	_isShowCursor(true),
-	_exePath()
+flt::OsWindows::OsWindows(bool useConsole)
+	: _hwnd(NULL)
+	, _isActivated(false)
+	, _isClosed(true)
+	, _keyTimer()
+	, _pKeyStates{ new(std::nothrow) KeyState[(int)KeyCode::MAX] }
+	, _pKeyDatas{ new(std::nothrow) KeyData[(int)KeyCode::MAX] }
+	, _keyUp()
+	, _consoleHwnd(NULL)
+	, _isShowCursor(true)
+	, _exePath()
 {
 	ASSERT(_pKeyDatas, "메모리 동적 할당 실패");
 	ASSERT(_pKeyStates, "메모리 동적 할당 실패");
@@ -267,6 +268,11 @@ bool flt::OsWindows::Finalize()
 bool flt::OsWindows::Update(float deltaSeconds)
 {
 	if(_hwnd == NULL)
+	{
+		return false;
+	}
+
+	if(_isClosed)
 	{
 		return false;
 	}
@@ -1236,6 +1242,7 @@ flt::WinGamePad* flt::OsWindows::FindEmptyGamePad(uint64 hash)
 LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static OsWindows* thisPtr = nullptr;	// WM_CREATE에서 할당
+
 	switch (msg)
 	{
 		case WM_INPUT:
@@ -1473,6 +1480,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 		{
 			// 앞으로 this를 사용할 수 있도록 OsWindows객체의 포인터를 thisPtr에 저장.
 			thisPtr = (OsWindows*)(((LPCREATESTRUCT)lParam)->lpCreateParams);
+			thisPtr->_isClosed = false;
 
 			Xbox::Initialize(thisPtr->_pGamePads, sizeof(thisPtr->_pGamePads) / sizeof(thisPtr->_pGamePads[0]));
 
@@ -1668,6 +1676,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 
 		case WM_DESTROY:
 		{
+			thisPtr->_isClosed = true;
 			::PostQuitMessage(0);
 			//return 0;
 		}
@@ -1675,6 +1684,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 
 		case WM_CLOSE:
 		{
+			thisPtr->_isClosed = true;
 			::PostQuitMessage(0);
 			//return 0;
 		}
@@ -1682,6 +1692,7 @@ LRESULT WINAPI flt::OsWindows::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 
 		case SC_CLOSE:
 		{
+			thisPtr->_isClosed = true;
 			::PostQuitMessage(0);
 			//return 0;
 		}

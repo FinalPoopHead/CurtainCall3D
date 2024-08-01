@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
 	}*/
 
 	/// 트윈 테스트
-	/*{
+	{
 		int value = 100;
 		int valueRef = 100;
 
@@ -111,8 +111,22 @@ int main(int argc, char* argv[])
 				{
 					std::cout << " ";
 				}
-				std::cout << "*";
+				std::cout << "*\n";
 			};
+
+
+		{
+			flt::FLTween tween = flt::tween::from(0)
+				.to(100).during(100.0f).onStep(onStepFunc)
+				.to(0).during(100.0f).easing(flt::ease::easeInOutBounce).onStep(onStepFunc);
+
+			for (int i = 0; i < 200; ++i)
+			{
+				tween.step(1.0f);
+			}
+			
+		}
+
 
 
 
@@ -167,7 +181,7 @@ int main(int argc, char* argv[])
 			}
 			std::cout << "*\n";
 		}
-	}*/
+	}
 
 	std::filesystem::path path = std::filesystem::current_path();
 

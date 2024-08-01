@@ -79,6 +79,7 @@ namespace flt
 	protected:
 		HWND _hwnd;
 		bool _isActivated;
+		bool _isClosed;
 
 		Timer _keyTimer;
 		KeyState* _pKeyStates;

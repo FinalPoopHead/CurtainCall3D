@@ -97,6 +97,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GameView.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="test\AdvantageCube.cpp" />
@@ -128,6 +129,7 @@
     <ClCompile Include="test\Tile.cpp" />
     <ClCompile Include="test\UIStateContext.cpp" />
     <ClCompile Include="test\UIStateContextController.cpp" />
+    <ClCompile Include="TitleBar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="MainWindow.h" />
@@ -150,6 +152,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="TitleBar.h" />
+    <QtMoc Include="GameView.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="test\AdvantageCube.h" />
     <ClInclude Include="test\AdvantageMine.h" />

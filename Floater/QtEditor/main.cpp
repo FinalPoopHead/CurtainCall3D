@@ -8,6 +8,7 @@
 #include "../FloaterGameEngine/include/Input.h"
 #include "./test/GameScene.h"
 #include "./test/MainMenuScene.h"
+#include "GameView.h"
 
 
 int main(int argc, char* argv[])
@@ -20,48 +21,34 @@ int main(int argc, char* argv[])
 	flt::GameEngine* gameEngine = flt::GameEngine::Instance();
 
 	QApplication a(argc, argv);
-	QWidget* container = QWidget::createWindowContainer(QWindow::fromWinId((WId)gameEngine->GetWindowHandle()));
-	container->setAttribute(Qt::WA_DontCreateNativeAncestors);
-	container->setAttribute(Qt::WA_NativeWindow);
-	container->setAttribute(Qt::WA_InputMethodEnabled, false);
-	container->show();
+	//QWidget* container = QWidget::createWindowContainer(QWindow::fromWinId((WId)gameEngine->GetWindowHandle()));
+	//container->setAttribute(Qt::WA_DontCreateNativeAncestors);
+	//container->setAttribute(Qt::WA_NativeWindow);
+	//container->setAttribute(Qt::WA_InputMethodEnabled, false);
+	//container->show();
+	GameView gameView(gameEngine->GetPlatform());
+	gameView.show();
 
 	flt::CreateScene<MainMenuScene>();
 	flt::CreateScene<GameScene>();
 	flt::SetScene(L"class MainMenuScene");
 
-	freopen("CONOUT$", "w", stdout);
+	FILE* console = freopen("CONOUT$", "w", stdout);
+	ASSERT(console, "Failed to open console window");
 	std::cout.clear();
 
-	bool isRun = true;
-	while (isRun)
+	while (true)
 	{
-		isRun = gameEngine->Update();
+		if (!gameEngine->Update())
+		{
+			gameView.close();
+			break;
+		}
 		a.processEvents();
-
-		if (flt::GetKeyDown(flt::KeyCode::esc))
-		{
-			std::cout << "ESC" << std::endl;
-		}
-
-		if(flt::GetKeyDown(flt::KeyCode::right))
-		{
-			std::cout << "Right Down" << std::endl;
-		}
-
-		//if(flt::GetKey(flt::KeyCode::right))
-		//{
-		//	std::cout << "Right" << std::endl;
-		//}
-
-		if(flt::GetKeyUp(flt::KeyCode::right))
-		{
-			std::cout << "Right Up" << std::endl;
-		}
-
 	}
 
 	gameEngine->Finalize();
+	fclose(console);
 
 	//return a.exec();
 }

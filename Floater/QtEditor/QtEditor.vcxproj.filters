@@ -24,6 +24,9 @@
     <Filter Include="Test">
       <UniqueIdentifier>{360004f1-1011-4220-aa84-1fc5fb2aa0eb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Window">
+      <UniqueIdentifier>{4da39b76-7593-4532-8a2e-5c7b06fa973b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -119,6 +122,12 @@
     <ClCompile Include="test\UIStateContextController.cpp">
       <Filter>Test</Filter>
     </ClCompile>
+    <ClCompile Include="GameView.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleBar.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="MainWindow.ui">
@@ -128,6 +137,12 @@
   <ItemGroup>
     <QtMoc Include="MainWindow.h">
       <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="GameView.h">
+      <Filter>Window</Filter>
+    </QtMoc>
+    <QtMoc Include="TitleBar.h">
+      <Filter>Window</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
