@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
 	flt::CreateScene<MainMenuScene>();
 	flt::CreateScene<GameScene>();
 	flt::SetScene(L"class MainMenuScene");
+	_gameView = new GameView(gameEngine, this);
 
 	QDockWidget* dock = new QDockWidget("GameView", this);
 	dock->setWidget(_gameView);
