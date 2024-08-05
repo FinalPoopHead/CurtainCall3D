@@ -12,7 +12,8 @@
 #include "../FloaterPlatform/include/Platform.h"
 #include "TitleBar.h"
 
-GameView::GameView(flt::GameEngine* gameEngine, QWidget* parent /*= nullptr*/) : QWidget(parent)
+GameView::GameView(flt::GameEngine* gameEngine, QWidget* parent /*= nullptr*/) 
+	: QWidget(parent)
 	, _gameEngine(gameEngine)
 	, _hwnd(NULL)
 	, _container(nullptr)
@@ -87,11 +88,11 @@ void GameView::closeEvent(QCloseEvent* event)
 	}
 }
 
-bool GameView::gameUpdate(const QByteArray& eventType, void* message, long* result)
+bool GameView::gameUpdate()
 {
 	if (_isRunning)
 	{
-		return true;
+		return _gameEngine->Update();
 	}
 
 	return true;

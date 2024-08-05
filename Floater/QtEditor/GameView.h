@@ -1,6 +1,7 @@
 ﻿#pragma once
-
-#include <QtWidgets/qwidget.h>
+#include <QWidget>
+//#include <QDockWidget>
+#include <QTabWidget>
 //#include "ui_GameView.h"
 #include "../FloaterUtil/include/FloaterType.h"
 
@@ -24,7 +25,8 @@ public:
 	void paintEvent(QPaintEvent* event) override;
 	void closeEvent(QCloseEvent *event) override;
 
-	bool gameUpdate(const QByteArray& eventType, void* message, long* result);
+	bool gameUpdate();
+
 private:
 	void ChangeWindowMaximize();
 	void CloseNativeWindow();
@@ -33,6 +35,7 @@ private:
 	flt::GameEngine* _gameEngine;
 	uint64 _hwnd;
 	QWidget* _container;
+	QTabWidget* _tabWidget;
 
 private:
 	constexpr static int TITLE_HEIGHT = 20;

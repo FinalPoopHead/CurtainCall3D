@@ -109,10 +109,10 @@ void MenuSelector::Update(float deltaSecond)
 				std::cout << "Right Down in app" << std::endl;
 			}
 
-			//if (flt::GetKey(flt::KeyCode::right))
-			//{
-			//	std::cout << "Right in app" << std::endl;
-			//}
+			if (flt::GetKey(flt::KeyCode::right))
+			{
+				std::cout << "Right in app" << std::endl;
+			}
 
 			if (flt::GetKeyUp(flt::KeyCode::right))
 			{

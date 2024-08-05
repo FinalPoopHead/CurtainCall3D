@@ -14,10 +14,9 @@ EditorApplication::~EditorApplication()
 
 bool EditorApplication::notify(QObject* receiver, QEvent* event)
 {
-	if(auto gameView = qobject_cast<GameView*>(receiver))
+	if (auto gameView = qobject_cast<GameView*>(receiver))
 	{
-		long result = 0;
-		if (!gameView -> gameUpdate("", event, &result))
+		if (!gameView->gameUpdate())
 		{
 			return false;
 		}
