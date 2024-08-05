@@ -21,12 +21,15 @@ int main(int argc, char* argv[])
 	flt::GameEngine* gameEngine = flt::GameEngine::Instance();
 
 	QApplication a(argc, argv);
+
+	MainWindow mainWindow;
+	mainWindow.show();
 	//QWidget* container = QWidget::createWindowContainer(QWindow::fromWinId((WId)gameEngine->GetWindowHandle()));
 	//container->setAttribute(Qt::WA_DontCreateNativeAncestors);
 	//container->setAttribute(Qt::WA_NativeWindow);
 	//container->setAttribute(Qt::WA_InputMethodEnabled, false);
 	//container->show();
-	GameView gameView(gameEngine->GetPlatform());
+	GameView gameView(gameEngine);
 	gameView.show();
 
 	flt::CreateScene<MainMenuScene>();

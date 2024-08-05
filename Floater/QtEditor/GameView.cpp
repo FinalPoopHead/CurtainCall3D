@@ -8,17 +8,18 @@
 #include <windows.h>
 #include <iostream>
 
+#include "../FloaterGameEngine/include/internal/GameEngine.h"
 #include "../FloaterPlatform/include/Platform.h"
 #include "TitleBar.h"
 
-GameView::GameView(flt::Platform* winPlatform, QWidget* parent /*= nullptr*/)
-	: QWidget(parent)
-	, _winPlatform(winPlatform)
+GameView::GameView(flt::GameEngine* gameEngine, QWidget* parent /*= nullptr*/) : QWidget(parent)
+	, _gameEngine(gameEngine)
 	, _hwnd(NULL)
 	, _container(nullptr)
+	, _isRunning(true) // 일단은 True로 해서 반드시 게임이 돌아가도록.
 {
-	_hwnd = winPlatform->GetWindowHandle();
-	winPlatform->ShowCursor(true);
+	_hwnd = gameEngine->GetWindowHandle();
+	gameEngine->GetPlatform()->ShowCursor(true);
 
 	setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowMinMaxButtonsHint);
 	//setAttribute(Qt::WA_TranslucentBackground);
@@ -38,6 +39,7 @@ GameView::GameView(flt::Platform* winPlatform, QWidget* parent /*= nullptr*/)
 	resize(800, 600);
 
 	connect(titleBar, &TitleBar::minimizeClicked, this, &QWidget::showMinimized);
+	connect(titleBar, &TitleBar::maximizeClicked, this, &GameView::ChangeWindowMaximize);
 	connect(titleBar, &TitleBar::closeClicked, this, &QWidget::close);
 }
 
@@ -83,6 +85,24 @@ void GameView::closeEvent(QCloseEvent* event)
 	{
 		CloseNativeWindow();
 	}
+}
+
+bool GameView::gameUpdate(const QByteArray& eventType, void* message, long* result)
+{
+	if (_isRunning)
+	{
+		return true;
+	}
+
+	return true;
+}
+
+void GameView::ChangeWindowMaximize()
+{
+	if (isMaximized())
+		QWidget::showNormal();
+	else
+		QWidget::showMaximized();
 }
 
 void GameView::CloseNativeWindow()

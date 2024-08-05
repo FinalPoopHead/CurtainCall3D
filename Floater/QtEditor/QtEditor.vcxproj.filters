@@ -128,6 +128,9 @@
     <ClCompile Include="TitleBar.cpp">
       <Filter>Window</Filter>
     </ClCompile>
+    <ClCompile Include="EditorApplication.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="MainWindow.ui">
@@ -235,6 +238,9 @@
     </ClInclude>
     <ClInclude Include="test\UIStateContextController.h">
       <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorApplication.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

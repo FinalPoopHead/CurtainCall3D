@@ -97,6 +97,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="EditorApplication.cpp" />
     <ClCompile Include="GameView.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
@@ -154,6 +155,7 @@
   <ItemGroup>
     <QtMoc Include="TitleBar.h" />
     <QtMoc Include="GameView.h" />
+    <ClInclude Include="EditorApplication.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="test\AdvantageCube.h" />
     <ClInclude Include="test\AdvantageMine.h" />
