@@ -38,6 +38,7 @@ namespace flt
 		Scene* SetScene(Scene* scene);
 		Scene* SetScene(const std::wstring& sceneName);
 		bool AddScene(const std::wstring& sceneName, Scene* scene);
+		bool RemoveScene(const std::wstring& sceneName);
 		Scene* GetCurrentScene();
 
 		uint32 GetWindowHandle();

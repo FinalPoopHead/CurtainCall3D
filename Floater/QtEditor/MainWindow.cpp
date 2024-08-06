@@ -7,22 +7,20 @@
 #include <QTabBar>
 #include <QMouseEvent>
 #include <QDockWidget>
+#include <QTimer>
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
 	, _gameView(nullptr)
 {
-	ui.setupUi(this);
+	_ui.setupUi(this);
 
-	/*flt::GameEngine* gameEngine = flt::GameEngine::Instance();
-	flt::CreateScene<MainMenuScene>();
-	flt::CreateScene<GameScene>();
-	flt::SetScene(L"class MainMenuScene");
-	_gameView = new GameView(gameEngine, this);
+	//_gameView = new GameView(this);
+	//QDockWidget* dock = new QDockWidget("GameView", this);
+	//dock->setWidget(_gameView);
+	//addDockWidget(Qt::LeftDockWidgetArea, dock);
 
-	QDockWidget* dock = new QDockWidget("GameView", this);
-	dock->setWidget(_gameView);
-	addDockWidget(Qt::LeftDockWidgetArea, dock);*/
+	connect(_ui.playButton, &QPushButton::clicked, this, &MainWindow::pushPlayButton);
 
 	testSetup();
 }
@@ -37,7 +35,7 @@ bool MainWindow::Update()
 {
 	if (_gameView)
 	{
-		return _gameView->gameUpdate();
+		_gameView->gameUpdate();
 	}
 	return true;
 }
@@ -117,5 +115,25 @@ void MainWindow::handleTabActivated(QDockWidget* dockWidget)
 			tabBar->installEventFilter(this);
 			break;
 		}
+	}
+}
+
+void MainWindow::pushPlayButton()
+{
+	if (_gameView == nullptr)
+	{
+		_gameView = new GameView(this);
+		QDockWidget* dock = new QDockWidget("GameView", this);
+		dock->setWidget(_gameView);
+		addDockWidget(Qt::LeftDockWidgetArea, dock);
+	}
+
+	if (_gameView->isPlaying())
+	{
+		_gameView->stop();
+	}
+	else
+	{
+		_gameView->run();
 	}
 }

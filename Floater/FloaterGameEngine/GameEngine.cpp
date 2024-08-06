@@ -106,6 +106,8 @@ bool flt::GameEngine::Update()
 
 void flt::GameEngine::Finalize()
 {
+	_loadingScene = nullptr;
+	_nextScene = nullptr;
 	if (_currentScene != nullptr)
 	{
 		//_currentScene->OnDisable();
@@ -117,6 +119,7 @@ void flt::GameEngine::Finalize()
 		scene->Finalize();
 		delete scene;
 	}
+	_scenes.clear();
 
 	_platform->DestroyRenderer(_renderer);
 	//delete _platform;
@@ -131,10 +134,6 @@ void flt::GameEngine::Finalize()
 	_soundEngine->Finalize();
 	//delete _soundEngine;
 	_soundEngine = nullptr;
-
-	// 여기에서 해도 되는지 모르겠다.
-	delete s_instance;
-	s_instance = nullptr;
 }
 
 flt::Scene* flt::GameEngine::GetScene(const std::wstring& sceneName)
@@ -170,6 +169,18 @@ bool flt::GameEngine::AddScene(const std::wstring& sceneName, Scene* scene)
 		return false;
 	}
 	_scenes.insert({ sceneName, scene });
+
+	return true;
+}
+
+bool flt::GameEngine::RemoveScene(const std::wstring& sceneName)
+{
+	auto iter = _scenes.find(sceneName);
+	if (iter == _scenes.end())
+	{
+		return false;
+	}
+	_scenes.erase(iter);
 
 	return true;
 }
@@ -272,7 +283,7 @@ bool flt::GameEngine::UpdateImpl(Scene* scene)
 
 	_timer.Update();
 	float deltaSecond = (float)_timer.GetDeltaSeconds() * _timeScale;
-
+	std::cout << deltaSecond << std::endl;
 	_soundEngine->Update();
 
 	scene->StartFrame();
@@ -293,7 +304,6 @@ bool flt::GameEngine::UpdateImpl(Scene* scene)
 		_fixedUpdateElapsedSecond -= fixedUpdateInterval;
 	}
 
-
 	scene->Update(deltaSecond);
 
 	scene->PreRender();
@@ -304,6 +314,7 @@ bool flt::GameEngine::UpdateImpl(Scene* scene)
 
 	// 외부에서 윈도우 루프를 더 돌리게 된 경우 키입력이 씹히지 않도록 하기 위해 맨 마지막에 호출한다.
 	bool isOnWindows = _platform->Update(deltaSecond);
+
 	return isOnWindows;
 }
 

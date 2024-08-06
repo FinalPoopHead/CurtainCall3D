@@ -19,15 +19,17 @@ public:
 private:
 	void testSetup();
 
+
 protected:
 	bool eventFilter(QObject* obj, QEvent* event) override;
 	
 private slots:
 	void handleTabActivated(QDockWidget* dockWidget);
-	
+	void pushPlayButton();
+
 private:
 	GameView* _gameView;
-	Ui::MainWindowClass ui;
+	Ui::MainWindowClass _ui;
 
 	QPoint m_dragStartPosition;
 	QDockWidget* m_activeDockWidget;

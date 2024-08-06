@@ -6,6 +6,10 @@
 #include "../FloaterUtil/include/FloaterType.h"
 
 class QLabel;
+class QVBoxLayout;
+class QTimer;
+class QMetaObject;
+class QMetaObject::Connection;
 
 namespace flt
 {
@@ -25,20 +29,28 @@ public:
 	void paintEvent(QPaintEvent* event) override;
 	void closeEvent(QCloseEvent *event) override;
 
-	bool gameUpdate();
-
+	bool isPlaying();
 	void run();
 	void stop();
+
+public slots:
+	void performTask();
+	void gameUpdate();
+
 private:
 	void ChangeWindowMaximize();
 	void CloseNativeWindow();
 
 private:
+	// 게임 Play관련 변수
 	flt::GameEngine* _gameEngine;
 	uint64 _hwnd;
+	QVBoxLayout* _layout;
 	QWidget* _container;
-
+	QTimer* _timer;
+	QMetaObject::Connection _connection;
 	bool _isRunning;
+
 private:
 	constexpr static int TITLE_HEIGHT = 20;
 	constexpr static int BORDER_WIDTH = 1;

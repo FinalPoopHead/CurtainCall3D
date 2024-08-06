@@ -68,6 +68,10 @@ flt::OsWindows::OsWindows(bool useConsole)
 			ASSERT(AllocConsole() != NULL, "콘솔 생성 실패");
 			_consoleHwnd = GetConsoleWindow();
 			ASSERT(_consoleHwnd != NULL, "콘솔 윈도우 핸들을 가져오지 못했습니다.");
+
+			FILE* console = freopen("CONOUT$", "w", stdout);
+			ASSERT(console, "Failed to open console window");
+			std::cout.clear();
 		}
 
 		ShowWindow(_consoleHwnd, SW_SHOW);
@@ -283,18 +287,6 @@ bool flt::OsWindows::Update(float deltaSeconds)
 	MSG msg;
 	msg.message = WM_NULL;
 
-	while (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-
-		// 윈도우 창이 종료됐다면 렌더링 할 필요가 없으니 즉시 return
-		if (msg.message == WM_QUIT)
-		{
-			return false;
-		}
-	}
-
 	for (int i = 0; i < 16; ++i)
 	{
 		if (_pGamePads[i].isConnected == false)
@@ -306,6 +298,18 @@ bool flt::OsWindows::Update(float deltaSeconds)
 	}
 
 	UpdateGamePadVibration(deltaSeconds);
+
+	while (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+
+		// 윈도우 창이 종료됐다면 렌더링 할 필요가 없으니 즉시 return
+		if (msg.message == WM_QUIT)
+		{
+			return false;
+		}
+	}
 
 	return true;
 }

@@ -19,6 +19,7 @@ namespace flt
 
 		flt::Scene* GetCurrentScene();
 		bool AddScene(const std::wstring& sceneName, flt::Scene* scene);
+		bool RemoveScene(const std::wstring& sceneName);
 
 		GameEngine* engine;
 	};
@@ -44,6 +45,15 @@ namespace flt
 		sceneName.resize(flt::TypeName<T>().length());
 		__impl::g_engineWrapper.AddScene(sceneName, scene);
 		return scene;
+	}
+
+	template<SceneDerived T>
+	void ReleaseScene(T* scene)
+	{
+		std::wstring sceneName = flt::TypeName<T>().data();
+		sceneName.resize(flt::TypeName<T>().length());
+		scene->Finalize();
+		delete scene;
 	}
 
 	Scene* SetScene(Scene* scene);

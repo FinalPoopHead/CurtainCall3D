@@ -23,6 +23,11 @@ bool flt::GameEngineWrapper::AddScene(const std::wstring& sceneName, flt::Scene*
 	return engine->AddScene(sceneName,scene);
 }
 
+bool flt::GameEngineWrapper::RemoveScene(const std::wstring& sceneName)
+{
+	return engine->RemoveScene(sceneName);
+}
+
 flt::Scene* flt::SetScene(Scene* scene)
 {
 	//GameEngine* engine = GameEngine::Instance();
