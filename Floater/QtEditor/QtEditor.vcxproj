@@ -36,7 +36,7 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>6.7.2</QtInstall>
+    <QtInstall>6.7.2_msvc2019_64</QtInstall>
     <QtModules>core;gui;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
@@ -97,10 +97,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DockWidget.cpp" />
     <ClCompile Include="EditorApplication.cpp" />
     <ClCompile Include="GameView.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="TabWidget.cpp" />
     <ClCompile Include="test\AdvantageCube.cpp" />
     <ClCompile Include="test\AdvantageMine.cpp" />
     <ClCompile Include="test\Board.cpp" />
@@ -155,8 +157,10 @@
   <ItemGroup>
     <QtMoc Include="TitleBar.h" />
     <QtMoc Include="GameView.h" />
+    <ClInclude Include="DockWidget.h" />
     <ClInclude Include="EditorApplication.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="TabWidget.h" />
     <ClInclude Include="test\AdvantageCube.h" />
     <ClInclude Include="test\AdvantageMine.h" />
     <ClInclude Include="test\Board.h" />

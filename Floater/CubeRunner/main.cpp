@@ -7,6 +7,7 @@
 int main(int argc, char* argv[])
 {
 	flt::GameEngine* pGameEngine = flt::GameEngine::Instance();
+	pGameEngine->Initialize();
 	pGameEngine->SetWindowTitle(L"Cube Runner");
 
 	pGameEngine->SetWindowSize(0, 0, flt::WindowMode::BORDERLESS);

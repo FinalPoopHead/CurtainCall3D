@@ -10,38 +10,41 @@
 
 #include "../FloaterGameEngine/include/internal/GameEngine.h"
 #include "../FloaterPlatform/include/Platform.h"
+#include "../FloaterGameEngine/include/EngineMinimal.h"
+#include "./test/GameScene.h"
+#include "./test/MainMenuScene.h"
 #include "TitleBar.h"
 
-GameView::GameView(flt::GameEngine* gameEngine, QWidget* parent /*= nullptr*/) 
-	: QWidget(parent)
-	, _gameEngine(gameEngine)
+
+GameView::GameView(QWidget* parent /*= nullptr*/) : QWidget(parent)
+	, _gameEngine(flt::GameEngine::Instance())
 	, _hwnd(NULL)
 	, _container(nullptr)
 	, _isRunning(true) // 일단은 True로 해서 반드시 게임이 돌아가도록.
 {
-	_hwnd = gameEngine->GetWindowHandle();
-	gameEngine->GetPlatform()->ShowCursor(true);
+	_hwnd = _gameEngine->GetWindowHandle();
+	_gameEngine->GetPlatform()->ShowCursor(true);
 
 	setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowMinMaxButtonsHint);
 	//setAttribute(Qt::WA_TranslucentBackground);
 
 	_container = QWidget::createWindowContainer(QWindow::fromWinId((WId)_hwnd), this);
 
-	TitleBar* titleBar = new TitleBar("GameView", this);
+	//TitleBar* titleBar = new TitleBar("GameView", this);
 	QWidget* centralWidget = new QWidget(this);
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setContentsMargins(BORDER_WIDTH, BORDER_WIDTH, BORDER_WIDTH, BORDER_WIDTH);
 	layout->setSpacing(0);
-	layout->addWidget(titleBar, 0);
-	layout->addWidget(_container, 1);
+	//layout->addWidget(titleBar, 0);
+	layout->addWidget(_container, 0);
 	setLayout(layout);
 
 	resize(800, 600);
 
-	connect(titleBar, &TitleBar::minimizeClicked, this, &QWidget::showMinimized);
-	connect(titleBar, &TitleBar::maximizeClicked, this, &GameView::ChangeWindowMaximize);
-	connect(titleBar, &TitleBar::closeClicked, this, &QWidget::close);
+	//connect(titleBar, &TitleBar::minimizeClicked, this, &QWidget::showMinimized);
+	//connect(titleBar, &TitleBar::maximizeClicked, this, &GameView::ChangeWindowMaximize);
+	//connect(titleBar, &TitleBar::closeClicked, this, &QWidget::close);
 }
 
 
@@ -96,6 +99,31 @@ bool GameView::gameUpdate()
 	}
 
 	return true;
+}
+
+void GameView::run()
+{
+	if(_isRunning)
+	{
+		return;
+	}
+
+	_isRunning = true;
+	_gameEngine->Initialize();
+	flt::CreateScene<MainMenuScene>();
+	flt::CreateScene<GameScene>();
+	flt::SetScene(L"class MainMenuScene");
+}
+
+void GameView::stop()
+{
+	if(!_isRunning)
+	{
+		return;
+	}
+
+	_isRunning = false;
+	_gameEngine->Finalize();
 }
 
 void GameView::ChangeWindowMaximize()

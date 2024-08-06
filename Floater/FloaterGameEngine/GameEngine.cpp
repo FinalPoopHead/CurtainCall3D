@@ -52,7 +52,7 @@ void flt::GameEngine::Initialize()
 	_platform = std::make_unique<Platform>(isDebug);
 	bool ret = _platform->Initialize(1920, 1080, L"", L"");
 	ASSERT(ret, "Platform Initialize failed");
-	_platform->ShowCursor(false);
+	//_platform->ShowCursor(false);
 
 	_renderer = _platform->CreateRenderer(RendererType::ROCKET_DX11);
 	//_renderer = _platform->CreateRenderer(RendererType::DX11);
@@ -225,7 +225,6 @@ flt::GameEngine* flt::GameEngine::Instance()
 	if (s_instance == nullptr)
 	{
 		s_instance = new GameEngine();
-		s_instance->Initialize();
 	}
 	return s_instance;
 }

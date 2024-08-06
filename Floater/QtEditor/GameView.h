@@ -18,7 +18,7 @@ class GameView : public QWidget
 	Q_OBJECT
 
 public:
-	GameView(flt::GameEngine* gameEngine, QWidget* parent = nullptr);
+	GameView(QWidget* parent = nullptr);
 	~GameView();
 
 	void resizeEvent(QResizeEvent* event) override;
@@ -27,6 +27,8 @@ public:
 
 	bool gameUpdate();
 
+	void run();
+	void stop();
 private:
 	void ChangeWindowMaximize();
 	void CloseNativeWindow();
@@ -35,11 +37,9 @@ private:
 	flt::GameEngine* _gameEngine;
 	uint64 _hwnd;
 	QWidget* _container;
-	QTabWidget* _tabWidget;
 
+	bool _isRunning;
 private:
 	constexpr static int TITLE_HEIGHT = 20;
 	constexpr static int BORDER_WIDTH = 1;
-
-	bool _isRunning;
 };
