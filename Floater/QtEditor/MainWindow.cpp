@@ -12,13 +12,18 @@
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
 	, _gameView(nullptr)
+	, _dockManager(nullptr)
 {
 	_ui.setupUi(this);
 
-	//_gameView = new GameView(this);
-	//QDockWidget* dock = new QDockWidget("GameView", this);
-	//dock->setWidget(_gameView);
-	//addDockWidget(Qt::LeftDockWidgetArea, dock);
+	ads::CDockManager::setConfigFlag(ads::CDockManager::FocusHighlighting, true);
+	
+	_dockManager = new ads::CDockManager(this);
+	_dockManager->setDockWidgetToolBarStyle(Qt::ToolButtonIconOnly, ads::CDockWidget::StateFloating);
+
+	ads::CDockWidget* dockWidget = new ads::CDockWidget("DockWidget", this);
+	dockWidget->setFeature(ads::CDockWidget::DockWidgetClosable, false);
+	_dockManager->addDockWidget(ads::LeftDockWidgetArea, dockWidget);
 
 	connect(_ui.playButton, &QPushButton::clicked, this, &MainWindow::pushPlayButton);
 
