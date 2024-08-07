@@ -26,7 +26,7 @@ class MainWindow : public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWindow(QWidget *parent = nullptr);
+	MainWindow(QWidget* parent = nullptr);
 	~MainWindow();
 
 	bool Update();
@@ -36,14 +36,23 @@ private:
 
 protected:
 	bool eventFilter(QObject* obj, QEvent* event) override;
-	
+
 private slots:
 	void handleTabActivated(QDockWidget* dockWidget);
 	void pushPlayButton();
 
+	void handleSceneView(bool checked);
+	void handleGameView(bool checked);
+	void handleOutputView(bool checked);
+
 private:
-	GameView* _gameView;
 	Ui::MainWindowClass _ui;
+
+	GameView* _gameView;
+	ads::CDockWidget* _gameViewDock;
+	ads::CDockWidget* _sceneViewDock;
+	ads::CDockWidget* _outputViewDock;
+
 
 	QPoint m_dragStartPosition;
 	QDockWidget* m_activeDockWidget;

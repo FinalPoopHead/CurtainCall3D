@@ -17,17 +17,35 @@ MainWindow::MainWindow(QWidget* parent)
 	_ui.setupUi(this);
 
 	ads::CDockManager::setConfigFlag(ads::CDockManager::FocusHighlighting, true);
+	ads::CDockManager::setConfigFlag(ads::CDockManager::ActiveTabHasCloseButton, true);
+	ads::CDockManager::setConfigFlag(ads::CDockManager::DockAreaHasCloseButton, false);
+	ads::CDockManager::setConfigFlag(ads::CDockManager::DockAreaHasUndockButton, false);
+	ads::CDockManager::setConfigFlag(ads::CDockManager::DockAreaDynamicTabsMenuButtonVisibility, true);
+	ads::CDockManager::setConfigFlag(ads::CDockManager::OpaqueSplitterResize, true);
+	//만약 나중에 위젯 하나를 독매니저 겸 도킹 스테이션으로 쓸려 할 때 
+	//ads::CDockManager::setConfigFlag(ads::CDockManager::HideSingleCentralWidgetTitleBar, true);
+
+	ads::CDockManager::setConfigFlag(ads::CDockManager::DragPreviewIsDynamic, true);
+	ads::CDockManager::setConfigFlag(ads::CDockManager::DragPreviewShowsContentPixmap, false);
+	ads::CDockManager::setConfigFlag(ads::CDockManager::DragPreviewHasWindowFrame, false);
+	ads::CDockManager::setConfigFlag(ads::CDockManager::FloatingContainerHasWidgetIcon, true);
+
+	ads::CDockManager::setAutoHideConfigFlags(ads::CDockManager::DefaultAutoHideConfig);
 	
 	_dockManager = new ads::CDockManager(this);
 	_dockManager->setDockWidgetToolBarStyle(Qt::ToolButtonIconOnly, ads::CDockWidget::StateFloating);
 
-	ads::CDockWidget* dockWidget = new ads::CDockWidget("DockWidget", this);
-	dockWidget->setFeature(ads::CDockWidget::DockWidgetClosable, false);
-	_dockManager->addDockWidget(ads::LeftDockWidgetArea, dockWidget);
+	// Menu -> File
+	connect(_ui.actionExit, &QAction::triggered, this, &QMainWindow::close);
 
-	connect(_ui.playButton, &QPushButton::clicked, this, &MainWindow::pushPlayButton);
+	// Menu -> View
+	connect(_ui.actionScene, &QAction::triggered, this, &MainWindow::handleSceneView);
+	connect(_ui.actionGame, &QAction::triggered, this, &MainWindow::handleGameView);
+	connect(_ui.actionOutput, &QAction::triggered, this, &MainWindow::handleOutputView);
 
-	testSetup();
+	//connect(_ui.playButton, &QPushButton::clicked, this, &MainWindow::pushPlayButton);
+
+	//testSetup();
 }
 
 MainWindow::~MainWindow()
@@ -48,20 +66,29 @@ bool MainWindow::Update()
 void MainWindow::testSetup()
 {
 	// 솔루션 탐색기
-	DockWidget* solutionExplorer = new DockWidget("Solution Explorer", this);
-	//solutionExplorer->addTab(new QTextEdit("Solution structure here"), "Solution");
-	addDockWidget(Qt::RightDockWidgetArea, solutionExplorer);
+	ads::CDockWidget* solutionExplorer = new ads::CDockWidget("Solution Explorer", this);
+	solutionExplorer->setFeature(ads::CDockWidget::DockWidgetClosable, true);
+	_dockManager->addDockWidget(ads::LeftDockWidgetArea, solutionExplorer);
 
 	// 속성 창
-	DockWidget* properties = new DockWidget("Properties", this);
-	//properties->addTab(new QTextEdit("Properties here"), "Properties");
-	addDockWidget(Qt::RightDockWidgetArea, properties);
+	ads::CDockWidget* Properties = new ads::CDockWidget("Properties", this);
+	Properties->setFeature(ads::CDockWidget::DockWidgetClosable, true);
+	_dockManager->addDockWidget(ads::LeftDockWidgetArea, Properties);
 
 	// 출력 창
-	DockWidget* output = new DockWidget("Output", this);
-	//output->addTab(new QTextEdit("Output here"), "Output");
-	//output->addTab(new QTextEdit("Error List here"), "Error List");
-	addDockWidget(Qt::BottomDockWidgetArea, output);
+	ads::CDockWidget* Output = new ads::CDockWidget("Output", this);
+	Output->setFeature(ads::CDockWidget::DockWidgetClosable, true);
+	_dockManager->addDockWidget(ads::LeftDockWidgetArea, Output);
+
+	// 게임 뷰
+	ads::CDockWidget* GameView = new ads::CDockWidget("GameView", this);
+	GameView->setFeature(ads::CDockWidget::DockWidgetClosable, true);
+	_dockManager->addDockWidget(ads::LeftDockWidgetArea, GameView);
+
+	// 씬 뷰
+	ads::CDockWidget* SceneView = new ads::CDockWidget("SceneView", this);
+	SceneView->setFeature(ads::CDockWidget::DockWidgetClosable, true);
+	_dockManager->addDockWidget(ads::LeftDockWidgetArea, SceneView);
 
 	//// 메인 에디터
 	//QTabWidget* centralWidget = new QTabWidget(this);
@@ -127,10 +154,7 @@ void MainWindow::pushPlayButton()
 {
 	if (_gameView == nullptr)
 	{
-		_gameView = new GameView(this);
-		QDockWidget* dock = new QDockWidget("GameView", this);
-		dock->setWidget(_gameView);
-		addDockWidget(Qt::LeftDockWidgetArea, dock);
+
 	}
 
 	if (_gameView->isPlaying())
@@ -140,5 +164,50 @@ void MainWindow::pushPlayButton()
 	else
 	{
 		_gameView->run();
+	}
+}
+
+void MainWindow::handleSceneView(bool checked)
+{
+	if(checked)
+	{
+		_sceneViewDock = new ads::CDockWidget("SceneView", this);
+		_sceneViewDock->setFeature(ads::CDockWidget::DockWidgetClosable, false);
+		_dockManager->addDockWidget(ads::LeftDockWidgetArea, _sceneViewDock);
+	}
+	else
+	{
+		_dockManager->removeDockWidget(_sceneViewDock);
+	}
+}
+
+void MainWindow::handleGameView(bool checked)
+{
+	if (checked)
+	{
+		_gameViewDock = new ads::CDockWidget("GameView", this);
+		_gameViewDock->setFeature(ads::CDockWidget::DockWidgetClosable, false);
+		_gameView = new GameView(_gameViewDock);
+		_gameViewDock->setWidget(_gameView);
+		_dockManager->addDockWidget(ads::LeftDockWidgetArea, _gameViewDock); 
+	}
+	else
+	{
+		_dockManager->removeDockWidget(_gameViewDock);
+		_gameView = nullptr;
+	}
+}
+
+void MainWindow::handleOutputView(bool checked)
+{
+	if (checked)
+	{
+		_outputViewDock = new ads::CDockWidget("OutputView", this);
+		_outputViewDock->setFeature(ads::CDockWidget::DockWidgetClosable, false);
+		_dockManager->addDockWidget(ads::LeftDockWidgetArea, _outputViewDock);
+	}
+	else
+	{
+		_dockManager->removeDockWidget(_outputViewDock);
 	}
 }
