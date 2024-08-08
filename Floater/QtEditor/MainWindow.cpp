@@ -3,7 +3,6 @@
 #include "QDockWidget"
 
 // 테스트용 include.
-#include "DockWidget.h"
 #include <QTabBar>
 #include <QMouseEvent>
 #include <QDockWidget>
@@ -34,6 +33,8 @@ MainWindow::MainWindow(QWidget* parent)
 	
 	_dockManager = new ads::CDockManager(this);
 	_dockManager->setDockWidgetToolBarStyle(Qt::ToolButtonIconOnly, ads::CDockWidget::StateFloating);
+
+	resize(1024, 768);
 
 	// Menu -> File
 	connect(_ui.actionExit, &QAction::triggered, this, &QMainWindow::close);
@@ -172,8 +173,9 @@ void MainWindow::handleSceneView(bool checked)
 	if(checked)
 	{
 		_sceneViewDock = new ads::CDockWidget("SceneView", this);
-		_sceneViewDock->setFeature(ads::CDockWidget::DockWidgetClosable, false);
-		_dockManager->addDockWidget(ads::LeftDockWidgetArea, _sceneViewDock);
+		//_sceneViewDock->setFeature(ads::CDockWidget::DockWidgetClosable, true);
+		_sceneViewDock->resize(QSize{640, 480});
+		_dockManager->addDockWidgetFloating(_sceneViewDock);
 	}
 	else
 	{
@@ -186,10 +188,11 @@ void MainWindow::handleGameView(bool checked)
 	if (checked)
 	{
 		_gameViewDock = new ads::CDockWidget("GameView", this);
-		_gameViewDock->setFeature(ads::CDockWidget::DockWidgetClosable, false);
+		//_gameViewDock->setFeature(ads::CDockWidget::DockWidgetClosable, true);
 		_gameView = new GameView(_gameViewDock);
 		_gameViewDock->setWidget(_gameView);
-		_dockManager->addDockWidget(ads::LeftDockWidgetArea, _gameViewDock); 
+		_gameViewDock->resize(640, 480);
+		_dockManager->addDockWidgetFloating(_gameViewDock); 
 	}
 	else
 	{
@@ -203,8 +206,9 @@ void MainWindow::handleOutputView(bool checked)
 	if (checked)
 	{
 		_outputViewDock = new ads::CDockWidget("OutputView", this);
-		_outputViewDock->setFeature(ads::CDockWidget::DockWidgetClosable, false);
-		_dockManager->addDockWidget(ads::LeftDockWidgetArea, _outputViewDock);
+		//_outputViewDock->setFeature(ads::CDockWidget::DockWidgetClosable, true);
+		_outputViewDock->resize(640, 480);
+		_dockManager->addDockWidgetFloating(_outputViewDock);
 	}
 	else
 	{
