@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Component.h"
+#include "../../../FloaterUtil/include/Type.h"
 #include "../../../FloaterRendererCommon/include/Transform.h"
 #include "../../../FloaterRendererCommon/include/TransformOwner.h"
 #include "../../../FloaterUtil/include/SparseSet.h"

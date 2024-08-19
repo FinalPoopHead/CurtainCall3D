@@ -749,3 +749,14 @@ bool flt::Scene::IsActiveTween(IFLTween* tween)
 	}
 	return iter->second.sparseIndex != UINT_MAX;
 }
+
+flt::Scene* flt::Scene::Load(const std::wstring& path)
+{
+
+	return nullptr;
+}
+
+flt::Scene* flt::Scene::Save(const std::wstring& path, Scene* scene)
+{
+	return nullptr;
+}

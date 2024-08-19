@@ -26,6 +26,10 @@ namespace flt
 		friend T* flt::CreateGameObject(bool isEnabled, TArgs&&... args);
 
 	public:
+		[[nodiscard]] static Scene* Load(const std::wstring& path);
+		[[nodiscard]] static Scene* Save(const std::wstring& path, Scene* scene);
+
+	public:
 		Scene();
 		~Scene();
 

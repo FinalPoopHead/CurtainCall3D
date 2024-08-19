@@ -19,11 +19,11 @@ int main(int argc, char* argv[])
 	//ASSERT(console, "Failed to open console window");
 	//std::cout.clear();
 
-	while(true)
-	{
-		mainWindow.Update();
-		a.processEvents();
-	}
+	//while(true)
+	//{
+	//	mainWindow.Update();
+	//	a.processEvents();
+	//}
 
 	//fclose(console);
 

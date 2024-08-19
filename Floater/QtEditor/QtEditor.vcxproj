@@ -183,7 +183,9 @@
     <ClInclude Include="ads\ResizeHandle.h" />
     <QtMoc Include="ContentsViewWidget.h" />
     <ClInclude Include="EditorApplication.h" />
+    <QtMoc Include="InspectorView.h" />
     <ClInclude Include="resource.h" />
+    <QtMoc Include="SceneView.h" />
     <ClInclude Include="test\AdvantageCube.h" />
     <ClInclude Include="test\AdvantageMine.h" />
     <ClInclude Include="test\Board.h" />

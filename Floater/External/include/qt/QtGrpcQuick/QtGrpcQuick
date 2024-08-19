@@ -1,0 +1,6 @@
+#ifndef QT_QTGRPCQUICK_MODULE_H
+#define QT_QTGRPCQUICK_MODULE_H
+#include <QtGrpcQuick/QtGrpcQuickDepends>
+#include "qqmlabstractgrpcchannel.h"
+#include "qtgrpcquickversion.h"
+#endif

@@ -131,6 +131,12 @@
     <ClCompile Include="EditorApplication.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ContentsViewWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewWrapWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="MainWindow.ui">
@@ -145,6 +151,18 @@
       <Filter>Window</Filter>
     </QtMoc>
     <QtMoc Include="TitleBar.h">
+      <Filter>Window</Filter>
+    </QtMoc>
+    <QtMoc Include="ViewWrapWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="ContentsViewWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="InspectorView.h">
+      <Filter>Window</Filter>
+    </QtMoc>
+    <QtMoc Include="SceneView.h">
       <Filter>Window</Filter>
     </QtMoc>
   </ItemGroup>
@@ -240,6 +258,75 @@
       <Filter>Test</Filter>
     </ClInclude>
     <ClInclude Include="EditorApplication.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\ads_globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\AutoHideDockContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\AutoHideSideBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\AutoHideTab.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\DockAreaTabBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\DockAreaTitleBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\DockAreaTitleBar_p.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\DockAreaWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\DockComponentsFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\DockContainerWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\DockFocusController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\DockingStateReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\DockManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\DockOverlay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\DockSplitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\DockWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\DockWidgetTab.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\ElidingLabel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\FloatingDockContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\FloatingDragPreview.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\IconProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\PushButton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ads\ResizeHandle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
