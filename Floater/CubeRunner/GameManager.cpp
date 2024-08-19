@@ -75,6 +75,7 @@ GameManager::GameManager() :
 	, _finalScorePanel()
 	, _finalScoreText()
 	, _roundText()
+	, _pauseText()
 	, _liveComboTexts()
 	, _comboTextPool()
 	, _missilePool()
@@ -312,6 +313,14 @@ GameManager::GameManager() :
 	_finalScoreText->SetFont(bigFontPath);
 	_finalScoreText->SetTextColor(whiteColor);
 	_finalScoreText->SetTextAlignment(eTextAlignment::CENTER);
+
+	_pauseText = flt::CreateGameObject<TextObject>(false);
+	_pauseText->SetOffsetPosition({ 0.5f,0.5f });
+	_pauseText->SetFont(bigFontPath);
+	_pauseText->SetTextColor(whiteColor);
+	_pauseText->SetTextAlignment(eTextAlignment::CENTER);
+	_pauseText->SetText(L"P A U S E");
+	_pauseText->tr.SetScale(1.5f, 1.5f, 1.5f);
 
 	ReadStageFile();
 	ReadRankingFile();
@@ -1697,6 +1706,21 @@ void GameManager::FadeOut()
 	StopTween(_fadeInTween);
 	StopTween(_fadeOutTween);
 	StartTween(_fadeOutTween);
+}
+
+void GameManager::PauseImage(bool isPause)
+{
+	if (isPause)
+	{
+		_fade->Enable();
+		_pauseText->Enable();
+		_fade->SetColor({ 0.0f,0.0f,0.0f,0.5f });
+	}
+	else
+	{
+		_pauseText->Disable();
+		_fade->Disable();
+	}
 }
 
 void GameManager::IncreasePlayerCount()

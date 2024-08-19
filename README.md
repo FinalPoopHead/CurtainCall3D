@@ -1,10 +1,12 @@
 # Cube Runner
 
+[Cube Runner 빌드파일](https://drive.google.com/file/d/1n-c1Z8R1KBGT-dKNkd66eq7bb8M8PArb/view?usp=sharing)
+
 ---
 
 # 게임 설명
 
-> 2024-07-10 업데이트
+> 2024-08-07 업데이트
 > 
 
 ## 조작
