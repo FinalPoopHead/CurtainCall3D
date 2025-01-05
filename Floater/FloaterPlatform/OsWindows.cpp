@@ -362,6 +362,9 @@ void flt::OsWindows::DestroyRenderer(IRenderer* renderer)
 		case flt::RendererType::ROCKET_DX11:
 			DestroyRendererRocketDX11(renderer);
 			break;
+		case flt::RendererType::VULKAN:
+			DestroyRendererVulkan(renderer);
+			break;
 		default:
 			break;
 	}

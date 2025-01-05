@@ -204,13 +204,13 @@ int main(int argc, char* argv[])
 	bool ret = platform.Initialize(1280, 720, L"Test", L"");
 	platform.SetWindowSize(1280, 720, flt::WindowMode::WINDOWED, -1);
 
-	platform.ShowCursor(false);
+	platform.ShowCursor(true);
 	flt::IRenderer* renderer = platform.CreateRenderer(flt::RendererType::VULKAN);
 
-	//while (platform.Update(0.16f))
-	//{
-	//	renderer->Render(0.16f);
-	//}
+	while (platform.Update(0.16f))
+	{
+		renderer->Render(0.16f);
+	}
 
 	platform.DestroyRenderer(renderer);
 	ret = platform.Finalize();

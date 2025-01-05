@@ -32,7 +32,7 @@ namespace flt
 	class RendererVulkan : public IRenderer
 	{
 	public:
-		RendererVulkan() {};
+		RendererVulkan();
 		~RendererVulkan() {};
 
 		bool Initialize(HWND hwnd, HWND debugHWnd = NULL);
@@ -54,7 +54,14 @@ namespace flt
 		bool CreateLogicalDevice();
 		bool CreateSwapChain();
 		bool CreateImageViews();
+		bool CreateRenderPass();
 		bool CreateGraphicsPipeline();
+		bool CreateFramebuffers();
+		bool CreateCommandPool();
+		bool CreateCommandBuffer();
+		bool CreateSyncObjects();
+
+		bool RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);;
 
 		bool CheckValidationLayerSupport();
 		bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
@@ -65,6 +72,12 @@ namespace flt
 		VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 		VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
 		VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+
+		VkShaderModule CreateShaderModule(const std::vector<char>& code);
+
+	private:
+		static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
+		static std::vector<char> ReadFile(const std::string& filename);
 
 	private:
 		VkInstance _instance;
@@ -83,6 +96,19 @@ namespace flt
 		VkFormat _swapChainImageFormat;
 		VkExtent2D _swapChainExtent;
 		std::vector<VkImageView> _swapChainImageViews;
+
+		VkRenderPass _renderPass;
+		VkPipelineLayout _pipelineLayout;
+		VkPipeline _graphicsPipeline;
+
+		std::vector<VkFramebuffer> _swapChainFramebuffers;
+
+		VkCommandPool _commandPool;
+		VkCommandBuffer _commandBuffer;
+
+		VkSemaphore _imageAvailableSemaphore;
+		VkSemaphore _renderFinishedSemaphore;
+		VkFence _inFlightFence;
 	};
 }
 

@@ -1,6 +1,8 @@
 ﻿#include "RendererVulkan.h"
 
 #include "vulkan/vulkan_win32.h"
+#include <fstream>
+#include <filesystem>
 #include <set>
 #include <algorithm>
 
@@ -14,11 +16,7 @@ const std::vector<const char*> deviceExtensions =
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
-	VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity
-	, VkDebugUtilsMessageTypeFlagsEXT messageType
-	, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData
-	, void* pUserData)
+VKAPI_ATTR VkBool32 VKAPI_CALL flt::RendererVulkan::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
 {
 	if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 	{
@@ -36,6 +34,28 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
 	//std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
 
 	return VK_FALSE;
+}
+
+std::vector<char> flt::RendererVulkan::ReadFile(const std::string& filename)
+{
+	std::filesystem::path path{ filename };
+	auto absPath = std::filesystem::absolute(path);
+	std::ifstream file(filename, std::ios::ate | std::ios::binary);
+
+	if (!file.is_open()) 
+	{
+		throw std::runtime_error("failed to open file!");
+	}
+
+	size_t fileSize = (size_t)file.tellg();
+	std::vector<char> buffer(fileSize);
+
+	file.seekg(0);
+	file.read(buffer.data(), fileSize);
+
+	file.close();
+
+	return buffer;
 }
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger)
@@ -60,11 +80,34 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 	}
 }
 
+flt::RendererVulkan::RendererVulkan()
+	: _instance(VK_NULL_HANDLE)
+	, _enableValidationLayers(false)
+	, _debugMessenger(VK_NULL_HANDLE)
+	, _surface(VK_NULL_HANDLE)
+	, _physicalDevice(VK_NULL_HANDLE)
+	, _device(VK_NULL_HANDLE)
+	, _graphicsQueue(VK_NULL_HANDLE)
+	, _presentQueue(VK_NULL_HANDLE)
+	, _swapChain(VK_NULL_HANDLE)
+	, _swapChainImageFormat(VK_FORMAT_UNDEFINED)
+	, _swapChainExtent({ 0, 0 })
+	, _renderPass(VK_NULL_HANDLE)
+	, _graphicsPipeline(VK_NULL_HANDLE)
+	, _pipelineLayout(VK_NULL_HANDLE)
+	, _swapChainFramebuffers()
+	, _commandPool(VK_NULL_HANDLE)
+	, _commandBuffer(VK_NULL_HANDLE)
+	, _imageAvailableSemaphore(VK_NULL_HANDLE)
+	, _renderFinishedSemaphore(VK_NULL_HANDLE)
+	, _inFlightFence(VK_NULL_HANDLE)
+{
+
+}
+
 bool flt::RendererVulkan::Initialize(HWND hwnd, HWND debugHWnd)
 {
-	//AllocConsole();
-	std::cout << "불칸 렌더러 생성 시작" << std::endl;
-	std::wcout << L"test vulkan" << std::endl;
+	/// TODO : 디버그 여부에 따라서 validation layer를 사용할지 말지 결정해야 함
 	_enableValidationLayers = true;
 
 	bool result = true;
@@ -75,13 +118,47 @@ bool flt::RendererVulkan::Initialize(HWND hwnd, HWND debugHWnd)
 	result &= CreateLogicalDevice();
 	result &= CreateSwapChain();
 	result &= CreateImageViews();
+	result &= CreateRenderPass();
 	result &= CreateGraphicsPipeline();
+	result &= CreateFramebuffers();
+	result &= CreateCommandPool();
+	result &= CreateCommandBuffer();
+	result &= CreateSyncObjects();
 
 	return result;
 }
 
 bool flt::RendererVulkan::Finalize()
 {
+	vkDeviceWaitIdle(_device);
+
+	vkDestroySemaphore(_device, _imageAvailableSemaphore, nullptr);
+	_imageAvailableSemaphore = VK_NULL_HANDLE;
+
+	vkDestroySemaphore(_device, _renderFinishedSemaphore, nullptr);
+	_renderFinishedSemaphore = VK_NULL_HANDLE;
+
+	vkDestroyFence(_device, _inFlightFence, nullptr);
+	_inFlightFence = VK_NULL_HANDLE;
+
+	vkDestroyCommandPool(_device, _commandPool, nullptr);
+	_commandPool = VK_NULL_HANDLE;
+
+	for (auto framebuffer : _swapChainFramebuffers)
+	{
+		vkDestroyFramebuffer(_device, framebuffer, nullptr);
+	}
+	_swapChainFramebuffers.clear();
+
+	vkDestroyPipeline(_device, _graphicsPipeline, nullptr);
+	_graphicsPipeline = VK_NULL_HANDLE;
+
+	vkDestroyPipelineLayout(_device, _pipelineLayout, nullptr);
+	_pipelineLayout = VK_NULL_HANDLE;
+
+	vkDestroyRenderPass(_device, _renderPass, nullptr);
+	_renderPass = VK_NULL_HANDLE;
+
 	for (auto imageView : _swapChainImageViews)
 	{
 		vkDestroyImageView(_device, imageView, nullptr);
@@ -111,7 +188,47 @@ bool flt::RendererVulkan::Finalize()
 
 bool flt::RendererVulkan::Render(float deltaTime)
 {
-	return false;
+	vkWaitForFences(_device, 1, &_inFlightFence, VK_TRUE, UINT64_MAX);
+	vkResetFences(_device, 1, &_inFlightFence);
+
+	uint32_t imageIndex{};
+	vkAcquireNextImageKHR(_device, _swapChain, UINT64_MAX, _imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+	vkResetCommandBuffer(_commandBuffer, 0);
+	RecordCommandBuffer(_commandBuffer, imageIndex);
+
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+	VkSemaphore waitSemaphores[] = { _imageAvailableSemaphore };
+	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+	submitInfo.waitSemaphoreCount = 1;
+	submitInfo.pWaitSemaphores = waitSemaphores;
+	submitInfo.pWaitDstStageMask = waitStages;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &_commandBuffer;
+	VkSemaphore signalSemaphores[] = { _renderFinishedSemaphore };
+	submitInfo.signalSemaphoreCount = 1;
+	submitInfo.pSignalSemaphores = signalSemaphores;
+
+	VkResult result = vkQueueSubmit(_graphicsQueue, 1, &submitInfo, _inFlightFence);
+	if (result != VK_SUCCESS)
+	{
+		return false;
+	}
+
+	VkPresentInfoKHR presentInfo{};
+	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+	presentInfo.waitSemaphoreCount = 1;
+	presentInfo.pWaitSemaphores = signalSemaphores;
+	VkSwapchainKHR swapChains[] = { _swapChain };
+	presentInfo.swapchainCount = 1;
+	presentInfo.pSwapchains = swapChains;
+	presentInfo.pImageIndices = &imageIndex;
+	presentInfo.pResults = nullptr;
+
+	vkQueuePresentKHR(_presentQueue, &presentInfo);
+
+	return true;
 }
 
 flt::HOBJECT flt::RendererVulkan::RegisterObject(RendererObject& renderable)
@@ -299,7 +416,8 @@ bool flt::RendererVulkan::CreateLogicalDevice()
 		createInfo.enabledLayerCount = 0;
 	}
 
-	if (vkCreateDevice(_physicalDevice, &createInfo, nullptr, &_device) != VK_SUCCESS)
+	VkResult result = vkCreateDevice(_physicalDevice, &createInfo, nullptr, &_device);
+	if (result != VK_SUCCESS)
 	{
 		return false;
 	}
@@ -312,6 +430,7 @@ bool flt::RendererVulkan::CreateLogicalDevice()
 
 bool flt::RendererVulkan::CreateSwapChain()
 {
+	///81p
 	SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(_physicalDevice);
 
 	VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
@@ -392,7 +511,8 @@ bool flt::RendererVulkan::CreateImageViews()
 		createInfo.subresourceRange.baseArrayLayer = 0;
 		createInfo.subresourceRange.layerCount = 1;
 
-		if (vkCreateImageView(_device, &createInfo, nullptr, &_swapChainImageViews[i]) != VK_SUCCESS)
+		VkResult result = vkCreateImageView(_device, &createInfo, nullptr, &_swapChainImageViews[i]);
+		if (result != VK_SUCCESS)
 		{
 			return false;
 		}
@@ -401,9 +521,321 @@ bool flt::RendererVulkan::CreateImageViews()
 	return true;
 }
 
+bool flt::RendererVulkan::CreateRenderPass()
+{
+	VkAttachmentDescription colorAttachment{};
+	colorAttachment.format = _swapChainImageFormat;
+	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+	VkAttachmentReference colorAttachmentRef{};
+	colorAttachmentRef.attachment = 0;
+	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+	VkSubpassDescription subpass{};
+	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+	subpass.colorAttachmentCount = 1;
+	subpass.pColorAttachments = &colorAttachmentRef;
+
+	VkSubpassDependency dependency{};
+	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+	dependency.dstSubpass = 0;
+	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	dependency.srcAccessMask = 0;
+	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+	VkRenderPassCreateInfo renderPassInfo{};
+	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	renderPassInfo.attachmentCount = 1;
+	renderPassInfo.pAttachments = &colorAttachment;
+	renderPassInfo.subpassCount = 1;
+	renderPassInfo.pSubpasses = &subpass;
+	renderPassInfo.dependencyCount = 1;
+	renderPassInfo.pDependencies = &dependency;
+
+	VkResult result = vkCreateRenderPass(_device, &renderPassInfo, nullptr, &_renderPass);
+	if (result != VK_SUCCESS)
+	{
+		ASSERT(false, "failed to create render pass!");
+		return false;
+	}
+
+	return true;
+}
+
 bool flt::RendererVulkan::CreateGraphicsPipeline()
 {
-	return false;
+	auto vertShaderCode = ReadFile("shaders/vert.spv");
+	auto fragShaderCode = ReadFile("shaders/frag.spv");
+
+	VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
+	VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);
+
+	VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
+	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+	vertShaderStageInfo.module = vertShaderModule;
+	vertShaderStageInfo.pName = "main";
+
+	VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
+	fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+	fragShaderStageInfo.module = fragShaderModule;
+	fragShaderStageInfo.pName = "main";
+
+	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
+
+	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	vertexInputInfo.vertexBindingDescriptionCount = 0;
+	vertexInputInfo.vertexAttributeDescriptionCount = 0;
+
+	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
+	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+	inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+	inputAssembly.primitiveRestartEnable = VK_FALSE;
+
+	VkPipelineViewportStateCreateInfo viewportState{};
+	viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+	viewportState.viewportCount = 1;
+	viewportState.scissorCount = 1;
+
+	VkPipelineRasterizationStateCreateInfo rasterizer{};
+	rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+	rasterizer.depthClampEnable = VK_FALSE;
+	rasterizer.rasterizerDiscardEnable = VK_FALSE;
+	rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+	rasterizer.lineWidth = 1.0f;
+	rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+	rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+	rasterizer.depthBiasEnable = VK_FALSE;
+
+	VkPipelineMultisampleStateCreateInfo multisampling{};
+	multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+	multisampling.sampleShadingEnable = VK_FALSE;
+	multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+
+	VkPipelineColorBlendAttachmentState colorBlendAttachment{};
+	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+	colorBlendAttachment.blendEnable = VK_FALSE;
+
+	VkPipelineColorBlendStateCreateInfo colorBlending{};
+	colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+	colorBlending.logicOpEnable = VK_FALSE;
+	colorBlending.logicOp = VK_LOGIC_OP_COPY;
+	colorBlending.attachmentCount = 1;
+	colorBlending.pAttachments = &colorBlendAttachment;
+	colorBlending.blendConstants[0] = 0.0f;
+	colorBlending.blendConstants[1] = 0.0f;
+	colorBlending.blendConstants[2] = 0.0f;
+	colorBlending.blendConstants[3] = 0.0f;
+
+	std::vector<VkDynamicState> dynamicStates = 
+	{
+		VK_DYNAMIC_STATE_VIEWPORT,
+		VK_DYNAMIC_STATE_SCISSOR
+	};
+	VkPipelineDynamicStateCreateInfo dynamicState{};
+	dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+	dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
+	dynamicState.pDynamicStates = dynamicStates.data();
+
+	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	pipelineLayoutInfo.setLayoutCount = 0;
+	pipelineLayoutInfo.pushConstantRangeCount = 0;
+
+	VkResult result = vkCreatePipelineLayout(_device, &pipelineLayoutInfo, nullptr, &_pipelineLayout);
+	if (result != VK_SUCCESS) 
+	{
+		ASSERT(false, "failed to create pipeline layout!");
+		return false;
+	}
+
+	VkGraphicsPipelineCreateInfo pipelineInfo{};
+	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+	pipelineInfo.stageCount = 2;
+	pipelineInfo.pStages = shaderStages;
+	pipelineInfo.pVertexInputState = &vertexInputInfo;
+	pipelineInfo.pInputAssemblyState = &inputAssembly;
+	pipelineInfo.pViewportState = &viewportState;
+	pipelineInfo.pRasterizationState = &rasterizer;
+	pipelineInfo.pMultisampleState = &multisampling;
+	pipelineInfo.pDepthStencilState = nullptr;
+	pipelineInfo.pColorBlendState = &colorBlending;
+	pipelineInfo.pDynamicState = &dynamicState;
+	pipelineInfo.layout = _pipelineLayout;
+	pipelineInfo.renderPass = _renderPass;
+	pipelineInfo.subpass = 0;
+	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+	pipelineInfo.basePipelineIndex = -1;
+
+	result = vkCreateGraphicsPipelines(_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_graphicsPipeline);
+	if (result != VK_SUCCESS)
+	{
+		ASSERT(false, "failed to create graphics pipeline!");
+		return false;
+	}
+
+	vkDestroyShaderModule(_device, fragShaderModule, nullptr);
+	vkDestroyShaderModule(_device, vertShaderModule, nullptr);
+	return true;
+}
+
+bool flt::RendererVulkan::CreateFramebuffers()
+{
+	_swapChainFramebuffers.resize(_swapChainImageViews.size());	
+
+	for (size_t i = 0; i < _swapChainFramebuffers.size(); ++i)
+	{
+		VkImageView attachments[] = { _swapChainImageViews[i] };
+
+		VkFramebufferCreateInfo framebufferInfo{};
+		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		framebufferInfo.renderPass = _renderPass;
+		framebufferInfo.attachmentCount = 1;
+		framebufferInfo.pAttachments = attachments;
+		framebufferInfo.width = _swapChainExtent.width;
+		framebufferInfo.height = _swapChainExtent.height;
+		framebufferInfo.layers = 1;
+
+		VkResult result = vkCreateFramebuffer(_device, &framebufferInfo, nullptr, &_swapChainFramebuffers[i]);
+		if (result != VK_SUCCESS)
+		{
+			ASSERT(false, "failed to create framebuffer!");
+			return false;
+		}
+	}
+		return true;
+}
+
+bool flt::RendererVulkan::CreateCommandPool()
+{
+	QueueFamilyIndices queueFamilyIndices = FindQueueFamilies(_physicalDevice);
+
+	VkCommandPoolCreateInfo poolInfo{};
+	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+	poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
+
+	VkResult result = vkCreateCommandPool(_device, &poolInfo, nullptr, &_commandPool);
+	if (result != VK_SUCCESS)
+	{
+		ASSERT(false, "failed to create command pool!");
+		return false;
+	}
+	return true;
+}
+
+bool flt::RendererVulkan::CreateCommandBuffer()
+{
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.commandPool = _commandPool;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandBufferCount = 1;
+
+	VkResult result = vkAllocateCommandBuffers(_device, &allocInfo, &_commandBuffer);
+	if (result != VK_SUCCESS)
+	{
+		ASSERT(false, "failed to allocate command buffers!");
+		return false;
+	}
+	return true;
+}
+
+bool flt::RendererVulkan::CreateSyncObjects()
+{
+	VkSemaphoreCreateInfo semaphoreInfo{};
+	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+	VkFenceCreateInfo fenceInfo{};
+	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+	VkResult result = vkCreateSemaphore(_device, &semaphoreInfo, nullptr, &_imageAvailableSemaphore);
+	if (result != VK_SUCCESS)
+	{
+		ASSERT(false, "failed to create synchronization objects!");
+		return false;
+	}
+
+	result = vkCreateSemaphore(_device, &semaphoreInfo, nullptr, &_renderFinishedSemaphore);
+	if (result != VK_SUCCESS)
+	{
+		ASSERT(false, "failed to create synchronization objects!");
+		return false;
+	}
+
+	result = vkCreateFence(_device, &fenceInfo, nullptr, &_inFlightFence);
+	if (result != VK_SUCCESS)
+	{
+		ASSERT(false, "failed to create synchronization objects!");
+		return false;
+	}
+
+	return true;
+}
+
+bool flt::RendererVulkan::RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
+{
+	VkCommandBufferBeginInfo beginInfo{};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	VkResult result = vkBeginCommandBuffer(commandBuffer, &beginInfo);
+	if (result != VK_SUCCESS) 
+	{
+		ASSERT(false, "failed to begin recording command buffer!");
+		return false;
+	}
+
+	VkRenderPassBeginInfo renderPassInfo{};
+	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+	renderPassInfo.renderPass = _renderPass;
+	renderPassInfo.framebuffer = _swapChainFramebuffers[imageIndex];
+	renderPassInfo.renderArea.offset = { 0, 0 };
+	renderPassInfo.renderArea.extent = _swapChainExtent;
+
+	VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
+	renderPassInfo.clearValueCount = 1;
+	renderPassInfo.pClearValues = &clearColor;
+
+	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _graphicsPipeline);
+
+	VkViewport viewport{};
+	viewport.x = 0.0f;
+	viewport.y = 0.0f;
+	viewport.width = (float)_swapChainExtent.width;
+	viewport.height = (float)_swapChainExtent.height;
+	viewport.minDepth = 0.0f;
+	viewport.maxDepth = 1.0f;
+	vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+
+	VkRect2D scissor{};
+	scissor.offset = { 0, 0 };
+	scissor.extent = _swapChainExtent;
+	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+	vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+
+	vkCmdEndRenderPass(commandBuffer);
+
+	result = vkEndCommandBuffer(commandBuffer);
+	if (result != VK_SUCCESS) 
+	{
+		ASSERT(false, "failed to record command buffer!");
+		return false;
+	}
+	return true;
 }
 
 bool flt::RendererVulkan::CheckValidationLayerSupport()
@@ -600,4 +1032,22 @@ VkExtent2D flt::RendererVulkan::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR&
 
 		return actualExtent;
 	}
+}
+
+VkShaderModule flt::RendererVulkan::CreateShaderModule(const std::vector<char>& code)
+{
+	VkShaderModuleCreateInfo createInfo{};
+	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	createInfo.codeSize = code.size();
+	createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+
+	VkShaderModule shaderModule;
+	VkResult result = vkCreateShaderModule(_device, &createInfo, nullptr, &shaderModule);
+	if (result != VK_SUCCESS) 
+	{
+		ASSERT(false, "failed to create shader module!");
+		throw std::runtime_error("failed to create shader module!");
+	}
+
+	return shaderModule;
 }
