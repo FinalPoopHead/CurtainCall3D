@@ -11,6 +11,11 @@
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
 	, _gameView(nullptr)
+	, _gameViewDock(nullptr)
+	, _sceneViewDock(nullptr)
+	, _outputViewDock(nullptr)
+	, _dragStartPosition(QPoint(0, 0))
+	, _activeDockWidget(nullptr)
 	, _dockManager(nullptr)
 {
 	_ui.setupUi(this);
@@ -108,7 +113,7 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
 			auto mouseEvent = static_cast<QMouseEvent*>(event);
 			if (mouseEvent->button() == Qt::LeftButton)
 			{
-				m_dragStartPosition = mouseEvent->position().toPoint();
+				_dragStartPosition = mouseEvent->position().toPoint();
 			}
 		}
 		else if (event->type() == QEvent::MouseMove)
@@ -116,13 +121,13 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
 			auto mouseEvent = static_cast<QMouseEvent*>(event);
 			if (mouseEvent->buttons() & Qt::LeftButton)
 			{
-				int dragDistance = (mouseEvent->position().toPoint() - m_dragStartPosition).manhattanLength();
+				int dragDistance = (mouseEvent->position().toPoint() - _dragStartPosition).manhattanLength();
 				if (dragDistance > QApplication::startDragDistance())
 				{
-					int index = tabBar->tabAt(m_dragStartPosition);
-					if (index != -1 && m_activeDockWidget)
+					int index = tabBar->tabAt(_dragStartPosition);
+					if (index != -1 && _activeDockWidget)
 					{
-						auto dockWidgets = tabifiedDockWidgets(m_activeDockWidget);
+						auto dockWidgets = tabifiedDockWidgets(_activeDockWidget);
 						if (index < dockWidgets.size())
 						{
 							auto dockWidget = dockWidgets[index];
@@ -140,7 +145,7 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
 
 void MainWindow::handleTabActivated(QDockWidget* dockWidget)
 {
-	m_activeDockWidget = dockWidget;
+	_activeDockWidget = dockWidget;
 	for (auto child : children())
 	{
 		if (auto tabBar = qobject_cast<QTabBar*>(child))
@@ -192,7 +197,36 @@ void MainWindow::handleGameView(bool checked)
 		_gameView = new GameView(_gameViewDock);
 		_gameViewDock->setWidget(_gameView);
 		_gameViewDock->resize(640, 480);
-		_dockManager->addDockWidgetFloating(_gameViewDock); 
+		_dockManager->addDockWidgetFloating(_gameViewDock);
+
+		//QPalette palette = this->palette();
+		//QString styleSheet;
+		//int lightness = palette.color(QPalette::Window).lightness();
+		//if (lightness < 128)
+		//{
+		//	// 다크 모드
+		//	styleSheet = R"(
+  //      )";
+		//}
+		//else
+		//{
+		//	// 라이트 모드
+		//	styleSheet = R"(
+  //          ads--CDockWidgetTab {
+  //              background-color: #f0f0f0;
+  //              color: black;
+  //          }
+  //          ads--CDockAreaTitleBar {
+  //              background-color: #f0f0f0;
+  //              color: black;
+  //          }
+  //          ads--CDockAreaWidget {
+  //              border: 1px solid #cccccc;
+  //          }
+  //      )";
+		//}
+
+		//_gameViewDock->setStyleSheet(styleSheet);
 	}
 	else
 	{

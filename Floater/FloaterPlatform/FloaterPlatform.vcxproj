@@ -177,6 +177,9 @@
     <ProjectReference Include="..\FloaterRendererDX11\FloaterRendererDX11.vcxproj">
       <Project>{5501099a-fcca-4350-8307-8499ce179eac}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\FloaterRendererVulkan\FloaterRendererVulkan.vcxproj">
+      <Project>{6f85e031-2fdc-4db2-9dc6-008b7e261b9f}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\FloaterUtil\FloaterUtil.vcxproj">
       <Project>{cb145f87-3fe0-445e-bb70-582b466cbe74}</Project>
     </ProjectReference>

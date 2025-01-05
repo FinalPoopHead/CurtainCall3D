@@ -26,6 +26,10 @@
 
 #include <array>
 
+///불칸 테스트용 헤더
+#include "../FloaterPlatform/include/Platform.h"
+#include "../FloaterRendererVulkan/include/CreateRenderer.h"
+
 //void Func(flt::info info);
 
 template<typename T>
@@ -36,11 +40,10 @@ T& unmove(T&& t)
 
 int main(int argc, char* argv[])
 {
-	int ghag = 0;
-	int* pghag = &ghag;
-
 	setlocale(LC_ALL, ".UTF8");
 	std::cout << std::boolalpha;
+	std::cout << "테스트" << std::endl;
+	std::wcout << L"테스트" << std::endl;
 
 	///자료구조 테스트
 	/*{
@@ -67,10 +70,8 @@ int main(int argc, char* argv[])
 		//int i = 0;
 	}*/
 
-
-
 	/// 로그 테스트
-	{
+	/*{
 		std::wstring str = L"Hello {}!";
 		std::wstring str2 = L"hi";
 		flt::Info(str, L"World");
@@ -79,7 +80,7 @@ int main(int argc, char* argv[])
 		//auto arr = std::make_wformat_args(unmove(1));
 		//auto arr = std::make_wformat_args(unmove(2.1f));
 		//auto arr = std::make_wformat_args(unmove(L"finished"));
-	}
+	}*/
 
 	/// 베지어 테스트
 	/*{
@@ -95,7 +96,7 @@ int main(int argc, char* argv[])
 	}*/
 
 	/// 트윈 테스트
-	{
+	/*{
 		int value = 100;
 		int valueRef = 100;
 
@@ -114,7 +115,6 @@ int main(int argc, char* argv[])
 				std::cout << "*\n";
 			};
 
-
 		{
 			flt::FLTween tween = flt::tween::from(0)
 				.to(100).during(100.0f).onStep(onStepFunc)
@@ -124,10 +124,8 @@ int main(int argc, char* argv[])
 			{
 				tween.step(1.0f);
 			}
-			
+
 		}
-
-
 
 
 		flt::Timer timer;
@@ -181,14 +179,12 @@ int main(int argc, char* argv[])
 			}
 			std::cout << "*\n";
 		}
-	}
-
-	std::filesystem::path path = std::filesystem::current_path();
+	}*/
 
 	////cpu 캐시 크기 가져오기
 	////std::cout << std::hardware_destructive_interference_size << std::endl;
 
-	flt::GameEngine* pGameEngine = flt::GameEngine::Instance();
+	/*flt::GameEngine* pGameEngine = flt::GameEngine::Instance();
 	//pGameEngine->SetWindowSize(0, 0, flt::WindowMode::WINDOWED);
 
 	//UnityLoadScene unityLoadScene(L"..\\x64\\data\\SoaringMap.json");
@@ -202,7 +198,22 @@ int main(int argc, char* argv[])
 	{
 	}
 
-	pGameEngine->Finalize();
+	pGameEngine->Finalize();*/
+
+	flt::Platform platform{true};
+	bool ret = platform.Initialize(1280, 720, L"Test", L"");
+	platform.SetWindowSize(1280, 720, flt::WindowMode::WINDOWED, -1);
+
+	platform.ShowCursor(false);
+	flt::IRenderer* renderer = platform.CreateRenderer(flt::RendererType::VULKAN);
+
+	//while (platform.Update(0.16f))
+	//{
+	//	renderer->Render(0.16f);
+	//}
+
+	platform.DestroyRenderer(renderer);
+	ret = platform.Finalize();
 
 	return 0;
 }

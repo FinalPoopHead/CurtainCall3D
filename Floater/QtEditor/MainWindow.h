@@ -54,8 +54,8 @@ private:
 	ads::CDockWidget* _outputViewDock;
 
 
-	QPoint m_dragStartPosition;
-	QDockWidget* m_activeDockWidget;
+	QPoint _dragStartPosition;
+	QDockWidget* _activeDockWidget;
 
 	ads::CDockManager* _dockManager;
 };

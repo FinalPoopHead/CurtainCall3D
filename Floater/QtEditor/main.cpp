@@ -15,17 +15,5 @@ int main(int argc, char* argv[])
 	MainWindow mainWindow;
 	mainWindow.show();
 
-	//FILE* console = freopen("CONOUT$", "w", stdout);
-	//ASSERT(console, "Failed to open console window");
-	//std::cout.clear();
-
-	//while(true)
-	//{
-	//	mainWindow.Update();
-	//	a.processEvents();
-	//}
-
-	//fclose(console);
-
 	return a.exec();
 }

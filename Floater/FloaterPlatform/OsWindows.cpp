@@ -16,6 +16,8 @@
 #include "../RocketAdapter/include/CreateRenderer.h"
 #include "../FloaterRendererCommon/include/ResourceMgr.h"
 
+#include "../FloaterRendererVulkan/include/CreateRenderer.h"
+
 #include <DbgHelp.h>
 #include <chrono>
 
@@ -320,9 +322,9 @@ flt::IRenderer* flt::OsWindows::CreateRenderer(RendererType type)
 
 	switch (type)
 	{
-		case flt::RendererType::SOFTWARE:
+		//case flt::RendererType::SOFTWARE:
 
-			break;
+		//	break;
 		case flt::RendererType::DX11:
 			renderer = CreateRendererDX11(_hwnd);
 			break;
@@ -332,8 +334,11 @@ flt::IRenderer* flt::OsWindows::CreateRenderer(RendererType type)
 		case flt::RendererType::ROCKET_DX11:
 			renderer = CreateRendererRocketDX11(_hwnd);
 			break;
+		case flt::RendererType::VULKAN:
+			renderer = CreateRendererVulkan(_hwnd);
+			break;
 		default:
-			ASSERT(false, "RendererType이 잘못되었습니다.");
+			ASSERT(false, "현재 지원하지 않는 type");
 			break;
 	}
 

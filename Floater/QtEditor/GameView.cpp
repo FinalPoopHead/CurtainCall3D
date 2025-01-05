@@ -26,7 +26,6 @@ public:
 	CustomEvent() : QEvent(CustomEventType) {}
 };
 
-
 GameView::GameView(QWidget* parent /*= nullptr*/) : QWidget(parent)
 	, _gameEngine(flt::GameEngine::Instance())
 	, _hwnd(NULL)

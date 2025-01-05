@@ -29,12 +29,12 @@ extern "C" bool flt::DestroyRendererDX11(IRenderer * renderer)
 		return false;
 	}
 
-	if (rendererDX11->Finalize())
+	if (!rendererDX11->Finalize())
 	{
-		delete rendererDX11;
-		return true;
+		return false;
+
 	}
 
-
-	return false;
+	delete rendererDX11;
+	return true;
 }
