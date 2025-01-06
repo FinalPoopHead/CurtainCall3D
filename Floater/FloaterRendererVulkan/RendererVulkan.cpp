@@ -104,6 +104,8 @@ flt::RendererVulkan::RendererVulkan()
 	, _imageAvailableSemaphores()
 	, _renderFinishedSemaphores()
 	, _inFlightFences()
+	, _framebufferResized(false)
+	, _isMinimized(false)
 	, _currentFrame(0)
 {
 
@@ -136,6 +138,11 @@ bool flt::RendererVulkan::Finalize()
 {
 	vkDeviceWaitIdle(_device);
 
+	CleanupSwapChain();
+	_swapChainFramebuffers.clear();
+	_swapChainImageViews.clear();
+	_swapChain = VK_NULL_HANDLE;
+
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
 	{
 		vkDestroySemaphore(_device, _imageAvailableSemaphores[i], nullptr);
@@ -146,15 +153,6 @@ bool flt::RendererVulkan::Finalize()
 	_renderFinishedSemaphores.clear();
 	_inFlightFences.clear();
 
-	vkDestroyCommandPool(_device, _commandPool, nullptr);
-	_commandPool = VK_NULL_HANDLE;
-
-	for (auto framebuffer : _swapChainFramebuffers)
-	{
-		vkDestroyFramebuffer(_device, framebuffer, nullptr);
-	}
-	_swapChainFramebuffers.clear();
-
 	vkDestroyPipeline(_device, _graphicsPipeline, nullptr);
 	_graphicsPipeline = VK_NULL_HANDLE;
 
@@ -164,14 +162,8 @@ bool flt::RendererVulkan::Finalize()
 	vkDestroyRenderPass(_device, _renderPass, nullptr);
 	_renderPass = VK_NULL_HANDLE;
 
-	for (auto imageView : _swapChainImageViews)
-	{
-		vkDestroyImageView(_device, imageView, nullptr);
-	}
-	_swapChainImageViews.clear();
-
-	vkDestroySwapchainKHR(_device, _swapChain, nullptr);
-	_swapChain = VK_NULL_HANDLE;
+	vkDestroyCommandPool(_device, _commandPool, nullptr);
+	_commandPool = VK_NULL_HANDLE;
 
 	vkDestroyDevice(_device, nullptr);
 	_device = VK_NULL_HANDLE;
@@ -193,11 +185,27 @@ bool flt::RendererVulkan::Finalize()
 
 bool flt::RendererVulkan::Render(float deltaTime)
 {
+	if (_isMinimized)
+	{
+		return true;
+	}
+
 	vkWaitForFences(_device, 1, &_inFlightFences[_currentFrame], VK_TRUE, UINT64_MAX);
-	vkResetFences(_device, 1, &_inFlightFences[_currentFrame]);
 
 	uint32_t imageIndex{};
-	vkAcquireNextImageKHR(_device, _swapChain, UINT64_MAX, _imageAvailableSemaphores[_currentFrame], VK_NULL_HANDLE, &imageIndex);
+	VkResult result = vkAcquireNextImageKHR(_device, _swapChain, UINT64_MAX, _imageAvailableSemaphores[_currentFrame], VK_NULL_HANDLE, &imageIndex);
+	if (result == VK_ERROR_OUT_OF_DATE_KHR)
+	{
+		RecreateSwapChain();
+		return true;
+	}
+	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+	{
+		ASSERT(false, "failed to acquire swap chain image!");
+	}
+
+	vkResetFences(_device, 1, &_inFlightFences[_currentFrame]);
+
 	vkResetCommandBuffer(_commandBuffers[_currentFrame], 0);
 	RecordCommandBuffer(_commandBuffers[_currentFrame], imageIndex);
 
@@ -215,7 +223,7 @@ bool flt::RendererVulkan::Render(float deltaTime)
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
-	VkResult result = vkQueueSubmit(_graphicsQueue, 1, &submitInfo, _inFlightFences[_currentFrame]);
+	result = vkQueueSubmit(_graphicsQueue, 1, &submitInfo, _inFlightFences[_currentFrame]);
 	if (result != VK_SUCCESS)
 	{
 		return false;
@@ -231,8 +239,20 @@ bool flt::RendererVulkan::Render(float deltaTime)
 	presentInfo.pImageIndices = &imageIndex;
 	presentInfo.pResults = nullptr;
 
-	vkQueuePresentKHR(_presentQueue, &presentInfo);
+	result = vkQueuePresentKHR(_presentQueue, &presentInfo);
 	_currentFrame = (_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+	if (result == VK_ERROR_OUT_OF_DATE_KHR 
+		|| result == VK_SUBOPTIMAL_KHR
+		|| _framebufferResized)
+	{
+		_framebufferResized = false;
+		RecreateSwapChain();
+	}
+	else if (result != VK_SUCCESS)
+	{
+		ASSERT(false, "failed to present swap chain image!");
+		return false;
+	}
 	return true;
 }
 
@@ -253,7 +273,15 @@ bool flt::RendererVulkan::SetFullScreen(bool isFullScreen)
 
 bool flt::RendererVulkan::Resize(uint32 width, uint32 height)
 {
-	return false;
+	if (width == 0 || height == 0)
+	{
+		_isMinimized = true;
+		return true;
+	}
+
+	_framebufferResized = true;
+	_isMinimized = false;
+	return true;
 }
 
 bool flt::RendererVulkan::CreateInstance()
@@ -499,7 +527,7 @@ bool flt::RendererVulkan::CreateImageViews()
 {
 	_swapChainImageViews.resize(_swapChainImages.size());
 
-	for (size_t i = 0; i < _swapChainImages.size(); i++)
+	for (size_t i = 0; i < _swapChainImages.size(); ++i)
 	{
 		VkImageViewCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -797,6 +825,34 @@ bool flt::RendererVulkan::CreateSyncObjects()
 	return true;
 }
 
+void flt::RendererVulkan::CleanupSwapChain()
+{
+	for (size_t i = 0; i < _swapChainFramebuffers.size(); ++i)
+	{
+		vkDestroyFramebuffer(_device, _swapChainFramebuffers[i], nullptr);
+	}
+
+	for (size_t i = 0; i < _swapChainImageViews.size(); ++i)
+	{
+		vkDestroyImageView(_device, _swapChainImageViews[i], nullptr);
+	}
+
+	vkDestroySwapchainKHR(_device, _swapChain, nullptr);
+}
+
+void flt::RendererVulkan::RecreateSwapChain()
+{
+	//최소화 됐을 경우 (너비와 높이가 0이 될 경우) 재생성하지 않음
+
+	vkDeviceWaitIdle(_device);
+
+	CleanupSwapChain();
+
+	CreateSwapChain();
+	CreateImageViews();
+	CreateFramebuffers();
+}
+
 bool flt::RendererVulkan::RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
 {
 	VkCommandBufferBeginInfo beginInfo{};
@@ -925,7 +981,7 @@ bool flt::RendererVulkan::IsDeviceSuitable(VkPhysicalDevice device)
 			break;
 		}
 
-		i++;
+		++i;
 	}
 
 	bool extensionsSupported = CheckDeviceExtensionSupport(device);
@@ -991,7 +1047,7 @@ QueueFamilyIndices flt::RendererVulkan::FindQueueFamilies(VkPhysicalDevice devic
 			break;
 		}
 
-		i++;
+		++i;
 	}
 
 	return indices;

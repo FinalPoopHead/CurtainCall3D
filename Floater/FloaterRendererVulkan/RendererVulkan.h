@@ -61,6 +61,9 @@ namespace flt
 		bool CreateCommandBuffer();
 		bool CreateSyncObjects();
 
+		void CleanupSwapChain();
+		void RecreateSwapChain();
+
 		bool RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);;
 
 		bool CheckValidationLayerSupport();
@@ -110,6 +113,8 @@ namespace flt
 		std::vector<VkSemaphore> _renderFinishedSemaphores;
 		std::vector<VkFence> _inFlightFences;
 
+		bool _framebufferResized;
+		bool _isMinimized;
 		uint32_t _currentFrame;
 	};
 }
