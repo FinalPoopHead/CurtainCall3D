@@ -6,6 +6,15 @@
 #include <set>
 #include <algorithm>
 
+#include "VulkanVertex.h"
+
+
+const std::vector<flt::VulkanVertex> vertices =
+{
+	{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+	{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+	{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+};
 
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -104,6 +113,7 @@ flt::RendererVulkan::RendererVulkan()
 	, _imageAvailableSemaphores()
 	, _renderFinishedSemaphores()
 	, _inFlightFences()
+	, _vertexBuffer(VK_NULL_HANDLE)
 	, _framebufferResized(false)
 	, _isMinimized(false)
 	, _currentFrame(0)
@@ -128,6 +138,7 @@ bool flt::RendererVulkan::Initialize(HWND hwnd, HWND debugHWnd)
 	result &= CreateGraphicsPipeline();
 	result &= CreateFramebuffers();
 	result &= CreateCommandPool();
+	result &= CreateVertexBuffer();
 	result &= CreateCommandBuffer();
 	result &= CreateSyncObjects();
 
@@ -142,6 +153,11 @@ bool flt::RendererVulkan::Finalize()
 	_swapChainFramebuffers.clear();
 	_swapChainImageViews.clear();
 	_swapChain = VK_NULL_HANDLE;
+
+	vkDestroyBuffer(_device, _vertexBuffer, nullptr);
+	_vertexBuffer = VK_NULL_HANDLE;
+	vkFreeMemory(_device, _vertexBufferMemory, nullptr);
+	_vertexBufferMemory = VK_NULL_HANDLE;
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
 	{
@@ -604,8 +620,8 @@ bool flt::RendererVulkan::CreateRenderPass()
 
 bool flt::RendererVulkan::CreateGraphicsPipeline()
 {
-	auto vertShaderCode = ReadFile("shaders/vert.spv");
-	auto fragShaderCode = ReadFile("shaders/frag.spv");
+	std::vector<char> vertShaderCode = ReadFile("shaders/vert.spv");
+	std::vector<char> fragShaderCode = ReadFile("shaders/frag.spv");
 
 	VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
 	VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);
@@ -628,6 +644,12 @@ bool flt::RendererVulkan::CreateGraphicsPipeline()
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	vertexInputInfo.vertexBindingDescriptionCount = 0;
 	vertexInputInfo.vertexAttributeDescriptionCount = 0;
+	auto bindingDescription = VulkanVertex::GetBindingDescription();
+	auto attributeDescriptions = VulkanVertex::GetAttributeDescriptions();
+	vertexInputInfo.vertexBindingDescriptionCount = 1;
+	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
 	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -766,6 +788,47 @@ bool flt::RendererVulkan::CreateCommandPool()
 	return true;
 }
 
+bool flt::RendererVulkan::CreateVertexBuffer()
+{
+	VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+
+	VkBuffer stagingBuffer{};
+	VkDeviceMemory stagingBufferMemory{};
+	bool result = CreateBuffer(
+		bufferSize
+		, VK_BUFFER_USAGE_TRANSFER_SRC_BIT
+		, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+		, stagingBuffer
+		, stagingBufferMemory);
+	if (!result)
+	{
+		return false;
+	}
+
+	void* data;
+	vkMapMemory(_device, stagingBufferMemory, 0, bufferSize, 0, &data);
+	memcpy(data, vertices.data(), (size_t)bufferSize);
+	vkUnmapMemory(_device, stagingBufferMemory);
+
+	result = CreateBuffer(
+		bufferSize
+		, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT
+		, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+		, _vertexBuffer
+		, _vertexBufferMemory);
+	if (!result)
+	{
+		return false;
+	}
+
+	CopyBuffer(stagingBuffer, _vertexBuffer, bufferSize);
+
+	vkDestroyBuffer(_device, stagingBuffer, nullptr);
+	vkFreeMemory(_device, stagingBufferMemory, nullptr);
+
+	return true;
+}
+
 bool flt::RendererVulkan::CreateCommandBuffer()
 {
 	_commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
@@ -895,7 +958,11 @@ bool flt::RendererVulkan::RecordCommandBuffer(VkCommandBuffer commandBuffer, uin
 	scissor.extent = _swapChainExtent;
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-	vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+	VkBuffer vertexBuffers[] = { _vertexBuffer };
+	VkDeviceSize offsets[] = { 0 };
+	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
+	vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
 
 	vkCmdEndRenderPass(commandBuffer);
 
@@ -1120,4 +1187,98 @@ VkShaderModule flt::RendererVulkan::CreateShaderModule(const std::vector<char>& 
 	}
 
 	return shaderModule;
+}
+
+bool flt::RendererVulkan::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
+{
+	VkBufferCreateInfo bufferInfo{};
+	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferInfo.size = size;
+	bufferInfo.usage = usage;
+	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	VkResult result = vkCreateBuffer(_device, &bufferInfo, nullptr, &buffer);
+	if (result != VK_SUCCESS)
+	{
+		ASSERT(false, "failed to create buffer!");
+		return false;
+	}
+
+	VkMemoryRequirements memRequirements;
+	vkGetBufferMemoryRequirements(_device, buffer, &memRequirements);
+
+	VkMemoryAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	allocInfo.allocationSize = memRequirements.size;
+	allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
+
+	result = vkAllocateMemory(_device, &allocInfo, nullptr, &bufferMemory);
+	if (result != VK_SUCCESS)
+	{
+		ASSERT(false, "failed to allocate buffer memory!");
+		return false;
+	}
+
+	result = vkBindBufferMemory(_device, buffer, bufferMemory, 0);
+	if (result != VK_SUCCESS)
+	{
+		ASSERT(false, "failed to bind buffer memory!");
+		return false;
+	}
+
+	return true;
+}
+
+void flt::RendererVulkan::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+{
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandPool = _commandPool;
+	allocInfo.commandBufferCount = 1;
+
+	VkCommandBuffer commandBuffer;
+	vkAllocateCommandBuffers(_device, &allocInfo, &commandBuffer);
+
+	VkCommandBufferBeginInfo beginInfo{};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+	VkBufferCopy copyRegion{};
+	copyRegion.srcOffset = 0;
+	copyRegion.dstOffset = 0;
+	copyRegion.size = size;
+	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+
+	vkEndCommandBuffer(commandBuffer);
+
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &commandBuffer;
+
+	vkQueueSubmit(_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(_graphicsQueue);
+
+	vkFreeCommandBuffers(_device, _commandPool, 1, &commandBuffer);
+}
+
+uint32_t flt::RendererVulkan::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
+{
+	VkPhysicalDeviceMemoryProperties memProperties{};
+	vkGetPhysicalDeviceMemoryProperties(_physicalDevice, &memProperties);
+
+	for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i)
+	{
+		if ((typeFilter & (1 << i))
+			&& ((memProperties.memoryTypes[i].propertyFlags & properties) == properties))
+		{
+			return i;
+		}
+	}
+
+	ASSERT(false, "failed to find suitable memory type!");
+	return UINT_MAX;
 }

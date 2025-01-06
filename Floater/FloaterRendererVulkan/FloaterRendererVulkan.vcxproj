@@ -22,10 +22,12 @@
     <ClInclude Include="include\CreateRenderer.h" />
     <ClInclude Include="RendererVulkan.h" />
     <ClInclude Include="test.h" />
+    <ClInclude Include="VulkanVertex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CreateRenderer.cpp" />
     <ClCompile Include="RendererVulkan.cpp" />
+    <ClCompile Include="VulkanVertex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FloaterMath\FloaterMath.vcxproj">

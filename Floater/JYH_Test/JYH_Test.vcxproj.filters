@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="GLSL">
+      <UniqueIdentifier>{35f3b438-2404-47b8-830c-6c5fcb340ca1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GLSL\old">
+      <UniqueIdentifier>{9499d95b-afba-43a2-a327-1c9859bc8630}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -74,5 +80,19 @@
     <ClInclude Include="ShakerComponent.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\shader.frag">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="shaders\shader.vert">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="shaders\triangle.vert">
+      <Filter>GLSL\old</Filter>
+    </None>
+    <None Include="shaders\triangle.frag">
+      <Filter>GLSL\old</Filter>
+    </None>
   </ItemGroup>
 </Project>

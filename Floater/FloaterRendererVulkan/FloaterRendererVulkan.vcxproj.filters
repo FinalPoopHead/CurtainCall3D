@@ -24,12 +24,18 @@
     <ClInclude Include="test.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="VulkanVertex.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RendererVulkan.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="CreateRenderer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanVertex.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

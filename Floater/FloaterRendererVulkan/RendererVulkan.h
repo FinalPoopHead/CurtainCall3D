@@ -58,8 +58,11 @@ namespace flt
 		bool CreateGraphicsPipeline();
 		bool CreateFramebuffers();
 		bool CreateCommandPool();
+		bool CreateVertexBuffer();
 		bool CreateCommandBuffer();
 		bool CreateSyncObjects();
+
+	private:
 
 		void CleanupSwapChain();
 		void RecreateSwapChain();
@@ -77,6 +80,11 @@ namespace flt
 		VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
 		VkShaderModule CreateShaderModule(const std::vector<char>& code);
+		bool CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+
+		void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+
+		uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 	private:
 		static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
@@ -112,6 +120,9 @@ namespace flt
 		std::vector<VkSemaphore> _imageAvailableSemaphores;
 		std::vector<VkSemaphore> _renderFinishedSemaphores;
 		std::vector<VkFence> _inFlightFences;
+
+		VkBuffer _vertexBuffer;
+		VkDeviceMemory _vertexBufferMemory;
 
 		bool _framebufferResized;
 		bool _isMinimized;
