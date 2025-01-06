@@ -104,11 +104,13 @@ namespace flt
 		std::vector<VkFramebuffer> _swapChainFramebuffers;
 
 		VkCommandPool _commandPool;
-		VkCommandBuffer _commandBuffer;
+		std::vector<VkCommandBuffer> _commandBuffers; // commandPool이 정리 될 때 자동으로 정리 됨
 
-		VkSemaphore _imageAvailableSemaphore;
-		VkSemaphore _renderFinishedSemaphore;
-		VkFence _inFlightFence;
+		std::vector<VkSemaphore> _imageAvailableSemaphores;
+		std::vector<VkSemaphore> _renderFinishedSemaphores;
+		std::vector<VkFence> _inFlightFences;
+
+		uint32_t _currentFrame;
 	};
 }
 

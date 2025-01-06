@@ -6,6 +6,9 @@
 #include <set>
 #include <algorithm>
 
+
+constexpr int MAX_FRAMES_IN_FLIGHT = 2;
+
 const std::vector<const char*> validationLayers =
 {
 	"VK_LAYER_KHRONOS_validation"
@@ -42,7 +45,7 @@ std::vector<char> flt::RendererVulkan::ReadFile(const std::string& filename)
 	auto absPath = std::filesystem::absolute(path);
 	std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
-	if (!file.is_open()) 
+	if (!file.is_open())
 	{
 		throw std::runtime_error("failed to open file!");
 	}
@@ -97,10 +100,11 @@ flt::RendererVulkan::RendererVulkan()
 	, _pipelineLayout(VK_NULL_HANDLE)
 	, _swapChainFramebuffers()
 	, _commandPool(VK_NULL_HANDLE)
-	, _commandBuffer(VK_NULL_HANDLE)
-	, _imageAvailableSemaphore(VK_NULL_HANDLE)
-	, _renderFinishedSemaphore(VK_NULL_HANDLE)
-	, _inFlightFence(VK_NULL_HANDLE)
+	, _commandBuffers()
+	, _imageAvailableSemaphores()
+	, _renderFinishedSemaphores()
+	, _inFlightFences()
+	, _currentFrame(0)
 {
 
 }
@@ -132,14 +136,15 @@ bool flt::RendererVulkan::Finalize()
 {
 	vkDeviceWaitIdle(_device);
 
-	vkDestroySemaphore(_device, _imageAvailableSemaphore, nullptr);
-	_imageAvailableSemaphore = VK_NULL_HANDLE;
-
-	vkDestroySemaphore(_device, _renderFinishedSemaphore, nullptr);
-	_renderFinishedSemaphore = VK_NULL_HANDLE;
-
-	vkDestroyFence(_device, _inFlightFence, nullptr);
-	_inFlightFence = VK_NULL_HANDLE;
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
+	{
+		vkDestroySemaphore(_device, _imageAvailableSemaphores[i], nullptr);
+		vkDestroySemaphore(_device, _renderFinishedSemaphores[i], nullptr);
+		vkDestroyFence(_device, _inFlightFences[i], nullptr);
+	}
+	_imageAvailableSemaphores.clear();
+	_renderFinishedSemaphores.clear();
+	_inFlightFences.clear();
 
 	vkDestroyCommandPool(_device, _commandPool, nullptr);
 	_commandPool = VK_NULL_HANDLE;
@@ -188,29 +193,29 @@ bool flt::RendererVulkan::Finalize()
 
 bool flt::RendererVulkan::Render(float deltaTime)
 {
-	vkWaitForFences(_device, 1, &_inFlightFence, VK_TRUE, UINT64_MAX);
-	vkResetFences(_device, 1, &_inFlightFence);
+	vkWaitForFences(_device, 1, &_inFlightFences[_currentFrame], VK_TRUE, UINT64_MAX);
+	vkResetFences(_device, 1, &_inFlightFences[_currentFrame]);
 
 	uint32_t imageIndex{};
-	vkAcquireNextImageKHR(_device, _swapChain, UINT64_MAX, _imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
-	vkResetCommandBuffer(_commandBuffer, 0);
-	RecordCommandBuffer(_commandBuffer, imageIndex);
+	vkAcquireNextImageKHR(_device, _swapChain, UINT64_MAX, _imageAvailableSemaphores[_currentFrame], VK_NULL_HANDLE, &imageIndex);
+	vkResetCommandBuffer(_commandBuffers[_currentFrame], 0);
+	RecordCommandBuffer(_commandBuffers[_currentFrame], imageIndex);
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-	VkSemaphore waitSemaphores[] = { _imageAvailableSemaphore };
+	VkSemaphore waitSemaphores[] = { _imageAvailableSemaphores[_currentFrame] };
 	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 	submitInfo.waitSemaphoreCount = 1;
 	submitInfo.pWaitSemaphores = waitSemaphores;
 	submitInfo.pWaitDstStageMask = waitStages;
 	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &_commandBuffer;
-	VkSemaphore signalSemaphores[] = { _renderFinishedSemaphore };
+	submitInfo.pCommandBuffers = &_commandBuffers[_currentFrame];
+	VkSemaphore signalSemaphores[] = { _renderFinishedSemaphores[_currentFrame] };
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
-	VkResult result = vkQueueSubmit(_graphicsQueue, 1, &submitInfo, _inFlightFence);
+	VkResult result = vkQueueSubmit(_graphicsQueue, 1, &submitInfo, _inFlightFences[_currentFrame]);
 	if (result != VK_SUCCESS)
 	{
 		return false;
@@ -227,7 +232,7 @@ bool flt::RendererVulkan::Render(float deltaTime)
 	presentInfo.pResults = nullptr;
 
 	vkQueuePresentKHR(_presentQueue, &presentInfo);
-
+	_currentFrame = (_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 	return true;
 }
 
@@ -636,7 +641,7 @@ bool flt::RendererVulkan::CreateGraphicsPipeline()
 	colorBlending.blendConstants[2] = 0.0f;
 	colorBlending.blendConstants[3] = 0.0f;
 
-	std::vector<VkDynamicState> dynamicStates = 
+	std::vector<VkDynamicState> dynamicStates =
 	{
 		VK_DYNAMIC_STATE_VIEWPORT,
 		VK_DYNAMIC_STATE_SCISSOR
@@ -652,7 +657,7 @@ bool flt::RendererVulkan::CreateGraphicsPipeline()
 	pipelineLayoutInfo.pushConstantRangeCount = 0;
 
 	VkResult result = vkCreatePipelineLayout(_device, &pipelineLayoutInfo, nullptr, &_pipelineLayout);
-	if (result != VK_SUCCESS) 
+	if (result != VK_SUCCESS)
 	{
 		ASSERT(false, "failed to create pipeline layout!");
 		return false;
@@ -690,7 +695,7 @@ bool flt::RendererVulkan::CreateGraphicsPipeline()
 
 bool flt::RendererVulkan::CreateFramebuffers()
 {
-	_swapChainFramebuffers.resize(_swapChainImageViews.size());	
+	_swapChainFramebuffers.resize(_swapChainImageViews.size());
 
 	for (size_t i = 0; i < _swapChainFramebuffers.size(); ++i)
 	{
@@ -712,7 +717,7 @@ bool flt::RendererVulkan::CreateFramebuffers()
 			return false;
 		}
 	}
-		return true;
+	return true;
 }
 
 bool flt::RendererVulkan::CreateCommandPool()
@@ -735,13 +740,15 @@ bool flt::RendererVulkan::CreateCommandPool()
 
 bool flt::RendererVulkan::CreateCommandBuffer()
 {
+	_commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.commandPool = _commandPool;
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandBufferCount = 1;
+	allocInfo.commandBufferCount = (uint32_t)_commandBuffers.size();
 
-	VkResult result = vkAllocateCommandBuffers(_device, &allocInfo, &_commandBuffer);
+	VkResult result = vkAllocateCommandBuffers(_device, &allocInfo, _commandBuffers.data());
 	if (result != VK_SUCCESS)
 	{
 		ASSERT(false, "failed to allocate command buffers!");
@@ -752,6 +759,10 @@ bool flt::RendererVulkan::CreateCommandBuffer()
 
 bool flt::RendererVulkan::CreateSyncObjects()
 {
+	_imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+	_renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+	_inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+
 	VkSemaphoreCreateInfo semaphoreInfo{};
 	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -759,25 +770,28 @@ bool flt::RendererVulkan::CreateSyncObjects()
 	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-	VkResult result = vkCreateSemaphore(_device, &semaphoreInfo, nullptr, &_imageAvailableSemaphore);
-	if (result != VK_SUCCESS)
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
 	{
-		ASSERT(false, "failed to create synchronization objects!");
-		return false;
-	}
+		VkResult result = vkCreateSemaphore(_device, &semaphoreInfo, nullptr, &_imageAvailableSemaphores[i]);
+		if (result != VK_SUCCESS)
+		{
+			ASSERT(false, "failed to create synchronization objects!");
+			return false;
+		}
 
-	result = vkCreateSemaphore(_device, &semaphoreInfo, nullptr, &_renderFinishedSemaphore);
-	if (result != VK_SUCCESS)
-	{
-		ASSERT(false, "failed to create synchronization objects!");
-		return false;
-	}
+		result = vkCreateSemaphore(_device, &semaphoreInfo, nullptr, &_renderFinishedSemaphores[i]);
+		if (result != VK_SUCCESS)
+		{
+			ASSERT(false, "failed to create synchronization objects!");
+			return false;
+		}
 
-	result = vkCreateFence(_device, &fenceInfo, nullptr, &_inFlightFence);
-	if (result != VK_SUCCESS)
-	{
-		ASSERT(false, "failed to create synchronization objects!");
-		return false;
+		result = vkCreateFence(_device, &fenceInfo, nullptr, &_inFlightFences[i]);
+		if (result != VK_SUCCESS)
+		{
+			ASSERT(false, "failed to create synchronization objects!");
+			return false;
+		}
 	}
 
 	return true;
@@ -790,7 +804,7 @@ bool flt::RendererVulkan::RecordCommandBuffer(VkCommandBuffer commandBuffer, uin
 	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
 	VkResult result = vkBeginCommandBuffer(commandBuffer, &beginInfo);
-	if (result != VK_SUCCESS) 
+	if (result != VK_SUCCESS)
 	{
 		ASSERT(false, "failed to begin recording command buffer!");
 		return false;
@@ -830,7 +844,7 @@ bool flt::RendererVulkan::RecordCommandBuffer(VkCommandBuffer commandBuffer, uin
 	vkCmdEndRenderPass(commandBuffer);
 
 	result = vkEndCommandBuffer(commandBuffer);
-	if (result != VK_SUCCESS) 
+	if (result != VK_SUCCESS)
 	{
 		ASSERT(false, "failed to record command buffer!");
 		return false;
@@ -1043,7 +1057,7 @@ VkShaderModule flt::RendererVulkan::CreateShaderModule(const std::vector<char>& 
 
 	VkShaderModule shaderModule;
 	VkResult result = vkCreateShaderModule(_device, &createInfo, nullptr, &shaderModule);
-	if (result != VK_SUCCESS) 
+	if (result != VK_SUCCESS)
 	{
 		ASSERT(false, "failed to create shader module!");
 		throw std::runtime_error("failed to create shader module!");
