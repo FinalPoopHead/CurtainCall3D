@@ -7,13 +7,38 @@
 #include <algorithm>
 
 #include "VulkanVertex.h"
+#include "../FloaterRendererCommon/include/Camera.h"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
+
+//struct UniformBufferObject
+//{
+//	flt::Matrix4f model;
+//	flt::Matrix4f view;
+//	flt::Matrix4f proj;
+//};
+
+struct UniformBufferObjectGLM
+{
+	glm::mat4 model;
+	glm::mat4 view;
+	glm::mat4 proj;
+};
 
 const std::vector<flt::VulkanVertex> vertices =
 {
-	{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-	{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-	{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+	{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+	{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+	{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+	{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+};
+
+const std::vector<uint16_t> indices =
+{
+	0, 1, 2,
+	2, 3, 0
 };
 
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
@@ -101,19 +126,29 @@ flt::RendererVulkan::RendererVulkan()
 	, _device(VK_NULL_HANDLE)
 	, _graphicsQueue(VK_NULL_HANDLE)
 	, _presentQueue(VK_NULL_HANDLE)
+	, _transferQueue(VK_NULL_HANDLE)
 	, _swapChain(VK_NULL_HANDLE)
 	, _swapChainImageFormat(VK_FORMAT_UNDEFINED)
 	, _swapChainExtent({ 0, 0 })
 	, _renderPass(VK_NULL_HANDLE)
+	, _descriptorSetLayout(VK_NULL_HANDLE)
 	, _graphicsPipeline(VK_NULL_HANDLE)
 	, _pipelineLayout(VK_NULL_HANDLE)
 	, _swapChainFramebuffers()
 	, _commandPool(VK_NULL_HANDLE)
 	, _commandBuffers()
+	, _transferCommandPool(VK_NULL_HANDLE)
+	, _transferCommandBuffer(VK_NULL_HANDLE)
 	, _imageAvailableSemaphores()
 	, _renderFinishedSemaphores()
 	, _inFlightFences()
 	, _vertexBuffer(VK_NULL_HANDLE)
+	, _vertexBufferMemory(VK_NULL_HANDLE)
+	, _indexBuffer(VK_NULL_HANDLE)
+	, _indexBufferMemory(VK_NULL_HANDLE)
+	, _uniformBuffers()
+	, _uniformBuffersMemory()
+	, _uniformBuffersMapped()
 	, _framebufferResized(false)
 	, _isMinimized(false)
 	, _currentFrame(0)
@@ -135,12 +170,19 @@ bool flt::RendererVulkan::Initialize(HWND hwnd, HWND debugHWnd)
 	result &= CreateSwapChain();
 	result &= CreateImageViews();
 	result &= CreateRenderPass();
+	result &= CreateDescriptorSetLayout();
 	result &= CreateGraphicsPipeline();
 	result &= CreateFramebuffers();
 	result &= CreateCommandPool();
 	result &= CreateVertexBuffer();
+	result &= CreateIndexBuffer();
+	result &= CreateUniformBuffers();
+	result &= CreateDescriptorPool();
+	result &= CreateDescriptorSets();
 	result &= CreateCommandBuffer();
 	result &= CreateSyncObjects();
+
+	ASSERT(result, "failed to initialize vulkan renderer!");
 
 	return result;
 }
@@ -153,6 +195,25 @@ bool flt::RendererVulkan::Finalize()
 	_swapChainFramebuffers.clear();
 	_swapChainImageViews.clear();
 	_swapChain = VK_NULL_HANDLE;
+
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
+	{
+		vkDestroyBuffer(_device, _uniformBuffers[i], nullptr);
+		vkFreeMemory(_device, _uniformBuffersMemory[i], nullptr);
+	}
+	_uniformBuffers.clear();
+	_uniformBuffersMemory.clear();
+
+	vkDestroyDescriptorPool(_device, _descriptorPool, nullptr);
+	_descriptorPool = VK_NULL_HANDLE;
+
+	vkDestroyDescriptorSetLayout(_device, _descriptorSetLayout, nullptr);
+	_descriptorSetLayout = VK_NULL_HANDLE;
+
+	vkDestroyBuffer(_device, _indexBuffer, nullptr);
+	_indexBuffer = VK_NULL_HANDLE;
+	vkFreeMemory(_device, _indexBufferMemory, nullptr);
+	_indexBufferMemory = VK_NULL_HANDLE;
 
 	vkDestroyBuffer(_device, _vertexBuffer, nullptr);
 	_vertexBuffer = VK_NULL_HANDLE;
@@ -180,6 +241,9 @@ bool flt::RendererVulkan::Finalize()
 
 	vkDestroyCommandPool(_device, _commandPool, nullptr);
 	_commandPool = VK_NULL_HANDLE;
+
+	vkDestroyCommandPool(_device, _transferCommandPool, nullptr);
+	_transferCommandPool = VK_NULL_HANDLE;
 
 	vkDestroyDevice(_device, nullptr);
 	_device = VK_NULL_HANDLE;
@@ -220,6 +284,8 @@ bool flt::RendererVulkan::Render(float deltaTime)
 		ASSERT(false, "failed to acquire swap chain image!");
 	}
 
+	UpdateUniformBuffer(_currentFrame);
+
 	vkResetFences(_device, 1, &_inFlightFences[_currentFrame]);
 
 	vkResetCommandBuffer(_commandBuffers[_currentFrame], 0);
@@ -256,7 +322,6 @@ bool flt::RendererVulkan::Render(float deltaTime)
 	presentInfo.pResults = nullptr;
 
 	result = vkQueuePresentKHR(_presentQueue, &presentInfo);
-	_currentFrame = (_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 	if (result == VK_ERROR_OUT_OF_DATE_KHR 
 		|| result == VK_SUBOPTIMAL_KHR
 		|| _framebufferResized)
@@ -269,6 +334,8 @@ bool flt::RendererVulkan::Render(float deltaTime)
 		ASSERT(false, "failed to present swap chain image!");
 		return false;
 	}
+
+	_currentFrame = (_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 	return true;
 }
 
@@ -428,15 +495,23 @@ bool flt::RendererVulkan::CreateLogicalDevice()
 {
 	QueueFamilyIndices indices = FindQueueFamilies(_physicalDevice);
 
+	std::optional<uint32_t> transferQueueFamilyIndex = FindTransferQueueFamilies(_physicalDevice);
+	if (!transferQueueFamilyIndex.has_value())
+	{
+		ASSERT(false, "failed to find a suitable transfer queue family!");
+		return false;
+	}
+
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-	std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+	std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value(), transferQueueFamilyIndex.value()};
+
 
 	float queuePriority = 1.0f;
-	for (uint32_t queueFamily : uniqueQueueFamilies)
+	for (uint32_t queueFamilyIndex : uniqueQueueFamilies)
 	{
 		VkDeviceQueueCreateInfo queueCreateInfo{};
 		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-		queueCreateInfo.queueFamilyIndex = queueFamily;
+		queueCreateInfo.queueFamilyIndex = queueFamilyIndex;
 		queueCreateInfo.queueCount = 1;
 		queueCreateInfo.pQueuePriorities = &queuePriority;
 		queueCreateInfos.push_back(queueCreateInfo);
@@ -473,6 +548,7 @@ bool flt::RendererVulkan::CreateLogicalDevice()
 
 	vkGetDeviceQueue(_device, indices.graphicsFamily.value(), 0, &_graphicsQueue);
 	vkGetDeviceQueue(_device, indices.presentFamily.value(), 0, &_presentQueue);
+	vkGetDeviceQueue(_device, transferQueueFamilyIndex.value(), 0, &_transferQueue);
 
 	return true;
 }
@@ -618,6 +694,30 @@ bool flt::RendererVulkan::CreateRenderPass()
 	return true;
 }
 
+bool flt::RendererVulkan::CreateDescriptorSetLayout()
+{
+	VkDescriptorSetLayoutBinding uboLayoutBinding{};
+	uboLayoutBinding.binding = 0;
+	uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	uboLayoutBinding.descriptorCount = 1;
+	uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	uboLayoutBinding.pImmutableSamplers = nullptr;
+
+	VkDescriptorSetLayoutCreateInfo layoutInfo{};
+	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	layoutInfo.bindingCount = 1;
+	layoutInfo.pBindings = &uboLayoutBinding;
+
+	VkResult result = vkCreateDescriptorSetLayout(_device, &layoutInfo, nullptr, &_descriptorSetLayout);
+	if (result != VK_SUCCESS)
+	{
+		ASSERT(false, "failed to create descriptor set layout!");
+		return false;
+	}
+
+	return true;
+}
+
 bool flt::RendererVulkan::CreateGraphicsPipeline()
 {
 	std::vector<char> vertShaderCode = ReadFile("shaders/vert.spv");
@@ -668,7 +768,8 @@ bool flt::RendererVulkan::CreateGraphicsPipeline()
 	rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
 	rasterizer.lineWidth = 1.0f;
 	rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-	rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+	//rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+	rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 	rasterizer.depthBiasEnable = VK_FALSE;
 
 	VkPipelineMultisampleStateCreateInfo multisampling{};
@@ -703,8 +804,9 @@ bool flt::RendererVulkan::CreateGraphicsPipeline()
 
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutInfo.setLayoutCount = 0;
-	pipelineLayoutInfo.pushConstantRangeCount = 0;
+	pipelineLayoutInfo.setLayoutCount = 1;
+	pipelineLayoutInfo.pSetLayouts = &_descriptorSetLayout;
+	//pipelineLayoutInfo.pushConstantRangeCount = 0;
 
 	VkResult result = vkCreatePipelineLayout(_device, &pipelineLayoutInfo, nullptr, &_pipelineLayout);
 	if (result != VK_SUCCESS)
@@ -729,7 +831,7 @@ bool flt::RendererVulkan::CreateGraphicsPipeline()
 	pipelineInfo.renderPass = _renderPass;
 	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
-	pipelineInfo.basePipelineIndex = -1;
+	//pipelineInfo.basePipelineIndex = -1;
 
 	result = vkCreateGraphicsPipelines(_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_graphicsPipeline);
 	if (result != VK_SUCCESS)
@@ -785,6 +887,27 @@ bool flt::RendererVulkan::CreateCommandPool()
 		ASSERT(false, "failed to create command pool!");
 		return false;
 	}
+
+
+	std::optional<uint32_t> transferQueueFamilyIndex = FindTransferQueueFamilies(_physicalDevice);
+	if (!transferQueueFamilyIndex.has_value())
+	{
+		ASSERT(false, "failed to find a suitable transfer queue family!");
+		return false;
+	}
+
+	VkCommandPoolCreateInfo transferPoolInfo{};
+	transferPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	transferPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+	transferPoolInfo.queueFamilyIndex = transferQueueFamilyIndex.value();
+
+	result = vkCreateCommandPool(_device, &transferPoolInfo, nullptr, &_transferCommandPool);
+	if (result != VK_SUCCESS)
+	{
+		ASSERT(false, "failed to create transfer command pool!");
+		return false;
+	}
+
 	return true;
 }
 
@@ -799,7 +922,7 @@ bool flt::RendererVulkan::CreateVertexBuffer()
 		, VK_BUFFER_USAGE_TRANSFER_SRC_BIT
 		, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 		, stagingBuffer
-		, stagingBufferMemory);
+		, stagingBufferMemory, VK_SHARING_MODE_EXCLUSIVE);
 	if (!result)
 	{
 		return false;
@@ -815,7 +938,7 @@ bool flt::RendererVulkan::CreateVertexBuffer()
 		, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT
 		, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
 		, _vertexBuffer
-		, _vertexBufferMemory);
+		, _vertexBufferMemory, VK_SHARING_MODE_EXCLUSIVE);
 	if (!result)
 	{
 		return false;
@@ -829,8 +952,149 @@ bool flt::RendererVulkan::CreateVertexBuffer()
 	return true;
 }
 
+bool flt::RendererVulkan::CreateIndexBuffer()
+{
+	VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+
+	VkBuffer stagingBuffer{};
+	VkDeviceMemory stagingBufferMemory{};
+	bool result = CreateBuffer(bufferSize
+		, VK_BUFFER_USAGE_TRANSFER_SRC_BIT
+		, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+		, stagingBuffer
+		, stagingBufferMemory, VK_SHARING_MODE_EXCLUSIVE);
+	if (!result)
+	{
+		return false;
+	}
+
+	void* data;
+	vkMapMemory(_device, stagingBufferMemory, 0, bufferSize, 0, &data);
+	memcpy(data, indices.data(), (size_t)bufferSize);
+	vkUnmapMemory(_device, stagingBufferMemory);
+
+	result = CreateBuffer(bufferSize
+		, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT
+		, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+		, _indexBuffer
+		, _indexBufferMemory, VK_SHARING_MODE_EXCLUSIVE);
+	if (!result)
+	{
+		return false;
+	}
+
+	CopyBuffer(stagingBuffer, _indexBuffer, bufferSize);
+
+	vkDestroyBuffer(_device, stagingBuffer, nullptr);
+	vkFreeMemory(_device, stagingBufferMemory, nullptr);
+
+	return true;
+}
+
+bool flt::RendererVulkan::CreateUniformBuffers()
+{
+	//VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+	VkDeviceSize bufferSize = sizeof(UniformBufferObjectGLM);
+
+	_uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+	_uniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
+	_uniformBuffersMapped.resize(MAX_FRAMES_IN_FLIGHT);
+
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
+	{
+		bool result = CreateBuffer(bufferSize
+			, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT
+			, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+			, _uniformBuffers[i]
+			, _uniformBuffersMemory[i]);
+
+		if (!result)
+		{
+			ASSERT(false, "failed to create uniform buffer!");
+			return false;
+		}
+
+		VkResult ret = vkMapMemory(_device, _uniformBuffersMemory[i], 0, bufferSize, 0, &_uniformBuffersMapped[i]);
+		if (ret != VK_SUCCESS)
+		{
+			ASSERT(false, "failed to map uniform buffer memory!");
+			return false;
+			}
+
+	}
+
+	return true;
+}
+
+bool flt::RendererVulkan::CreateDescriptorPool()
+{
+	VkDescriptorPoolSize poolSize{};
+	poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	poolSize.descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+
+	VkDescriptorPoolCreateInfo poolInfo{};
+	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	poolInfo.poolSizeCount = 1;
+	poolInfo.pPoolSizes = &poolSize;
+	poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+
+	VkResult result = vkCreateDescriptorPool(_device, &poolInfo, nullptr, &_descriptorPool);
+	if (result != VK_SUCCESS)
+	{
+		ASSERT(false, "failed to create descriptor pool!");
+		return false;
+	}
+
+	return true;
+}
+
+bool flt::RendererVulkan::CreateDescriptorSets()
+{
+	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, _descriptorSetLayout);
+	VkDescriptorSetAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	allocInfo.descriptorPool = _descriptorPool;
+	allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+	allocInfo.pSetLayouts = layouts.data();
+
+	_descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
+	VkResult result = vkAllocateDescriptorSets(_device, &allocInfo, _descriptorSets.data());
+	if (result != VK_SUCCESS)
+	{
+		ASSERT(false, "failed to allocate descriptor sets!");
+		return false;
+	}
+
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
+	{
+		VkDescriptorBufferInfo bufferInfo{};
+		bufferInfo.buffer = _uniformBuffers[i];
+		bufferInfo.offset = 0;
+		bufferInfo.range = sizeof(UniformBufferObjectGLM);
+
+		VkWriteDescriptorSet descriptorWrite{};
+		descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrite.dstSet = _descriptorSets[i];
+		descriptorWrite.dstBinding = 0;
+		descriptorWrite.dstArrayElement = 0;
+		descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorWrite.descriptorCount = 1;
+		descriptorWrite.pBufferInfo = &bufferInfo;
+		descriptorWrite.pImageInfo = nullptr;
+		descriptorWrite.pTexelBufferView = nullptr;
+
+		vkUpdateDescriptorSets(_device, 1, &descriptorWrite, 0, nullptr);
+	}
+
+
+
+
+	return true;
+}
+
 bool flt::RendererVulkan::CreateCommandBuffer()
 {
+	/// graphics, present용 command buffer 생성
 	_commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 
 	VkCommandBufferAllocateInfo allocInfo{};
@@ -845,6 +1109,10 @@ bool flt::RendererVulkan::CreateCommandBuffer()
 		ASSERT(false, "failed to allocate command buffers!");
 		return false;
 	}
+
+	///// transfer용 command buffer 생성
+	//VkCommandBufferAllocateInfo transferAllocInfo{};
+
 	return true;
 }
 
@@ -920,7 +1188,7 @@ bool flt::RendererVulkan::RecordCommandBuffer(VkCommandBuffer commandBuffer, uin
 {
 	VkCommandBufferBeginInfo beginInfo{};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+	//beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
 	VkResult result = vkBeginCommandBuffer(commandBuffer, &beginInfo);
 	if (result != VK_SUCCESS)
@@ -962,7 +1230,12 @@ bool flt::RendererVulkan::RecordCommandBuffer(VkCommandBuffer commandBuffer, uin
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-	vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
+	vkCmdBindIndexBuffer(commandBuffer, _indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 0, 1, &_descriptorSets[_currentFrame], 0, nullptr);
+
+	//vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
+	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 
 	vkCmdEndRenderPass(commandBuffer);
 
@@ -973,6 +1246,23 @@ bool flt::RendererVulkan::RecordCommandBuffer(VkCommandBuffer commandBuffer, uin
 		return false;
 	}
 	return true;
+}
+
+void flt::RendererVulkan::UpdateUniformBuffer(uint32_t currentImage)
+{
+	static auto startTime = std::chrono::high_resolution_clock::now();
+
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+	UniformBufferObjectGLM ubo{};
+	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	ubo.proj = glm::perspective(glm::radians(45.0f), _swapChainExtent.width / (float)_swapChainExtent.height, 0.1f, 10.0f);
+	ubo.proj[1][1] *= -1;
+
+	auto size = sizeof(ubo);
+	memcpy(_uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
 }
 
 bool flt::RendererVulkan::CheckValidationLayerSupport()
@@ -1097,27 +1387,50 @@ QueueFamilyIndices flt::RendererVulkan::FindQueueFamilies(VkPhysicalDevice devic
 	std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
 	vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
 
-	int i = 0;
-	for (const auto& queueFamily : queueFamilies) {
-		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+	for (uint32_t i = 0; i < queueFamilyCount; ++i)
+	{
+		const auto& queueFamily = queueFamilies[i];
+
+		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+		{
 			indices.graphicsFamily = i;
 		}
 
 		VkBool32 presentSupport = false;
 		vkGetPhysicalDeviceSurfaceSupportKHR(device, i, _surface, &presentSupport);
 
-		if (presentSupport) {
+		if (presentSupport) 
+		{
 			indices.presentFamily = i;
 		}
 
-		if (indices.IsComplete()) {
+		if (indices.IsComplete()) 
+		{
 			break;
 		}
-
-		++i;
 	}
 
 	return indices;
+}
+
+std::optional<uint32_t> flt::RendererVulkan::FindTransferQueueFamilies(VkPhysicalDevice device)
+{
+	uint32_t queueFamilyCount = 0;
+	vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+	std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+	vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+	for (uint32_t i = 0; i < queueFamilyCount; ++i)
+	{
+		if (queueFamilies[i].queueFlags & VK_QUEUE_TRANSFER_BIT 
+			&& !(queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT))
+		{
+			return i;
+		}
+	}
+
+	return std::nullopt;
 }
 
 VkSurfaceFormatKHR flt::RendererVulkan::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
@@ -1189,13 +1502,17 @@ VkShaderModule flt::RendererVulkan::CreateShaderModule(const std::vector<char>& 
 	return shaderModule;
 }
 
-bool flt::RendererVulkan::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
+bool flt::RendererVulkan::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory, VkSharingMode sharingMode)
 {
 	VkBufferCreateInfo bufferInfo{};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	bufferInfo.size = size;
 	bufferInfo.usage = usage;
-	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	bufferInfo.sharingMode = sharingMode; // default, graphics queue에서 사용할 때
+	//bufferInfo.sharingMode = VK_SHARING_MODE_CONCURRENT;
+	uint32_t queueFamilyIndices[] = { 0, 1 };
+	bufferInfo.queueFamilyIndexCount = 2;
+	bufferInfo.pQueueFamilyIndices = queueFamilyIndices;
 
 	VkResult result = vkCreateBuffer(_device, &bufferInfo, nullptr, &buffer);
 	if (result != VK_SUCCESS)
@@ -1234,6 +1551,7 @@ void flt::RendererVulkan::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkD
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	//allocInfo.commandPool = _transferCommandPool;
 	allocInfo.commandPool = _commandPool;
 	allocInfo.commandBufferCount = 1;
 
@@ -1259,6 +1577,8 @@ void flt::RendererVulkan::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkD
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &commandBuffer;
 
+	//vkQueueSubmit(_transferQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	//vkQueueWaitIdle(_transferQueue);
 	vkQueueSubmit(_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
 	vkQueueWaitIdle(_graphicsQueue);
 
