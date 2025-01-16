@@ -65,6 +65,9 @@ namespace flt
 		bool CreateGraphicsPipeline();
 		bool CreateFramebuffers();
 		bool CreateCommandPool();
+		bool CreateTextureImage();
+		bool CreateTextureImageView();
+		bool CreateTextureSampler();
 		bool CreateVertexBuffer();
 		bool CreateIndexBuffer();
 		bool CreateUniformBuffers();
@@ -81,6 +84,9 @@ namespace flt
 		bool RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 		void UpdateUniformBuffer(uint32_t currentImage);
 
+		VkCommandBuffer BeginSingleTimeCommands();
+		void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
+
 		bool CheckValidationLayerSupport();
 		bool CheckDeviceExtensionSupport(VkPhysicalDevice device);
 		bool IsDeviceSuitable(VkPhysicalDevice device);
@@ -94,10 +100,14 @@ namespace flt
 
 		VkShaderModule CreateShaderModule(const std::vector<char>& code);
 		bool CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory, VkSharingMode sharingMode = VK_SHARING_MODE_EXCLUSIVE);
+		bool CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+		VkImageView CreateImageView(VkImage image, VkFormat format);
 
 		void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+		void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+		void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 
-		uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+		uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 	private:
 		static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
@@ -151,6 +161,12 @@ namespace flt
 
 		VkDescriptorPool _descriptorPool;
 		std::vector<VkDescriptorSet> _descriptorSets;
+
+		VkImage _textureImage;
+		VkDeviceMemory _textureImageMemory;
+
+		VkImageView _textureImageView;
+		VkSampler _textureSampler;
 
 		bool _framebufferResized;
 		bool _isMinimized;

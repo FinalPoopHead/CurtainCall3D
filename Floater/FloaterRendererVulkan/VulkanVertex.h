@@ -12,6 +12,7 @@ namespace flt
 	{
 		Vector2f pos;
 		Vector3f color;
+		Vector2f texCoord;
 
 		static VkVertexInputBindingDescription GetBindingDescription()
 		{
@@ -23,9 +24,9 @@ namespace flt
 			return bindingDescription;
 		}
 
-		static std::array<VkVertexInputAttributeDescription, 2> GetAttributeDescriptions()
+		static std::array<VkVertexInputAttributeDescription, 3> GetAttributeDescriptions()
 		{
-			std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
+			std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
 			// Position
 			attributeDescriptions[0].binding = 0;
 			attributeDescriptions[0].location = 0;
@@ -37,6 +38,12 @@ namespace flt
 			attributeDescriptions[1].location = 1;
 			attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
 			attributeDescriptions[1].offset = offsetof(VulkanVertex, color);
+
+			// Texture coordinates
+			attributeDescriptions[2].binding = 0;
+			attributeDescriptions[2].location = 2;
+			attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+			attributeDescriptions[2].offset = offsetof(VulkanVertex, texCoord);
 
 			return attributeDescriptions;
 		}
