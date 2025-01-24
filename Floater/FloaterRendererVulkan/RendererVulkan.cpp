@@ -9,6 +9,8 @@
 #include "VulkanVertex.h"
 #include "../FloaterRendererCommon/include/Camera.h"
 
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
@@ -32,16 +34,24 @@ struct UniformBufferObjectGLM
 
 const std::vector<flt::VulkanVertex> vertices =
 {
-	{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-	{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-	{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-	{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+	{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+	{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+	{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+	{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+
+	{{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+	{{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+	{{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+	{{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
 };
 
 const std::vector<uint16_t> indices =
 {
 	0, 1, 2,
-	2, 3, 0
+	2, 3, 0,
+
+	4, 5, 6,
+	6, 7, 4
 };
 
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
@@ -131,12 +141,14 @@ flt::RendererVulkan::RendererVulkan()
 	, _presentQueue(VK_NULL_HANDLE)
 	, _transferQueue(VK_NULL_HANDLE)
 	, _swapChain(VK_NULL_HANDLE)
+	, _swapChainImages()
 	, _swapChainImageFormat(VK_FORMAT_UNDEFINED)
 	, _swapChainExtent({ 0, 0 })
+	, _swapChainImageViews()
 	, _renderPass(VK_NULL_HANDLE)
 	, _descriptorSetLayout(VK_NULL_HANDLE)
-	, _graphicsPipeline(VK_NULL_HANDLE)
 	, _pipelineLayout(VK_NULL_HANDLE)
+	, _graphicsPipeline(VK_NULL_HANDLE)
 	, _swapChainFramebuffers()
 	, _commandPool(VK_NULL_HANDLE)
 	, _commandBuffers()
@@ -154,6 +166,13 @@ flt::RendererVulkan::RendererVulkan()
 	, _uniformBuffersMapped()
 	, _descriptorPool(VK_NULL_HANDLE)
 	, _descriptorSets()
+	, _depthImage(VK_NULL_HANDLE)
+	, _depthImageMemory(VK_NULL_HANDLE)
+	, _depthImageView(VK_NULL_HANDLE)
+	, _textureImage(VK_NULL_HANDLE)
+	, _textureImageMemory(VK_NULL_HANDLE)
+	, _textureImageView(VK_NULL_HANDLE)
+	, _textureSampler(VK_NULL_HANDLE)
 	, _framebufferResized(false)
 	, _isMinimized(false)
 	, _currentFrame(0)
@@ -177,8 +196,9 @@ bool flt::RendererVulkan::Initialize(HWND hwnd, HWND debugHWnd)
 	result &= CreateRenderPass();
 	result &= CreateDescriptorSetLayout();
 	result &= CreateGraphicsPipeline();
-	result &= CreateFramebuffers();
 	result &= CreateCommandPool();
+	result &= CreateDepthResources();
+	result &= CreateFramebuffers();
 	result &= CreateTextureImage();
 	result &= CreateTextureImageView();
 	result &= CreateTextureSampler();
@@ -269,7 +289,7 @@ bool flt::RendererVulkan::Finalize()
 
 	if (_enableValidationLayers)
 	{
-		DestroyDebugUtilsMessengerEXT(_instance, _debugMessenger, nullptr);
+		//DestroyDebugUtilsMessengerEXT(_instance, _debugMessenger, nullptr);
 		_debugMessenger = VK_NULL_HANDLE;
 	}
 
@@ -341,7 +361,7 @@ bool flt::RendererVulkan::Render(float deltaTime)
 	presentInfo.pResults = nullptr;
 
 	result = vkQueuePresentKHR(_presentQueue, &presentInfo);
-	if (result == VK_ERROR_OUT_OF_DATE_KHR 
+	if (result == VK_ERROR_OUT_OF_DATE_KHR
 		|| result == VK_SUBOPTIMAL_KHR
 		|| _framebufferResized)
 	{
@@ -460,7 +480,8 @@ bool flt::RendererVulkan::SetupDebugMessenger()
 	createInfo.pfnUserCallback = DebugCallback;
 
 	VkResult result = CreateDebugUtilsMessengerEXT(_instance, &createInfo, nullptr, &_debugMessenger);
-	if (result != VK_SUCCESS) {
+	if (result != VK_SUCCESS) 
+	{
 		return false;
 	}
 
@@ -526,7 +547,7 @@ bool flt::RendererVulkan::CreateLogicalDevice()
 	}
 
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-	std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value(), transferQueueFamilyIndex.value()};
+	std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value(), transferQueueFamilyIndex.value() };
 
 
 	float queuePriority = 1.0f;
@@ -645,7 +666,7 @@ bool flt::RendererVulkan::CreateImageViews()
 
 	for (size_t i = 0; i < _swapChainImages.size(); ++i)
 	{
-		_swapChainImageViews[i] = CreateImageView(_swapChainImages[i], _swapChainImageFormat);
+		_swapChainImageViews[i] = CreateImageView(_swapChainImages[i], _swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
 	}
 
 	return true;
@@ -667,23 +688,43 @@ bool flt::RendererVulkan::CreateRenderPass()
 	colorAttachmentRef.attachment = 0;
 	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
+	VkAttachmentDescription depthAttachment{};
+	depthAttachment.format = FindDepthFormat();
+	depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+	depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE; // 그린 이후에 사용하지 않을 것이므로 don`t care, 이러면 하드웨어가 추가 최적화를 할 수 있다.
+	depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED; // 이전 뎁스 정보는 필요 없으므로 undefined 사용 가능.
+	depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+
+	VkAttachmentReference depthAttachmentRef{};
+	depthAttachmentRef.attachment = 1;
+	depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
 	VkSubpassDescription subpass{};
 	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 	subpass.colorAttachmentCount = 1;
 	subpass.pColorAttachments = &colorAttachmentRef;
+	subpass.pDepthStencilAttachment = &depthAttachmentRef;
 
 	VkSubpassDependency dependency{};
 	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
 	dependency.dstSubpass = 0;
-	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
+		| VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 	dependency.srcAccessMask = 0;
-	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
+		| VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT
+		| VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
+
+	std::array<VkAttachmentDescription, 2> attachments = { colorAttachment, depthAttachment };
 	VkRenderPassCreateInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-	renderPassInfo.attachmentCount = 1;
-	renderPassInfo.pAttachments = &colorAttachment;
+	renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+	renderPassInfo.pAttachments = attachments.data();
 	renderPassInfo.subpassCount = 1;
 	renderPassInfo.pSubpasses = &subpass;
 	renderPassInfo.dependencyCount = 1;
@@ -791,6 +832,19 @@ bool flt::RendererVulkan::CreateGraphicsPipeline()
 	multisampling.sampleShadingEnable = VK_FALSE;
 	multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 
+	VkPipelineDepthStencilStateCreateInfo depthStencil{};
+	depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+	depthStencil.depthTestEnable = VK_TRUE;
+	depthStencil.depthWriteEnable = VK_TRUE;
+	depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
+	depthStencil.depthBoundsTestEnable = VK_FALSE;
+	depthStencil.minDepthBounds = 0.0f;
+	depthStencil.maxDepthBounds = 1.0f;
+	/// 마지막 세 필드는 스텐실 버퍼 연산을 구성하며 이미지에 스텐실 구형 요소가 포함되어있는지 확인해야 한다.
+	depthStencil.stencilTestEnable = VK_FALSE;
+	depthStencil.front = {};
+	depthStencil.back = {};
+
 	VkPipelineColorBlendAttachmentState colorBlendAttachment{};
 	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 	colorBlendAttachment.blendEnable = VK_FALSE;
@@ -838,7 +892,7 @@ bool flt::RendererVulkan::CreateGraphicsPipeline()
 	pipelineInfo.pViewportState = &viewportState;
 	pipelineInfo.pRasterizationState = &rasterizer;
 	pipelineInfo.pMultisampleState = &multisampling;
-	pipelineInfo.pDepthStencilState = nullptr;
+	pipelineInfo.pDepthStencilState = &depthStencil;
 	pipelineInfo.pColorBlendState = &colorBlending;
 	pipelineInfo.pDynamicState = &dynamicState;
 	pipelineInfo.layout = _pipelineLayout;
@@ -865,13 +919,15 @@ bool flt::RendererVulkan::CreateFramebuffers()
 
 	for (size_t i = 0; i < _swapChainFramebuffers.size(); ++i)
 	{
-		VkImageView attachments[] = { _swapChainImageViews[i] };
+		/// 모든 swapChainImage에서 동일한 depthImage 를 사용할 수 있는 이유는
+		/// 세마포어로 인해 하나의 서브패스만 동시에 실행되기 때문이다.
+		std::array<VkImageView, 2> attachments = { _swapChainImageViews[i], _depthImageView };
 
 		VkFramebufferCreateInfo framebufferInfo{};
 		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		framebufferInfo.renderPass = _renderPass;
-		framebufferInfo.attachmentCount = 1;
-		framebufferInfo.pAttachments = attachments;
+		framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+		framebufferInfo.pAttachments = attachments.data();
 		framebufferInfo.width = _swapChainExtent.width;
 		framebufferInfo.height = _swapChainExtent.height;
 		framebufferInfo.layers = 1;
@@ -902,7 +958,6 @@ bool flt::RendererVulkan::CreateCommandPool()
 		return false;
 	}
 
-
 	std::optional<uint32_t> transferQueueFamilyIndex = FindTransferQueueFamilies(_physicalDevice);
 	if (!transferQueueFamilyIndex.has_value())
 	{
@@ -921,6 +976,29 @@ bool flt::RendererVulkan::CreateCommandPool()
 		ASSERT(false, "failed to create transfer command pool!");
 		return false;
 	}
+
+	return true;
+}
+
+bool flt::RendererVulkan::CreateDepthResources()
+{
+	VkFormat depthFormat = FindDepthFormat();
+
+	bool result = CreateImage(_swapChainExtent.width, _swapChainExtent.height, depthFormat
+		, VK_IMAGE_TILING_OPTIMAL
+		, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT
+		, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+		, _depthImage
+		, _depthImageMemory);
+
+	if (result == false)
+	{
+		return false;
+	}
+
+	_depthImageView = CreateImageView(_depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+
+	TransitionImageLayout(_depthImage, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
 	return true;
 }
@@ -983,7 +1061,7 @@ bool flt::RendererVulkan::CreateTextureImage()
 
 bool flt::RendererVulkan::CreateTextureImageView()
 {
-	_textureImageView = CreateImageView(_textureImage, VK_FORMAT_R8G8B8A8_SRGB);
+	_textureImageView = CreateImageView(_textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
 
 	return true;
 }
@@ -1134,7 +1212,7 @@ bool flt::RendererVulkan::CreateUniformBuffers()
 		{
 			ASSERT(false, "failed to map uniform buffer memory!");
 			return false;
-			}
+		}
 
 	}
 
@@ -1211,7 +1289,7 @@ bool flt::RendererVulkan::CreateDescriptorSets()
 		descriptorWrites[0].pTexelBufferView = nullptr;
 
 		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		descriptorWrites[1].dstSet = _descriptorSets[i];	
+		descriptorWrites[1].dstSet = _descriptorSets[i];
 		descriptorWrites[1].dstBinding = 1;
 		descriptorWrites[1].dstArrayElement = 0;
 		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -1222,9 +1300,6 @@ bool flt::RendererVulkan::CreateDescriptorSets()
 
 		vkUpdateDescriptorSets(_device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 	}
-
-
-
 
 	return true;
 }
@@ -1295,6 +1370,10 @@ bool flt::RendererVulkan::CreateSyncObjects()
 
 void flt::RendererVulkan::CleanupSwapChain()
 {
+	vkDestroyImageView(_device, _depthImageView, nullptr);
+	vkDestroyImage(_device, _depthImage, nullptr);
+	vkFreeMemory(_device, _depthImageMemory, nullptr);
+
 	for (size_t i = 0; i < _swapChainFramebuffers.size(); ++i)
 	{
 		vkDestroyFramebuffer(_device, _swapChainFramebuffers[i], nullptr);
@@ -1318,6 +1397,7 @@ void flt::RendererVulkan::RecreateSwapChain()
 
 	CreateSwapChain();
 	CreateImageViews();
+	CreateDepthResources();
 	CreateFramebuffers();
 }
 
@@ -1341,9 +1421,11 @@ bool flt::RendererVulkan::RecordCommandBuffer(VkCommandBuffer commandBuffer, uin
 	renderPassInfo.renderArea.offset = { 0, 0 };
 	renderPassInfo.renderArea.extent = _swapChainExtent;
 
-	VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
-	renderPassInfo.clearValueCount = 1;
-	renderPassInfo.pClearValues = &clearColor;
+	std::array<VkClearValue, 2> clearValues{};
+	clearValues[0].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
+	clearValues[1].depthStencil = { 1.0f, 0 };
+	renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+	renderPassInfo.pClearValues = clearValues.data();
 
 	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
@@ -1524,8 +1606,8 @@ bool flt::RendererVulkan::IsDeviceSuitable(VkPhysicalDevice device)
 	VkPhysicalDeviceFeatures supportedFeatures;
 	vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
 
-	return indices.IsComplete() 
-		&& extensionsSupported 
+	return indices.IsComplete()
+		&& extensionsSupported
 		&& swapChainAdequate
 		&& supportedFeatures.samplerAnisotropy;
 }
@@ -1539,7 +1621,8 @@ SwapChainSupportDetails flt::RendererVulkan::QuerySwapChainSupport(VkPhysicalDev
 	uint32_t formatCount;
 	vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, nullptr);
 
-	if (formatCount != 0) {
+	if (formatCount != 0) 
+	{
 		details.formats.resize(formatCount);
 		vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, details.formats.data());
 	}
@@ -1547,7 +1630,8 @@ SwapChainSupportDetails flt::RendererVulkan::QuerySwapChainSupport(VkPhysicalDev
 	uint32_t presentModeCount;
 	vkGetPhysicalDeviceSurfacePresentModesKHR(device, _surface, &presentModeCount, nullptr);
 
-	if (presentModeCount != 0) {
+	if (presentModeCount != 0) 
+	{
 		details.presentModes.resize(presentModeCount);
 		vkGetPhysicalDeviceSurfacePresentModesKHR(device, _surface, &presentModeCount, details.presentModes.data());
 	}
@@ -1577,12 +1661,12 @@ QueueFamilyIndices flt::RendererVulkan::FindQueueFamilies(VkPhysicalDevice devic
 		VkBool32 presentSupport = false;
 		vkGetPhysicalDeviceSurfaceSupportKHR(device, i, _surface, &presentSupport);
 
-		if (presentSupport) 
+		if (presentSupport)
 		{
 			indices.presentFamily = i;
 		}
 
-		if (indices.IsComplete()) 
+		if (indices.IsComplete())
 		{
 			break;
 		}
@@ -1601,7 +1685,7 @@ std::optional<uint32_t> flt::RendererVulkan::FindTransferQueueFamilies(VkPhysica
 
 	for (uint32_t i = 0; i < queueFamilyCount; ++i)
 	{
-		if (queueFamilies[i].queueFlags & VK_QUEUE_TRANSFER_BIT 
+		if (queueFamilies[i].queueFlags & VK_QUEUE_TRANSFER_BIT
 			&& !(queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT))
 		{
 			return i;
@@ -1609,6 +1693,39 @@ std::optional<uint32_t> flt::RendererVulkan::FindTransferQueueFamilies(VkPhysica
 	}
 
 	return std::nullopt;
+}
+
+VkFormat flt::RendererVulkan::FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features)
+{
+	for (VkFormat format : candidates)
+	{
+		VkFormatProperties props;
+		vkGetPhysicalDeviceFormatProperties(_physicalDevice, format, &props);
+
+		if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features)
+		{
+			return format;
+		}
+		else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features)
+		{
+			return format;
+		}
+	}
+
+	ASSERT(false, "failed to find supported format!");
+	return VkFormat{};
+}
+
+VkFormat flt::RendererVulkan::FindDepthFormat()
+{
+	return FindSupportedFormat({ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT }
+		, VK_IMAGE_TILING_OPTIMAL
+		, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+}
+
+bool flt::RendererVulkan::HasStencilComponent(VkFormat format)
+{
+	return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 }
 
 VkSurfaceFormatKHR flt::RendererVulkan::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
@@ -1763,7 +1880,7 @@ bool flt::RendererVulkan::CreateImage(uint32_t width, uint32_t height, VkFormat 
 		return false;
 	}
 
-	result = vkBindImageMemory(_device, image, imageMemory, 0);	
+	result = vkBindImageMemory(_device, image, imageMemory, 0);
 	if (result != VK_SUCCESS)
 	{
 		ASSERT(false, "failed to bind image memory!");
@@ -1773,14 +1890,14 @@ bool flt::RendererVulkan::CreateImage(uint32_t width, uint32_t height, VkFormat 
 	return true;
 }
 
-VkImageView flt::RendererVulkan::CreateImageView(VkImage image, VkFormat format)
+VkImageView flt::RendererVulkan::CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags)
 {
 	VkImageViewCreateInfo viewInfo{};
 	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	viewInfo.image = image;
 	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
 	viewInfo.format = format;
-	viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	viewInfo.subresourceRange.aspectMask = aspectFlags;
 	viewInfo.subresourceRange.baseMipLevel = 0;
 	viewInfo.subresourceRange.levelCount = 1;
 	viewInfo.subresourceRange.baseArrayLayer = 0;
@@ -1866,6 +1983,24 @@ void flt::RendererVulkan::TransitionImageLayout(VkImage image, VkFormat format, 
 
 		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	}
+	else if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
+	{
+		barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+
+		if (HasStencilComponent(format))
+		{
+			barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
+		}
+
+		barrier.srcAccessMask = 0;
+		barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+		/// 깊이 버퍼의 읽기는 VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT 단계에서
+		/// 쓰기는 VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT 단계에서 이루어진다.
+		/// 이 중 더 빠른 단계인 EARLY 단계를 선택.
+		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 	}
 	else
 	{

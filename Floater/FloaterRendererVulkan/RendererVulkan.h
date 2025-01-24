@@ -65,6 +65,7 @@ namespace flt
 		bool CreateGraphicsPipeline();
 		bool CreateFramebuffers();
 		bool CreateCommandPool();
+		bool CreateDepthResources();
 		bool CreateTextureImage();
 		bool CreateTextureImageView();
 		bool CreateTextureSampler();
@@ -77,7 +78,6 @@ namespace flt
 		bool CreateSyncObjects();
 
 	private:
-
 		void CleanupSwapChain();
 		void RecreateSwapChain();
 
@@ -93,6 +93,9 @@ namespace flt
 		SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
 		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
 		std::optional<uint32_t> FindTransferQueueFamilies(VkPhysicalDevice device);
+		VkFormat FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+		VkFormat FindDepthFormat();
+		bool HasStencilComponent(VkFormat format);
 
 		VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 		VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
@@ -101,7 +104,7 @@ namespace flt
 		VkShaderModule CreateShaderModule(const std::vector<char>& code);
 		bool CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory, VkSharingMode sharingMode = VK_SHARING_MODE_EXCLUSIVE);
 		bool CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
-		VkImageView CreateImageView(VkImage image, VkFormat format);
+		VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 
 		void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 		void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
@@ -162,6 +165,10 @@ namespace flt
 		VkDescriptorPool _descriptorPool;
 		std::vector<VkDescriptorSet> _descriptorSets;
 
+		VkImage _depthImage;
+		VkDeviceMemory _depthImageMemory;
+		VkImageView _depthImageView;
+
 		VkImage _textureImage;
 		VkDeviceMemory _textureImageMemory;
 
@@ -173,5 +180,3 @@ namespace flt
 		uint32_t _currentFrame;
 	};
 }
-
-
