@@ -26,7 +26,7 @@
 
 #include <array>
 
-///불칸 테스트용 헤더
+///벌컨 테스트용 헤더
 #include "../FloaterPlatform/include/Platform.h"
 #include "../FloaterRendererVulkan/include/CreateRenderer.h"
 

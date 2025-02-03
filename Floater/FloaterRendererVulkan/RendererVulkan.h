@@ -53,28 +53,139 @@ namespace flt
 
 	private:
 		/// Initialization functions
+
+		/// <summary>
+		/// 벌컨 인스턴스를 생성합니다.
+		/// 전역을 사용할 확장을 설정합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool CreateInstance();
+
+		/// <summary>
+		/// 디버그 메신저를 설정합니다.
+		/// 콜백 함수를 등록하고 받을 메세지의 종류를 설정합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool SetupDebugMessenger();
+
+		/// <summary>
+		/// 그려질 윈도우 surface를 생성합니다.
+		/// </summary>
+		/// <param name="hwnd"></param>
+		/// <returns></returns>
 		bool CreateWin32Surface(HWND hwnd);
+
+		/// <summary>
+		/// 사용할 그래픽 카드를 선택해 물리 디바이스를 생성합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool PickPhysicalDevice();
+
+		/// <summary>
+		/// 사용할 큐 패밀리를 선택해 디바이스를 생성합니다.
+		/// 생성한 디바이스로 큐를 생성합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool CreateLogicalDevice();
+
+		/// <summary>
+		/// 생성한 surface에 맞는 스왑체인을 생성합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool CreateSwapChain();
+
+		/// <summary>
+		/// 스왑체인 Image에 대한 ImageView를 생성합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool CreateImageViews();
+
+		/// <summary>
+		/// 렌더 패스를 생성합니다.
+		/// 사용할 attachment, subpass간 의존등을 설정합니다.
+		/// RenderPass
+		///  └─ SubPass(1개 이상)
+		///	  └─ PipeLine(1개 이상)
+		/// </summary>
+		/// <returns></returns>
 		bool CreateRenderPass();
+
+		/// <summary>
+		/// DescriptorSetLayout을 생성합니다.
+		/// 파이프라인이 리소스에 엑세스 하는 데 사용할 DescriptorSet의 구조를 정의합니다.
+		/// DescriptorSet과 PipelineLayout을 만들 때 사용합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool CreateDescriptorSetLayout();
+
+		/// <summary>
+		/// GraphicsPipeline을 생성합니다.
+		/// 실제 렌더링 방식을 정의합니다.
+		/// 파이프라인은 고정되며 셰이더 등을 변경해야 한다면 다른 파이프라인 객체를 사용해야 합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool CreateGraphicsPipeline();
+
+		/// <summary>
+		/// RenderPass의 RenderTarget으로 사용되는 attachment를 나타내는 framebuffer를 생성합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool CreateFramebuffers();
+
+		/// <summary>
+		/// command buffer가 사용할 메모리를 할당해 주는 command pool을 생성합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool CreateCommandPool();
+
+		/// <summary>
+		/// depthbuffer에 사용할 image, image memory, imageview를 생성합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool CreateDepthResources();
+
+		/// <summary>
+		/// texture를 위한 image, image memory를 생성합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool CreateTextureImage();
+
 		bool CreateTextureImageView();
+
+		/// <summary>
+		/// sampler를 생성합니다.
+		/// 비등방성 필터링을 사용하려면 physical device에서 samplerAnisotropy를 지원하는지 확인 하고
+		/// device 에서 deviceFeatures.samplerAnisotropy = VK_TRUE; 를 설정 해야 합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool CreateTextureSampler();
+
+		/// <summary>
+		/// 버텍스 버퍼를 생성합니다.
+		/// cpu에서 접근 하기 유리한 staging 버퍼에 데이터를 복사하고
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		bool CreateVertexBuffer();
+
 		bool CreateIndexBuffer();
+
 		bool CreateUniformBuffers();
+
+		/// <summary>
+		/// DescriptorSet이 사용할 메모리를 할당해 주는 DescriptorPool을 생성합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool CreateDescriptorPool();
+
+		/// <summary>
+		/// 유니폼 버퍼, 이미지, 샘플러 등 GPU리소스에 대한 참조를 가진 DescriptorSet을 생성합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool CreateDescriptorSets();
+
 		bool CreateCommandBuffer();
+
 		bool CreateSyncObjects();
 
 	private:
@@ -86,6 +197,9 @@ namespace flt
 
 		VkCommandBuffer BeginSingleTimeCommands();
 		void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
+
+		VkCommandBuffer BeginSingleTimeTransferCommands();
+		void EndSingleTimeTransferCommands(VkCommandBuffer commandBuffer);
 
 		bool CheckValidationLayerSupport();
 		bool CheckDeviceExtensionSupport(VkPhysicalDevice device);

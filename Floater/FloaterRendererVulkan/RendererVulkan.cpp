@@ -70,18 +70,35 @@ VKAPI_ATTR VkBool32 VKAPI_CALL flt::RendererVulkan::DebugCallback(VkDebugUtilsMe
 {
 	if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 	{
-		std::cerr << "ERROR  " << pCallbackData->pMessage << std::endl;
+		std::cerr << "ERROR  ";
 	}
 	else if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
 	{
-		std::cerr << "WARNING  " << pCallbackData->pMessage << std::endl;
+		std::cerr << "WARNING  ";
 	}
 	else
 	{
-		std::cerr << "INFO  " << pCallbackData->pMessage << std::endl;
+		std::cerr << "INFO  ";
 	}
 
-	//std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+	if ((messageType & VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT) == VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT)
+	{
+		std::cerr << "GENERAL  ";
+	}
+	else if ((messageType & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT) == VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT)
+	{
+		std::cerr << "VALIDATION  ";
+	}
+	else if ((messageType & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT) == VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT)
+	{
+		std::cerr << "PERFORMANCE  ";
+	}
+	else if ((messageType & VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT) == VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT)
+	{
+		std::cerr << "DEVICE ADDRESS BINDING  ";
+	}
+
+	std::cerr << pCallbackData->pMessage << std::endl;
 
 	return VK_FALSE;
 }
@@ -289,7 +306,7 @@ bool flt::RendererVulkan::Finalize()
 
 	if (_enableValidationLayers)
 	{
-		//DestroyDebugUtilsMessengerEXT(_instance, _debugMessenger, nullptr);
+		DestroyDebugUtilsMessengerEXT(_instance, _debugMessenger, nullptr);
 		_debugMessenger = VK_NULL_HANDLE;
 	}
 
@@ -408,6 +425,25 @@ bool flt::RendererVulkan::Resize(uint32 width, uint32 height)
 
 bool flt::RendererVulkan::CreateInstance()
 {
+	/// 지원하는 확장기능 확인
+	{
+		uint32_t extensionCount = 0;
+		vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+
+		std::vector<VkExtensionProperties> e(extensionCount);
+		VkResult result = vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, e.data());
+
+		if (result != VK_SUCCESS && result != VK_INCOMPLETE)
+		{
+			return false;
+		}
+
+		for (uint32_t i = 0; i < extensionCount; ++i)
+		{
+			std::cout << e[i].extensionName << std::endl;
+		}
+	}
+
 	if (_enableValidationLayers)
 	{
 		if (!CheckValidationLayerSupport())
@@ -417,7 +453,8 @@ bool flt::RendererVulkan::CreateInstance()
 		}
 	}
 
-	/// 불칸 인스턴스 생성
+	/// 벌컨 인스턴스 생성
+	// 엔진 이름 등을 넣어주는 이유는 잘 알려진 엔진의 경우 드라이버 단에서 최적화가 될 수도 있기 때문에.
 	VkApplicationInfo appInfo{};
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	appInfo.pApplicationName = "Hello Vulkan";
@@ -430,6 +467,7 @@ bool flt::RendererVulkan::CreateInstance()
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	createInfo.pApplicationInfo = &appInfo;
 
+	// 전역으로 사용할 확장을 세팅
 	std::vector<const char*> extensions = { "VK_KHR_surface", "VK_KHR_win32_surface" };
 	if (_enableValidationLayers)
 	{
@@ -512,7 +550,7 @@ bool flt::RendererVulkan::PickPhysicalDevice()
 
 	if (deviceCount == 0) {
 		return false;
-		throw std::runtime_error("failed to find GPUs with Vulkan support!");
+		//throw std::runtime_error("failed to find GPUs with Vulkan support!");
 	}
 
 	std::vector<VkPhysicalDevice> devices(deviceCount);
@@ -1115,7 +1153,7 @@ bool flt::RendererVulkan::CreateVertexBuffer()
 		, VK_BUFFER_USAGE_TRANSFER_SRC_BIT
 		, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 		, stagingBuffer
-		, stagingBufferMemory, VK_SHARING_MODE_CONCURRENT);
+		, stagingBufferMemory, VK_SHARING_MODE_EXCLUSIVE);
 	if (!result)
 	{
 		return false;
@@ -1155,7 +1193,7 @@ bool flt::RendererVulkan::CreateIndexBuffer()
 		, VK_BUFFER_USAGE_TRANSFER_SRC_BIT
 		, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 		, stagingBuffer
-		, stagingBufferMemory, VK_SHARING_MODE_CONCURRENT);
+		, stagingBufferMemory, VK_SHARING_MODE_EXCLUSIVE);
 	if (!result)
 	{
 		return false;
@@ -1222,9 +1260,9 @@ bool flt::RendererVulkan::CreateUniformBuffers()
 bool flt::RendererVulkan::CreateDescriptorPool()
 {
 	/// 부적절한 DescriptorPool일 경우 검증 레이어에서 잡지 못할 수 있다.
-	/// 불칸 1.1부터 vaAllocateDescriptorSets은 pool이 충분히 크지 않은 경우 VK_ERROR_POOL_OUT_OF_MEMORY와 함께 실패할 수 있다.
+	/// 벌컨 1.1부터 vaAllocateDescriptorSets은 pool이 충분히 크지 않은 경우 VK_ERROR_POOL_OUT_OF_MEMORY와 함께 실패할 수 있다.
 	/// 하지만 하드웨어에 따라서 드라이버가 내부적으로 문제를 해결하려고 시도할 수도 있다.(즉 실패하지 않을 수 있다.)
-	/// 불칸은 할당에 대한 책임을 드라이버로 전환하기 때문.
+	/// 벌컨은 할당에 대한 책임을 드라이버로 전환하기 때문.
 	std::array<VkDescriptorPoolSize, 2> poolSizes{};
 	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
@@ -1517,6 +1555,41 @@ void flt::RendererVulkan::EndSingleTimeCommands(VkCommandBuffer commandBuffer)
 	vkQueueWaitIdle(_graphicsQueue);
 
 	vkFreeCommandBuffers(_device, _commandPool, 1, &commandBuffer);
+}
+
+VkCommandBuffer flt::RendererVulkan::BeginSingleTimeTransferCommands()
+{
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandPool = _transferCommandPool;
+	allocInfo.commandBufferCount = 1;
+
+	VkCommandBuffer commandBuffer;
+	vkAllocateCommandBuffers(_device, &allocInfo, &commandBuffer);
+
+	VkCommandBufferBeginInfo beginInfo{};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+	return commandBuffer;
+}
+
+void flt::RendererVulkan::EndSingleTimeTransferCommands(VkCommandBuffer commandBuffer)
+{
+	vkEndCommandBuffer(commandBuffer);
+
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &commandBuffer;
+
+	vkQueueSubmit(_transferQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(_transferQueue);
+
+	vkFreeCommandBuffers(_device, _transferCommandPool, 1, &commandBuffer);
 }
 
 bool flt::RendererVulkan::CheckValidationLayerSupport()
@@ -1915,13 +1988,16 @@ VkImageView flt::RendererVulkan::CreateImageView(VkImage image, VkFormat format,
 
 void flt::RendererVulkan::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 {
-	VkCommandBuffer commandBuffer = BeginSingleTimeCommands();
+	//VkCommandBuffer commandBuffer = BeginSingleTimeCommands();
+
+	VkCommandBuffer commandBuffer = BeginSingleTimeTransferCommands();
 
 	VkBufferCopy copyRegion{};
 	copyRegion.size = size;
 	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
-	EndSingleTimeCommands(commandBuffer);
+	EndSingleTimeTransferCommands(commandBuffer);
+	//EndSingleTimeCommands(commandBuffer);
 }
 
 void flt::RendererVulkan::CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height)
