@@ -15,6 +15,9 @@
 /// vkCmdBindVertexBuffers, vkCmdBindIndexBuffer를 사용하여 오프셋을 이용해 여러 버퍼를 바인딩하는 방법을 알아보자.
 /// 또한 앨리어싱(aliasing) 기법을 사용하여 버퍼를 관리하는 방법을 알아보자.
 
+/// <summary>
+/// 
+/// </summary>
 struct QueueFamilyIndices
 {
 	std::optional<uint32_t> graphicsFamily;
@@ -51,6 +54,9 @@ namespace flt
 		virtual bool SetFullScreen(bool isFullScreen);
 		virtual bool Resize(uint32 width, uint32 height);
 
+	/// <summary>
+	/// 초기화에 사용하는 함수들
+	/// </summary>
 	private:
 		/// Initialization functions
 
@@ -150,6 +156,10 @@ namespace flt
 		/// <returns></returns>
 		bool CreateTextureImage();
 
+		/// <summary>
+		/// texture image view를 생성합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool CreateTextureImageView();
 
 		/// <summary>
@@ -163,13 +173,24 @@ namespace flt
 		/// <summary>
 		/// 버텍스 버퍼를 생성합니다.
 		/// cpu에서 접근 하기 유리한 staging 버퍼에 데이터를 복사하고
-		/// 
+		/// transferQueue를 통해 gpu에서 접근 가능한 버퍼로 복사합니다.
 		/// </summary>
 		/// <returns></returns>
 		bool CreateVertexBuffer();
 
+		/// <summary>
+		/// 인덱스 버퍼를 생성합니다.
+		/// cpu에서 접근 하기 유리한 staging 버퍼에 데이터를 복사하고
+		/// transferQueue를 통해 gpu에서 접근 가능한 버퍼로 복사합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool CreateIndexBuffer();
 
+		/// <summary>
+		/// 유니폼 버퍼를 생성합니다.
+		/// 프레임 개수만큼 생성합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool CreateUniformBuffers();
 
 		/// <summary>
@@ -184,10 +205,23 @@ namespace flt
 		/// <returns></returns>
 		bool CreateDescriptorSets();
 
+		/// <summary>
+		/// graphics/present, transfer 용 command buffer를 생성합니다.
+		/// </summary>
+		/// <returns></returns>
 		bool CreateCommandBuffer();
 
+		/// <summary>
+		/// 렌더링을 위한 Semaphore와 Fences를 생성합니다.
+		/// Semaphore는 gpu내 동기화를 위한 객체이며
+		/// Fences는 cpu와 gpu간 동기화를 위한 객체입니다.
+		/// </summary>
+		/// <returns></returns>
 		bool CreateSyncObjects();
 
+	/// <summary>
+	/// 내부에서 사용하는 헬퍼 함수들
+	/// </summary>
 	private:
 		void CleanupSwapChain();
 		void RecreateSwapChain();

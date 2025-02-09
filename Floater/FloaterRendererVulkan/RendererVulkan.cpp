@@ -111,7 +111,8 @@ std::vector<char> flt::RendererVulkan::ReadFile(const std::string& filename)
 
 	if (!file.is_open())
 	{
-		throw std::runtime_error("failed to open file!");
+		ASSERT(false, "failed to open file!");
+		return std::vector<char>{};
 	}
 
 	size_t fileSize = (size_t)file.tellg();
@@ -548,9 +549,10 @@ bool flt::RendererVulkan::PickPhysicalDevice()
 	uint32_t deviceCount = 0;
 	vkEnumeratePhysicalDevices(_instance, &deviceCount, nullptr);
 
-	if (deviceCount == 0) {
+	if (deviceCount == 0) 
+	{
+		ASSERT(false, "failed to find GPUs with Vulkan support!");
 		return false;
-		//throw std::runtime_error("failed to find GPUs with Vulkan support!");
 	}
 
 	std::vector<VkPhysicalDevice> devices(deviceCount);
@@ -565,9 +567,10 @@ bool flt::RendererVulkan::PickPhysicalDevice()
 		}
 	}
 
-	if (_physicalDevice == VK_NULL_HANDLE) {
+	if (_physicalDevice == VK_NULL_HANDLE)
+	{
+		ASSERT(false, "failed to find a suitable GPU!");
 		return false;
-		//throw std::runtime_error("failed to find a suitable GPU!");
 	}
 
 	return true;
@@ -1361,7 +1364,18 @@ bool flt::RendererVulkan::CreateCommandBuffer()
 	}
 
 	///// transfer용 command buffer 생성
-	//VkCommandBufferAllocateInfo transferAllocInfo{};
+	VkCommandBufferAllocateInfo transferAllocInfo{};
+	transferAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	transferAllocInfo.commandPool = _transferCommandPool;
+	transferAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	transferAllocInfo.commandBufferCount = 1;
+
+	result = vkAllocateCommandBuffers(_device, &transferAllocInfo, &_transferCommandBuffer);
+	if (result != VK_SUCCESS)
+	{
+		ASSERT(false, "failed to allocate transfer command buffer!");
+		return false;
+	}
 
 	return true;
 }
@@ -1864,7 +1878,6 @@ VkShaderModule flt::RendererVulkan::CreateShaderModule(const std::vector<char>& 
 	if (result != VK_SUCCESS)
 	{
 		ASSERT(false, "failed to create shader module!");
-		throw std::runtime_error("failed to create shader module!");
 	}
 
 	return shaderModule;
@@ -1914,7 +1927,8 @@ bool flt::RendererVulkan::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usa
 	return true;
 }
 
-bool flt::RendererVulkan::CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory)
+bool flt::RendererVulkan::CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties
+	, VkImage& image, VkDeviceMemory& imageMemory)
 {
 	VkImageCreateInfo imageInfo{};
 	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
