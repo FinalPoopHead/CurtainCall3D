@@ -1172,7 +1172,7 @@ bool flt::RendererVulkan::CreateVertexBuffer()
 		, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT
 		, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
 		, _vertexBuffer
-		, _vertexBufferMemory, VK_SHARING_MODE_CONCURRENT);
+		, _vertexBufferMemory, VK_SHARING_MODE_EXCLUSIVE);
 	if (!result)
 	{
 		return false;
@@ -1211,7 +1211,7 @@ bool flt::RendererVulkan::CreateIndexBuffer()
 		, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT
 		, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
 		, _indexBuffer
-		, _indexBufferMemory, VK_SHARING_MODE_CONCURRENT);
+		, _indexBufferMemory, VK_SHARING_MODE_EXCLUSIVE);
 	if (!result)
 	{
 		return false;
