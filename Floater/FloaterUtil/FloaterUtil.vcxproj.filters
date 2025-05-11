@@ -118,6 +118,9 @@
     <ClInclude Include="FSM.h">
       <Filter>FSM</Filter>
     </ClInclude>
+    <ClInclude Include="Optional.h">
+      <Filter>Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConvString.cpp">

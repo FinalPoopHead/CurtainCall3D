@@ -180,6 +180,7 @@
     <ClInclude Include="include\OwningPtr.h" />
     <ClInclude Include="include\Perlin.h" />
     <ClInclude Include="include\StaticArray.h" />
+    <ClInclude Include="Optional.h" />
     <ClInclude Include="TesterFixedSizeMemoryPool.h" />
     <ClInclude Include="TesterRBTree.h" />
     <ClInclude Include="include\UUID.h" />
