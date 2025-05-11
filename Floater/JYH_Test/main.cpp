@@ -71,16 +71,18 @@ int main(int argc, char* argv[])
 	}*/
 
 	/// 로그 테스트
-	/*{
+	{
 		std::wstring str = L"Hello {}!";
 		std::wstring str2 = L"hi";
 		flt::Info(str, L"World");
-
+		//flt::Info(str2); -> C++ 규칙으로 사용 불가능
+		flt::Info{ str2 };
+		flt::Info(L"Test");
 		flt::Info(L"Debug Test {}, {:2}, {}", 156, 2.12345f, str2);
 		//auto arr = std::make_wformat_args(unmove(1));
 		//auto arr = std::make_wformat_args(unmove(2.1f));
 		//auto arr = std::make_wformat_args(unmove(L"finished"));
-	}*/
+	}
 
 	/// 베지어 테스트
 	/*{
