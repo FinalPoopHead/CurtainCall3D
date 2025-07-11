@@ -8,6 +8,7 @@
 
 
 #pragma comment(lib, "vulkan-1.lib")
+#pragma comment(lib, "spirv-reflect-static.lib")
 
 /// TODO : 커스텀 메모리 allocator 구현 (buddy allocator)
 /// TODO : 버퍼 복사를 위한 커맨트 풀 분리(이 경우 장점 확인), transfer 전용 queue

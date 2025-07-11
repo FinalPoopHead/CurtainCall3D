@@ -19,6 +19,9 @@
     <Filter Include="GLSL\old">
       <UniqueIdentifier>{9499d95b-afba-43a2-a327-1c9859bc8630}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HLSL">
+      <UniqueIdentifier>{bde3a30d-48eb-47c4-9343-65c510672035}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

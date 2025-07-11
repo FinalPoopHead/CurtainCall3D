@@ -135,13 +135,13 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\External\include\vulkan\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\External\include\vulkan\;$(ProjectDir)..\External\include\spirv_reflect\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\External\lib\$(Platform)\$(Configuration)\vulkan;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\External\lib\$(Platform)\$(Configuration)\vulkan;$(ProjectDir)..\External\lib\$(Platform)\$(Configuration)\spirv_reflect</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -155,7 +155,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\External\include\vulkan\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\External\include\vulkan\;$(ProjectDir)..\External\include\spirv_reflect\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -163,7 +163,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\External\lib\$(Platform)\$(Configuration)\vulkan;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\External\lib\$(Platform)\$(Configuration)\vulkan;$(ProjectDir)..\External\lib\$(Platform)\$(Configuration)\spirv_reflect</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

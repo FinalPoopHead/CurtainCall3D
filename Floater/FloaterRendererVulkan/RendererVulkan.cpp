@@ -1,6 +1,7 @@
 ﻿#include "RendererVulkan.h"
 
 #include "vulkan/vulkan_win32.h"
+#include "spirv_reflect.h"
 #include <fstream>
 #include <filesystem>
 #include <set>
