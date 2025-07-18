@@ -93,7 +93,7 @@ void flt::RendererComponent::SetFilePath(const std::wstring& path)
 {
 	std::filesystem::path p(path);
 	ASSERT(std::filesystem::exists(p), "File not found");
-	RenderableBuilder builder(path);
+	RendererNodeBuilder builder(path);
 	_resource.Set(builder);
 	_rendererObject->SetRawNode(_resource.Get()->node);
 

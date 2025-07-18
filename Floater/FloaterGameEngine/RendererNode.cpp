@@ -2,7 +2,7 @@
 #include "../FloaterRendererCommon/include/ModelLoader.h"
 #include "../FloaterRendererCommon/include/IRenderer.h"
 
-flt::RendererNode* flt::RenderableBuilder::build() const
+flt::RendererNode* flt::RendererNodeBuilder::build() const
 {
 	flt::ModelLoader loader;
 	flt::RawScene rawScene;

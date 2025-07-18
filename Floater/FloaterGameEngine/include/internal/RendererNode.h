@@ -21,10 +21,10 @@ namespace flt
 
 	template struct Resource<RendererNode>;
 
-	struct RenderableBuilder : public IBuilder<RendererNode>
+	struct RendererNodeBuilder : public IBuilder<RendererNode>
 	{
-		RenderableBuilder(const std::wstring& filePath) : IBuilder<RendererNode>(filePath), filePath(filePath) {}
-		RenderableBuilder(const RenderableBuilder& other) = delete;
+		RendererNodeBuilder(const std::wstring& filePath) : IBuilder<RendererNode>(filePath), filePath(filePath) {}
+		RendererNodeBuilder(const RendererNodeBuilder& other) = delete;
 
 		virtual RendererNode* build() const override;
 
