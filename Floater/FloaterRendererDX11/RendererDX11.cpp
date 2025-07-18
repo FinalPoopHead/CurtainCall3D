@@ -1,6 +1,7 @@
 ﻿#include "RendererDX11.h"
 #include "../FloaterUtil/include/FloaterMacro.h"
 #include "../FloaterRendererCommon/include/ResourceMgr.h"
+#include "../FloaterRendererCommon/include/Camera.h"
 #include "DX11VSConstantBuffer.h"
 #include "DX11Mesh.h"
 #include <DirectXColors.h>

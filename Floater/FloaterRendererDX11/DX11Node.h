@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include "../FloaterRendererCommon/include/Transform.h"
-#include "../FloaterRendererCommon/include/Camera.h"
-#include "../FloaterRendererCommon/include/RawNode.h"
+//#include "../FloaterRendererCommon/include/Transform.h"
+//#include "../FloaterRendererCommon/include/Camera.h"
+//#include "../FloaterRendererCommon/include/RawNode.h"
 #include "DX11Mesh.h"
 #include "DX11Skeleton.h"
 
@@ -11,6 +11,9 @@
 
 namespace flt
 {
+	class Transform;
+	class Camera;
+
 	struct DX11Node
 	{
 #pragma region Nasted
