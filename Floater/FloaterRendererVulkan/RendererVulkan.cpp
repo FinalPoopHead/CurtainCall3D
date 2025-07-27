@@ -9,6 +9,7 @@
 
 #include "VulkanVertex.h"
 #include "../FloaterRendererCommon/include/Camera.h"
+#include "VulkanNode.h"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -33,7 +34,7 @@ struct UniformBufferObjectGLM
 	glm::mat4 proj;
 };
 
-const std::vector<flt::VulkanVertex> vertices =
+const std::vector<flt::VulkanVertex> g_vertices =
 {
 	{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
 	{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
@@ -46,7 +47,7 @@ const std::vector<flt::VulkanVertex> vertices =
 	{{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
 };
 
-const std::vector<uint16_t> indices =
+const std::vector<uint16_t> g_indices =
 {
 	0, 1, 2,
 	2, 3, 0,
@@ -399,6 +400,50 @@ bool flt::RendererVulkan::Render(float deltaTime)
 
 flt::HOBJECT flt::RendererVulkan::RegisterObject(RendererObject& renderable)
 {
+	if (renderable.camera)
+	{
+		_cameras.push_back(renderable.camera);
+	}
+
+	if (renderable.node)
+	{
+	}
+	//VkDeviceSize bufferSize = sizeof(g_vertices[0]) * g_vertices.size();
+
+	//VkBuffer stagingBuffer{};
+	//VkDeviceMemory stagingBufferMemory{};
+	//bool result = CreateBuffer(
+	//	bufferSize
+	//	, VK_BUFFER_USAGE_TRANSFER_SRC_BIT
+	//	, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+	//	, stagingBuffer
+	//	, stagingBufferMemory, VK_SHARING_MODE_EXCLUSIVE);
+	//if (!result)
+	//{
+	//	return false;
+	//}
+
+	//void* data;
+	//vkMapMemory(_device, stagingBufferMemory, 0, bufferSize, 0, &data);
+	//memcpy(data, g_vertices.data(), (size_t)bufferSize);
+	//vkUnmapMemory(_device, stagingBufferMemory);
+
+	//result = CreateBuffer(
+	//	bufferSize
+	//	, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT
+	//	, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+	//	, _vertexBuffer
+	//	, _vertexBufferMemory, VK_SHARING_MODE_EXCLUSIVE);
+	//if (!result)
+	//{
+	//	return false;
+	//}
+
+	//CopyBuffer(stagingBuffer, _vertexBuffer, bufferSize);
+
+	//vkDestroyBuffer(_device, stagingBuffer, nullptr);
+	//vkFreeMemory(_device, stagingBufferMemory, nullptr);
+
 	return HOBJECT();
 }
 
@@ -520,7 +565,7 @@ bool flt::RendererVulkan::SetupDebugMessenger()
 	createInfo.pfnUserCallback = DebugCallback;
 
 	VkResult result = CreateDebugUtilsMessengerEXT(_instance, &createInfo, nullptr, &_debugMessenger);
-	if (result != VK_SUCCESS) 
+	if (result != VK_SUCCESS)
 	{
 		return false;
 	}
@@ -550,7 +595,7 @@ bool flt::RendererVulkan::PickPhysicalDevice()
 	uint32_t deviceCount = 0;
 	vkEnumeratePhysicalDevices(_instance, &deviceCount, nullptr);
 
-	if (deviceCount == 0) 
+	if (deviceCount == 0)
 	{
 		ASSERT(false, "failed to find GPUs with Vulkan support!");
 		return false;
@@ -820,6 +865,304 @@ bool flt::RendererVulkan::CreateGraphicsPipeline()
 	std::vector<char> vertShaderCode = ReadFile("shaders/vert.spv");
 	std::vector<char> fragShaderCode = ReadFile("shaders/frag.spv");
 
+	//버텍스 셰이더 리플렉션
+	{
+		SpvReflectShaderModule vertSpvReflectModule{};
+		SpvReflectResult result = spvReflectCreateShaderModule(vertShaderCode.size(), vertShaderCode.data(), &vertSpvReflectModule);
+		if (result != SPV_REFLECT_RESULT_SUCCESS)
+		{
+			ASSERT(false, "failed to reflect vertex shader module!");
+			return false;
+		}
+
+		uint32_t inputCount = 0;
+		result = spvReflectEnumerateInputVariables(&vertSpvReflectModule, &inputCount, nullptr);
+		if (result != SPV_REFLECT_RESULT_SUCCESS)
+		{
+			ASSERT(false, "failed to enumerate input variables in vertex shader!");
+			return false;
+		}
+
+		std::vector<SpvReflectInterfaceVariable*> inputVariables(inputCount);
+		result = spvReflectEnumerateInputVariables(&vertSpvReflectModule, &inputCount, inputVariables.data());
+		if (result != SPV_REFLECT_RESULT_SUCCESS)
+		{
+			ASSERT(false, "failed to enumerate input variables in vertex shader!");
+			return false;
+		}
+
+
+		std::vector<VkVertexInputAttributeDescription> vertexInputAttributes;
+		uint32_t finalOffset = 0;
+		for (const SpvReflectInterfaceVariable* inputVariable : inputVariables)
+		{
+			uint32_t offset = 0;
+			VkFormat format = VK_FORMAT_UNDEFINED;
+			switch (inputVariable->format)
+			{
+				case SPV_REFLECT_FORMAT_R16_UINT:
+				{
+					format = VK_FORMAT_R16_UINT;
+					offset = 2;
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R16_SINT:
+				{
+					format = VK_FORMAT_R16_SINT;
+					offset = 2;
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R16_SFLOAT:
+				{
+					format = VK_FORMAT_R16_SFLOAT;
+					offset = 2;
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R16G16_UINT:
+				{
+					format = VK_FORMAT_R16G16_UINT;
+					offset = 4;
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R16G16_SINT:
+				{
+					format = VK_FORMAT_R16G16_SINT;
+					offset = 4;
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R16G16_SFLOAT:
+				{
+					format = VK_FORMAT_R16G16_SFLOAT;
+					offset = 4;
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R16G16B16_UINT:
+				{
+					format = VK_FORMAT_R16G16B16_UINT;
+					offset = 6;
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R16G16B16_SINT:
+				{
+					format = VK_FORMAT_R16G16B16_SINT;
+					offset = 6;
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R16G16B16_SFLOAT:
+				{
+					format = VK_FORMAT_R16G16B16_SFLOAT;
+					offset = 6;
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R16G16B16A16_UINT:
+				{
+					format = VK_FORMAT_R16G16B16A16_UINT;
+					offset = 8;
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R16G16B16A16_SINT:
+				{
+					format = VK_FORMAT_R16G16B16A16_SINT;
+					offset = 8;
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R16G16B16A16_SFLOAT:
+				{
+					format = VK_FORMAT_R16G16B16A16_SFLOAT;
+					offset = 8;
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R32_UINT:
+				{
+					format = VK_FORMAT_R32_UINT; 
+					offset = 4; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R32_SINT:
+				{
+					format = VK_FORMAT_R32_SINT; 
+					offset = 4; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R32_SFLOAT:
+				{
+					format = VK_FORMAT_R32_SFLOAT; 
+					offset = 4; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R32G32_UINT:
+				{
+					format = VK_FORMAT_R32G32_UINT; 
+					offset = 8; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R32G32_SINT:
+				{
+					format = VK_FORMAT_R32G32_SINT; 
+					offset = 8; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R32G32_SFLOAT:
+				{
+					format = VK_FORMAT_R32G32_SFLOAT; offset = 8; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R32G32B32_UINT:
+				{
+					format = VK_FORMAT_R32G32B32_UINT; 
+					offset = 12; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R32G32B32_SINT:
+				{
+					format = VK_FORMAT_R32G32B32_SINT; 
+					offset = 12; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R32G32B32_SFLOAT:
+				{
+					format = VK_FORMAT_R32G32B32_SFLOAT; 
+					offset = 12; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R32G32B32A32_UINT:
+				{
+					format = VK_FORMAT_R32G32B32A32_UINT; 
+					offset = 16; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R32G32B32A32_SINT:
+				{
+					format = VK_FORMAT_R32G32B32A32_SINT; offset = 16; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R32G32B32A32_SFLOAT:
+				{
+					format = VK_FORMAT_R32G32B32A32_SFLOAT; 
+					offset = 16; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R64_UINT:
+				{
+					format = VK_FORMAT_R64_UINT; 
+					offset = 8; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R64_SINT:
+				{
+					format = VK_FORMAT_R64_SINT; 
+					offset = 8; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R64_SFLOAT:
+				{
+					format = VK_FORMAT_R64_SFLOAT; 
+					offset = 8; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R64G64_UINT:
+				{
+					format = VK_FORMAT_R64G64_UINT; 
+					offset = 16; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R64G64_SINT:
+				{
+					format = VK_FORMAT_R64G64_SINT; 
+					offset = 16; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R64G64_SFLOAT:
+				{
+					format = VK_FORMAT_R64G64_SFLOAT; 
+					offset = 16; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R64G64B64_UINT:
+				{
+					format = VK_FORMAT_R64G64B64_UINT;
+					offset = 24; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R64G64B64_SINT:
+				{
+					format = VK_FORMAT_R64G64B64_SINT; 
+					offset = 24; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R64G64B64_SFLOAT:
+				{
+					format = VK_FORMAT_R64G64B64_SFLOAT; 
+					offset = 24; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R64G64B64A64_UINT:
+				{
+					format = VK_FORMAT_R64G64B64A64_UINT; 
+					offset = 32; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R64G64B64A64_SINT:
+				{
+					format = VK_FORMAT_R64G64B64A64_SINT; 
+					offset = 32; 
+					break;
+				}
+				case SPV_REFLECT_FORMAT_R64G64B64A64_SFLOAT:
+				{
+					format = VK_FORMAT_R64G64B64A64_SFLOAT;
+					offset = 32; 
+					break;
+				}
+				default:
+				{
+					ASSERT(false, "unsupported vertex attribute format in shader!");
+					return false;
+				}
+			}
+
+			VkVertexInputAttributeDescription attributeDescription{};
+			attributeDescription.location = inputVariable->location;
+			attributeDescription.binding = 0; // 버텍스 바인딩은 일단 0으로 고정.
+			attributeDescription.format = format;
+			attributeDescription.offset = finalOffset;
+			finalOffset += offset;
+			vertexInputAttributes.push_back(attributeDescription);
+		}
+
+		uint32_t setCount = 0;
+		result = spvReflectEnumerateDescriptorSets(&vertSpvReflectModule, &setCount, nullptr);
+		if (result != SPV_REFLECT_RESULT_SUCCESS)
+		{
+			ASSERT(false, "failed to enumerate descriptor sets in vertex shader!");
+			return false;
+		}
+		std::vector<SpvReflectDescriptorSet*> descriptorSets(setCount);
+		result = spvReflectEnumerateDescriptorSets(&vertSpvReflectModule, &setCount, descriptorSets.data());
+		if (result != SPV_REFLECT_RESULT_SUCCESS)
+		{
+			ASSERT(false, "failed to enumerate descriptor sets in vertex shader!");
+			return false;
+		}
+
+		for (const SpvReflectDescriptorSet* descriptorSet : descriptorSets)
+		{
+			for (uint32_t bindingIndex = 0; bindingIndex < descriptorSet->binding_count; ++bindingIndex)
+			{
+				const SpvReflectDescriptorBinding* binding = descriptorSet->bindings[bindingIndex];
+				if (binding->descriptor_type == SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
+				{
+					if (binding->set != 0 || binding->binding != 0)
+					{
+						ASSERT(false, "unexpected descriptor set or binding in vertex shader!");
+						return false;
+					}
+				}
+			}
+		}
+	}
+
+
 	VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
 	VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);
 
@@ -841,6 +1184,7 @@ bool flt::RendererVulkan::CreateGraphicsPipeline()
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	vertexInputInfo.vertexBindingDescriptionCount = 0;
 	vertexInputInfo.vertexAttributeDescriptionCount = 0;
+
 	auto bindingDescription = VulkanVertex::GetBindingDescription();
 	auto attributeDescriptions = VulkanVertex::GetAttributeDescriptions();
 	vertexInputInfo.vertexBindingDescriptionCount = 1;
@@ -1148,6 +1492,47 @@ bool flt::RendererVulkan::CreateTextureSampler()
 
 bool flt::RendererVulkan::CreateVertexBuffer()
 {
+	VkDeviceSize bufferSize = sizeof(g_vertices[0]) * g_vertices.size();
+
+	VkBuffer stagingBuffer{};
+	VkDeviceMemory stagingBufferMemory{};
+	bool result = CreateBuffer(
+		bufferSize
+		, VK_BUFFER_USAGE_TRANSFER_SRC_BIT
+		, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+		, stagingBuffer
+		, stagingBufferMemory, VK_SHARING_MODE_EXCLUSIVE);
+	if (!result)
+	{
+		return false;
+	}
+
+	void* data;
+	vkMapMemory(_device, stagingBufferMemory, 0, bufferSize, 0, &data);
+	memcpy(data, g_vertices.data(), (size_t)bufferSize);
+	vkUnmapMemory(_device, stagingBufferMemory);
+
+	result = CreateBuffer(
+		bufferSize
+		, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT
+		, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+		, _vertexBuffer
+		, _vertexBufferMemory, VK_SHARING_MODE_EXCLUSIVE);
+	if (!result)
+	{
+		return false;
+	}
+
+	CopyBuffer(stagingBuffer, _vertexBuffer, bufferSize);
+
+	vkDestroyBuffer(_device, stagingBuffer, nullptr);
+	vkFreeMemory(_device, stagingBufferMemory, nullptr);
+
+	return true;
+}
+
+bool flt::RendererVulkan::CreateVertexBuffer(const std::vector<RawVertex>& vertices)
+{
 	VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
 	VkBuffer stagingBuffer{};
@@ -1188,6 +1573,45 @@ bool flt::RendererVulkan::CreateVertexBuffer()
 }
 
 bool flt::RendererVulkan::CreateIndexBuffer()
+{
+	VkDeviceSize bufferSize = sizeof(g_indices[0]) * g_indices.size();
+
+	VkBuffer stagingBuffer{};
+	VkDeviceMemory stagingBufferMemory{};
+	bool result = CreateBuffer(bufferSize
+		, VK_BUFFER_USAGE_TRANSFER_SRC_BIT
+		, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+		, stagingBuffer
+		, stagingBufferMemory, VK_SHARING_MODE_EXCLUSIVE);
+	if (!result)
+	{
+		return false;
+	}
+
+	void* data;
+	vkMapMemory(_device, stagingBufferMemory, 0, bufferSize, 0, &data);
+	memcpy(data, g_indices.data(), (size_t)bufferSize);
+	vkUnmapMemory(_device, stagingBufferMemory);
+
+	result = CreateBuffer(bufferSize
+		, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT
+		, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+		, _indexBuffer
+		, _indexBufferMemory, VK_SHARING_MODE_EXCLUSIVE);
+	if (!result)
+	{
+		return false;
+	}
+
+	CopyBuffer(stagingBuffer, _indexBuffer, bufferSize);
+
+	vkDestroyBuffer(_device, stagingBuffer, nullptr);
+	vkFreeMemory(_device, stagingBufferMemory, nullptr);
+
+	return true;
+}
+
+bool flt::RendererVulkan::CreateIndexBuffer(const std::vector<int>& indices)
 {
 	VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 
@@ -1507,7 +1931,7 @@ bool flt::RendererVulkan::RecordCommandBuffer(VkCommandBuffer commandBuffer, uin
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 0, 1, &_descriptorSets[_currentFrame], 0, nullptr);
 
 	//vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
-	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(g_indices.size()), 1, 0, 0, 0);
 
 	vkCmdEndRenderPass(commandBuffer);
 
@@ -1709,7 +2133,7 @@ SwapChainSupportDetails flt::RendererVulkan::QuerySwapChainSupport(VkPhysicalDev
 	uint32_t formatCount;
 	vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, nullptr);
 
-	if (formatCount != 0) 
+	if (formatCount != 0)
 	{
 		details.formats.resize(formatCount);
 		vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, details.formats.data());
@@ -1718,7 +2142,7 @@ SwapChainSupportDetails flt::RendererVulkan::QuerySwapChainSupport(VkPhysicalDev
 	uint32_t presentModeCount;
 	vkGetPhysicalDeviceSurfacePresentModesKHR(device, _surface, &presentModeCount, nullptr);
 
-	if (presentModeCount != 0) 
+	if (presentModeCount != 0)
 	{
 		details.presentModes.resize(presentModeCount);
 		vkGetPhysicalDeviceSurfacePresentModesKHR(device, _surface, &presentModeCount, details.presentModes.data());
@@ -1886,6 +2310,10 @@ VkShaderModule flt::RendererVulkan::CreateShaderModule(const std::vector<char>& 
 
 bool flt::RendererVulkan::CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory, VkSharingMode sharingMode)
 {
+	/// 추후 bufferMemory를 외부에서 받지 말고 메모리 풀을 만들어서 재사용해야함. vkAllocateMemory는 매우 비쌈.
+	/// vkGetBufferMemoryRequirements를 통해서 buffer의 메모리 요구사항을 알아낸 후 오프셋 정렬 필요.
+	/// 프레임마다 메모리 풀을 나눠서 사용할수도 있다고 함.
+	/// https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator 이 라이브러리에서 자동적으로 관리해준다고 함.
 	VkBufferCreateInfo bufferInfo{};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	bufferInfo.size = size;

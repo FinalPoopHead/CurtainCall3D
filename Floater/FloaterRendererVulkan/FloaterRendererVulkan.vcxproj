@@ -22,11 +22,17 @@
     <ClInclude Include="include\CreateRenderer.h" />
     <ClInclude Include="RendererVulkan.h" />
     <ClInclude Include="test.h" />
+    <ClInclude Include="VulkanMemoryAllocator.h" />
+    <ClInclude Include="VulkanNode.h" />
+    <ClInclude Include="VulkanRendererObject.h" />
     <ClInclude Include="VulkanVertex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CreateRenderer.cpp" />
     <ClCompile Include="RendererVulkan.cpp" />
+    <ClCompile Include="VulkanMemoryAllocator.cpp" />
+    <ClCompile Include="VulkanNode.cpp" />
+    <ClCompile Include="VulkanRendererObject.cpp" />
     <ClCompile Include="VulkanVertex.cpp" />
   </ItemGroup>
   <ItemGroup>

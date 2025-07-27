@@ -39,6 +39,9 @@ struct SwapChainSupportDetails
 
 namespace flt
 {
+	struct VulkanNode;
+	class Camera;
+
 	class RendererVulkan : public IRenderer
 	{
 	public:
@@ -55,9 +58,9 @@ namespace flt
 		virtual bool SetFullScreen(bool isFullScreen);
 		virtual bool Resize(uint32 width, uint32 height);
 
-	/// <summary>
-	/// 초기화에 사용하는 함수들
-	/// </summary>
+		/// <summary>
+		/// 초기화에 사용하는 함수들
+		/// </summary>
 	private:
 		/// Initialization functions
 
@@ -178,6 +181,7 @@ namespace flt
 		/// </summary>
 		/// <returns></returns>
 		bool CreateVertexBuffer();
+		bool CreateVertexBuffer(const std::vector<RawVertex>& vertices);
 
 		/// <summary>
 		/// 인덱스 버퍼를 생성합니다.
@@ -186,6 +190,7 @@ namespace flt
 		/// </summary>
 		/// <returns></returns>
 		bool CreateIndexBuffer();
+		bool CreateIndexBuffer(const std::vector<int>& indices);
 
 		/// <summary>
 		/// 유니폼 버퍼를 생성합니다.
@@ -220,9 +225,9 @@ namespace flt
 		/// <returns></returns>
 		bool CreateSyncObjects();
 
-	/// <summary>
-	/// 내부에서 사용하는 헬퍼 함수들
-	/// </summary>
+		/// <summary>
+		/// 내부에서 사용하는 헬퍼 함수들
+		/// </summary>
 	private:
 		void CleanupSwapChain();
 		void RecreateSwapChain();
@@ -327,5 +332,9 @@ namespace flt
 		bool _framebufferResized;
 		bool _isMinimized;
 		uint32_t _currentFrame;
+
+	private:
+		std::vector<VulkanNode*> _nodes; // 렌더링할 노드들의 부모
+		std::vector<Camera*> _cameras; // 렌더링할 카메라들
 	};
 }

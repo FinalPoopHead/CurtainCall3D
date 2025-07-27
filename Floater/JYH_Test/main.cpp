@@ -29,6 +29,8 @@
 ///벌컨 테스트용 헤더
 #include "../FloaterPlatform/include/Platform.h"
 #include "../FloaterRendererVulkan/include/CreateRenderer.h"
+#include "../FloaterRendererCommon/include/ModelLoader.h"
+#include "../FloaterRendererCommon/include/Camera.h"
 
 //void Func(flt::info info);
 
@@ -206,12 +208,48 @@ int main(int argc, char* argv[])
 	bool ret = platform.Initialize(1280, 720, L"Test", L"");
 	platform.SetWindowSize(1280, 720, flt::WindowMode::WINDOWED, -1);
 
+	flt::ModelLoader modelLoader;
+	flt::RawScene rawScene;
+	modelLoader.Load(L"..\\Resources\\Models\\Sphere.fbx", &rawScene);
+
+	bool isDraw = true;
+	flt::RendererObject rendererObject(isDraw);
+	rendererObject.SetRawNode(*rawScene.nodes.begin());
+	rendererObject.SetMaterial(0, L"..\\Resources\\Textures\\rustediron1-alt2-Unreal-Engine\\rustediron2_basecolor.png", flt::RawMaterial::TextureType::ALBEDO_OPACITY);
+	rendererObject.SetMaterial(0, L"..\\Resources\\Textures\\rustediron1-alt2-Unreal-Engine\\rustediron2_metallic.png", flt::RawMaterial::TextureType::METALLIC);
+	rendererObject.SetMaterial(0, L"..\\Resources\\Textures\\rustediron1-alt2-Unreal-Engine\\rustediron2_normal.png", flt::RawMaterial::TextureType::NORMAL);
+	rendererObject.SetMaterial(0, L"..\\Resources\\Textures\\rustediron1-alt2-Unreal-Engine\\rustediron2_roughness.png", flt::RawMaterial::TextureType::ROUGHNESS);
+
+	flt::Transform transform;
+	transform.SetPosition({ 0.0f, 0.0f, 0.0f });
+
+	rendererObject.transform = &transform;
+
+	bool isCameraDraw = false;
+	flt::RendererObject camera(isCameraDraw);
+	flt::Transform cameraTransform;
+	cameraTransform.SetPosition({ 0.0f, 0.0f, -5.0f });
+	camera.transform = &cameraTransform;
+
+	flt::Camera cameraComponent(&cameraTransform);
+	camera.camera = &cameraComponent;
+
+
+
+
 	platform.ShowCursor(true);
 	flt::IRenderer* renderer = platform.CreateRenderer(flt::RendererType::VULKAN);
+	//flt::IRenderer* renderer = platform.CreateRenderer(flt::RendererType::ROCKET_DX11);
+	
+	renderer->RegisterObject(rendererObject);
+	renderer->RegisterObject(camera);
 
 	while (platform.Update(0.16f))
 	{
 		renderer->Render(0.16f);
+		Sleep(16); // 60 FPS
+
+		transform.AddRotation({ 0.0f, 1.0f, 0.0f }, 0.01f);
 	}
 
 	platform.DestroyRenderer(renderer);
